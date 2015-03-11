@@ -29,7 +29,7 @@ The repo interface is defined [here](../).
 ├── keys/           <--- cryptographic keys
 │   ├── id.pri      <--- identity private key
 │   └── id.pub      <--- identity public key
-├── leveldb/        <--- leveldb datastore
+├── datastore/      <--- datastore
 ├── logs/           <--- 1 or more files (log rotate)
 │   └── events.log  <--- can be tailed
 ├── repo.lock       <--- mutex for repo
@@ -55,11 +55,20 @@ Notes:
 
 ### blocks/
 
-The `blocks/` directory contains the raw data representing all IPFS objects
-stored locally, whether pinned or cached. Each object is stored in its own
-file. The filename is the hash of the object. The files are nested in
-directories whose names are prefixes of the hash, as in `.git/objects`.
+The `block/` component contains the raw data representing all IPFS objects
+stored locally, whether pinned or cached. This component is controlled by the `
+datastore`. For example, it may be stored within a leveldb instance in `
+datastore/`, or it may be stored entirely with independent files, like git.
 
+In the default case, the user uses fs-datastore for all `/blocks` so the
+objects are stored in individual files. In other cases, `/blocks` may even be
+stored remotely.
+
+#### blocks/ with an fs-datastore
+
+Each object is stored in its own file. The filename is the hash of the object.
+The files are nested in directories whose names are prefixes of the hash, as
+in `.git/objects`.
 
 For example:
 ```sh
@@ -109,15 +118,14 @@ they are. The only specially-named key is `id.{pub, sec}`
 <key>.sym is a symmetric secret key
 ```
 
-### leveldb/
+### datastore/
 
-The `leveldb` directory contains the data for a leveldb instance used to store
-operation data for the IPFS node. If the user uses a `boltdb` datastore
+The `datastore` directory contains the data for a leveldb instance used to
+store operation data for the IPFS node. If the user uses a `boltdb` datastore
 instead, the directory will be named `boltdb`. Thus the data files of each
 database will not clash.
 
-TODO: consider whether all should just be named `datastore/` --
-I made this change just now and not sure its a good idea.
+TODO: consider whether all should just be named `leveldb/`
 
 ### logs/
 
@@ -151,6 +159,11 @@ fs-repo: 1
 
 _Any_ fs-repo implementation of _any_ versions MUST be able to read the
 `version` file. It MUST NOT change between versions.
+
+## Datastore
+
+Both the `/blocks` and `/datastore` directories are controlled by the
+`datastore` component of the repo.
 
 ## Notes
 
