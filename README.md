@@ -67,8 +67,8 @@ Other protocols:
 - relay - the relay protocol
 
 Formats:
-- [multihash](https://github.com/jbenet/go-multihash) - self-describing hash digest format
-- [multiaddr](https://github.com/jbenet/go-multiaddr) - self-describing addressing format
+- [multihash](https://github.com/jbenet/multihash) - self-describing hash digest format
+- [multiaddr](https://github.com/jbenet/multiaddr) - self-describing addressing format
 
 
 ## Collaborating
