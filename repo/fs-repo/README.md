@@ -62,31 +62,9 @@ datastore/`, or it may be stored entirely with independent files, like git.
 
 In the default case, the user uses fs-datastore for all `/blocks` so the
 objects are stored in individual files. In other cases, `/blocks` may even be
-stored remotely.
+stored remotely
 
-#### blocks/ with an fs-datastore
-
-Each object is stored in its own file. The filename is the hash of the object.
-The files are nested in directories whose names are prefixes of the hash, as
-in `.git/objects`.
-
-For example:
-```sh
-# multihashes
-1220fe389b55ea958590769f9046b0f7268bca90a92e4a9f45cbb30930f4bf89269d # sha2
-1114f623e0ec7f8719fb14a18838d2a3ef4e550b5e53 # sha1
-
-# locations of the blocks
-.ipfs/blocks/1114/f6/23/e0ec7f8719fb14a18838d2a3ef4e550b5e53
-.ipfs/blocks/1220/fe/38/9b55ea958590769f9046b0f7268bca90a92e4a9f45cbb30930f4bf89269d
-```
-
-**Important Notes:**
-- the hashes are encoded in hex, not the usual base58, because some
-  filesystems are case insensitive.
-- the multihash prefix is two bytes, which would waste two directory levels,
-  thus these are combined into one.
-- the git `idx` and `pack` file could be used to coalesce objects
+- [blocks/ with an fs-datastore](#blocks-with-an-fs-datastore)
 
 ### config
 
@@ -181,6 +159,33 @@ Users can tell IPFS programs to look elsewhere with the env var:
 ```
 IPFS_PATH=/path/to/repo
 ```
+
+### blocks/ with an fs-datastore
+
+![](fs-datastore.png)
+
+Each object is stored in its own file. The filename is the hash of the object.
+The files are nested in directories whose names are prefixes of the hash, as
+in `.git/objects`.
+
+For example:
+```sh
+# multihashes
+1220fe389b55ea958590769f9046b0f7268bca90a92e4a9f45cbb30930f4bf89269d # sha2
+1114f623e0ec7f8719fb14a18838d2a3ef4e550b5e53 # sha1
+
+# locations of the blocks
+.ipfs/blocks/1114/f6/23/e0ec7f8719fb14a18838d2a3ef4e550b5e53
+.ipfs/blocks/1220/fe/38/9b55ea958590769f9046b0f7268bca90a92e4a9f45cbb30930f4bf89269d
+```
+
+**Important Notes:**
+- the hashes are encoded in hex, not the usual base58, because some
+  filesystems are case insensitive.
+- the multihash prefix is two bytes, which would waste two directory levels,
+  thus these are combined into one.
+- the git `idx` and `pack` file could be used to coalesce objects
+
 
 ### Reading without the `repo.lock`
 
