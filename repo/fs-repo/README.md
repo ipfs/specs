@@ -1,4 +1,8 @@
 # IPFS fs-repo version 1 Spec
+Author[s]: [Juan Benet](github.com/jbenet)
+
+Reviewer[s]:
+* * *
 
 The [Spec](../../) for the fs-repo IPFS repository.
 

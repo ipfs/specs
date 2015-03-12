@@ -3,6 +3,8 @@ Author[s]: [whyrusleeping](github.com/whyrusleeping)
 
 Reviewer[s]: 
 
+* * *
+
 Note: This spec is currently in the `wip` phase, things are likely to change very quickly.
 
 ## Goals:

@@ -1,4 +1,9 @@
 # IPFS Repo Spec
+Author[s]: [Juan Benet](github.com/jbenet)
+
+Reviewer[s]:
+
+* * *
 
 The [Spec](../) for IPFS node repositories.
 
