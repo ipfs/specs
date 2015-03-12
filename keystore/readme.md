@@ -74,6 +74,8 @@ DESCRIPTION:
 
 Similar to ssh's `ssh-keygen` with the `-t` option and interactive prompts.
 
+* * *
+
 ##### Key Send
 ```
 
@@ -99,6 +101,8 @@ DESCRIPTION:
 
 Ensure that the user knows the implications of sending a key
 
+* * *
+
 ##### Key Encrypt
 ```
 
@@ -120,6 +124,12 @@ DESCRIPTION:
 
 ```
 
+##### Comments:
+
+This should probably just operate on raw data and not on DAGs.
+
+* * *
+
 ##### Other Interface Changes
 
 We will also need to make additions to support keys in other commands, these changes are as follows:
@@ -133,6 +143,7 @@ We will also need to make additions to support keys in other commands, these cha
     - Support for a `-encrypt-key` option, for encrypting the block before hashing and storing
 	
 ### Code Changes/Additions
+An outline of which packages or submodules will be affected.
 
 #### Repo
 
@@ -154,5 +165,11 @@ We will also need to make additions to support keys in other commands, these cha
 		link to the hash of the encrypted node
 
 #### New 'Encrypt' package
-????
+
+Should contain code for crypto operations on dags.
+
+#### New 'Keystore' package
+
+Should contain a `KeyStore` object with methods for storing and retrieving keys.
+
 
