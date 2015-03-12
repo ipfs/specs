@@ -173,3 +173,38 @@ Should contain code for crypto operations on dags.
 Should contain a `KeyStore` object with methods for storing and retrieving keys.
 
 
+### Structures
+Some tenative mockups (in json) of the new DAG structures for signing and encrypting
+
+Signed DAG:
+```
+{
+	"Links" : [
+		{
+			"Name":"@content",
+			"Hash":"QmTheContent",
+		}
+	],
+	"Data": protobuf{
+		"Type":"Signed DAG",
+		"Signature": "thesignature",
+		"PubKeyID": "QmPubKeyHash",
+	}
+}
+```
+
+Encrypted DAG:
+```
+{
+	"Links" : [
+		{
+			"Name":"@content",
+			"Hash":"QmRawEncryptedDag",
+		}
+	],
+	"Data": protobuf{
+		"Type":"Encrypted DAG",
+		"PubKeyID": "QmPubKeyHash",
+	}
+}
+```
