@@ -90,7 +90,8 @@ DESCRIPTION:
     'ipfs key send' is a command used to share keypairs with other trusted users.
 
 	It will first look up the peer specified and print out their information and 
-	prompt the user "are you sure? [y/n]" before sending the keypair.
+	prompt the user "are you sure? [y/n]" before sending the keypair. The target
+	peer must be online and dialable in order for the key to be sent.
 
 	Note: while it is still managed through the keystore, ipfs will prevent you from
 			sharing your nodes private key with anyone else.
@@ -99,7 +100,7 @@ DESCRIPTION:
 
 ##### Comments:
 
-Ensure that the user knows the implications of sending a key
+Ensure that the user knows the implications of sending a key. 
 
 * * *
 
