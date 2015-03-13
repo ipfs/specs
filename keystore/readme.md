@@ -149,6 +149,9 @@ We will also need to make additions to support keys in other commands, these cha
 
 - `ipfs object put`
     - Support for a `-encrypt-key` option, for encrypting the object before hashing and storing
+
+- `ipfs name publish`
+	- Support for a `-key` option to select which keyspace to publish to
 	
 ### Code Changes/Additions
 An outline of which packages or submodules will be affected.
