@@ -78,8 +78,9 @@ sha3
 ## The Stack
 
 IPFS has a stack of modular protocols. Each layer may have multiple
-implementations. This spec will only address the interfaces between the
-layers, and mention possible implementations. Details are left to other specs.
+implementations, all in different modules. This spec will only address the
+interfaces between the layers, and briefly mention possible implementations.
+Details are left to the other specs.
 
 IPFS has five layers:
 
@@ -169,6 +170,22 @@ on top of the merkledag, such as:
 
 See more in the merkledag spec (TODO).
 
+### Merkledag Paths
+
+The merkledag is enough to resolve paths:
+
+```
+/ipfs/QmdpMvUptHuGysVn6mj69K53EhitFd2LzeHCmHrHasHjVX/test/foo
+```
+
+- (a) Would first fetch + resolve `QmdpMvUptHuGysVn6mj69K53EhitFd2LzeHCmHrHasHjVX`
+- (b) Then look into the links of (a), find the hash for `test`, and resolve it
+- (c) Then look into the links of (b), find the hash for `foo`, and resolve it
+
+See more in the path resolution spec (TODO).
+
+![](../media/ipfs-resolve/ipfs-resolve.gif)
+
 ### Naming -- PKI namespace and mutable pointers
 
 IPFS is mostly concerned with content-addressed data, which by nature
@@ -190,7 +207,9 @@ any centralization whatsoever, or certificate authorities.
 
 See more in the namin spec (TODO).
 
-### Applications and Datastructures -- on top of IPFS
+
+
+## Applications and Datastructures -- on top of IPFS
 
 The stack described so far is enough to represent arbitrary datastructures
 and replicate them accross the internet. It is also enough to build and
@@ -201,6 +220,42 @@ Users can create arbitrary datastructures that extend the merkledag and deploy
 them to the rest of the world using any of the tools that understand IPFS.
 
 See more in the datastructures and applications specs (TODO).
+
+
+### unixfs -- representing traditional files
+
+The unix filesystem abstractions -- files and directories -- are the main way
+people conceive of files in the internet. In IPFS, `unixfs` is a datastructure
+that represents unix files on top of IPFS. We need a separate datastructure
+to carry over information like:
+
+- whether the object represents a file or directory.
+- total sizes, minus indexing overhead
+
+See more in the unixfs spec (TODO).
+
+
+## Lifetime of fetching an object.
+
+Suppose we ask an IPFS node to retrieve
+
+```
+/ipfs/QmdpMvUptHuGysVn6mj69K53EhitFd2LzeHCmHrHasHjVX/test/foo
+```
+
+The IPFS node first splits the path into components (discarding the `ipfs` prefix):
+
+```
+[ "QmdpMvUptHuGysVn6mj69K53EhitFd2LzeHCmHrHasHjVX", "test", "foo" ]
+```
+
+Then, the IPFS node resolves the components.
+The first component in an `/ipfs/...` path is always a multihash.
+The rest are names of links, to be resolved into multihashes.
+
+
+
+
 
 ## IPFS User Interfaces
 
