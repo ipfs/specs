@@ -26,7 +26,7 @@ are hashes. This gives all objects in IPFS useful properties:
 - universal: any datastructure can be represented as a merkledag
 - decentralized: objects can be created by anyone, without centralized writers
 
-These yield many useful properties for the system as a whole:
+In turn, these yield properties for the system as a whole:
 
 - links are content addressed
 - objects can be served by untrusted agents
@@ -36,9 +36,9 @@ These yield many useful properties for the system as a whole:
 - any datastructure can be modelled and distributed
 - (todo: list more)
 
-IPFS is a stack of network protocols that organize agent networks
-that create, publish, distribute, serve, and download merkledags.
-It is the authenticated, decentralized, permanent web.
+IPFS is a stack of network protocols that organize agent networks to create,
+publish, distribute, serve, and download merkledags. It is the authenticated,
+decentralized, permanent web.
 
 
 ## Nodes and Network Model
@@ -83,17 +83,19 @@ layers, and mention possible implementations. Details are left to other specs.
 
 IPFS has five layers:
 
-- naming - a self-certifying PKI namespace (IPNS)
-- merkledag - datastructure format (thin waist)
-- exchange - block transport and replication
-- routing - locating peers and objects
-- network - establishing connections between peers
+- **naming** - a self-certifying PKI namespace (IPNS)
+- **merkledag** - datastructure format (thin waist)
+- **exchange** - block transport and replication
+- **routing** - locating peers and objects
+- **network** - establishing connections between peers
+
+![](stack.png)
 
 These are briefly described bottom-up.
 
-## network
+### Network -- connecting to peers
 
-The network provides point-to-point transports (reliable and unreliable)
+The **network** provides point-to-point transports (reliable and unreliable)
 between any two IPFS nodes in the network. It handles:
 - NAT traversal - hole punching, port mapping, and relay
 - supports multiple transports - TCP, SCTP, UTP, ...
@@ -101,3 +103,115 @@ between any two IPFS nodes in the network. It handles:
 - multi-multiplexes -multiplexes connections, streams, protocols, peers, ...
 
 See more in the [network spec](network).
+
+### Routing -- finding peers and data
+
+The IPFS **Routing** layer serves two important purposes:
+- **peer routing** -- to find other nodes
+- **content routing** -- to find data published to ipfs
+
+The Routing Sytem is an interface that is satisfied by various kinds
+of implementations. For example:
+
+- **DHTs:** perhaps the most common, DHTs can be used to create a semi-
+  persistent routing record distributed cache in the network.
+- **mdns:** used to find services advertised locally. `mdns` (or `dnssd`)
+  is a local discovery service. We will be using it.
+- **snr:** supernode routing is a delegated routing system: it delegates
+  to one of a set of supernodes. This is roughly like federated routing.
+- **dns:** ipfs routing could even happen over dns.
+
+See more in the routing spec (TODO).
+
+### Block Exchange -- transfering content-addressed data
+
+The IPFS **Block Exchange** takes care of negotiating bulk data transfers.
+Once nodes know each other -- and are connected -- the exchange protocols
+govern how the transfer of content-addressed blocks occurrs.
+
+The Block Exhcnage is an interface that is satisfied by various kinds
+of implementations. For example:
+
+- **Bitswap:** our main protocol for exchanging data. It is a generalization
+  of BitTorrent to work with arbitrary (and not known apriori) DAGs.
+- **HTTP:** a simple exchange can be implemented with HTTP clients and servers.
+
+### Merkledag -- making sense of data
+
+[As discussed above](#IPFS-and-the-Merkle-DAG), the IPFS **merkledag** is the
+datastructure at the heart of IPFS. It is an
+[acyclic directed graph](http://en.wikipedia.org/wiki/Directed_acyclic_graph)
+whose edges are hashes. Another name for it is the merkleweb.
+
+The merkledag data structure is:
+
+```protobuf
+message MDagLink {
+  bytes Hash = 1;    // multihash of the target object
+  string Name = 2;   // utf string name. should be unique per object
+  uint64 Tsize = 3;  // cumulative size of target object
+}
+
+message MDagNode {
+  MDagLink Links = 2;  // refs to other objects
+  bytes Data = 1;      // opaque user data
+}
+```
+
+The merkledag is the "thin waist" of authenticated datastructures.
+It is a minimal set of information needed to represent + transfer arbitrary
+authenticated datastructures. More complex datastructures are implemented
+on top of the merkledag, such as:
+
+- **git** and other version control systems
+- **bitcoin** and other blockchains
+- **unixfs**, a content-addressed unix filesystem
+
+See more in the merkledag spec (TODO).
+
+### Naming -- PKI namespace and mutable pointers
+
+IPFS is mostly concerned with content-addressed data, which by nature
+is immutable: changing an object would change its hash -- and thus its
+address, making it a _different_ object altogether. (Think of it as a
+copy-on-write filesystem).
+
+The IPFS **naming** layer -- or IPNS -- handles the creation of:
+- mutable pointers to objects
+- human-readable names
+
+IPNS is based on
+[SFS](http://en.wikipedia.org/wiki/Self-certifying_File_System). It is a
+PKI namespace -- a name is simply the hash of a public key. Whoever
+controls the private key controls the name. Records are signed by the private
+key and distributed anywhere (in IPFS, via the routing system). This is an
+egalitarian way to assign mutable names in the internet at large, without
+any centralization whatsoever, or certificate authorities.
+
+See more in the namin spec (TODO).
+
+### Applications and Datastructures -- on top of IPFS
+
+The stack described so far is enough to represent arbitrary datastructures
+and replicate them accross the internet. It is also enough to build and
+deploy decentralized websites.
+
+Applications and datastructures on top of IPFS are represented as merkledags.
+Users can create arbitrary datastructures that extend the merkledag and deploy
+them to the rest of the world using any of the tools that understand IPFS.
+
+See more in the datastructures and applications specs (TODO).
+
+## IPFS User Interfaces
+
+IPFS is not just a protocol. It is also a toolset. IPFS implementations
+include various tools for working with the merkledag, how to publish
+something, how to name something, etc. These interfaces may be critical to the
+survival of an implementation, or the project as a whole. These interfaces
+govern how people use IPFS, thus careful attention must be given to their
+design and implementation. Examples:
+
+- The [IPFS api](http://ipfs.io/docs/api) - an HTTP service
+- The [IPFS cli](http://ipfs.io/docs/commands/) - a unix cli
+- The IPFS libs - implementations in various languages
+- The IPFS gateways - nodes in the internet that serve HTTP over IPFS
