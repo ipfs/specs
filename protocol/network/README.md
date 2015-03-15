@@ -182,12 +182,14 @@ This type system represents the interface exposed to clients. Actual implementat
 ```go
 type PrivateKey interface {
   PublicKey() PublicKey
+
   Sign(data []byte) Signature
   Decrypt(ciphertext []byte) (plaintext []byte)
 }
 
 type PublicKey interface {
   PeerID() PeerID
+
   Verify(Signature) (ok bool)
   Encrypt(plaintext []byte) (ciphertext []byte)
 }
@@ -205,21 +207,112 @@ type Node interface {
   // NewStream creates a new stream to given peerID.
   // It may have to establish a new connection to given peer.
   // (This includes finding the addresses of a peer, and NAT Traversal.)
-  NewStream(Protocol, PeerID)
+  NewStream(Protocol, PeerID) (Stream, error)
 
-  // SetHandler sets a callback for remote-opened streams for a protocol
+  // SetStreamHandler sets a callback for remote-opened streams for a protocol
   // Thus clients register "protocol handlers", much like URL route handlers
-  SetHandler(Protocol, StreamHandler)
+  SetStreamHandler(Protocol, StreamHandler)
+
+  // Raw connections are not exported to the user, only streams.
 }
+
+type StreamHandler func (Stream)
 ```
 
-~~~ WIP STACK DUMP ~~~
-- look at go-ipfs network to match types.
-- stream model
-- stream/conn/swarm muxing
-- ports as constrained entrypoints
-- userland transport
-- exotic transports
-- multicast / pubsub
-- non IP networks (NDN, XIA)
-~~~ WIP STACK DUMP ~~~
+TODO: incorporate unreliable message / packet streams.
+
+#### Communication Model - Streams
+
+The Network layer handles all the problems of connecting to a peer, and exposes
+simple bidirectional streams. Users can both open a new stream
+(`NewStream()`) and register a stream handler (`SetStreamHandler`). The user
+is then free to implement whatever wire messaging protocol she desires. This
+makes it easy to build peer-to-peer protocols, as the complexities of
+connectivity, multi-transport support, flow control, and so on, are handled.
+
+To help capture the model, consider that:
+
+- `NewStream` is similar to making a Request in an HTTP client.
+- `SetStreamHandler` is similar to registering a URL handler in an HTTP server
+
+So a protocol, such as a DHT, could:
+
+```go
+node := p2p.NewNode(peerid)
+
+// register a handler, here it is simply echoing everything.
+node.SetStreamHandler("/helloworld", func (s Stream) {
+  io.Copy(s, s)
+})
+
+// make a request.
+buf1 := []byte("Hello World!")
+buf2 := make([]byte, len(buf1))
+
+stream, _ := node.NewStream("/helloworld", peerid) // open a new stream
+stream.Write(buf1)  // write to the remote
+stream.Read(buf2)   // read what was sent back
+fmt.Println(buf2)   // print what was sent back
+```
+
+### Ports - Constrained Entrypoints
+
+In the internet of 2015, we have a processing model where a program may be
+running without the ability to open multiple -- or even single -- network
+ports. Most hosts are behind NAT, whether of household ISP variety or new
+containerized data-center type. And some programs may even be running in
+browsers, with no ability to open sockets directly (sort of). This presents
+challenges to completely peer-to-peer networks who aspire to connect _any_
+hosts together -- whether they're running on a page in the browser, or in
+a container within a container.
+
+IPFS only needs a single channel of communication with the rest of the
+network. This may be a single TCP or UDP port, or a single connection
+through Websockets or WebRTC. In a sense, the role of the TCP/UDP network
+stack -- i.e. multiplexing applications and connections -- may now be forced
+to happen at the application level.
+
+### Transport Protocols
+
+IPFS is transport agnostic. It can run on any transport protocol. The
+`ipfs-addr` format (which is an ipfs-specific
+[multiaddr](https://github.com/jbenet/multiaddr)) describes the transport.
+For example:
+
+```sh
+# ipv4 + tcp
+/ip4/10.1.10.10/tcp/29087/ipfs/QmVcSqVEsvm5RR9mBLjwpb2XjFVn5bPdPL69mL8PH45pPC
+
+# ipv6 + tcp
+/ip6/2601:9:4f82:5fff:aefd:ecff:fe0b:7cfe/tcp/1031/ipfs/QmRzjtZsTqL1bMdoJDwsC6ZnDX1PW1vTiav1xewHYAPJNT
+
+# ipv4 + udp + udt
+/ip4/104.131.131.82/udp/4001/udt/ipfs/QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ
+
+# ipv4 + udp + utp
+/ip4/104.131.67.168/udp/1038/utp/ipfs/QmU184wLPg7afQjBjwUUFkeJ98Fp81GhHGurWvMqwvWEQN
+```
+
+IPFS delegtes the transport dialing to a multiaddr-based network pkg, such
+as [go-multiaddr-net](https://github.com/jbenet/go-multiaddr-net). It is
+advisable to build modules like this in other languages, and scope the
+implementation of other transport protocols.
+
+Some of the transport protocols we will be using:
+
+- UTP
+- UDT
+- SCTP
+- WebRTC (SCTP, etc)
+- Websockets
+- TCP Remy
+
+### Non-IP Networks
+
+Efforts like [NDN](http://named-data.net) and
+[XIA](http://www.cs.cmu.edu/~xia/) are new architectures for the internet,
+which are closer to the model IPFS uses than what IP provides today. IPFS
+will be able to operate on top of these architectures trivially, as there
+is no assumptions made about the network stack in the protocol. Implementations
+will likley need to change, but changing implementations is vastly easier than
+changing protocols.

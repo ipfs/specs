@@ -1,8 +1,8 @@
 # IPFS Protocol Spec
 
-Author[s]: [Juan Benet](http://github.com/jbenet)
+Authors: [@jbenet](http://github.com/jbenet)
 
-Reviewer[s]:
+Reviewers:
 
 * * *
 
