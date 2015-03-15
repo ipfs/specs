@@ -215,3 +215,12 @@ design and implementation. Examples:
 - The [IPFS cli](http://ipfs.io/docs/commands/) - a unix cli
 - The IPFS libs - implementations in various languages
 - The IPFS gateways - nodes in the internet that serve HTTP over IPFS
+
+## ~~WIP~~
+
+WIP Stack Dump:
+- How the layers fit together
+- How they call on each other
+- Mention all the ports
+- Mention all the interfaces with the user
+- Mnetion gateways
