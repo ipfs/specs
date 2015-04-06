@@ -39,6 +39,7 @@ SUBCOMMANDS:
     ipfs key info <key>           - Get information about a given key
 	ipfs key rm	<key>             - Delete a given key from your keystore
 	ipfs key rename <key> <name>  - Renames a given key
+	ipfs key show <key>			  - Print out a given key
 
 	ipfs key send <key> <peer>    - Shares a specified private key with the given peer
 
@@ -214,6 +215,10 @@ does not linger in memory.
 
 Should contain code for crypto operations on dags.
 
+Encryption of dags should work by first generating a symmetric key, and using 
+that key to encrypt all the data. That key should then be encrypted with the 
+public key chosen and stored in the Encrypted DAG structure.
+
 Note: One option is to simply add it to the key interface.
 
 ### Structures
@@ -248,6 +253,9 @@ Encrypted DAG:
 	"Data": protobuf{
 		"Type":"Encrypted DAG",
 		"PubKeyID": "QmPubKeyHash",
+		"Key": "ephemeral symmetric key, encrypted with public key",
 	}
 }
 ```
+
+
