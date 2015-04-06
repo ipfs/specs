@@ -25,7 +25,8 @@ in the directory should be readonly, by the owner `400`.
 
 ### Interface
 Several additions and modifications will need to be made to the ipfs toolchain to
-accomodate the changes. First, the creation of an `ipfs key` subcommand:
+accomodate the changes. First, the creation of two subcommands `ipfs key` and
+`ipfs crypt`:
 
 ```
 
@@ -39,11 +40,6 @@ SUBCOMMANDS:
 	ipfs key rm	<key>             - Delete a given key from your keystore
 	ipfs key rename <key> <name>  - Renames a given key
 
-    ipfs key sign <data>          - Generates a signature for the given data with a specified key
-    ipfs key verify <data> <sig>  - Verify that the given data and signature match
-    ipfs key encrypt <data>       - Encrypt the given data
-    ipfs key decrypt <data>       - Decrypt the given data
-
 	ipfs key send <key> <peer>    - Shares a specified private key with the given peer
 
     Use 'ipfs key <subcmd> --help' for more information about each command.
@@ -52,6 +48,23 @@ DESCRIPTION:
 
     'ipfs key' is a command used to manage ipfs keypairs.
 
+```
+
+```
+
+	ipfs crypt - Perform cryptographic operations using ipfs keypairs
+
+SUBCOMMANDS:
+
+    ipfs key sign <data>          - Generates a signature for the given data with a specified key
+    ipfs key verify <data> <sig>  - Verify that the given data and signature match
+    ipfs key encrypt <data>       - Encrypt the given data
+    ipfs key decrypt <data>       - Decrypt the given data
+
+DESCRIPTION:
+
+	`ipfs crypt` is a command used to perform various cryptographic operations
+	using ipfs keypairs, including: signing, verifying, encrypting and decrypting.
 ```
 
 #### Some subcommands:
@@ -108,10 +121,10 @@ Ensure that the user knows the implications of sending a key.
 
 * * *
 
-##### Key Encrypt
+##### Crypt Encrypt
 ```
 
-    ipfs key encrypt <data> - Encrypt the given data with a specified key
+    ipfs crypt encrypt <data> - Encrypt the given data with a specified key
 
 ARGUMENTS:
 
@@ -121,10 +134,12 @@ OPTIONS:
 
 	-k, -key		string		- The name of the key to use for encryption (default: localkey)
 	-o, -output		string		- The name of the output file (default: stdout)
+	-c, -cipher     string		- The cipher to use for the operation
+	-m, -mode		string		- The block cipher mode to use for the operation
 
 DESCRIPTION:
 
-    'ipfs key encrypt' is a command used to encypt data so that only holders of a certain
+    'ipfs crypt encrypt' is a command used to encypt data so that only holders of a certain
 	key can read it.
 
 ```
