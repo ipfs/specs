@@ -57,10 +57,10 @@ DESCRIPTION:
 
 SUBCOMMANDS:
 
-    ipfs key sign <data>          - Generates a signature for the given data with a specified key
-    ipfs key verify <data> <sig>  - Verify that the given data and signature match
-    ipfs key encrypt <data>       - Encrypt the given data
-    ipfs key decrypt <data>       - Decrypt the given data
+    ipfs crypt sign <data>          - Generates a signature for the given data with a specified key
+    ipfs crypt verify <data> <sig>  - Verify that the given data and signature match
+    ipfs crypt encrypt <data>       - Encrypt the given data
+    ipfs crypt decrypt <data>       - Decrypt the given data
 
 DESCRIPTION:
 
