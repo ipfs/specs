@@ -5,6 +5,7 @@ Reviewers:
 
 - [Kristoffer Strom](github.com/krl)
 - [Jeromy Johnson](github.com/whyrusleeping)
+- [W. Trevor King](github.com/wking)
 
 * * *
 
@@ -149,6 +150,12 @@ type Record struct {
 // Users provide their own Validator implementations.
 type Validator func(r *Record) (bool, error)
 
+// Order is a function that sorts two records based on validity.
+// This means that one record should be preferred over the other.
+// there must be a total order. if return is 0, then a == b.
+// Return value is -1, 0, 1.
+type Order func(a, b *Record) int
+
 // Marshal/Unmarshal specifies a way to code the record
 type Marshal(r *Record) ([]byte, error)
 type Unmarshal(r *Record, []byte) (error)
@@ -182,6 +189,23 @@ func Validator(r *Record) (bool, error) {
   }
 
   return true, nil
+}
+
+func Order(a, b *Record) int {
+  if a.Expires > b.Expires {
+    return 1
+  }
+  if a.Expires < b.Expires {
+    return -1
+  }
+
+  // only return 0 if records are the exact same record.
+  // otherwise, if the ordering doesn't matter (in this case
+  // because the expiry is the same) return one of them
+  // deterministically. Comparing the hashes takes care of this.
+  ra := a.Hash()
+  rb := b.Hash()
+  return bytes.Compare(ra, rb)
 }
 
 func Marshal(r *Record) ([]byte, error) {
