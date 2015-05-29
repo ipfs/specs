@@ -1,5 +1,7 @@
 # The Keychain
 
+## THIS WIP IS JUST A NOTES PLACEHOLDER ATM
+
 Authors: [Juan Benet](github.com/jbenet)
 
 Reviewers:
@@ -70,3 +72,8 @@ var ProofOfStorage = "proof-of-storage"
 var ProofOfRetrievability = "proof-of-retrievability"
 ```
 
+## diagrams
+
+![](https://www.evernote.com/l/AMZm3JN_2TJIL5frkmLYPf71oeA7qaOUiVEB/image.png)
+
+![](https://www.evernote.com/l/AMacVgdLVAhPc5EOuvFZKHOhhd9VNcUq9zAB/image.png)
