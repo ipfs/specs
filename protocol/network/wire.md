@@ -10,7 +10,7 @@ Reviewers:
 
 This [spec](../../) describes the IPFS protocol on the wire.
 
-As explained in the [network spec](./network), IPFS is [transport agnostic](./network/#Transport-Agnostic). We have the **hard constraint** of making IPFS work across _any_ duplex stream (an outgoing and an incoming stream pair, any arbitrary connection) and work on _any_ platform.
+As explained in the [network spec](./), IPFS is [transport agnostic](./#Transport-Agnostic). We have the **hard constraint** of making IPFS work across _any_ duplex stream (an outgoing and an incoming stream pair, any arbitrary connection) and work on _any_ platform.
 
 To make this work, IPFS has to solve a few problems:
 
@@ -102,4 +102,4 @@ For now, we use [protobuf](https://github.com/google/protobuf) for all protocol 
 
 ## Secure Communications
 
-The wire protocol is -- of course -- wrapped with encryption. We use cyphersuites similar to TLS. This is explained further in the [network spec](./network/#Encryption).
+The wire protocol is -- of course -- wrapped with encryption. We use cyphersuites similar to TLS. This is explained further in the [network spec](./#Encryption).
