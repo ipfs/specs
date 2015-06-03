@@ -10,16 +10,16 @@ Reviewers:
 
 This [spec](../../) describes the IPFS protocol on the wire.
 
-As explained in the [network spec](./), IPFS is [transport agnostic](./#Transport-Agnostic). We have the **hard constraint** of making IPFS work across _any_ duplex stream (an outgoing and an incoming stream pair, any arbitrary connection) and work on _any_ platform.
+As explained in the [network spec](./), IPFS is [transport agnostic](./#transport-agnostic). We have the **hard constraint** of making IPFS work across _any_ duplex stream (an outgoing and an incoming stream pair, any arbitrary connection) and work on _any_ platform.
 
 To make this work, IPFS has to solve a few problems:
 
-- [Protocol Multiplexing](#Protocol-Multiplexing) - running multiple protocols over the same stream
+- [Protocol Multiplexing](#protocol-multiplexing) - running multiple protocols over the same stream
   - [multistream](#multistream) - self-describing protocol streams
   - [multistream-select](#multistream-select) - a self-describing protocol selector
-  - [Stream Multiplexing](#Stream-Multiplexing) - running many independent streams over the same wire.
-- [Portable Encodings](#Portable-Encodings) - using portable serialization formats
-- [Secure Communications](#Secure-Communication) - using ciphersuites to establish security and privacy (like TLS).
+  - [Stream Multiplexing](#stream-multiplexing) - running many independent streams over the same wire.
+- [Portable Encodings](#portable-encodings) - using portable serialization formats
+- [Secure Communications](#secure-communication) - using ciphersuites to establish security and privacy (like TLS).
 
 ## Protocol-Multiplexing
 
@@ -27,7 +27,7 @@ Protocol Multiplexing means running multiple different protocols over the same s
 
 - [multistream](#multistream) - self-describing protocol streams
 - [multistream-select](#multistream-select) - a self-describing protocol selector
-- [Stream Multiplexing](#Stream-Multiplexing) - running many independent streams over the same wire.
+- [Stream Multiplexing](#stream-multiplexing) - running many independent streams over the same wire.
 
 ### multistream - self-describing protocol stream
 
@@ -102,4 +102,4 @@ For now, we use [protobuf](https://github.com/google/protobuf) for all protocol 
 
 ## Secure Communications
 
-The wire protocol is -- of course -- wrapped with encryption. We use cyphersuites similar to TLS. This is explained further in the [network spec](./#Encryption).
+The wire protocol is -- of course -- wrapped with encryption. We use cyphersuites similar to TLS. This is explained further in the [network spec](./#encryption).
