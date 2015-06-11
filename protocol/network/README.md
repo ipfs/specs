@@ -221,7 +221,34 @@ type StreamHandler func (Stream)
 
 TODO: incorporate unreliable message / packet streams.
 
-#### Communication Model - Streams
+### Protocol Interface
+
+The network protocol consists of:
+
+- Any secure, reliable, stream transport:
+  - a reliable transport protocol (TCP, QUIC, SCTP, UDT, UTP, ...)
+  - a secure PKI based transport protocol (SSH, TLS, ...)
+  - a stream transport (with flow control, etc) (HTTP2, SSH, QUIC)
+- Protocol stream framing, to multiplex services
+- Auxiliary protocols for connectivity:
+  - Identify - exchange node information
+  - NAT - NAT Traversal (ICE)
+  - Relay - for when NAT Traversal fails
+
+Both the transport and stream muxer are pluggable. Unless
+constraints dictate otherwise, implementations SHOULD implement TCP and HTTP/2
+for interoperability. These are the default
+
+- any reliable transport protocol
+- a secure channel encryption
+- a stream multiplexor with flow control (e.g. HTTP/2, SPDY, QUIC, SSH)
+- every stream protocol header
+
+(TODO: unreliable transport)
+
+## Properties
+
+### Communication Model - Streams
 
 The Network layer handles all the problems of connecting to a peer, and exposes
 simple bidirectional streams. Users can both open a new stream
