@@ -9,7 +9,7 @@ The motivation and base of the protocol can be found here:
 
 The multistream protocol does not cover:
 
-- participant discovery, selection of the transport used and connection establishmend
+- discovering participants, selecting transports, and establishing connections
 - managing the state of the connection
 
 multistream enables several types of streams to be used over one single stream, like an intelligent message broker that offers the ability to negotiate the protocol and version that is going to be used. To simplify, a visual representation can be:
@@ -27,7 +27,7 @@ multistream enables several types of streams to be used over one single stream, 
 └────────────────────────────────┘
 ```
 
-multistream doesn't cover stream multiplexing over the same connection, however, we can achieve this by levaring the functionality offered by SPDY or HTTP/2.
+multistream doesn't cover stream multiplexing over the same connection, however, we can achieve this by leveraging functionality offered by SPDY or HTTP/2.
 
 ```
 ┌─── ───┐┌─── ───┐┌ ┌─── ───┐┌─── ───┐┌┐
