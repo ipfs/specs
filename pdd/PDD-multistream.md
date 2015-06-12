@@ -67,8 +67,8 @@ Compliance test 1 (human readable format):
 ```
 # With a connection established between silent - broadcast
 < /multistream/1.0.0       # multistream header
-< /bird/3.2.1              # Protocol header
-< hey, how is it going?    # First protocol message
+  < /bird/3.2.1              # Protocol header
+    < hey, how is it going?    # First protocol message
 ```
 
 #### 2 - duplex-stream
@@ -82,14 +82,14 @@ Compliance test 2 (human readable format):
 ```
 # With a connection established between interactive - select
 < /multistream/1.0.0
-> /multistream/1.0.0
-> ls
-< ["/dogs/0.1.0","/cats/1.2.11"]
-> /mouse/1.1.0
-< na
-> /dogs/0.1.0
-< /dogs/0.1.0
-> hey
+  > /multistream/1.0.0
+  > ls
+    < ["/dogs/0.1.0","/cats/1.2.11"]
+  > /mouse/1.1.0
+    < na
+  > /dogs/0.1.0
+    < /dogs/0.1.0
+      > hey
 ```
 
 ## Wire out

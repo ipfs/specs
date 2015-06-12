@@ -24,6 +24,7 @@ The objectives for Protocol Driven Development are:
 # Process
 
 In order to achieve compliance, we have to follow four main steps:
+
 1 - Define the desired Protocol Spec that is going to be implemented
 2 - Design the compliance tests that prove that a certain implementation conforms with the spec
 3 - Once an implementation is done, capture the messages traded on the wire using that implementation, so that the behaviour of both participants can be replicated without the agent
