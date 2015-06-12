@@ -49,7 +49,21 @@ multistream doesn't cover stream multiplexing over the same connection, however,
 └────────────────────────────────────────────────┘
 ```
 
-Reference material and discussion:
+multistream messages have the following structure:
+
+```
+┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+ ┌───────────────┐┌───────┐│
+││varint with    ││message│
+ │ message length││       ││
+│└───────────────┘└───────┘
+ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+```
+
+However, for readability reasons, we will omit the `varint` part on the Compliance Spec.
+
+
+Other reference material and discussion:
 - https://github.com/ipfs/node-ipfs/issues/13#issuecomment-109802818
 
 ## Protocol Compliance Tests Spec
@@ -63,7 +77,7 @@ In a push-stream example (one-way stream), we have two agents:
 - 'broadcast' - where messages are emited 
 - 'silent' - listener to the messages emited by the broadcast counterparty
 
-Compliance test 1 (human readable format):
+Compliance test 1 (human readable format, without varint):
 ```
 # With a connection established between silent - broadcast
 < /multistream/1.0.0       # multistream header
