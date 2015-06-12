@@ -1,10 +1,56 @@
-# PDD for MultiStream (example/use case)
+# PDD for multistream (example/use case)
 
 ## Protocol
 
-Defined here:
+The motivation and base of the protocol can be found here:
+
 - https://github.com/ipfs/specs/blob/wire/protocol/network/wire.md#multistream---self-describing-protocol-stream
 - https://github.com/ipfs/specs/blob/wire/protocol/network/wire.md#multistream-selector---self-describing-protocol-stream-selector
+
+The multistream protocol does not cover:
+
+- participant discovery, selection of the transport used and connection establishmend
+- managing the state of the connection
+
+multistream enables several types of streams to be used over one single stream, like an intelligent message broker that offers the ability to negotiate the protocol and version that is going to be used. To simplify, a visual representation can be:
+
+```
+┌ ─ ─ ─ ─ ─ ─ ┌ ─ ─ ─ ─ ─ ─ ┐┌ ─ ┐
+ dht-id/1.0.1│ bitswap/1.2.3  ...
+└ ─ ─ ─ ─ ─ ─ └ ─ ─ ─ ─ ─ ─ ┘└ ─ ┘
+┌────────────────────────────────┐
+│ multistream-select             │
+└────────────────────────────────┘
+┌────────────────────────────────┐
+│transport                       │
+│  [TCP, UDP, uTP, ...]          │
+└────────────────────────────────┘
+```
+
+multistream doesn't cover stream multiplexing over the same connection, however, we can achieve this by levaring the functionality offered by SPDY or HTTP/2.
+
+```
+┌─── ───┐┌─── ───┐┌ ┌─── ───┐┌─── ───┐┌┐
+ a/1.0.0  b/1.0.0  │ a/1.0.0  b/1.0.0 ││
+└─── ───┘└─── ───┘└ └─── ───┘└─── ───┘ ┘
+┌─── ──── ──── ──── ┌─── ──── ──── ──── ┌───
+│multistream-select││multistream-select││...│
+└ ──── ──── ──── ──┘└ ──── ──── ──── ──┘└ ──┘
+┌─── ──── ──── ──── ──── ──── ──── ──── ──── ┌───
+│stream multiplexing                        ││...│
+│ [HTTP/2, SPDY]                            ││   │
+└─ ──── ──── ──── ──── ──── ──── ──── ──── ─┘└─ ─┘
+┌────────────────────────────────────────────────┐
+│ multistream-select                             │
+└────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────┐
+│transport                                       │
+│  [TCP, UDP, uTP, ...]                          │
+└────────────────────────────────────────────────┘
+```
+
+Reference material and discussion:
+- https://github.com/ipfs/node-ipfs/issues/13#issuecomment-109802818
 
 ## Protocol Compliance Tests Spec
 
@@ -74,6 +120,6 @@ tests
         └── silent.out
 ```
 
-## Protocol Compliance Test Suit
+## Protocol Compliance Test Suite
 
 The protocol compliance test suit for multistream-select can be found on `tests/comp/compliance-test.js`, each agent is tested alone with the input we have prepared on the previous step for it, once that agent replies to all the messages, we compare (diff) both the output generated and its "pristine" counterpart, expecting to get 0 differences.
