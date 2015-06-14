@@ -27,7 +27,7 @@ A (distributed) `record system` is a protocol which defines a method for craftin
 
 
 - `crafting` - construction of a record (the process of calculating the values of a record)
-- `formating` - serializing of a record into a bitstring.
+- `serializing` - formating a record into a bitstring.
 - `distributing` - transportation of a record from one set of computers to another.
 - `verifying` - checking a record's values to ensure correctness and validity.
 
@@ -127,6 +127,7 @@ The objects:
 Record Node {
   Scheme   Link // link to a validity scheme
   Value    Link // link to an object representing the value.
+  Version  Data // record version number
   Validity Data // data needed to satisfy the validity scheme
 }
 ```
@@ -165,7 +166,7 @@ type Unmarshal(r *Record, []byte) (error)
 
 For example, Alice and Bob earlier could use the following interface:
 
-```protobuf
+```go
 type Record struct {
   Scheme    Link // link to the validity scheme
   Signature Link // link to a cryptographic signature over the record

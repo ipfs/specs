@@ -16,20 +16,20 @@ This is the [Spec](../) for the IPFS Merkledag.
 - `hash` - throughout this document, the word `hash` refers specifically to cryptographic hash functions, such as sha3.
 - `dag` - directed acyclic graph
 - `merkle-link` - a link (graph edge) between two objects, which is (a) represented by the hash of the target object, and (b) embedded in the source object. merkle-links construct graphs (dags) whose links are content-addressed, and authenticated.
-- `merkledag` - the merkledag is a directed acyclic graph whose links are merkle-links (hashes of the content). It is a hash tree, and (under a very lose definition) a merkle tree. Alternative names: the merkle-web, the merkle-forest, the merkle-chain.
+- `merkledag` - the merkledag is a directed acyclic graph whose links are merkle-links (hashes of the content). It is a hash tree, and (under a very loose definition) a merkle tree. Alternative names: the merkle-web, the merkle-forest, the merkle-chain.
 - `multihash` - the [multihash](https://github.com/jbenet/multihash) format / protocol.
 - `ipfs object` - a node in the ipfs merkledag. It represents a singular entity.
 - `merkledag format` - the format that ipfs objects are expressed with.
 - `link segment` or `link table` - the part of the merkledag format that expresses links to other objects.
-- `data segment` - the part of the merkledag format that expresses object data.
-- `protobuf` - protocol buffers, a serialization encoding.
+- `data segment` - the part of the merkledag format that expresses non-link object data.
+- `protobuf` - [protocol buffers](https://developers.google.com/protocol-buffers/), a serialization encoding.
 - `multicodec` - a self-describing, generalized serialization format.
 
 ## Abstract
 
 The _ipfs merkledag_ is a directed acyclic graph whose edges are merkle-links. This means that links to objects can authenticate the objects themselves, and that every object contains a secure representation of its children.
 
-This is a powerful primitive for distributed systems computations. The merkledag simplifies distributed protocols by providing an append-only authenticated datastructure. Parties can communicate and exchange secure references (merkle-links) to objects. The references are enough to verify the correctness of the object at a later time, which allows the objects themselves to be served over untrusted channels. Merkledags also allow the branching of a datastructure and subsequent merging, as in the version control system git. More generally, merkledags simplify the construction of Secure CRDTs, which enable distributed, convergent, commutative computation in an authenticated, secure way.
+This is a powerful primitive for distributed systems computations. The merkledag simplifies distributed protocols by providing an append-only authenticated datastructure. Parties can communicate and exchange secure references (merkle-links) to objects. The references are enough to verify the correctness of the object at a later time, which allows the objects themselves to be served over untrusted channels. Merkledags also allow the branching of a datastructure and subsequent merging, as in the version control system git. More generally, merkledags simplify the construction of Secure [CRDTs](http://en.wikipedia.org/wiki/Conflict-free_replicated_data_type), which enable distributed, convergent, commutative computation in an authenticated, secure way.
 
 ## The Format
 
