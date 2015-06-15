@@ -49,7 +49,7 @@ multistream doesn't cover stream multiplexing over the same connection, however,
 └────────────────────────────────────────────────┘
 ```
 
-multistream messages have the following structure:
+The multistream messages (such as 'ls', 'na', 'protocol/version') have the following format:
 
 ```
 ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
