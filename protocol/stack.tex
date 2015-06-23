@@ -174,23 +174,33 @@
   };
   \draw[process,->] (block) -- (multihash);
 
-  \node[interface] (datastore) [right=of multihash] {
+  \node[interface] (blockstore) [right=of multihash] {
+    \href{https://gist.github.com/jbenet/d1fedddfef85f0c4efd5}{Blockstore} \\
+    \method{Put}{\target{Value}{blockstore-value}, Hash, DigestSize}{} \\
+    \method{Get}{\target{Key}{blockstore-key}}{Value} \\
+    \method{Has}{Key}{bool} \\
+    \method{Delete}{Key}{} \\
+    \method{AllKeys}{}{KeyIterator}
+  };
+  \draw[use,bend right] (multihash) to (blockstore-key);
+  \draw[use,bend right] (block) to (blockstore-value);
+
+  \node[interface] (datastore) [below=of blockstore] {
     \href{https://gist.github.com/jbenet/d1fedddfef85f0c4efd5}{Datastore} \\
-    \method{Put}{\target{Key}{datastore-key}, \target{Value}{datastore-value}}{} \\
+    \method{Put}{Key, Value}{} \\
     \method{Get}{Key}{Value} \\
     \method{Has}{Key}{bool} \\
-    \method{Delete}{Key}{}
-  };
-  \draw[use,bend right] (multihash) to (datastore-key);
-  \draw[use,bend right] (block) to (datastore-value);
-
-  \node[interface] (blockstore) [above=of datastore] {
-    \href{https://gist.github.com/jbenet/d1fedddfef85f0c4efd5}{Blockstore} \\
+    \method{Delete}{Key}{} \\
     \method{AllKeys}{}{KeyIterator}
   };
   \draw[extend] (datastore) -- (blockstore);
 
-  \node[interface] (notifier) [right=0.3 of datastore] {
+  \node[actor] (garbage-collector) [above left=0.3 of blockstore] {
+    \href{GC spec?  Example?}{Garbage collector}
+  };
+  \draw[use] (blockstore) -- (garbage-collector);
+
+  \node[interface] (notifier) [right=0.3 of blockstore] {
     \href{https://gist.github.com/jbenet/d1fedddfef85f0c4efd5}{Notifier} \\
     \method{Notifiees}{}{NotifieeIterator} \\
     \method{AddNotifiee}{Notifiee}{} \\
@@ -199,6 +209,10 @@
 
   \node[actor] (exchange-server) [above=of blockstore] {
     \href{https://gist.github.com/jbenet/d1fedddfef85f0c4efd5}{Exchange server} \\
+    \method{Put}{Value, Hash, DigestSize}{} \\
+    \method{Get}{Key}{Value} \\
+    \method{Has}{Key}{bool} \\
+    \method{Delete}{Key}{} \\
     \event{BlockPut} \\
     \event{NewBlockPut} \\
     \event{BlockDeleted}
