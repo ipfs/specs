@@ -146,6 +146,10 @@
   };
   \draw[extend,bend right=5] (merkle) to (record);
 
+  \node[data] (record-list) [above=2 of record] {
+    \href{https://github.com/ipfs/specs/pull/7}{Record list} \\
+  };
+
   \node[data] (layout) [left=1.5 of key] {
     \href{https://github.com/ipfs/specs/issues/10}{Layout}
   };
@@ -232,6 +236,8 @@
     \method{Get}{Context, Key}{ValueIterator}
   };
   \draw[use] (record) to [out=140,in=-90] (signature.east) to [out=90,in=-120] (recordstore-value);
+  \draw[use] (signature.east) to [out=90,in=-120] (record-list);
+  \draw[use,bend left=10] (record-list) to (recordstore-value);
 
   \node[interface] (ipns) [above=of recordstore] {
     \href{https://github.com/ipfs/specs/tree/master/protocol#naming----pki-namespace-and-mutable-pointers}{IPNS} \\
