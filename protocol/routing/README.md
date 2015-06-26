@@ -61,6 +61,10 @@ _When searching for a peer, do we fetch the kbucket from a peer and see which pe
 
 #### Ping
 
+Ping mechanism (for heartbeats). Ping a peer and log the time it took to answer.
+
+_what if the Id doesn't exist? Is there any rule for non existing peers? Should we log time for best matches as well?_
+
 #### Provide
 
 #### Get value
