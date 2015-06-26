@@ -67,6 +67,15 @@ _what if the Id doesn't exist? Is there any rule for non existing peers? Should 
 
 #### Provide
 
+Providing is the process of storing/updating the metadata (pointers) of where the blocks of a given file are stored/available in the IPFS network. What this means is that the DHT is not used for block discovery, but for the metadata which identifies where they are, instead.
+When a node advertises a block available for download, IPFS stores a record in the DHT with its own Peer.ID. This is termed "providing". the node becomes a "provider". Requesters who wish to retrieve the content, query the DHT (or DSHT) and need only to retrieve a subset of providers, not all of them. (this works better with huge DHTs, and latency-aware DHTs like coral).
+
+We provide once per block, because every block (even sub-blocks) are independently addressable by their hash. (yes, this is expensive, but we can mitigate the cost with better DHT + record designs, bloom filters, and more)
+
+There is an optimistic optimization -- which is that if a node is storing a node that is the parent (root/ancestor) of other nodes, then it is much more likely to also be storing the children. So when a requester attempts to pull down a large dag, it first queries the DHT for providers of the root. Once the requester finds some and connects directly to retrieve the blocks, bitswap will optimistically send them the "wantlist", which will usually obviate any more dht queries for that dag. we haven't measured this to be true yet -- we need to -- but in practice it seems to work quite well, else we wouldnt see as quick download speeds. (one way to look at it, is "per-dag swarms that overlap", but it's not a fully correct statement as having a root doesn't necessarily mean a node has any or all children.)
+
+Providing a block happens as it gets added. Reproviding happens periodically, currently 0.5 * dht record timeout ~= 12 hours.
+
 #### Get value
 
 #### Put value
