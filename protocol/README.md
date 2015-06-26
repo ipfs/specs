@@ -122,7 +122,7 @@ of implementations. For example:
   to one of a set of supernodes. This is roughly like federated routing.
 - **dns:** ipfs routing could even happen over dns.
 
-See more in the routing spec (TODO).
+See more in the [routing spec](https://github.com/ipfs/specs/tree/master/protocol/routing).
 
 ### Block Exchange -- transfering content-addressed data
 
