@@ -78,11 +78,11 @@ Providing a block happens as it gets added. Reproviding happens periodically, cu
 
 #### Get value
 
+
+
 #### Put value
 
-1. find peer
-2. transfer 
-3. provide
+_not 100% about this happens exactly. From what I understand, the IPFS node that is adding the file, breaks the file into blocks, creates the hashes and provides each single one of them. When do we execute a Put? Replicas are done through "Get", right?_
 
 ### DHT 
 
