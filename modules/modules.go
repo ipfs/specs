@@ -183,9 +183,13 @@ type DAG.Link struct {
 // DAG.Node represents an IPFS Merkle DAG Node, the basic unit of data
 // and datastructures in IPFS.
 type DAG.Node interface {
-  Links() []DAG.Link // link segment, link table
-  Data()  []byte     // data segment, raw bytes
+  Links()     []DAG.Link // link segment, link table
+  Data()      []byte     // data segment, raw bytes
+  Serialize() []byte     // serialized version of the Node
 }
+
+// DAG.Parse deserializes a DAG node (the inverse of Node.Serialize())
+func DAG.Parse([]byte) (*Node, error)
 
 // DAG.Store represents a storage system for DAGs. it layers cleanly on top
 // of a Block.Store (or even a Datastore) and provides basic node fetching
