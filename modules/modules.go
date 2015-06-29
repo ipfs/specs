@@ -18,7 +18,7 @@ type Multiaddr []byte
 
 type crypto.PublicKey interface {
   Encrypt([]byte) (crypto.Ciphertext, error)
-  Verify(crypto.Signature) (bool, error)
+  Verify([]byte, crypto.Signature) (bool, error)
 }
 
 type crypto.PrivateKey interface {
