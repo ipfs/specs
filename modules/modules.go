@@ -122,6 +122,7 @@ type DS.Datastore interface {
   Get(DS.Key) (interface{}, error)
   Has(DS.Key) (bool, error)
   Delete(DS.Key) error
+  AllKeys() (DS.KeyIter, error)  // return all Keys stored by this Datastore
 }
 
 //-----------------------------------------------------------------------------
