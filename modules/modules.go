@@ -155,7 +155,7 @@ type Blocks.Block interface {
 type Blocks.Store interface {
   Put(*blocks.Block) error            // store a Block under its Key
   Has(key.Key) (bool, error)          // check whethrer Block is in Block.Store
-  Get(key.Key) (*blocks.Block, error) // retreive Block by its Key
+  Get(key.Key) (*blocks.Block, error) // retrieve Block by its Key
   Delete(key.Key) error               // stop storing a Block
 
   AllKeys() (key.KeyIter, error)  // return all Keys stored by this Block.Store
