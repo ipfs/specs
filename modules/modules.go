@@ -8,6 +8,11 @@ package modules
 // See https://github.com/jbenet/multihash
 type Multihash []byte
 
+type MultihashParameters struct {
+	Hash       uint8
+	DigestSize uint8
+}
+
 // Multiaddr is a self-describing network address format.
 // See https://github.com/jbenet/mutliaddr
 type Multiaddr []byte
@@ -135,39 +140,30 @@ type DS.Datastore interface {
 //
 // (though lower layers of IPFS that handle only Blocks do not necessarily
 // need to be moving DAG.Nodes.)
-
-// Blocks.Key is a Multihash that is the hash of a Blocks.Block.
+//
+// A block's key is a Multihash that is the hash of a Blocks.Block.
 // It is used to reference, and (content) address blocks in various
 // block storage systems, and interfaces.
-type Blocks.Key Multihash
-
-// Blocks.Block is a sequence of bytes. A block represents a "chunk of
-// data".
-type Blocks.Block interface {
-  Data() []byte       // data that the block represents
-  Key()  Blocks.Key   // name of the block
-}
-
 
 // Blocks.Store is a storage system for Blocks, a way to store Blocks and
 // retrive them by their Key. (may wrap a Datastore, or something more
 // complex, like Bitswap.Node)
 type Blocks.Store interface {
-  Put(*blocks.Block) error            // store a Block under its Key
-  Has(key.Key) (bool, error)          // check whethrer Block is in Block.Store
-  Get(key.Key) (*blocks.Block, error) // retrieve Block by its Key
-  Delete(key.Key) error               // stop storing a Block
+  Put(MultihashParameters, []bytes) error // store a Block under its Key
+  Has(Multihash) (bool, error)            // check whether Block is in Blocks.Store
+  Get(Multihash) ([]bytes, error)         // retrieve Block by its Key
+  Delete(Multihash) error                 // stop storing a Block
 
-  AllKeys() (key.KeyIter, error)  // return all Keys stored by this Block.Store
+  AllKeys() (Blocks.KeyIter, error)  // return all Keys stored by this Blocks.Store
 }
 
 
 // Blocks.Notifiee is an object listening for particular events in the
 // Block.Store, in particular a block becoming available locally.
 type Block.Notifiee interface {
-  BlockPut(blocks.Block)     // fired when a block is put
-  NewBlockPut(blocks.Block)  // fired when a new block is put
-  BlockDeleted(blocks.Block) // fired when a block is deleted
+  BlockPut(Multihash, []bytes)     // fired when a block is put
+  NewBlockPut(Multihash, []bytes)  // fired when a new block is put
+  BlockDeleted(Multihash, []bytes) // fired when a block is deleted
 }
 
 //-----------------------------------------------------------------------------
