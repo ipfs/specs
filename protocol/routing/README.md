@@ -9,63 +9,49 @@ TODOS:
 
 -----------------------
 
-> This spec defines the routing protocol spec, covering `Peer discovery`, `Routing` and the `DHT`. The spec is a **Work In Progress**.
+> This spec defines the routing protocol spec. Routing offers an interface for the features exposed by `Peer discovery` and `DHT`. The spec is a **Work In Progress**.
 
 ## Supports
 
-- Peer discovery through
-  - mdns
-  - custom peers list
-  - random walking on the network
 - Routing primitives
   - Publish and fetch content (also providing)
 - Maintaining partial state of the network
   - DHT
   - kbucket
 
-### Overview
+## Overview
 
-The Routing Protocol is divided in three major components, these are:
-- Peer Discovery: Responsible for filling our kbucket with best candidates.
+The Routing Protocol is composed by three componenets, these are:
 - Interface: Our routing primitives that are offered for the user, such as finding and publishing content, including the storage and lookup of metadata (Providers).
-- Peer-to-peer Structured Overlay Network: Algorithm for the implicit network organization, based on [Coral](http://iptps03.cs.berkeley.edu/final-papers/coral.pdf) and [mainlineDHT](http://www.bittorrent.org/beps/bep_0005.html)
+- Peer Discovery: Responsible for filling our kbucket with best candidates.
+- Peer-to-peer Structured Overlay Network (DHT): Algorithm for the implicit network organization, based on [Coral](http://iptps03.cs.berkeley.edu/final-papers/coral.pdf) and [mainlineDHT](http://www.bittorrent.org/beps/bep_0005.html)
 
-Bootstrapping the routing happens by connecting to a predefined "railing" peers list, shipped with the go-ipfs release and/or by discovery through mDNS. Once at least one peer is found and added to the kbucket, the routing changes to an active state and our peer becomes able to route and receive messages.
+```
+┌──────────────┐
+│   routing    │
+└──────────────┘
+┌─────────┐┌───┐
+│discovery││DHT│
+└─────────┘└───┘
+```
 
-### Peer Discovery
+In order for routing to work, we first have to pass the bootstrap state. Bootstrapping happens by connecting to a predefined "railing" peers list, shipped with the go-ipfs release and/or by discovery through mDNS. Once at least one peer is found and added to the kbucket, the routing changes to an active state and our peer becomes able to route and receive messages.
 
-#### bootstrap peer list
-
-List with known and trusted peers shipped with IPFS.
-
-- _How is this list updated?_
-- _Is this list updated periodically_?
-
-#### random walk
-
-IPFS issues random Peer lookups periodically to refresh our kbucket if needed. For impl reference, see: https://github.com/ipfs/go-ipfs/blob/master/routing/dht/dht_bootstrap.go#L88-L109.
-
-#### mDNS
-
-In addition to known peers and random lookups, IPFS also performs Peer Discovery through mDNS ([MultiCast DNS](https://tools.ietf.org/html/rfc6762))
-
--_How offen do we issue this searches?_
-
-### Routing
+## Routing
 
 For impl reference, check: https://github.com/ipfs/go-ipfs/blob/master/routing/routing.go#L19-L49
 
-#### Find a peer
+### Find a peer
 
 _When searching for a peer, do we fetch the kbucket from a peer and see which peer we want to ping next or do we ask for a given Id to a peer and that peer replies to us with the best candidate (or itself if it is the case)?_
 
-#### Ping
+### Ping
 
 Ping mechanism (for heartbeats). Ping a peer and log the time it took to answer.
 
 _what if the Id doesn't exist? Is there any rule for non existing peers? Should we log time for best matches as well?_
 
-#### Provide
+### Provide
 
 Providing is the process of storing/updating the metadata (pointers) of where the blocks of a given file are stored/available in the IPFS network. What this means is that the DHT is not used for block discovery, but for the metadata which identifies where they are, instead.
 When a node advertises a block available for download, IPFS stores a record in the DHT with its own Peer.ID. This is termed "providing". the node becomes a "provider". Requesters who wish to retrieve the content, query the DHT (or DSHT) and need only to retrieve a subset of providers, not all of them. (this works better with huge DHTs, and latency-aware DHTs like coral).
@@ -76,18 +62,11 @@ There is an optimistic optimization -- which is that if a node is storing a node
 
 Providing a block happens as it gets added. Reproviding happens periodically, currently 0.5 * dht record timeout ~= 12 hours.
 
-#### Get value
+### Get value
 
 
 
-#### Put value
+### Put value
 
 _not 100% about this happens exactly. From what I understand, the IPFS node that is adding the file, breaks the file into blocks, creates the hashes and provides each single one of them. When do we execute a Put? Replicas are done through "Get", right?_
 
-### DHT 
-
-explain:
-- dht/coral, how the algo works
-- kbucket
-- each time a contact is made with a new peer, we check to see if it is a better candidate for our kbucket
-- xor metric
