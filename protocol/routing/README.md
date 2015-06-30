@@ -43,6 +43,8 @@ For impl reference, check: https://github.com/ipfs/go-ipfs/blob/master/routing/r
 
 ### Find a peer
 
+Finding a peer happens through an iterative process. We query the best candidate in our kbucket for the awarness of the peer we are looking for, if that peer isn't the ideal candidate, it will return 3 possible candidates from his kbucket and it will query those to check for the best candidate. We repeat the process until we find that peer
+
 _When searching for a peer, do we fetch the kbucket from a peer and see which peer we want to ping next or do we ask for a given Id to a peer and that peer replies to us with the best candidate (or itself if it is the case)?_
 
 ### Ping
