@@ -41,7 +41,7 @@ exchange│   └─────────────────────
 
 ## routing layer
 
-### routing
+### router
 
 ![](https://cldup.com/gifxf20TnJ-3000x3000.png)
 
