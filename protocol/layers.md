@@ -55,21 +55,21 @@ exchange│   └─────────────────────
 
 ![](https://cldup.com/q3JsosI5zo-3000x3000.png)
 
+## network layer
+
 ### swarm
 
 ![](https://cldup.com/As4HG0h4d9-3000x3000.png)
 
-## network layer
-
-### protocol muxing
+#### protocol muxing
 
 ![](https://cldup.com/o8CRUe2Y2U-1200x1200.png)
 
-### connection
+#### connection
 
 ![](https://cldup.com/JpaKDIUxRS-1200x1200.png)
 
-### nat traversal
+#### nat traversal
 
 ![](https://cldup.com/3KMuGu3tEb-2000x2000.png)
 
