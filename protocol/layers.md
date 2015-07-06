@@ -61,6 +61,14 @@ exchange│   └─────────────────────
 
 ![](https://cldup.com/As4HG0h4d9-3000x3000.png)
 
+swarms offers the API for routing layer be able to open "streams" with other peers. The API should look like:
+
+- `.openStream(multiaddr, protocol)`
+- `.registerHandle(protocol, cb)`
+
+swarm holds the collection of connections and respective open streams on top of these connections (for reusing purposes)
+a connection should be an abstraction of a socket where spdy was already negotiated
+
 #### protocol muxing
 
 ![](https://cldup.com/o8CRUe2Y2U-1200x1200.png)
