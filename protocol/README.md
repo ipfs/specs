@@ -1,4 +1,4 @@
-# IPFS Protocol Spec
+# IPFS Protocol Spec (WIP!)
 
 Authors: [@jbenet](http://github.com/jbenet)
 
