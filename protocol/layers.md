@@ -55,39 +55,3 @@ exchange│   └─────────────────────
 
 ![](https://cldup.com/q3JsosI5zo-3000x3000.png)
 
-## network layer
-
-### swarm
-
-![](https://cldup.com/As4HG0h4d9-3000x3000.png)
-
-swarms offers the API for routing layer be able to open "streams" with other peers. The API should look like:
-
-- `.openStream(multiaddr, protocol)`
-- `.registerHandle(protocol, cb)`
-
-swarm holds the collection of connections and respective open streams on top of these connections (for reusing purposes)
-a connection should be an abstraction of a socket where spdy was already negotiated
-
-#### protocol muxing
-
-![](https://cldup.com/o8CRUe2Y2U-1200x1200.png)
-
-#### connection
-
-![](https://cldup.com/JpaKDIUxRS-1200x1200.png)
-
-#### nat traversal
-
-![](https://cldup.com/3KMuGu3tEb-2000x2000.png)
-
-# execution example
-
-
-
-# refs
-
-- https://github.com/ipfs/specs/pull/15/files
-- https://github.com/ipfs/go-ipfs/blob/master/routing/dht/dht.go
-- https://github.com/ipfs/go-ipfs/blob/master/p2p/host/host.go
-- https://github.com/ipfs/go-ipfs/blob/master/routing/dht/notif.go
