@@ -1,22 +1,31 @@
-# IPFS Protocol Spec (WIP!)
+IPFS Protocol Spec
+==================
 
-Authors: [@jbenet](http://github.com/jbenet)
+> **This spec is an Work In Progress (WIP)**
+
+Authors: 
+
+- [@jbenet](http://github.com/jbenet)
 
 Reviewers:
 
 * * *
 
-This [spec](../) document defines the IPFS protocol stack, the subsystems, the
+This spec document defines the IPFS protocol stack, the subsystems, the
 interfaces, and how it all fits together. It delegates non-interface details
 to other specs as much as possible. This is meant as a top-level view of the
 protocol and how the system fits together.
-
 
 Note, this document is not meant to be an introduction of the concepts in IPFS
 and is not recommended as a first pass to understanding how IPFS works. For
 that, please refer to the [IPFS paper](http://static.benet.ai/t/ipfs.pdf).
 
-## IPFS and the Merkle DAG
+# Index
+
+- []()
+- []()
+
+## 1. IPFS and the Merkle DAG
 
 At the heart of IPFS is the MerkleDAG, a directed acyclic graph whose links
 are hashes. This gives all objects in IPFS useful properties:
@@ -41,7 +50,7 @@ publish, distribute, serve, and download merkledags. It is the authenticated,
 decentralized, permanent web.
 
 
-## Nodes and Network Model
+## 2. Nodes and Network Model
 
 The IPFS network uses PKI based identity. An "ipfs node" is a program that
 can find, publish, and replicate merkledag objects. Its identity is defined
@@ -54,7 +63,7 @@ nodeID := multihash(publicKey)
 
 TODO: constraints on keygen.
 
-### multihash and upgradeable hashing
+### 2.1 multihash and upgradeable hashing
 
 All hashes in ipfs are encoded with
 [multihash](https://github.com/jbenet/multihash/), a self-describing hash
@@ -75,7 +84,7 @@ sha3
 ```
 
 
-## The Stack
+## 3. The Stack
 
 IPFS has a stack of modular protocols. Each layer may have multiple
 implementations, all in different modules. This spec will only address the
@@ -94,7 +103,7 @@ IPFS has five layers:
 
 These are briefly described bottom-up.
 
-### Network -- connecting to peers
+### [3.1 Network](network)
 
 The **network** provides point-to-point transports (reliable and unreliable)
 between any two IPFS nodes in the network. It handles:
@@ -105,7 +114,7 @@ between any two IPFS nodes in the network. It handles:
 
 See more in the [network spec](network).
 
-### Routing -- finding peers and data
+### [3.2 Routing -- finding peers and data](routing)
 
 The IPFS **Routing** layer serves two important purposes:
 - **peer routing** -- to find other nodes
@@ -124,7 +133,7 @@ of implementations. For example:
 
 See more in the [routing spec](https://github.com/ipfs/specs/tree/master/protocol/routing).
 
-### Block Exchange -- transfering content-addressed data
+### [3.3 Block Exchange -- transfering content-addressed data](exchange)
 
 The IPFS **Block Exchange** takes care of negotiating bulk data transfers.
 Once nodes know each other -- and are connected -- the exchange protocols
@@ -137,7 +146,7 @@ of implementations. For example:
   of BitTorrent to work with arbitrary (and not known apriori) DAGs.
 - **HTTP:** a simple exchange can be implemented with HTTP clients and servers.
 
-### Merkledag -- making sense of data
+### [3.4. Merkledag -- making sense of data](../merkledag)
 
 [As discussed above](#IPFS-and-the-Merkle-DAG), the IPFS **merkledag** is the
 datastructure at the heart of IPFS. It is an
@@ -170,7 +179,7 @@ on top of the merkledag, such as:
 
 See more in the merkledag spec (TODO).
 
-### Merkledag Paths
+### [3.4.1 Merkledag Paths](../merkledag)
 
 The merkledag is enough to resolve paths:
 
@@ -186,7 +195,7 @@ See more in the path resolution spec (TODO).
 
 ![](../media/ipfs-resolve/ipfs-resolve.gif)
 
-### Naming -- PKI namespace and mutable pointers
+### [3.5 Naming -- PKI namespace and mutable pointers]()
 
 IPFS is mostly concerned with content-addressed data, which by nature
 is immutable: changing an object would change its hash -- and thus its
@@ -209,7 +218,7 @@ See more in the namin spec (TODO).
 
 
 
-## Applications and Datastructures -- on top of IPFS
+## [4. Applications and Datastructures -- on top of IPFS]()
 
 The stack described so far is enough to represent arbitrary datastructures
 and replicate them accross the internet. It is also enough to build and
@@ -222,7 +231,7 @@ them to the rest of the world using any of the tools that understand IPFS.
 See more in the datastructures and applications specs (TODO).
 
 
-### unixfs -- representing traditional files
+### [4.1 unixfs -- representing traditional files]()
 
 The unix filesystem abstractions -- files and directories -- are the main way
 people conceive of files in the internet. In IPFS, `unixfs` is a datastructure
@@ -235,7 +244,7 @@ to carry over information like:
 See more in the unixfs spec (TODO).
 
 
-## Lifetime of fetching an object.
+## [5 Lifetime of fetching an object.]()
 
 Suppose we ask an IPFS node to retrieve
 
@@ -253,11 +262,7 @@ Then, the IPFS node resolves the components.
 The first component in an `/ipfs/...` path is always a multihash.
 The rest are names of links, to be resolved into multihashes.
 
-
-
-
-
-## IPFS User Interfaces
+## [6 IPFS User Interfaces]()
 
 IPFS is not just a protocol. It is also a toolset. IPFS implementations
 include various tools for working with the merkledag, how to publish
@@ -271,9 +276,10 @@ design and implementation. Examples:
 - The IPFS libs - implementations in various languages
 - The IPFS gateways - nodes in the internet that serve HTTP over IPFS
 
-## ~~WIP~~
+* * *
 
-WIP Stack Dump:
+### WIP Stack Dump:
+
 - How the layers fit together
 - How they call on each other
 - Mention all the ports
