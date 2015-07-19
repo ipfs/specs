@@ -5,7 +5,8 @@ IPFS Protocol Spec
 
 Authors: 
 
-- [@jbenet](http://github.com/jbenet)
+- [Juan Benet](https://github.com/jbenet)
+- [David Dias](https://github.com/diasdavid)
 
 Reviewers:
 

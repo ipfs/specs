@@ -4,7 +4,8 @@ IPFS Protocol Network Spec
 > This spec is a Work In Progress (WIP)
 
 Authors: 
-- [Juan Benet](http://github.com/jbenet)
+- [Juan Benet](https://github.com/jbenet)
+- [David Dias](https://github.com/diasdavid)
 
 Reviewers:
 
