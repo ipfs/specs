@@ -1,8 +1,6 @@
 IPFS Protocol Network Spec
 =========================
 
-> This spec is a Work In Progress (WIP)
-
 Authors: 
 - [Juan Benet](https://github.com/jbenet)
 - [David Dias](https://github.com/diasdavid)
@@ -11,9 +9,17 @@ Reviewers:
 
 * * *
 
+# Abstract
+
 This describes the IPFS network protocol. The network layer provides point-to-point transports (reliable and unreliable) between any two IPFS nodes in the network.
 
-# Index
+This document defines the spec implemented in libp2p.
+
+# Status of this spec
+
+> This spec is a Work In Progress (WIP)
+
+# Table of Contents
 
 - [1. Introduction and Goals]()
 - [2. Requirements]()
@@ -322,7 +328,98 @@ is no assumptions made about the network stack in the protocol. Implementations
 will likley need to change, but changing implementations is vastly easier than
 changing protocols.
 
-## 6 Overview of the Software Stack
+### 5.5 On the wire
+
+We have the **hard constraint** of making IPFS work across _any_ duplex stream (an outgoing and an incoming stream pair, any arbitrary connection) and work on _any_ platform.
+
+To make this work, IPFS has to solve a few problems:
+
+- [Protocol Multiplexing](#protocol-multiplexing) - running multiple protocols over the same stream
+  - [multistream](#multistream) - self-describing protocol streams
+  - [multistream-select](#multistream-select) - a self-describing protocol selector
+  - [Stream Multiplexing](#stream-multiplexing) - running many independent streams over the same wire.
+- [Portable Encodings](#portable-encodings) - using portable serialization formats
+- [Secure Communications](#secure-communication) - using ciphersuites to establish security and privacy (like TLS).
+
+#### 5.5.1 Protocol-Multiplexing
+
+Protocol Multiplexing means running multiple different protocols over the same stream. This could happen sequentially (one after the other), or concurrently (at the same time, with their messages interleaved). We achieve protocol multiplexing using three pieces:
+
+- [multistream](#multistream) - self-describing protocol streams
+- [multistream-select](#multistream-select) - a self-describing protocol selector
+- [Stream Multiplexing](#stream-multiplexing) - running many independent streams over the same wire.
+
+#### 5.5.2 multistream - self-describing protocol stream
+
+[multistream](https://github.com/jbenet/multistream) is a self-describing protocol stream format. It is extremely simple. Its goal is to define a way to add headers to protocols that describe the protocol itself. It is sort of like adding versions to a protocol, but being extremely explicit.
+
+For example:
+
+```
+/ipfs/QmVXZiejj3sXEmxuQxF2RjmFbEiE9w7T82xDn3uYNuhbFb/ipfs-dht/0.2.3
+<dht-message>
+<dht-message>
+...
+```
+
+#### 5.5.3 multistream-selector - self-describing protocol stream selector
+
+[multistream-select](https://github.com/jbenet/multistream/tree/master/multistream-select) is a simple [multistream](https://github.com/jbenet/multistream) protocol that allows listing and selecting other protocols. This means that Protomux has a list of registered protocols, listens for one, and then _nests_ (or upgrades) the connection to speak the registered protocol. This takes direct advantage of multistream: it enables interleaving multiple protocols, as well as inspecting what protocols might be spoken by the remote endpoint.
+
+For example:
+
+```
+/ipfs/QmdRKVhvzyATs3L6dosSb6w8hKuqfZK2SyPVqcYJ5VLYa2/multistream-select/0.3.0
+/ipfs/QmVXZiejj3sXEmxuQxF2RjmFbEiE9w7T82xDn3uYNuhbFb/ipfs-dht/0.2.3
+<dht-message>
+<dht-message>
+...
+```
+
+#### 5.5.4 Stream Multiplexing
+
+Stream Multiplexing is the process of multiplexing (or combining) many different streams into a single one. This is a complicated subject because it enables protocols to run concurrently over the same wire. And all sorts of notions regarding fairness, flow control, head-of-line blocking, etc. start affecting the protocols. In practice, stream multiplexing is well understood and there are many stream multiplexing protocols. To name a few:
+
+- HTTP/2
+- SPDY
+- QUIC
+- SSH
+
+IPFS nodes are free to support whatever stream multiplexors they wish, on top of the default one. The default one is there to enable even the simplest of nodes to speak multiple protocols at once. The default multiplexor will be HTTP/2 (or maybe QUIC?), but implementations for it are sparse, so we are beginning with SPDY. We simply select which protocol to use with a multistream header.
+
+For example:
+
+```
+/ipfs/QmdRKVhvzyATs3L6dosSb6w8hKuqfZK2SyPVqcYJ5VLYa2/multistream-select/0.3.0
+/ipfs/Qmb4d8ZLuqnnVptqTxwqt3aFqgPYruAbfeksvRV1Ds8Gri/spdy/3
+<spdy-header-opening-a-stream-0>
+/ipfs/QmVXZiejj3sXEmxuQxF2RjmFbEiE9w7T82xDn3uYNuhbFb/ipfs-dht/0.2.3
+<dht-message>
+<dht-message>
+<spdy-header-opening-a-stream-1>
+/ipfs/QmVXZiejj3sXEmxuQxF2RjmFbEiE9w7T82xDn3uYNuhbFb/ipfs-bitswap/0.3.0
+<bitswap-message>
+<bitswap-message>
+<spdy-header-selecting-stream-0>
+<dht-message>
+<dht-message>
+<dht-message>
+<dht-message>
+<spdy-header-selecting-stream-1>
+<bitswap-message>
+<bitswap-message>
+<bitswap-message>
+<bitswap-message>
+...
+```
+
+#### 5.5.5 Portable Encodings
+
+In order to be ubiquitous, we _must_ use hyper-portable format encodings, those that are easy to use in various other platforms. Ideally these encodings are well-tested in the wild, and widely used. There may be cases where multiple encodings have to be supported (and hence we may need a [multicodec](https://github.com/jbenet/multicodec) self-describing encoding), but this has so far not been needed.
+
+For now, we use [protobuf](https://github.com/google/protobuf) for all protocol messages exclusively, but other good candidates are [capnp](https://capnproto.org), [bson](http://bsonspec.org/), [ubjson](http://ubjson.org/).
+
+## 6 Software Stack
 
 The network is abstracted through the swarm which presents a simplified interface for the remaining layers to have access to the network. This interface should look like:
 
@@ -373,3 +470,6 @@ Every socket open (through the transport chosen), is "multistream'ed" into the s
 Identify stream requests should be issued by the listenner as soon as it receives a valid connection, otherwise the listenner won't be able to identify who is that stream comming, disabling its ability for connection reuse. Identify is responsible for 'tagging' the incomming connection on swarm with the right Id.
 
 A peer only updates its own multiaddrs list with observedAddrs if it receives the same observedAddr twice, avoiding addr explosion (a phenomenon that happens when both peers are behind symmetric NAT).
+
+
+## References
