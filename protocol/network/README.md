@@ -21,11 +21,31 @@ This document defines the spec implemented in libp2p.
 
 # Table of Contents
 
-- [1. Introduction and Goals]()
-- [2. Requirements]()
+- [1 Introduction and Goals]()
+- [2 Requirements]()
   - [2.1 NAT traversal] ()
-- [3. Datastructures]()
-- ...
+  - [2.2 Relay]()
+  - [2.3 Ecryption]()
+  - [2.4 Transport Agnostic]()
+  - [2.5 Multi-Multiplexing]()
+- [3 Datastructures]()
+- [4 Interface]()
+  - [4.1 Client Interface]()
+  - [4.2 Protocol Interface]()
+- [5 Properties]()
+  - [5.1 Communication Model - Streams]()
+  - [5.2 Ports - Constrained Entrypoints]()
+  - [5.3 Transport Protocol]()
+  - [5.4 Non-IP Networks]()
+  - [5.5 On the wire]()
+    - [5.5.1 Protocol-Multiplexing]()
+    - [5.5.2 multistream - self-describing protocol stream]()
+    - [5.5.3 multistream-selector - self-describing protocol stream selector]()
+    - [5.5.4 Stream Multiplexing]()
+    - [5.5.5 Portable Encodings]()
+- [6 Software Stack]()
+- [7 Implementation Details]()
+- [References]()
 
 ## 1. Introduction and Goals
 
@@ -421,7 +441,21 @@ For now, we use [protobuf](https://github.com/google/protobuf) for all protocol 
 
 ## 6 Software Stack
 
-The network is abstracted through the swarm which presents a simplified interface for the remaining layers to have access to the network. This interface should look like:
+### 6.1 Overview
+
+### 6.2 Discovery
+
+goal: find more peers, keep routing table fresh (if Kad-Router is not being used, discovery doens't necessary has a use)
+
+### 6.3 Peer Routing
+
+goal: get ref to other peers, that then can be used by swarm to open a stream. Also is free to open streams to other peers to traverse the DHT
+
+### 6.4 Swarm (aka Connectivity)
+
+goal: open stream, NAT traversal, Relay
+
+~~The network is abstracted through the swarm which presents a simplified interface for the remaining layers to have access to the network. This interface should look like:~~
 
 - `.openStream(peer, protocol)` - peer should contain the ID of the peer and its respective multiaddrs known.
 - `.registerHandler(protocol, handlerFunc)` - enable a protocol to be registered, so that another peer can open a stream to talk with us to that specific protocol
@@ -465,11 +499,21 @@ The stream muxer must implement the interface offered by [abstract-stream-muxer]
 
 Every socket open (through the transport chosen), is "multistream'ed" into the stream muxer used, once a stream muxer connection
 
+### 6.5 libp2p
+
 ## 7 Implementation Details
+
+### 7.1 Discovery
+
+### 7.2 Peer Routing
+
+### 7.3 Swarm
 
 Identify stream requests should be issued by the listenner as soon as it receives a valid connection, otherwise the listenner won't be able to identify who is that stream comming, disabling its ability for connection reuse. Identify is responsible for 'tagging' the incomming connection on swarm with the right Id.
 
 A peer only updates its own multiaddrs list with observedAddrs if it receives the same observedAddr twice, avoiding addr explosion (a phenomenon that happens when both peers are behind symmetric NAT).
+
+### 7.4 libp2p
 
 
 ## References
