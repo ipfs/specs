@@ -505,6 +505,8 @@ Every socket open (through the transport chosen), is "multistream'ed" into the s
 
 ### 7.1 Discovery
 
+A discovery service must have return new peers as they are found. It must implement a feature to `verify` if we can open a Connection, using swarm, before returning it as a "new peer found"
+
 ### 7.2 Peer Routing
 
 ### 7.3 Swarm
