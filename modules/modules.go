@@ -1,5 +1,9 @@
 package modules
 
+// This file serves a descriptionary purpose.
+// The types in these interfaces don't perfectly
+// match the types in implementations such as go-ipfs.
+
 //-----------------------------------------------------------------------------
 
 // the Multiformats are self-describing formats IPFS uses.
