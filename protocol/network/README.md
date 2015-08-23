@@ -48,7 +48,7 @@ This RFC is organized by chapters described on the `Table of Contents` section. 
 - [6 Interfaces](/6-interfaces.md)
   - [6.1 Client Interface]()
   - [6.2 Protocol Interface]()
-- [7 Properties](/7-properties.md)
+- [7 Properties](7-properties.md)
   - [7.1 Communication Model - Streams]()
   - [7.2 Ports - Constrained Entrypoints]()
   - [7.3 Transport Protocol]()
