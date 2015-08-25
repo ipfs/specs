@@ -45,11 +45,11 @@ type Record struct {
   Signature []byte
 }
 
-func signablePart(rec *Record) []byte {
+func signablePart(r *Record) []byte {
   var sigbuf bytes.Buffer
   sigbuf.Write(r.Value)
   sigbuf.Write(r.Expires)
-  return sugbuf.Bytes()
+  return sigbuf.Bytes()
 }
 
 func MakeRecord(value []byte, authorKey crypto.PrivateKey) Record {
