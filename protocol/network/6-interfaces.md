@@ -1,6 +1,61 @@
 6 Interfaces
 ============
 
+## 6.1 libp2p
+
+## 6.2 Peer Routing
+
+## 6.3 Swarm
+
+~~The network is abstracted through the swarm which presents a simplified interface for the remaining layers to have access to the network. This interface should look like:~~
+
+- `.openStream(peer, protocol)` - peer should contain the ID of the peer and its respective multiaddrs known.
+- `.registerHandler(protocol, handlerFunc)` - enable a protocol to be registered, so that another peer can open a stream to talk with us to that specific protocol
+- `.listen()` - to start listening for incoming connections and therefore opening of streams
+
+The following figure represents how the network level pieces, are tied together:
+
+```
+┌ ─ ─ ─ ─ ┌ ─ ─ ─ ─ ┌ ─ ─ ─ ─ ┌───────────┐
+ mounted │ mounted │ mounted ││Identify   │
+│protocol │protocol │protocol │(mounted   │
+ 1       │ 2       │ ...     ││ protocol) │
+└ ─ ─ ─ ─ └ ─ ─ ─ ─ └ ─ ─ ─ ─ └───────────┘
+┌─────────────────────────────────────────┐
+│             swarm                       │
+└─────────────────────────────────────────┘
+┌─────────────────────────────────────────┐
+│            connection                   │
+└─────────────────────────────────────────┘
+┌───────────────┐┌───────────┐┌───────────┐
+│Transport      ││multistream││ stream    │
+│(TCP, UDP, etc)││           ││ muxer     │
+└───────────────┘└───────────┘│┌ ─ ─ ─ ─ ┐│
+                              │  spdy     │
+                              │└ ─ ─ ─ ─ ┘│
+                              │┌ ─ ─ ─ ─ ┐│
+                              │ multiplex │
+                              │└ ─ ─ ─ ─ ┘│
+                              │┌ ─ ─ ─ ─ ┐│
+                              │ QUIC      │
+                              │└ ─ ─ ─ ─ ┘│
+                              │┌ ─ ─ ─ ─ ┐│
+                              │ others    │
+                              │└ ─ ─ ─ ─ ┘│
+                              └───────────┘
+```
+
+## 6.4 Distributed Record Store
+
+
+
+
+
+
+
+
+----------------------------
+OLD 
 The network protocol's interface has two parts:A
 
 1. the _client interface_, for clients (e.g. higher layers of IPFS)
