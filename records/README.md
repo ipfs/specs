@@ -169,7 +169,6 @@ For example, Alice and Bob earlier could use the following interface:
 ```go
 type Record struct {
   Scheme    Link // link to the validity scheme
-  Signature Link // link to a cryptographic signature over the record
   Expires   Data // datetime at which record expires
   Value     Data // an opaque value
 }
