@@ -40,7 +40,7 @@ type KeyPair struct {
 
 // Signature represents a digital signature over another object.
 type Signature struct {
-  Key       Link // the key used to sign
+  Key       Link // the key used to verify this signature (PublicKey)
   Algorithm Link // the algorithm used to sign the signee
   Encoding  Link // the encoding the sig is serialized with
   Signee    Link // the object the key is signing
