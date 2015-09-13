@@ -28,9 +28,6 @@ A Peer Routing subsystem, exposes an interface to identify which peers should a 
 
 We present two examples of possible Peer Routing subsystems, the first based on a the Kademlia DHT and the second based on mDNS. Nevertheless, other Peer Routing mechanisms might be implemented, as long as they fulfil the same expectation and interface.
 
-
-
-
 ### 4.1.1 kad-routing
 
 kad-routing implements the Kademlia Routing table, where each peer holds a set of k-buckets, each of them containing several PeerInfo from other peers in the network. In order to find the whereabouts of these peers, it implements 3 discovery mechanisms:
@@ -72,14 +69,24 @@ A predefined set of peers available on the network in well known locations, so t
 
 mDNS-routing uses mDNS probes to identify if local area network peers that have a given key or simply are present.
 
-## 4.2 Swarm
 
+
+
+
+
+
+
+## 4.2 Swarm
 
 ### 4.2.1 Stream Muxer
 
 The stream muxer must implement the interface offered by [abstract-stream-muxer](https://github.com/diasdavid/abstract-stream-muxer).
 
 ### 4.2.2 Protocol Muxer
+
+Protocol muxing is handled on the application level instead of the conventional way at the port level (where a different services/protocols listen at different ports). This enables us to support several protocols to be muxed in the same socket, saving the cost of doing NAT traversal for more than one port.
+
+Protocol multiplexing is done through [`multistream`](https://github.com/jbenet/multistream), a protocol to negoatiate different types of streams (protocols) using [`multicodec`](https://github.com/jbenet/multicodec)
 
 ### 4.2.3 Transport
 
@@ -90,6 +97,15 @@ The stream muxer must implement the interface offered by [abstract-stream-muxer]
 **Identify** is one of the protocols mounted on top of swarm, our Connection handler, however, it follows and respects the same pattern as any other protocol when it comes to mounting it on top of swarm. Identify enables us to trade listenAddrs and observedAddrs between peers, this is crucial for the working of IPFS, since every socket open implements REUSEPORT, an observedAddr by another peer can enable a third peer to connect to us, since the port will be already open and redirect to us on a NAT.
 
 ### 4.2.6 Relay
+
+
+
+
+
+
+
+
+
 
 
 
