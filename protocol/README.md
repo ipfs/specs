@@ -128,9 +128,9 @@ See more in the routing spec (TODO).
 
 The IPFS **Block Exchange** takes care of negotiating bulk data transfers.
 Once nodes know each other -- and are connected -- the exchange protocols
-govern how the transfer of content-addressed blocks occurrs.
+govern how the transfer of content-addressed blocks occurs.
 
-The Block Exhcnage is an interface that is satisfied by various kinds
+The Block Exchange is an interface that is satisfied by various kinds
 of implementations. For example:
 
 - **Bitswap:** our main protocol for exchanging data. It is a generalization
