@@ -1,7 +1,7 @@
 2 An analysis the State of the Art in Network Stacks
 ====================================================
 
-This section presents to the reader an analysis of the available protocols and arquitectures for a Network Stack. The goal is to provide the foundations from which to infer the conclusions and understand what are libp2p requirements and its designed arquitecture.
+This section presents to the reader an analysis of the available protocols and architectures for a Network Stack. The goal is to provide the foundations from which to infer the conclusions and understand what are libp2p requirements and its designed architecture.
 
 ## 2.1 The client-server model
 
@@ -22,7 +22,11 @@ We even learned how to hide all of the complexity of a distributed system behind
 
 ## 2.2 Categorizing the network stack protocols by solutions
 
-### 2.2.1 Establishing the phisical Link
+Before diving into the libp2p protocols, it is important to understand the large diversity of protocols already in wide use and deployment that help maintain today's simple abstractions. For example, when one thinks about an HTTP connection, one might naively just think HTTP/TCP/IP as the main protocols involved, but in reality many more participate, all depending on the usage, the networks involved, and so on. Protocols like DNS, DHCP, ARP, OSPF, Ethernet, 802.11 (WiFI), ... and many others get involved. Looking inside ISPs' own networks would reveal dozens more.
+
+Additionally, it's worth noting that the traditional 7-layer OSI model characterization does not fit libp2p. Instead, we categorize protocols based on their role, the problem they solve. The upper layers of the OSI model are geared towards point-to-point links between applications, whereas the libp2p protocols speak more towards various sizes of networks, with various properties, under various different security models. Different libp2p protocols can have the same role (in the OSI model, this would be "address the same layer"), meaning that multiple protocols can run simultaneously, all addressing one role (instead of one-protocol-per-layer in traditional OSI stacking) For example, bootstrap lists, mDNS, DHT Discovery, and PEX are all forms of the role "Peer Discovery"; they can coexist and even synergize.
+
+### 2.2.1 Establishing the physical Link
 
 - ethernet
 - wifi
@@ -44,8 +48,10 @@ We even learned how to hide all of the complexity of a distributed system behind
 ### 2.2.4 Routing messages through the Network
 
 - RIP(1, 2)
-- OSPF
+- OSP
 - PPP
+- Tor
+- I2P
 
 ### 2.2.5 Transport
 
