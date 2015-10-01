@@ -44,6 +44,7 @@ Additionally, it's worth noting that the traditional 7-layer OSI model character
 - ARP
 - DHCP
 - DNS
+- Onion
 
 ### 2.2.4 Routing messages through the Network
 
