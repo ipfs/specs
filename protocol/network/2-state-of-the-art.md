@@ -53,6 +53,7 @@ Additionally, it's worth noting that the traditional 7-layer OSI model character
 - PPP
 - Tor
 - I2P
+- cjdns
 
 ### 2.2.5 Transport
 
