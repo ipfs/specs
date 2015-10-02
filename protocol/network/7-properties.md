@@ -186,3 +186,7 @@ For example:
 
 In order to be ubiquitous, we _must_ use hyper-portable format encodings, those that are easy to use in various other platforms. Ideally these encodings are well-tested in the wild, and widely used. There may be cases where multiple encodings have to be supported (and hence we may need a [multicodec](https://github.com/jbenet/multicodec) self-describing encoding), but this has so far not been needed.
 For now, we use [protobuf](https://github.com/google/protobuf) for all protocol messages exclusively, but other good candidates are [capnp](https://capnproto.org), [bson](http://bsonspec.org/), [ubjson](http://ubjson.org/).
+
+### 7.5.6 Secure Communications
+
+The wire protocol is -- of course -- wrapped with encryption. We use cyphersuites similar to TLS. This is explained further in the [network spec](./#encryption).
