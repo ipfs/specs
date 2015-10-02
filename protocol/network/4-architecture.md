@@ -5,11 +5,12 @@ libp2p was designed around the Unix Philosophy, creating smaller components, eas
 
 Although different Peers can support different protocols depending on their capabilities, any Peer can act as a dialer and/or a listener for connections from other Peers, connections that once established can be reused from both ends, removing the distinction between clients and servers.
 
-libp2p interface acts as a thin veneer to three subsystems that are required in order for peers to be able to communicate. These subsystems are allowed to be built on top of other subsystems as long as they respect the standardized interface. The main 3 subsystems are:
+libp2p interface acts as a thin veneer to a multitude of subsystems that are required in order for peers to be able to communicate. These subsystems are allowed to be built on top of other subsystems as long as they respect the standardized interface. The main areas where these subsystems fit are:
 
 - Peer Routing - Mechanism to find a Peer in a network. This Routing can be done recursively, iteratively or even in a broadcast/multicast mode.
 - Swarm - Handles everything that touches the 'opening a stream' part of libp2p, from protocol muxing, stream muxing, NAT Traversal, Connection Relaying, while being multitransport
 - Distributed Record Store - A system to store and distribute records. Records are small entries used by other systems for signaling, establishing links, announcing peers or content, and so on. It has a similar role to DNS in the broader internet.
+- Discovery - Finding or identifying other peers in the network.
 
 Each of these subsystem exposes a well known interface (see chapter 6 for Interfaces) and may use eachother in order to fulfil their goal. A global overview of the system is:
 
@@ -17,9 +18,9 @@ Each of these subsystem exposes a well known interface (see chapter 6 for Interf
 ┌─────────────────────────────────────────────────────────────────────────────────┐
 │                                  libp2p                                         │
 └─────────────────────────────────────────────────────────────────────────────────┘
-┌─────────────────────────┐┌──────────────────────────┐┌──────────────────────────┐
-│       Peer Routing      ││      Swarm               ││ Distributed Record Store │
-└─────────────────────────┘└──────────────────────────┘└──────────────────────────┘
+┌─────────────────┐┌─────────────────┐┌──────────────────────────┐┌───────────────┐
+│   Peer Routing  ││   Swarm         ││ Distributed Record Store ││  Discovery    │
+└─────────────────┘└─────────────────┘└──────────────────────────┘└───────────────┘
 ```
 
 ## 4.1 Peer Routing
@@ -30,11 +31,7 @@ We present two examples of possible Peer Routing subsystems, the first based on 
 
 ### 4.1.1 kad-routing
 
-kad-routing implements the Kademlia Routing table, where each peer holds a set of k-buckets, each of them containing several PeerInfo from other peers in the network. In order to find the whereabouts of these peers, it implements 3 discovery mechanisms:
-
-- mDNS-discovery
-- random-walk
-- bootstrap-list
+kad-routing implements the Kademlia Routing table, where each peer holds a set of k-buckets, each of them containing several PeerInfo from other peers in the network. 
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
@@ -48,36 +45,9 @@ kad-routing implements the Kademlia Routing table, where each peer holds a set o
 └──────────────────────────────────────────────────────────────┘
 ```
 
-#### 4.1.1.1 mDNS-discovery
-
-mDNS-discovery is a Discovery Protocol that uses mDNS (link to wikipedia) over local area networks. It emits mDNS beacons to find if there are more peers available. Local area network peers are very useful to peer-to-peer protocols, as low latency links are very useful.
-
-mDNS-discovery is a standalone protocol and does not depend on any other libp2p protocol. mDNS-discovery can yield peers available in the local area network, without relying on other infrastructure. This is particularly useful in intranets, networks disconnected from the internet backbone, and networks who temporarily loose links.
-
-mDNS-discovery can be configured per-service (i.e. discover only peers participating in a specific protocol, like IPFS), and with private networks (discover peers belonging to a private network).
-
-We are exploring ways to make mDNS-discovery beacons encrypted (so that other nodes in the local network cannot discern what service is being used). Though the nature of mDNS will always reveal local IP addresses.
-
-Privacy Note: mDNS advertises in local area networks, which reveals IP addresses to listeners in the same local network. It is not recommended to use this with privacy-sensitive applications or oblivious routing protocols.
-
-#### 4.1.1.2 random-walk
-
-Random-Walk is a Discovery Protocol for DHTs (and other protocols with routing tables). It makes random DHT queries in order to learn about a large number of peers quickly. This causes the DHT (or other protocol) to converge much faster, at the expense of a small load at the very beginning.
-
-#### 4.1.1.3 bootstrap-list
-
-Bootstrap-List is a Discovery Protocol that uses local storage to cache the addresses of highly stable (and somewhat trusted) peers available in the network. This allows protocols to "find the rest of the network". This is essentially the same way that DNS bootstraps itself. (though note that changing the DNS bootstrap list --the "dot domain" addresses -- is not easy to do, by design).
- - The list should be stored in long-term local storage, whatever that means to the local node (e.g. to disk)
- - Protocols can ship a default list hardcoded or along with the standard code distribution (like DNS)
- - In most cases (and certainly in the case of IPFS) the Bootstrap-List should be user configurable, as users may wish to establish separate networks, or place their reliance and trust in specific nodes.
-
 ### 4.1.2 mDNS-routing
 
 mDNS-routing uses mDNS probes to identify if local area network peers that have a given key or simply are present.
-
-
-
-
 
 
 
@@ -130,3 +100,35 @@ Follows [IPRS](https://github.com/ipfs/specs/tree/master/records)
 ### 4.3.5 s3-record-store
 
 
+
+
+
+
+
+
+
+
+## 4.4 Discovery
+
+### 4.4.1 mDNS-discovery
+
+mDNS-discovery is a Discovery Protocol that uses mDNS (link to wikipedia) over local area networks. It emits mDNS beacons to find if there are more peers available. Local area network peers are very useful to peer-to-peer protocols, as low latency links are very useful.
+
+mDNS-discovery is a standalone protocol and does not depend on any other libp2p protocol. mDNS-discovery can yield peers available in the local area network, without relying on other infrastructure. This is particularly useful in intranets, networks disconnected from the internet backbone, and networks who temporarily loose links.
+
+mDNS-discovery can be configured per-service (i.e. discover only peers participating in a specific protocol, like IPFS), and with private networks (discover peers belonging to a private network).
+
+We are exploring ways to make mDNS-discovery beacons encrypted (so that other nodes in the local network cannot discern what service is being used). Though the nature of mDNS will always reveal local IP addresses.
+
+Privacy Note: mDNS advertises in local area networks, which reveals IP addresses to listeners in the same local network. It is not recommended to use this with privacy-sensitive applications or oblivious routing protocols.
+
+#### 4.4.2 random-walk
+
+Random-Walk is a Discovery Protocol for DHTs (and other protocols with routing tables). It makes random DHT queries in order to learn about a large number of peers quickly. This causes the DHT (or other protocol) to converge much faster, at the expense of a small load at the very beginning.
+
+#### 4.4.3 bootstrap-list
+
+Bootstrap-List is a Discovery Protocol that uses local storage to cache the addresses of highly stable (and somewhat trusted) peers available in the network. This allows protocols to "find the rest of the network". This is essentially the same way that DNS bootstraps itself. (though note that changing the DNS bootstrap list --the "dot domain" addresses -- is not easy to do, by design).
+ - The list should be stored in long-term local storage, whatever that means to the local node (e.g. to disk)
+ - Protocols can ship a default list hardcoded or along with the standard code distribution (like DNS)
+ - In most cases (and certainly in the case of IPFS) the Bootstrap-List should be user configurable, as users may wish to establish separate networks, or place their reliance and trust in specific nodes.
