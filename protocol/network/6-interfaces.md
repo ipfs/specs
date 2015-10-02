@@ -9,9 +9,11 @@
 
 ~~The network is abstracted through the swarm which presents a simplified interface for the remaining layers to have access to the network. This interface should look like:~~
 
-- `.openStream(peer, protocol)` - peer should contain the ID of the peer and its respective multiaddrs known.
-- `.registerHandler(protocol, handlerFunc)` - enable a protocol to be registered, so that another peer can open a stream to talk with us to that specific protocol
-- `.listen()` - to start listening for incoming connections and therefore opening of streams
+- `sw.addTransport(transport, [options, dialOptions, listenOptions])` - Add a transport to be supported by this swarm instance. Swarm expects it to implement the [abstract-transport](https://github.com/diasdavid/abstract-transport) interface.
+- `sw.addUpgrade(connUpgrade, [options])` - A connection upgrade must be able to receive and return something that implements the [abstract-connection](https://github.com/diasdavid/abstract-connection) interface.
+- `sw.addStreamMuxer(streamMuxer, [options])` - Upgrading a connection to use a stream muxer is still considered an upgrade, but a special case since once this connection is applied, the returned obj will implement the abstract-stream-muxer interface.
+- `sw.dial(PeerInfo, options, protocol, callback)` - PeerInfo should contain the ID of the peer and its respective multiaddrs known.
+- `sw.handleProtocol(protocol, handlerFunction)` - enable a protocol to be registered, so that another peer can open a stream to talk with us to that specific protocol
 
 The following figure represents how the network level pieces, are tied together:
 
