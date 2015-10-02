@@ -1,7 +1,7 @@
 8 Implementations
 =================
 
-These are the list of known libp2p, or in another words, the components that respect the interfaces and expectations defined in the Interfaces chapter, that can be composed to make a working libp2p.
+This is a list of known libp2p module implementations. They are components that respect the interfaces and expectations defined in the "Interfaces" chapter, and can be composed to make a working libp2p library.
 
 ## 8.1 libp2p
 
