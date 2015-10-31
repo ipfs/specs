@@ -30,7 +30,7 @@ This RFC is organized by chapters described on the `Table of Contents` section. 
 
 - [1 Introduction](/protocol/network/1-introduction.md)
   - [1.1 Motivation](/protocol/network/1-introduction.md#11-motivation)
-  - [1.2 Goals](#/protocol/network/1-introduction.md#12-goals)
+  - [1.2 Goals](/protocol/network/1-introduction.md#12-goals)
 - [2 Overview of current Network Stack](/protocol/network/2-state-of-the-art.md)
   - [2.1 Client Server model](/protocol/network/2-state-of-the-art.md#21-the-client-server-model)
   - [2.2 Categorizing the Network Stack protocols by solutions](/protocol/network/2-state-of-the-art.md#22-categorizing-the-network-stack-protocols-by-solutions)
