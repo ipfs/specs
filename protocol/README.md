@@ -40,7 +40,7 @@ In turn, these yield properties for the system as a whole:
 
 - links are content addressed
 - objects can be served by untrusted agents
-- objects can be cached permenently
+- objects can be cached permanently
 - objects can be created and used offline
 - networks can be partitioned and merged
 - any datastructure can be modelled and distributed
