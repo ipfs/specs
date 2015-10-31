@@ -28,7 +28,7 @@ This RFC is organized by chapters described on the `Table of Contents` section. 
 
 # Table of Contents
 
-- [1 Introduction](protocol/network/1-introduction.md)
+- [1 Introduction](/protocol/network/1-introduction.md)
   - [1.1 Motivation]()
   - [1.2 Goals]()
 - [2 Overview of current Network Stack](2-current-network-stack.md)
