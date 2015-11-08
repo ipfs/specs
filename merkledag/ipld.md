@@ -286,7 +286,7 @@ Suppose _this_ was the _exact order_ in the _Canonical Format_ (not json, but cb
 
 #### Path Restrictions
 
-There are some important problems that come about with path descriptions in Unix and the web. For a discussion see (TODO link to path issue in go-ipfs or go-ipld). In order to be compatible with the models and expectations of unix and the web, IPLD explicitly disallows paths with certain path components. **Note that the data itself _may_ still contain these properties (someone will do it, and there are legitimate uses for it). So it is only _Path Resolvers_ that MUST NOT resolve through those paths.** The restrictions are the same as typical unix and UTF-8 path systems:
+There are some important problems that come about with path descriptions in Unix and the web. For a discussion see [this discussion](https://github.com/ipfs/go-ipfs/issues/1710). In order to be compatible with the models and expectations of unix and the web, IPLD explicitly disallows paths with certain path components. **Note that the data itself _may_ still contain these properties (someone will do it, and there are legitimate uses for it). So it is only _Path Resolvers_ that MUST NOT resolve through those paths.** The restrictions are the same as typical unix and UTF-8 path systems:
 
 
 TODO:
