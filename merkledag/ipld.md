@@ -162,17 +162,12 @@ Suppose this hashes to the multihash value `QmBBB...BBB`. This node links the _s
 
 > ipld cat --json QmBBB...BBB/author
 {
-  "title": "As We May Think",
-  "author": {
-    "mlink": "QmAAA...AAA" // links to the node above.
-  }
+  "name": "Vannevar Bush"
 }
 
 > ipld cat --yml QmBBB...BBB/author
 ---
-title: As We May Think
-author:
-  mlink: QmAAA...AAA
+name: Vannevar Bush
 
 > ipld cat --json QmBBB...BBB/author/name
 "Vannevar Bush"
