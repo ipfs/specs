@@ -36,7 +36,7 @@ libp2p uses cyphersuites like TLS.
 
 libp2p is transport agnostic, so it can run over any transport protocol. It does not even depend on IP; it may run on top of NDN, XIA, and other new internet architectures.
 
-In order to reason about possible transports, libp2p uses [multiaddr](https://github.com/jbenet/multiaddr), a self-describing addressing format. This makes it possible for libp2p to treat addresses opaquely everywhere in the system, and have support various transport protocols in the network layer. The actual format of addresses in libp2p is `ipfs-addr`, a multiaddr that ends with an ipfs nodeid. For example, these are all valid `ipfs-addrs`:
+In order to reason about possible transports, libp2p uses [multiaddr](https://github.com/jbenet/multiaddr), a self-describing addressing format. This makes it possible for libp2p to treat addresses opaquely everywhere in the system, and have support for various transport protocols in the network layer. The actual format of addresses in libp2p is `ipfs-addr`, a multiaddr that ends with an ipfs nodeid. For example, these are all valid `ipfs-addrs`:
 
 ```
 # ipfs over tcp over ipv6 (typical tcp)
@@ -69,7 +69,7 @@ libp2p is pragmatic. It seeks to be usable in as many settings as possible, to b
 - can multiplex multiple transport protocols
 - can multiplex multiple connections per peer
 - can multiplex multiple client protocols
-- can multiples multiple streams per protocol, per connection (SPDY, HTTP2, QUIC, SSH)
+- can multiplex multiple streams per protocol, per connection (SPDY, HTTP2, QUIC, SSH)
 - has flow control (backpressure, fairness)
 - encrypts each connection with a different ephemeral key
 
