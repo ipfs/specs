@@ -33,11 +33,14 @@ For example, suppose we have this _merkle-path_:
 ```
 /ipfs/QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k/a/b/c/d
 ```
+
 Where:
 - `ipfs` is a protocol namespace (to allow the computer to discern what to do)
 - `QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k` is a cryptographic hash.
 - `a/b/c/d` is a path _traversal_, as in unix.
 - this link traverses five objects.
+
+Suppose also that this path points to the object `{ "hello": "world" }`.
 
 Resolving it involves looking up each object and attaining a hash value, then traversing to the next.
 
@@ -82,7 +85,7 @@ Some Constraints:
 - Given the wide success of JSON, a huge number of systems present JSON interfaces. IPLD MUST be able to import and export to JSON trivially.
 - The JSON data model is also very simple and easy to use. IPLD MUST be just as easy to use.
 - Definining new datastructures MUST be trivially easy. It should not be cumbersome -- or require much knowledge -- to experiment with new definitions on top of IPLD.
-- IPLD MUST be compatible with RDF and the proper W3C Semantic Web / Linked Data standards. We can achieve this easily through JSON-LD.
+- Since IPLD is based on the JSON data model, it is fully compatible with RDF and Linked Data standards through JSON-LD.
 - IPLD Serialized Formats (on disk and on the wire) MUST be fast and space efficient. (should not use JSON as the storage format, and instead use CBOR or similar formats)
 - IPLD cryptographic hashes MUST be upgradeable (use [multihash](https://github.com/jbenet/multihash))
 
@@ -162,17 +165,12 @@ Suppose this hashes to the multihash value `QmBBB...BBB`. This node links the _s
 
 > ipld cat --json QmBBB...BBB/author
 {
-  "title": "As We May Think",
-  "author": {
-    "mlink": "QmAAA...AAA" // links to the node above.
-  }
+  "name": "Vannevar Bush"
 }
 
 > ipld cat --yml QmBBB...BBB/author
 ---
-title: As We May Think
-author:
-  mlink: QmAAA...AAA
+name: "Vannevar Bush"
 
 > ipld cat --json QmBBB...BBB/author/name
 "Vannevar Bush"
@@ -302,11 +300,11 @@ On the subject of integers, there exist a variety of formats which represent int
 
 ## Serialized Data Formats
 
-IPLD supports a variety of serialized data formats trough [multicodec](https://github.com/jbenet/multicodec). These can be used however is idiomatic to the format, for example in `CBOR`, we can use `CBOR` type tags to represent the merkle-link, and avoid writing out the full string key `mlink`. Users are encouraged to use the formats to their fullest, and to store and transmit IPLD data in whatever format makes the most sense. The only requirement **is that there MUST be a well-defined one-to-one mapping with the IPLD Canonical format.** This is so that data can be transformed from one format to another, and back, without changing its meaning nor its cryptographic hashes.
+IPLD supports a variety of serialized data formats through [multicodec](https://github.com/jbenet/multicodec). These can be used however is idiomatic to the format, for example in `CBOR`, we can use `CBOR` type tags to represent the merkle-link, and avoid writing out the full string key `mlink`. Users are encouraged to use the formats to their fullest, and to store and transmit IPLD data in whatever format makes the most sense. The only requirement **is that there MUST be a well-defined one-to-one mapping with the IPLD Canonical format.** This is so that data can be transformed from one format to another, and back, without changing its meaning nor its cryptographic hashes.
 
 ### Canonical Format
 
-In order to preserve merkle-linking's power, we muste ensure that there is a single **_canonical_** serialized representation of an IPLD document. This ensures that applications arrive at the same cryptographic hashes. It should be noted --though-- that this is a system-wide parameter. Future systems might change it to evolve representations. However we estimate this would need to be done no more than once per decade.
+In order to preserve merkle-linking's power, we must ensure that there is a single **_canonical_** serialized representation of an IPLD document. This ensures that applications arrive at the same cryptographic hashes. It should be noted --though-- that this is a system-wide parameter. Future systems might change it to evolve representations. However we estimate this would need to be done no more than once per decade.
 
 **The IPLD Canonical format is _canonicalized CBOR_.**
 
