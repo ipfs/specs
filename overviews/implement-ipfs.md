@@ -19,6 +19,7 @@ There are a number of self-describing protocols/formats in use all over ipfs.
 - [multiaddr](https://github.com/jbenet/multiaddr)
 - [multihash](https://github.com/jbenet/multihash)
 - [multicodec](https://github.com/jbenet/multicodec)
+- [multistream](https://github.com/jbenet/multistream)
 
 ### libp2p
 
@@ -62,8 +63,8 @@ Implementations:
   - [go-ipfs-repo-fs](https://github.com/ipfs/go-ipfs-repo/fs) - in filesystem
   - [go-ipfs-repo-s3](https://github.com/ipfs/go-ipfs-repo/s3) - in amazon s3
 - [js-ipfs-repo](https://github.com/ipfs/js-ipfs-repo)
-  - [go-ipfs-repo-fs](https://github.com/ipfs/go-ipfs-repo/fs) - in filesystem
-  - [go-ipfs-repo-browser](https://github.com/ipfs/go-ipfs-repo/browser) - in local storage
+  - [js-ipfs-repo-fs](https://github.com/ipfs/js-ipfs-repo/fs) - in filesystem
+  - [js-ipfs-repo-browser](https://github.com/ipfs/js-ipfs-repo/browser) - in local storage
 
 ## IPFS Core
 
