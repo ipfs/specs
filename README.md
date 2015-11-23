@@ -7,6 +7,13 @@ For now, they assume a high level of familiarity with the concepts.
 
 ![](ipfs-splash.png)
 
+## Table of Contents
+
+- [Disclaimer](#work-in-progress)
+- [Specifications](#specs)
+- [Implementations](#implementations)
+- [Contributing](#contributing)
+
 ## Work In Progress
 
 Warning: this is a work in progress. IPFS is a young system and we want to
@@ -70,12 +77,19 @@ Formats:
 - [multihash](https://github.com/jbenet/multihash) - self-describing hash digest format
 - [multiaddr](https://github.com/jbenet/multiaddr) - self-describing addressing format
 
+## Implementations
 
-## Collaborating
+- [IPLD](https://github.com/ipfs/go-ipld)
+- [Blockchain-data](https://github.com/ipfs/blockchain-data)
+- [Bitswap-ml](https://github.com/ipfs/bitswap-ml)
+- [Archive-format](https://github.com/ipfs/archive-format)
+
+## Contributing
 
 Suggestions, contributions, criticisms are welcome. Though please make sure to
 familiarize yourself deeply with IPFS, the models it adopts, and the principles
-it follows.
+it follows, as specified in the [IPFS Contributor's
+Guide](https://github.com/ipfs/contributing).
 
 Please be aware that specs are really hard to design by committee.
 Treat this space like you would the workshop of an artist. Please suggest
