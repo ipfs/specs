@@ -73,6 +73,6 @@ Additionally, it's worth noting that the traditional 7-layer OSI model character
 
 ## 2.3 Current Shortcommings
 
-Although we currently have a panoply of protocols available for our services the communicate, the abundance and the variety of solutions is also its shortfall. It is currently dificult for an application to be able to support and be available through several transports (for e.g. the lack of TCP/UDP stack in browser applications).
+Although we currently have a panoply of protocols available for our services the communicate, the abundance and the variety of solutions is also its shortfall. It is currently difficult for an application to be able to support and be available through several transports (for e.g. the lack of TCP/UDP stack in browser applications).
 
 There is also no 'presence linking', meaning that isn't a notion for a peer to announce itself in several transports, so that other peer can guarantee that it is always the same peer.
