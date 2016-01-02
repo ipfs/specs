@@ -18,17 +18,17 @@ get it right. We will continue to evaluate and re-think pieces. At this point,
 the IPFS protocol is solid enough to write this spec and produce interoperable
 implementations in different languages.
 
-**(This is not done yet, but)**
+**(This is not done yet, but.)**
 I will tag different specs with their stability:
 
 - `wip` this spec is a work-in-progress, it is likely not even complete.
 - `draft` this spec is a rough draft and will likely change substantially.
 - `stable` this spec is likely to improve, but not change fundamentally.
-- `reliable` this spec is believed to be close to final. minor changes only.
-- `permanent` this spec will not change
+- `reliable` this spec is believed to be close to final. Minor changes only.
+- `permanent` this spec will not change.
 
 Nothing in this spec repository is `permanent` yet. The most important
-pieces of IPFS are now `solid` or `stable`. Many subsystems remain as
+pieces of IPFS are now `reliable` or `stable`. Many subsystems remain as
 `draft`.
 
 Note that, as in many IPFS repositories, most of the work is happening in
@@ -46,28 +46,27 @@ Stack:
 - network - the network layer spec
 - routing - the routing layer spec
 - exchange - the exchange layer spec
-- merkledag - the merkledag layer spec
+- merkledag - the Merkle DAG layer spec
 - ipns - the naming layer spec
 - app - the application layer spec
 
-
 Routing Systems:
-- kademlia - kademlia dht
-- dnssd - mdns for local area networks
+- kademlia - Kademlia DHT
+- dnssd - mDNS for local area networks
 - snr - supernode delegated routing
 - multirouter - combines multiple others
 
 Exchanges:
-- bitswap - bittorrent inspired exchange
+- bitswap - BitTorrent-inspired exchange
 
 Service:
-- service - the spec ipfs libraries and servers should implement
-- service-http-api - the http api version of ipfs-service
-- service-cli - the cli version of ipfs-service
+- service - the spec IPFS libraries and servers should implement
+- service-http-api - the HTTP API version of ipfs-service
+- service-cli - the CLI version of ipfs-service
 
 Repository:
-- [repo](repo) - ipfs node local repository spec
-- config - ipfs node configuration
+- [repo](repo) - IPFS node local repository spec
+- config - IPFS node configuration
 - fs-repo - the spec of the fs-repo implementation
 
 Other protocols:
@@ -77,7 +76,6 @@ Other protocols:
 Formats:
 - [multihash](https://github.com/jbenet/multihash) - self-describing hash digest format
 - [multiaddr](https://github.com/jbenet/multiaddr) - self-describing addressing format
-
 
 ## Collaborating
 
