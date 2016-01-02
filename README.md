@@ -31,6 +31,10 @@ Nothing in this spec repository is `permanent` yet. The most important
 pieces of IPFS are now `solid` or `stable`. Many subsystems remain as
 `draft`.
 
+Note that, as in many IPFS repositories, most of the work is happening in
+[the issues](https://github.com/ipfs/specs/issues/) or in [active pull requests](https://github.com/ipfs/specs/pulls/).
+Go take a look!
+
 ## Specs
 
 The specs contained in this repository are:
