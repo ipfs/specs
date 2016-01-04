@@ -33,11 +33,41 @@ This RFC is organized by chapters described on the *Table of contents* section.
 
 # Introduction
 
+Importing data into IPFS can be done in a variety of ways. These are use-case specific, produce different datastructures, produce different graph topologies, and so on. These are not strictly needed in an IPFS implementation, but definitely make it more useful. 
+
+These data importing primitivies  are really just tools on top of IPLD, meaning that these can be generic and separate from IPFS itself.
+
+Essentially, data importing is divided into two parts:
+
+- Layouts - The graph topologies in which data is going to be structured and represented, there can include:
+  - balanced graphs, simpler to implement
+  - trickledag, a custom graph optimized for seeking
+  - live stream
+  - database indices
+  - and so on
+- Splitters - The chunking algorithms applied to each file, these can be:
+  - fixed size chunking (also known as dumb chunking)
+  - rabin fingerprinting
+  - dedicated format chunking, these require knowledge of the format and typically only work with certain time of files (e.g. video, audio, images, etc)
+  - special datastructures chunking, formats like, tar, pdf, doc, container and/org vm images fall into this category
+
 ### Goals
 
 - Have a set of primitives to digest, chunk and parse files, so that different chunkers can be replaced/added without any trouble.
 
 # Requirements
+
+These are a set of requirements (or guidelines) of the expectations that need to be fullfilled for a layout or a splitter:
+
+- a layout should expose an API encoder/decoder like, that is, able to convert data to its format and convert it back to the original format
+- a layout should contain a clear umnambiguous representation of the data that gets converted to its format
+- a layout can leverage one or more splitting strategies, applying the best strategy depending on the data format (dedicated format chunking)
+- a splitter can be:
+  - agnostic - chunks any data format in the same way
+  - dedicated - only able to chunk specific data formats
+- a splitter should expose also a encoder/decoder like API
+- a splitter, once fed with data, should yield chunks to be added to layout or another layout of itself
+- an importer is a aggregate of layouts and splitters
 
 # Architecture
 
@@ -60,9 +90,9 @@ This RFC is organized by chapters described on the *Table of contents* section.
 
 # Interfaces
 
-#### chunker (splitters)
+#### splitters
 
-#### layout (topologies)
+#### layout
 
 #### importer
 
