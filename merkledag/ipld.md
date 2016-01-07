@@ -26,7 +26,18 @@ Objects with merkle-links form a Graph (merkle-graph), which necessarily is both
 
 ### What is a _merkle-path_?
 
-A _merkle-path_ is a unix-style path (e.g. `/a/b/c/d`) which initially dereferences through a _merkle-link_ and then follows _named merkle-links_ in the intermediate objects. Following a name means looking into the object, finding the _name_ and resolving the associated _merkle-link_.
+A merkle-path is a unix-style path (e.g. `/a/b/c/d`) which initially dereferences through a _merkle-link_ and allows access of elements of the referenced node and other nodes transitively.
+
+There is no single merkle-path, but there are two:
+
+- merkle-path for filesystems: this is a merkle-path that is designed to be used in the context of filesystems (that also includes network protocols such as HTTP or FTP). Their idea is to be as close as possible to the traditional filesystem semantic
+- merkle-path for IPLD: this is a merkle-path that can be used to access more elements of the IPLD data model (specifically: link properties) but that doesn't fit within the traditional filesystem model.
+
+When you use a merkle path, make sure of which one you use. Command line tools are encouraged to allow switching between the two flavors using a switch.
+
+### Filesystem merkle-path
+
+A _filesystem merkle-path_ is a unix-style path which initially dereferences through a _merkle-link_ and then follows _named merkle-links_ in the intermediate objects. Following a name means looking into the object, finding the _name_ and resolving the associated _merkle-link_.
 
 For example, suppose we have this _merkle-path_:
 
@@ -71,6 +82,81 @@ O_5 = | "hello": "world"  |  whose hash value is QmR8Bzg59Y4FGWHeu9iTYhwhiP8PHCN
 ```
 
 This entire _merkle-path_ traversal is a unix-style path traversal over a _merkle-dag_ which uses _merkle-links_ with names.
+
+### IPLD merkle-path (best solution)
+
+An _IPLD merkle-path_ is an extension of a _filesystem merkle-path_ which uses a special syntax to access link properties.
+
+Path elements are suffixed by either `.link` to access the link properties or by `.object` to dereference the _merkle-link_. if no suffix is present, the _merkle-link_ is dereferenced (to be compatible with _filesystem merkle-paths_ in most cases)
+
+**FIXME**: perhaps use different suffixes so we are less likely to have ambiguities. Using a character that is denied by Windows would be a good idea since those are less likely to be present in filenames. For most cases, this would make _IPLD merkle-paths_ a superset of _filesystem merkle-paths_. For example we could use `?link` and `?object`
+
+Suppose we have object which hashes to QmCCC...000:
+
+    ---
+    stuff:
+      foo:
+        mlink: QmCCC...111
+        mode: 0755
+        owner: jbenet
+
+and we have object which hashes to QmCCC...111 (the foo link):
+
+    ---
+    other:
+      cat.link:
+        mlink: QmCCC...222
+        mode: 0644
+        owner: jbenet
+
+Now:
+
+- the path `/ipfs/QmCCC...000/stuff/foo.link/mode` yields `0755`
+- the path `/ipfs/QmCCC...000/stuff/foo/other/cat.link/mode` does not exists because `other` does not have a `cat` object, only a `cat.link`
+- the path `/ipfs/QmCCC...000/stuff/foo/other/cat.link.link/mode` yields `0644`
+- the path `/ipfs/QmCCC...000/stuff/foo.object/other/cat.link` yields object `QmCCC...222`
+
+### IPLD merkle-path (other solution)
+
+An _IPLD merkle-path_ is a path which initially dereferences through a _merkle-link_ and then follows elements in intermediate objects through the separator `.`, and follows _merkle-links_ through the separator `/`.
+
+**Variation:** The separator `/` can also be used instead of `.` if there is no ambiguity.
+
+The separator can be escaped in any path element using `\.`, and the `\` character is escaped using `\\`.
+
+Suppose we have object which hashes to QmCCC...000:
+
+    ---
+    stuff:
+      foo:
+        mlink: QmCCC...111
+        mode: 0755
+        owner: jbenet
+
+and we have object which hashes to QmCCC...111 (the foo link):
+
+    ---
+    other:
+      cat.jpg:
+        mlink: QmCCC...222
+        mode: 0644
+        owner: jbenet
+
+Now:
+
+- the path `/ipfs/QmCCC...000/stuff.foo.mode` yields `0755`
+- the path `/ipfs/QmCCC...000/stuff/foo` does not exists because in the object `QmCCC...000`, the `stuff` object cannot is not a _merkle-link_ (it doesn't have the `mlink` key)
+- the path `/ipfs/QmCCC...000/stuff.foo/other.cat\.jpg` yields object `QmCCC...222`
+    <br/>**FIXME:** or does it yields `{"mlink": "QmCCC...222", "mode": 0644, "owner": "jbenet"}` and `/ipfs/QmCCC...000/stuff.foo/other.cat\.jpg` yields the object `QmCCC...222`?
+- the path `/ipfs/QmCCC...000/stuff.foo/other.cat\.jpg.mode` yields `0644`
+
+Variation:
+
+- the path `/ipfs/QmCCC...000/stuff/foo.mode` yields `0755`
+- the path `/ipfs/QmCCC...000/stuff.foo.mode` yields `0755`
+- the path `/ipfs/QmCCC...000/stuff/foo/mode` does not exists because object `QmCCC...111` does not have a `mode` key.
+- the path `/ipfs/QmCCC...000/stuff.foo/other.cat\.jpg` yields same as above (**FIXME**)
+- the path `/ipfs/QmCCC...000/stuff.foo/other.cat\.jpg.mode` yields `0644`
 
 ## What is the IPLD Data Model?
 
