@@ -104,7 +104,8 @@ To unescape IPLD object keys that are not reserved and get the corresponding pat
 
 ### IPLD merkle-path (best solution)
 
-An _IPLD merkle-path_ is an extension of a _filesystem merkle-path_ which uses a special syntax to access link properties.
+An _IPLD merkle-path_ is an extension of a _filesystem merkle-path_ which uses a special syntax to access link properties. **[In case we use escaping in protobuf IPLD format** Except that key escaping is not performed when looking up items in the IPLD objects. This allow accessing reserved keys using _IPLD merkle-paths_ that are not accessible in filesystems.**]**
+
 
 Path elements are suffixed by either `.link` to access the link properties or by `.object` to dereference the _merkle-link_. if no suffix is present, the _merkle-link_ is dereferenced (to be compatible with _filesystem merkle-paths_ in most cases)
 
