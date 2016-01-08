@@ -85,6 +85,23 @@ O_5 = | "hello": "world"  |  whose hash value is QmR8Bzg59Y4FGWHeu9iTYhwhiP8PHCN
 
 This entire _merkle-path_ traversal is a unix-style path traversal over a _merkle-dag_ which uses _merkle-links_ with names.
 
+**[In case we use escaping in protobuf IPLD format]**
+
+In order to not restrict individual path component by disallowing some file names and still allow storing arbitrary data in IPLD objects, path components must be escaped when they are looked up in IPLD objects.
+
+To escape a path component in order to look it up in an IPLD object:
+
+- every `\` character in the path component must be replaced with `\\`
+- every `@` character in the path component must be replaced with `\@`
+
+This makes any key containing a `@` character unescaped in an IPLD object not accessible through a _filesystem merkle-path_. This is a reserved key that can be used to store auxiliary data without making it a link and visible in regular filesystems. This data can be made available in filesystems through extended attributes or opening and reading file contents.
+
+To unescape IPLD object keys that are not reserved and get the corresponding path component:
+
+- every `\@` sequence in the key must be replaced by `@`
+- every `\\` sequence in the key must be replaced by `\`
+
+
 ### IPLD merkle-path (best solution)
 
 An _IPLD merkle-path_ is an extension of a _filesystem merkle-path_ which uses a special syntax to access link properties.
