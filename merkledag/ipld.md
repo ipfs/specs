@@ -41,6 +41,8 @@ There is no single merkle-path, but there are two:
 
 When you use a merkle path, make sure of which one you use. Command line tools are encouraged to allow switching between the two flavors using a switch.
 
+Filesystem representations (fuse mounts, HTTP or FTP protocols) should use the _filesystem merkle-paths_ if they intend to store arbitrary file. They can allow switching to _IPLD merkle-paths_ using a mount option or a configuration switch to allow object inspection, and turn the filesystem something like `/proc` or `/sys` on unix machines where storing user files is not the objective.
+
 ### Filesystem merkle-path
 
 A _filesystem merkle-path_ is a unix-style path which initially dereferences through a _merkle-link_ and then follows _named merkle-links_ in the intermediate objects. Following a name means looking into the object, finding the _name_ and resolving the associated _merkle-link_.
