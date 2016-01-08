@@ -308,11 +308,37 @@ On the subject of integers, there exist a variety of formats which represent int
 
 IPLD supports a variety of serialized data formats through [multicodec](https://github.com/jbenet/multicodec). These can be used however is idiomatic to the format, for example in `CBOR`, we can use `CBOR` type tags to represent the merkle-link, and avoid writing out the full string key `@link`. Users are encouraged to use the formats to their fullest, and to store and transmit IPLD data in whatever format makes the most sense. The only requirement **is that there MUST be a well-defined one-to-one mapping with the IPLD Canonical format.** This is so that data can be transformed from one format to another, and back, without changing its meaning nor its cryptographic hashes.
 
+## Serialised CBOR with tags
+
+IPLD objects can be represented using cbor using the tags described below when possible. Tags are defined in [RFC 7049 section 2.4](http://tools.ietf.org/html/rfc7049#section-2.4):
+
+- `<tag-escaped-key>`: **[If key escaping is necessary]** The string that follows (major type 2 or 3) is interpreted as an escaped string (of the same major type). Every occurrences of `\` are considered to be `\\`, and every occurrences of `@` are considered to be `\@`.
+
+- `<tag-base58>`: the byte string that follows (major type 2) is to be interpreted as a text string instead (major type 3). This text string is the base58 encoded version of the byte string.
+
+- `<tag-ipfs-path>`: the text string (major type 2) that follows (or the byte string tagged with `<tag-base58>`) is to be interpreted with "`/ipfs/`" added in front of the string.
+
+- `<tag-link-object>`:  an array (major type 4) must follow. The array must have two elements: a text string (or a byte string tagged using `<tag-ipfs-path>`) followed by a map (major type 5). This whole must be interpreted as a map identical to the map of the array, but with an additional entry. The additional entry would have a text string containing `link` as a key, and the text string contained in the array as value.
+
+**FIXME:** register tags with IANA.
+
+When encoding an IPLD node to CBOR with tags, these tags must be included whenever possible, and avoided if not necessary. This will ensure a unique encoding across implementations. More specifically (and in this order):
+
+- If map key is a text string `s` and `escape(unescape(s)) == s`, then this string is transformed to `unescape(s)` and tagged with `<tag-escaped-key>`
+
+- if a text string starts with "`/ipfs/`", this prefix is removed and the string is tagged with `<tag-ipfs-path>`.
+
+- If a text string contains a valid base58 encoded value, it is converted to a binary string and tagged with `<tag-base58>`
+
+- If a map contains an entry which key is the text string "`link`", this entry is removed from the map, an array is created containing the entry value and the map, and this array is prefixed by the tag `<tag-link-object>`. The result is used in place of the map.
+
+When an IPLD object contains these tags in the way explained here, the multicodec header used to represent the object codec must be `/cbor/ipld-tagsv1` instead of just `/cbor`. Readers will be able to use an optimized reading process to detect links using these tags.
+
 ### Canonical Format
 
 In order to preserve merkle-linking's power, we must ensure that there is a single **_canonical_** serialized representation of an IPLD document. This ensures that applications arrive at the same cryptographic hashes. It should be noted --though-- that this is a system-wide parameter. Future systems might change it to evolve representations. However we estimate this would need to be done no more than once per decade.
 
-**The IPLD Canonical format is _canonicalized CBOR_.**
+**The IPLD Canonical format is _canonicalized CBOR with tags_.**
 
 The legacy canonical format is protocol buffers.
 
