@@ -98,27 +98,27 @@ For example, suppose we have this _merkle-path_:
 
 The link will:
 
-- look up the first object `QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k` that we call `root`
-- Look up the key `root["a"]["b"]` and find here a _merkle-link_
+- look up the first object `QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k` that we call `object0`
+- Look up the key `object0["a"]["b"]` and find here a _merkle-link_
 - Dereference this _merkle-link_ to get `object1`
 - Look up the key `object1["c"]["d"]` which will be returned as the result
 
 Note that if we added a trailing slash to the path (`/ipfs/QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k/a.b/c.d/`), we would perform a last _merkle-link_ dereferencing:
 
-- look up the first object `QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k` that we call `root`
-- Look up the key `root["a"]["b"]` and find here a _merkle-link_
+- look up the first object `QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k` that we call `object0`
+- Look up the key `object0["a"]["b"]` and find here a _merkle-link_
 - Dereference this _merkle-link_ to get `object1`
 - Look up the key `object1["c"]["d"]` and find a _merkle-link_
 - Dereference this _merkle-link_ and return the IPLD object as the result
 
-Also, in case the IPLD object does not contain a _merkle-link_, it is possible to use both the `/` or the `.` separator as there is no ambiguity.
+Also, in case the IPLD object does not contain a _merkle-link_, it is possible to use both the `/` or the `.` separator to access internal properties as there is no ambiguity.
 
 To be able to access objects that are behind keys containing either a `/` or a `.` character, the individual path element can be character escaped using `\`.
 
 For example, resolving `/ipfs/QmUmg7B.../a\.b.c/d\/e/f\\g/` will:
 
-- look for the IPLD node that we call `root` whose hash is `QmUmg7B...`
-- resolve _merkle-link_ found in `root["a.b"]["c"]` to `object1`
+- look for the IPLD node that we call `object0` whose hash is `QmUmg7B...`
+- resolve _merkle-link_ found in `object0["a.b"]["c"]` to `object1`
 - resolve _merkle-link_ found in `object1["d/e"]` to `object2`
 - resolve _merkle-link_ found in `object2["f\\g"]` and return the result.
 
