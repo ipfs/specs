@@ -34,9 +34,9 @@ Objects with merkle-links form a Graph (merkle-graph), which necessarily is both
 
 A merkle-path is a unix-style path (e.g. `/a/b/c/d`) which initially dereferences through a _merkle-link_ and allows access of elements of the referenced node and other nodes transitively.
 
-Merkle paths aren't suited to be used in filesystem representations (fuse mounts, HTTP or FTP protocols) as they describe the underlying IPLD data structure. Their use in filesystems is howver well suited for debug purposes (like `/proc` on unix).
+_Merkle-paths_ aren't suited for using them in a general purpose filesystem because it introduces many restrictions on file names. However, it can be used to work on special purpose filesystems. It can be compared to the `/proc` filesystem on unix computers or HTTP Web APIs where the allowed paths is restricted.
 
-Filesystems are encouraged to design an object model on top of IPLD that would be specialized for file manipulation and have specific path algorithms to query this model
+General purpose filesystems are encouraged to design an object model on top of IPLD that would be specialized for file manipulation and have specific path algorithms to query this model
 
 ### How do _merkle-paths_ work?
 
