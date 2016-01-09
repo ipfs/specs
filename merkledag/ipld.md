@@ -308,6 +308,16 @@ In order to preserve merkle-linking's power, we must ensure that there is a sing
 
 **The IPLD Canonical format is _canonicalized CBOR_.**
 
+The legacy canonical format is protocol buffers.
+
+This canonical format is used to decide which format to use when creating the object for the first time and computing its hash. Once the format is decided for an IPLD object, it must be used in all communications so senders and receivers can check the data against the hash.
+
+For example, when sending a legacy object encoded in protocol buffers over the wire, the sender must not send the CBOR version as the receiver will not be able to check the file validity.
+
+In the same way, when the receiver is storing the object, it must make sure that the canonical format for this object is store along with the object so it will be able to share the object with other peers.
+
+A simple way to store such objects with their format is to store them with their multicodec header.
+
 
 ## Datastructure Examples
 
