@@ -48,40 +48,107 @@ The conversion to the IPLD data model must have the following properties:
 
 There is a canonical form which is described below:
 
-**FIXME: decide on that form. Until now, multiple possible forms are presented here**
+    {
+      "data": "<Data>",
+      "named-links": {
+        "<Links[0].Name>": {
+          "link": "<Links[0].Hash.(base58)>",
+          "name": "<Links[0].Name>",
+          "size": <Links[0].Tsize>
+        },
+        "<Links[2].Name>": {
+          "link": "<Links[1].Hash.(base58)>",
+          "name": "<Links[1].Name>",
+          "size": <Links[1].Tsize>
+        },
+        ...
+      }
+      "ordered-links": [
+        "<Links[0].Name>",
+        {
+          "name": "<Link[1].Name>",
+          "link": "<Links[1].Hash.(base58)>",
+          "tsize": <Links[1].Tsize>
+        }
+        "<Links[2].Name>",
+        ...
+      ]
+    }
 
+- Here we assume that the link #0 and #1 have the same name. As specified in [ipld.md](ipld.md) in paragraph **Duplicate property keys**, only the first link is present in the named link section. The other link is present in the `ordered-links` section for completeness and to allow recreating the original protocol buffer message.
 
-### Escape encoding
+- Links are not accessible on the top level object. Applications that are using protocol buffer objects such as unixfs will have to handle that and special case for legacy objects.
+
+- No escaping is needed and no conflict is possible
+
+-----------------
+
+### Simple variation on that solution
+
+    {
+      "data": "<Data>",
+      "<Links[0].Name>": {
+        "link": "<Links[0].Hash.(base58)>",
+        "name": "<Links[0].Name>",
+        "size": <Links[0].Tsize>
+      },
+      "<Links[2].Name>": {
+        "link": "<Links[1].Hash.(base58)>",
+        "name": "<Links[1].Name>",
+        "size": <Links[1].Tsize>
+      },
+        ...
+      "ordered-links": [
+        "<Links[0].Name>",
+        {
+          "name": "<Link[1].Name>",
+          "link": "<Links[1].Hash.(base58)>",
+          "tsize": <Links[1].Tsize>
+        }
+        "<Links[2].Name>",
+        ...
+      ]
+    }
+
+- Here we assume that the link #0 and #1 have the same name. As specified in [ipld.md](ipld.md) in paragraph **Duplicate property keys**, only the first link is present in the named link section. The other link is present in the `ordered-links` section for completeness and to allow recreating the original protocol buffer message.
+
+- Link whose name would conflict with other top level keys are not included in the top level object. They are only accessible in `ordered-links` section by iterating through the values.
+
+- Links are not accessible on the top level object. Applications that are using protocol buffer objects such as unixfs will have to handle that and special case for legacy objects.
+
+- No escaping is needed and no conflict is possible
+
+### Other variation: escape encoding
 
 A protocol buffer message would be converted the following way:
 
     {
-      "<Links[0].Name.(escaped)>": {
-        "mlink": "<Links[0].Hash.(base58)>",
-        "name": "<Links[0].Name>",
-        "size": <Links[0].Tsize>
-      },
-      "<Links[1].Name.(escaped)>": {
-        "mlink": "<Links[1].Hash.(base58)>",
-        "name": "<Links[1].Name>",
-        "size": <Links[1].Tsize>
-      },
-      ...
-      "@attrs": {
-        "data": "<Data>",
-        "links": [
-          {
-            "mlink": "<Links[0].Hash.(base58)>",
-            "name": "<Links[0].Name>",
-            "size": <Links[0].Tsize>
-          },
-          {
-            "mlink": "<Links[1].Hash.(base58)>",
-            "name": "<Links[1].Name>",
-            "size": <Links[1].Tsize>
-          }
-        ]
+      "data": "<Data>",
+      "named-links": {
+        "<Links[0].Name>": {
+          "mlink": "<Links[0].Hash.(base58)>",
+          "name": "<Links[0].Name>",
+          "size": <Links[0].Tsize>
+        },
+        "<Links[1].Name>": {
+          "mlink": "<Links[1].Hash.(base58)>",
+          "name": "<Links[1].Name>",
+          "size": <Links[1].Tsize>
+        },
+        ...
       }
+      "ordered-links": [
+        {
+          "mlink": "<Links[0].Hash.(base58)>",
+          "name": "<Links[0].Name>",
+          "size": <Links[0].Tsize>
+        },
+        {
+          "mlink": "<Links[1].Hash.(base58)>",
+          "name": "<Links[1].Name>",
+          "size": <Links[1].Tsize>
+        }
+      ]
     }
 
 Notes :
@@ -98,7 +165,7 @@ Notes :
 
 **FIXME: Using the `@` character is not mandatory. Any other character could fit. Don't hesitate to give your ideas.**
 
-### Other proposition that avoids escaping
+### Other variation that avoids escaping
 
 We can imagine another transformation where the link names are not escaped. For example:
 
