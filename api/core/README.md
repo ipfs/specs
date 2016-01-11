@@ -39,7 +39,7 @@ The `core` API is the programmatic interface for IPFS, it defines the method sig
   - level
   - tail
 
-## Extentions
+## Extensions
 
 > Everything defined here is optional
 
