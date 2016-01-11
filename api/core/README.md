@@ -1,6 +1,8 @@
-# IPFS API Level 1 Spec - Transport Agnostic
+# Core API
 
-### IPFS Core
+The `core` API is the programmatic interface for IPFS, it defines the method signatures.
+
+## Required for compliant IPFS implementation
 
 > Everything defined here is required.
 
@@ -36,16 +38,16 @@
 - log
   - level
   - tail
-- name (ipns)
-  - name publish
-  - resolve
 
-### IPFS Ext
+## Extentions
 
 > Everything defined here is optional
 
+- name (ipns)
+  - name publish
+  - resolve
 - dns
-- resolve
+  - resolve
 - tar
   - add
   - cat
@@ -64,11 +66,15 @@
   - add
   - list
   - rm
+- bitswap
+  - stat
+  - unwant
+  - wantlist
 
-### IPFS Tools
 
-> Everything defined here is optional, and might be specific to the
-> implementation details (like running on the command line).
+## Tooling on top of the Core + Exntetions
+
+> Everything defined here is optional, and might be specific to the implementation details (like running on the command line).
 
 - commands
 - update
@@ -82,7 +88,7 @@
   - net
   - sys
 
-### Libp2p
+## Network API specifics that bubble up from libp2p API
 
 - ping
 - dht
@@ -100,10 +106,6 @@
   - filters add
   - filters rm
   - peers
-- record (iprs)
+- records (iprs)
   - put
   - get
-- bitswap
-  - stat
-  - unwant
-  - wantlist

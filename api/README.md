@@ -1,14 +1,36 @@
-# IPFS API Spec
+IPFS API Specifications (core + http + cli)
+===========================================
 
-> Official spec of the APIs that ipfs implementations must conform to, as well as test suites to ensure they do.
+> This document presentes the specifications for the IPFS APIs, namely: 'core', the programmatic interface, 'http', a networked API interface over HTTP and 'cli', the command line interface to interact with IPFS.
 
-> **WARNING** This is a work in *progress*. There be dragons.
+Authors:
 
-The IPFS HTTP API Spec, in Apiary format, can be found in [ipfs/http-api-spec](//github.com/ipfs/http-api-spec).
+- David Dias
+- Richard Littauer
 
-The IPFS API has two levels. The first level is a general description based on function signatures and the second one is the transport specific description.
+Reviewers:
 
-* [Level 1 Spec - Transport Agnostic](level1.md)
-* Level 2 Spec - Transport Specific
-  * [Level 2 CLI Spec](level2/cli.md)
-  * [Level 2 HTTP(S) Spec](level2/http.md)
+- Jeromy Johnson
+- Juan Benet
+
+# Abstract
+
+This describes the [IPFS](https://ipfs.io/) APIs, including 'core', 'http' and 'cli'.
+
+# Status of this spec
+
+> **This spec is a Work In Progress (WIP).**
+
+# Organization of this document
+
+This RFC is organized by chapters described on the *Table of contents* section. Each of the chapters can be found in its own file.
+
+# Table of contents
+
+- [%N% Introduction]()
+- [%N% APIs]()
+  - [%N.M% Core]()
+  - [%N.M% HTTP]()
+  - [%N.M% CLI]()
+- [%N% Implementations]()
+- [%N% Referecences]()
