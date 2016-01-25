@@ -4,7 +4,7 @@
 
 > **WARNING** This is a work in *progress*. There be dragons.
 
-The IPFS API code for apiary can be found in [ipfs/api](//github.com/ipfs/api).
+The IPFS HTTP API Spec, in Apiary format, can be found in [ipfs/http-api-spec](//github.com/ipfs/http-api-spec).
 
 The IPFS API has two levels. The first level is a general description based on function signatures and the second one is the transport specific description.
 
