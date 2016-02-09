@@ -20,9 +20,11 @@ A _merkle-link_ is a link between two objects which is content-addressed with th
 - **Cryptographic Integrity Checking**: resolving a link's value can be tested by hashing. In turn, this allows wide, secure, trustless exchanges of data (e.g. git or bittorrent), as others cannot give you any data that does not hash to the link's value.
 - **Immutable Datastructures**: data structures with merkle links cannot mutate, which is a nice property for distributed systems. This is useful for versioning, for representing distributed mutable state (eg CRDTs), and for long term archival.
 
-A _merkle-link_ is represented in the IPLD object model by a map containing a key `link` which value is the actual link. When dereferencing the link, the map itself is to be replaced by the object it points to.
+A _merkle-link_ is represented in the IPLD object model by a map containing a key `@link` mapped to a string value: the actual link. When dereferencing the link, the map itself is to be replaced by the object it points to unless the link path is invalid.
 
-The link can either be a base58 hash, in which case it is assumed that it is a link in the `/ipfs` hierarchy, or directly the absolute path to the object.
+The link can either be a base58 hash, in which case it is assumed that it is a link in the `/ipfs` hierarchy, or directly the absolute path to the object. Currently, only the `/ipfs` hierarchy is allowed.
+
+If an application wants to use the `@link` key for other purposes, the application itself is responsible to escape the keys in the IPLD object so that the application keys do not conflict with the `@link` key. When discussing application specific paths, it may be worth escaping all keys starting with `@` in case future versions of IPLD make use of other keys.
 
 ### What is a _merkle-graph_ or a _merkle-dag_?
 
@@ -151,7 +153,7 @@ Merkle-Linking between nodes is the reason for IPLD to exist. A Link in IPLD is 
 {
   "title": "As We May Think",
   "author": {
-    "link": "QmAAA...AAA" // links to the node above.
+    "@link": "QmAAA...AAA" // links to the node above.
   }
 }
 ```
@@ -163,7 +165,7 @@ Suppose this hashes to the multihash value `QmBBB...BBB`. This node links the _s
 {
   "title": "As We May Think",
   "author": {
-    "link": "QmAAA...AAA" // links to the node above.
+    "@link": "QmAAA...AAA" // links to the node above.
   }
 }
 
@@ -189,17 +191,17 @@ For example, supposed you have a file system, and want to assign metadata like p
 ```js
 {
   "foo": {
-    "link": "QmCCC...111"
+    "@link": "QmCCC...111"
     "mode": "0755",
     "owner": "jbenet"
   },
   "cat.jpg": {
-    "link": "QmCCC...222"
+    "@link": "QmCCC...222"
     "mode": "0644",
     "owner": "jbenet"
   },
   "doge.jpg": {
-    "link": "QmCCC...333",
+    "@link": "QmCCC...333",
     "mode": "0644",
     "owner": "jbenet"
   }
@@ -211,15 +213,15 @@ or in YML
 ```yml
 ---
 foo:
-  link: QmCCC...111
+  @link: QmCCC...111
   mode: 0755
   owner: jbenet
 cat.jpg:
-  link: QmCCC...222
+  @link: QmCCC...222
   mode: 0644
   owner: jbenet
 doge.jpg:
-  link: QmCCC...333
+  @link: QmCCC...333
   mode: 0644
   owner: jbenet
 ```
@@ -236,13 +238,13 @@ Though we have new properties in the links that are _specific to this datastruct
 {
   "subfiles": [
     {
-      "link": "QmPHPs1P3JaWi53q5qqiNauPhiTqa3S1mbszcVPHKGNWRh"
+      "@link": "QmPHPs1P3JaWi53q5qqiNauPhiTqa3S1mbszcVPHKGNWRh"
     },
     {
-      "link": "QmPCuqUTNb21VDqtp5b8VsNzKEMtUsZCCVsEUBrjhERRSR"
+      "@link": "QmPCuqUTNb21VDqtp5b8VsNzKEMtUsZCCVsEUBrjhERRSR"
     },
     {
-      "link": "QmS7zrNSHEt5GpcaKrwdbnv1nckBreUxWnLaV4qivjaNr3"
+      "@link": "QmS7zrNSHEt5GpcaKrwdbnv1nckBreUxWnLaV4qivjaNr3"
     }
   ]
 }
@@ -250,9 +252,9 @@ Though we have new properties in the links that are _specific to this datastruct
 > ipld cat --yml QmCCC...CCC/doge.jpg
 ---
 subfiles:
-  - link: QmPHPs1P3JaWi53q5qqiNauPhiTqa3S1mbszcVPHKGNWRh
-  - link: QmPCuqUTNb21VDqtp5b8VsNzKEMtUsZCCVsEUBrjhERRSR
-  - link: QmS7zrNSHEt5GpcaKrwdbnv1nckBreUxWnLaV4qivjaNr3
+  - @link: QmPHPs1P3JaWi53q5qqiNauPhiTqa3S1mbszcVPHKGNWRh
+  - @link: QmPCuqUTNb21VDqtp5b8VsNzKEMtUsZCCVsEUBrjhERRSR
+  - @link: QmS7zrNSHEt5GpcaKrwdbnv1nckBreUxWnLaV4qivjaNr3
 
 > ipld cat --json QmCCC...CCC/doge.jpg/subfiles/1
 {
@@ -304,7 +306,7 @@ On the subject of integers, there exist a variety of formats which represent int
 
 ## Serialized Data Formats
 
-IPLD supports a variety of serialized data formats through [multicodec](https://github.com/jbenet/multicodec). These can be used however is idiomatic to the format, for example in `CBOR`, we can use `CBOR` type tags to represent the merkle-link, and avoid writing out the full string key `link`. Users are encouraged to use the formats to their fullest, and to store and transmit IPLD data in whatever format makes the most sense. The only requirement **is that there MUST be a well-defined one-to-one mapping with the IPLD Canonical format.** This is so that data can be transformed from one format to another, and back, without changing its meaning nor its cryptographic hashes.
+IPLD supports a variety of serialized data formats through [multicodec](https://github.com/jbenet/multicodec). These can be used however is idiomatic to the format, for example in `CBOR`, we can use `CBOR` type tags to represent the merkle-link, and avoid writing out the full string key `@link`. Users are encouraged to use the formats to their fullest, and to store and transmit IPLD data in whatever format makes the most sense. The only requirement **is that there MUST be a well-defined one-to-one mapping with the IPLD Canonical format.** This is so that data can be transformed from one format to another, and back, without changing its meaning nor its cryptographic hashes.
 
 ### Canonical Format
 
@@ -349,16 +351,16 @@ Split into multiple independent sub-Files.
   "size": "1424119",
   "subfiles": [
     {
-      "link": "QmAAA...",
+      "@link": "QmAAA...",
       "size": "100324"
     },
     {
-      "link": "QmAA1...",
+      "@link": "QmAA1...",
       "size": "120345",
       "repeat": "10"
     },
     {
-      "link": "QmAA1...",
+      "@link": "QmAA1...",
       "size": "120345"
     },
   ]
@@ -370,17 +372,17 @@ Split into multiple independent sub-Files.
 ```js
 {
   "foo": {
-    "link": "QmCCC...111"
+    "@link": "QmCCC...111"
     "mode": "0755",
     "owner": "jbenet"
   },
   "cat.jpg": {
-    "link": "QmCCC...222"
+    "@link": "QmCCC...222"
     "mode": "0644",
     "owner": "jbenet"
   },
   "doge.jpg": {
-    "link": "QmCCC...333",
+    "@link": "QmCCC...333",
     "mode": "0644",
     "owner": "jbenet"
   }
@@ -402,15 +404,15 @@ Split into multiple independent sub-Files.
 ```js
 {
   "foo": {
-    "link": "QmCCC...111"
+    "@link": "QmCCC...111"
     "mode": "0755"
   },
   "cat.jpg": {
-    "link": "QmCCC...222"
+    "@link": "QmCCC...222"
     "mode": "0644"
   },
   "doge.jpg": {
-    "link": "QmCCC...333",
+    "@link": "QmCCC...333",
     "mode": "0644"
   }
 }
@@ -420,10 +422,10 @@ Split into multiple independent sub-Files.
 
 ```js
 {
-  "tree": {"link": "e4647147e940e2fab134e7f3d8a40c2022cb36f3"},
+  "tree": {"@link": "e4647147e940e2fab134e7f3d8a40c2022cb36f3"},
   "parents": [
-    {"link": "b7d3ead1d80086940409206f5bd1a7a858ab6c95"},
-    {"link": "ba8fbf7bc07818fa2892bd1a302081214b452afb"}
+    {"@link": "b7d3ead1d80086940409206f5bd1a7a858ab6c95"},
+    {"@link": "ba8fbf7bc07818fa2892bd1a302081214b452afb"}
   ],
   "author": {
     "name": "Juan Batiz-Benet",
@@ -445,8 +447,8 @@ Split into multiple independent sub-Files.
 
 ```js
 {
-  "parent": {"link": "Qm000000002CPGAzmfdYPghgrFtYFB6pf1BqMvqfiPDam8"},
-  "transactions": {"link": "QmTgzctfxxE8ZwBNGn744rL5R826EtZWzKvv2TF2dAcd9n"},
+  "parent": {"@link": "Qm000000002CPGAzmfdYPghgrFtYFB6pf1BqMvqfiPDam8"},
+  "transactions": {"@link": "QmTgzctfxxE8ZwBNGn744rL5R826EtZWzKvv2TF2dAcd9n"},
   "nonce": "UJPTFZnR2CPGAzmfdYPghgrFtYFB6pf1BqMvqfiPDam8"
 }
 ```
@@ -458,16 +460,16 @@ This time, im YML. TODO: make this a real txn
 ```yml
 ---
 inputs:
-  - input: {link: Qmes5e1x9YEku2Y4kDgT6pjf91TPGsE2nJAaAKgwnUqR82}
+  - input: {@link: Qmes5e1x9YEku2Y4kDgT6pjf91TPGsE2nJAaAKgwnUqR82}
     amount: 100
 outputs:
-  - output: {link: Qmes5e1x9YEku2Y4kDgT6pjf91TPGsE2nJAaAKgwnUqR82}
+  - output: {@link: Qmes5e1x9YEku2Y4kDgT6pjf91TPGsE2nJAaAKgwnUqR82}
     amount: 50
-  - output: {link: QmbcfRVZqMNVRcarRN3JjEJCHhQBcUeqzZfa3zoWMaSrTW}
+  - output: {@link: QmbcfRVZqMNVRcarRN3JjEJCHhQBcUeqzZfa3zoWMaSrTW}
     amount: 30
-  - output: {link: QmV9PkR2gXcmUgNH7s7zMg9dsk7Hy7bLS18S9SHK96m7zV}
+  - output: {@link: QmV9PkR2gXcmUgNH7s7zMg9dsk7Hy7bLS18S9SHK96m7zV}
     amount: 15
-  - output: {link: QmP8r8fLUnEywGnRRUrHB28nnBKwmshMLiYeg8udzYg7TK}
+  - output: {@link: QmP8r8fLUnEywGnRRUrHB28nnBKwmshMLiYeg8udzYg7TK}
     amount: 5
 script: OP_VERIFY
 ```
