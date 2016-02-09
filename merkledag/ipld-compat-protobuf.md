@@ -2,14 +2,11 @@
 
 IPLD has a known conversion with the legacy Protocol Buffers format in order for new IPLD objects to interact with older protocol buffer objects.
 
-## Detecting if the legacy format is in use
+## Detecting the format in use
 
-The format is encapsulated after a multicodec header that tells which codec to use. In addition, older applications that do not yet use the multicodec header will transmit a protocol buffer stream. This can be detected by looking at the first byte:
+The format is encapsulated after two multicodec headers. The first have the codec path `/mdagv1` and can be used to detect whether IPLD objects are transmitted or just legacy protocol buffer messages.
 
-- if the first byte is between 0 and 127, it is a multicodec header
-- if the first byte if between 128 and 255, it is a protocol buffer stream
-
-In case a multicodec header is in use, the actual IPLD object is encapsulated first with a multicodec header which identifier is `/mdagv1`, then by a second header which identifier corresponds to the actual encoding of the object:
+The second multicodec header is used to detect the actual format in which the IPLD object is encoded:
 
 - `/protobuf/msgio`: is the encapsulation for protocol buffer message
 - `/json`: is the encapsulation for JSON encoding
