@@ -310,48 +310,36 @@ IPLD supports a variety of serialized data formats through [multicodec](https://
 
 ## Serialised CBOR with tags
 
-IPLD objects can be represented using cbor using the tags described below when possible. Tags are defined in [RFC 7049 section 2.4](http://tools.ietf.org/html/rfc7049#section-2.4):
+IPLD objects can be represented using cbor using tags which are defined in [RFC 7049 section 2.4](http://tools.ietf.org/html/rfc7049#section-2.4).
 
-- `<tag-base58>`: the byte string that follows (major type 2) is to be interpreted as a text string instead (major type 3). This text string is the base58 encoded version of the byte string (using the IPFS alphabet).
+A tag `<tag-link-object>` is defined. This tag must be followed by an array (major type 4) containing two elements. The first being either a text string (major type 3) or a byte string (major type 2). The second element is defined to be a map (major type 5).
 
-- `<tag-link-object>`:  an array (major type 4) of two or three elements (link prefix, link hash (optional) and map) must follow:
+When encoding an IPLD object to CBOR, every map that contain a link key is transformed to a `<tag-link-object>` followed by the array containing the link and then containing the CBOR version of the map without the link key.
 
-    - The link prefix must be an integer representing the first path of the link, or a text string appended at the beginning of the link. Available integers are:
-        - `1`: represents the prefix `/ipfs/`
+- if the link key is a valid [multiaddress](https://github.com/jbenet/multiaddr) and converting that link text to the multiaddress binary string and back to text is guaranteed to result to the exact same text, the link is stored as a binary multiaddress as the first array item.
+- else, the link is stored as text as the first array item.
 
-    - The link hash, either a text string to be appended after the link prefix, or a tag `<tag-base58>` followed by the binary string representing the hash digest.
+When decoding CBOR and converting it to IPLD, each occurences of `<tag-link-object>` with its following array is transformed.
 
-    - a map
+- If the first array item is a binary string, it is interpreted as a multiaddress and converted to a textual format. Else, the text string is used directly.
+- The map that follows is augmented with a new pair. The key is the standard IPLD link property, the value is the link in its textual format.
+- When iterating over this augmented map, the link property must come first and not in any other order. This guarantee a consistent ordering.
+- This augmented map is used instead of the `<tag-link-object>` in the IPLD output.
 
-    The link value is constructed by concatenating the link prefix and the link hash (if present) in its text form.
-
-    This must be interpreted as a map identical to the map of the array, but with an additional entry. The additional entry would have a text string containing `link` as a key, and the text string representing the link formed by the first two elements of the array. When iterating over the map, this entry must appear first.
+When an IPLD object contains these tags in the way explained here, the multicodec header used to represent the object codec must be `/cbor/ipld-tagsv1` instead of just `/cbor`. Readers will be able to use an optimized reading process to detect links using these tags.
 
 **TODO:**
 
 - [ ] register tags with IANA.
-- [ ] specify tags we use for escaping (if we want to store escaped string in unescaped form)
 
-When encoding an IPLD node to CBOR with tags, some conversion steps are necessary (in this order):
-
-- if a map contains an entry which key is the text string `link` and the value is a text string, the map is converted to a link object:
-
-    - the `link` entry is removed from the map
-    - if the link value cannot be split in a prefix and a base58 suffix, an array is created with the link value (a text string) and the transformed map.
-    - else, the link is split in a textual prefix and a base58 binary digest (the base58 value is decoded) and an array with the prefix, the `<tag-base58>` followed by the binary hash, and the transformed map is created
-    - the original map is transformed to a `<tag-link-object>` followed by the array just created
-
-- if a text string is a canonical base58 representation of a binary string, the text string is converted to binary and `<tag-base58>` is added at the beginning
-
-- if a text string is a canonical base64 representation (with no stray characters) of a binary string, the text string is converted to binary and the tag `22` (defined in RFC7049) is added at the beginning
-
-When an IPLD object contains these tags in the way explained here, the multicodec header used to represent the object codec must be `/cbor/ipld-tagsv1` instead of just `/cbor`. Readers will be able to use an optimized reading process to detect links using these tags.
 
 ### Canonical Format
 
 In order to preserve merkle-linking's power, we must ensure that there is a single **_canonical_** serialized representation of an IPLD document. This ensures that applications arrive at the same cryptographic hashes. It should be noted --though-- that this is a system-wide parameter. Future systems might change it to evolve representations. However we estimate this would need to be done no more than once per decade.
 
 **The IPLD Canonical format is _canonicalized CBOR with tags_.**
+
+Users of this format should not expect any specific ordering of the keys, as the keys might be ordered differently in non canonical formats.
 
 The legacy canonical format is protocol buffers.
 
