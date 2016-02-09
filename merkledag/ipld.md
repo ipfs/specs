@@ -72,23 +72,6 @@ O_5 = | "hello": "world"  |  whose hash value is QmR8Bzg59Y4FGWHeu9iTYhwhiP8PHCN
 
 This entire _merkle-path_ traversal is a unix-style path traversal over a _merkle-dag_ which uses _merkle-links_ with names.
 
-**[In case we use escaping in protobuf IPLD format]**
-
-In order to not restrict individual path component by disallowing some file names and still allow storing arbitrary data in IPLD objects, path components must be escaped when they are looked up in IPLD objects.
-
-To escape a path component in order to look it up in an IPLD object:
-
-- every `\` character in the path component must be replaced with `\\`
-- every `@` character in the path component must be replaced with `\@`
-
-This makes any key containing a `@` character unescaped in an IPLD object not accessible through a _filesystem merkle-path_. This is a reserved key that can be used to store auxiliary data without making it a link and visible in regular filesystems. This data can be made available in filesystems through extended attributes or opening and reading file contents.
-
-To unescape IPLD object keys that are not reserved and get the corresponding path component:
-
-- every `\@` sequence in the key must be replaced by `@`
-- every `\\` sequence in the key must be replaced by `\`
-
-
 ## What is the IPLD Data Model?
 
 The IPLD Data Model defines a simple JSON-based _structure_ for all merkle-dags, and identifies a set of formats to encode the structure into.
@@ -335,10 +318,6 @@ In the same way, when the receiver is storing the object, it must make sure that
 
 A simple way to store such objects with their format is to store them with their multicodec header.
 
-
-### Other encodings
-
-Speak up in comments if you have other encoding suggestions, or you have another implementation with another encoding.
 
 ## Datastructure Examples
 
