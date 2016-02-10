@@ -310,27 +310,35 @@ IPLD supports a variety of serialized data formats through [multicodec](https://
 
 ## Serialised CBOR with tags
 
-IPLD objects can be represented using cbor using tags which are defined in [RFC 7049 section 2.4](http://tools.ietf.org/html/rfc7049#section-2.4).
+IPLD links can be represented in CBOR using tags which are defined in [RFC 7049 section 2.4](http://tools.ietf.org/html/rfc7049#section-2.4).
 
-A tag `<tag-link-object>` is defined. This tag must be followed by an array (major type 4) containing two elements. The first being either a text string (major type 3) or a byte string (major type 2). The second element is defined to be a map (major type 5).
+A tag `<tag-link-object>` is defined. This tag must be followed by an array (major type 4) containing one or two elements. The first being either a text string (major type 3) or a byte string (major type 2). The second element is defined to be a map (major type 5) and can be omitted if the map is empty. The canonical format is to omit this map if it is empty.
 
-When encoding an IPLD object to CBOR, every map that contain a link key is transformed to a `<tag-link-object>` followed by the array containing the link and then containing the CBOR version of the map without the link key.
+When encoding an IPLD object to CBOR, every IPLD object can be considered to be encoded using `<tag-link-object>` using this algorithm:
 
-- if the link key is a valid [multiaddress](https://github.com/jbenet/multiaddr) and converting that link text to the multiaddress binary string and back to text is guaranteed to result to the exact same text, the link is stored as a binary multiaddress as the first array item.
-- else, the link is stored as text as the first array item.
+- If the IPLD object doesn't contain a link property, it is encoded in CBOR as a map.
+- If the IPLD object contain a link property but it is not a string, it is encoded in CBOR as a map.
+- The link property is extracted and the object is converted to a map that don't contain the link.
+- If the link is a valid [multiaddress](https://github.com/jbenet/multiaddr) and converting that link text to the multiaddress binary string and back to text is guaranteed to result to the exact same text, the link is converted to a binary multiaddress stored in CBOR as a byte string (major type 2).
+- Else, the link is stored as text (major type 3)
+- A CBOR array is constructed containing the link as first item
+- If the map created earlier is not empty, the map is added to the array as its second item
+- The array is prefixed by the `<tag-link-object>`, this is the final CBOR representation of a link.
 
-When decoding CBOR and converting it to IPLD, each occurences of `<tag-link-object>` with its following array is transformed.
+When decoding CBOR and converting it to IPLD, each occurences of `<tag-link-object>` with its following array is transformed by the following algorithm:
 
 - If the first array item is a binary string, it is interpreted as a multiaddress and converted to a textual format. Else, the text string is used directly.
-- The map that follows is augmented with a new pair. The key is the standard IPLD link property, the value is the link in its textual format.
-- When iterating over this augmented map, the link property must come first and not in any other order. This guarantee a consistent ordering.
-- This augmented map is used instead of the `<tag-link-object>` in the IPLD output.
+- If the array contains a second item (which should be a map), it is extracted. Else an empty map is created.
+- The map is augmented with a new key value pair. The key is the standard IPLD link property, the valus is the string containing the link.
+- This map should be interpreted as an IPLD object instead of the tag.
+- When iterating over the map in its canonical form, the link must be come before every other key even if the canonical CBOR order says otherwise.
 
-When an IPLD object contains these tags in the way explained here, the multicodec header used to represent the object codec must be `/cbor/ipld-tagsv1` instead of just `/cbor`. Readers will be able to use an optimized reading process to detect links using these tags.
+When an IPLD object contains these tags in the way explained here, the multicodec header used to represent the object codec must be `/cbor/ipld-tagsv1` instead of just `/cbor`. Readers should be able to use an optimized reading process to detect links using these tags.
+
 
 **TODO:**
 
-- [ ] register tags with IANA.
+- [ ] register tag with IANA.
 
 
 ### Canonical Format
@@ -338,6 +346,8 @@ When an IPLD object contains these tags in the way explained here, the multicode
 In order to preserve merkle-linking's power, we must ensure that there is a single **_canonical_** serialized representation of an IPLD document. This ensures that applications arrive at the same cryptographic hashes. It should be noted --though-- that this is a system-wide parameter. Future systems might change it to evolve representations. However we estimate this would need to be done no more than once per decade.
 
 **The IPLD Canonical format is _canonicalized CBOR with tags_.**
+
+The canonical CBOR format must follow rules defines in [RFC 7049 section 3.9](http://tools.ietf.org/html/rfc7049#section-3.9) in addition to the rules defined here.
 
 Users of this format should not expect any specific ordering of the keys, as the keys might be ordered differently in non canonical formats.
 
