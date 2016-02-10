@@ -1,7 +1,7 @@
 IPFS API Specifications (core + http + cli)
 ===========================================
 
-> This document presentes the specifications for the IPFS APIs, namely: 'core', the programmatic interface, 'http', a networked API interface over HTTP and 'cli', the command line interface to interact with IPFS.
+> This document presents the specifications for the IPFS APIs, namely: 'core', the programmatic interface, 'http', a networked API interface over HTTP and 'cli', the command line interface to interact with IPFS.
 
 Authors:
 

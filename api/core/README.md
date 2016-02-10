@@ -72,7 +72,7 @@ The `core` API is the programmatic interface for IPFS, it defines the method sig
   - wantlist
 
 
-## Tooling on top of the Core + Exntetions
+## Tooling on top of the Core + Extentions
 
 > Everything defined here is optional, and might be specific to the implementation details (like running on the command line).
 
