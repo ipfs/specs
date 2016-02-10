@@ -312,7 +312,10 @@ IPLD supports a variety of serialized data formats through [multicodec](https://
 
 IPLD links can be represented in CBOR using tags which are defined in [RFC 7049 section 2.4](http://tools.ietf.org/html/rfc7049#section-2.4).
 
-A tag `<tag-link-object>` is defined. This tag must be followed by an array (major type 4) containing one or two elements. The first being either a text string (major type 3) or a byte string (major type 2). The second element is defined to be a map (major type 5) and can be omitted if the map is empty. The canonical format is to omit this map if it is empty.
+A tag `<tag-link-object>` is defined. This tag can be followed by:
+
+- a text string (major type 3) or byte string (major type 2) corresponding to the link target. This is the canonical format for links with no link properties.
+- an array (major type 4) containing as first element the link target (text or binary string) and as optional second argument the link properties (a map, major type 5)
 
 When encoding an IPLD object to CBOR, every IPLD object can be considered to be encoded using `<tag-link-object>` using this algorithm:
 
@@ -321,15 +324,15 @@ When encoding an IPLD object to CBOR, every IPLD object can be considered to be 
 - The link property is extracted and the object is converted to a map that don't contain the link.
 - If the link is a valid [multiaddress](https://github.com/jbenet/multiaddr) and converting that link text to the multiaddress binary string and back to text is guaranteed to result to the exact same text, the link is converted to a binary multiaddress stored in CBOR as a byte string (major type 2).
 - Else, the link is stored as text (major type 3)
-- A CBOR array is constructed containing the link as first item
-- If the map created earlier is not empty, the map is added to the array as its second item
-- The array is prefixed by the `<tag-link-object>`, this is the final CBOR representation of a link.
+- If the map created earlier is empty, the resulting encoding is the `<tag-link-object>` followed by the CBOR representation of the link
+- If the map is not empty, the resulting encoding is the `<tag-link-object>` followed by an array of two elements containing the link followed by the map
 
-When decoding CBOR and converting it to IPLD, each occurences of `<tag-link-object>` with its following array is transformed by the following algorithm:
+When decoding CBOR and converting it to IPLD, each occurences of `<tag-link-object>` is transformed by the following algorithm:
 
-- If the first array item is a binary string, it is interpreted as a multiaddress and converted to a textual format. Else, the text string is used directly.
-- If the array contains a second item (which should be a map), it is extracted. Else an empty map is created.
-- The map is augmented with a new key value pair. The key is the standard IPLD link property, the valus is the string containing the link.
+- If the following value is an array, its elements are extracted. First the link followed by the link properties. If there are no link properties, an empty map is used instead.
+- Else, the following value must be the link, which is extracted. The link properties are created as an empty map.
+- If the link is a binary string, it is interpreted as a multiaddress and converted to a textual format. Else, the text string is used directly.
+- The map of the link properties is augmented with a new key value pair. The key is the standard IPLD link property, the value is the textual string containing the link.
 - This map should be interpreted as an IPLD object instead of the tag.
 - When iterating over the map in its canonical form, the link must be come before every other key even if the canonical CBOR order says otherwise.
 
