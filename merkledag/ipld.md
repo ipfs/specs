@@ -308,7 +308,7 @@ On the subject of integers, there exist a variety of formats which represent int
 
 IPLD supports a variety of serialized data formats through [multicodec](https://github.com/jbenet/multicodec). These can be used however is idiomatic to the format, for example in `CBOR`, we can use `CBOR` type tags to represent the merkle-link, and avoid writing out the full string key `@link`. Users are encouraged to use the formats to their fullest, and to store and transmit IPLD data in whatever format makes the most sense. The only requirement **is that there MUST be a well-defined one-to-one mapping with the IPLD Canonical format.** This is so that data can be transformed from one format to another, and back, without changing its meaning nor its cryptographic hashes.
 
-## Serialised CBOR with tags
+### Serialised CBOR with tags
 
 IPLD links can be represented in CBOR using tags which are defined in [RFC 7049 section 2.4](http://tools.ietf.org/html/rfc7049#section-2.4).
 
@@ -320,8 +320,8 @@ A tag `<tag-link-object>` is defined. This tag can be followed by:
 When encoding an IPLD object to CBOR, every IPLD object can be considered to be encoded using `<tag-link-object>` using this algorithm:
 
 - If the IPLD object doesn't contain a link property, it is encoded in CBOR as a map.
-- If the IPLD object contain a link property but it is not a string, it is encoded in CBOR as a map.
-- The link property is extracted and the object is converted to a map that don't contain the link.
+- If the IPLD object contains a link property but it is not a string, it is encoded in CBOR as a map.
+- The link property is extracted and the object is converted to a map that doesn't contain the link.
 - If the link is a valid [multiaddress](https://github.com/jbenet/multiaddr) and converting that link text to the multiaddress binary string and back to text is guaranteed to result to the exact same text, the link is converted to a binary multiaddress stored in CBOR as a byte string (major type 2).
 - Else, the link is stored as text (major type 3)
 - If the map created earlier is empty, the resulting encoding is the `<tag-link-object>` followed by the CBOR representation of the link
