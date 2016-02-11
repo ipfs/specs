@@ -36,7 +36,7 @@ A merkle-path is a unix-style path (e.g. `/a/b/c/d`) which initially dereference
 
 _Merkle-paths_ aren't suited for using them in a general purpose filesystem because it introduces many restrictions on file names. However, it can be used to work on special purpose filesystems. It can be compared to the `/proc` filesystem on unix computers or HTTP Web APIs where the allowed paths is restricted.
 
-General purpose filesystems are encouraged to design an object model on top of IPLD that would be specialized for file manipulation and have specific path algorithms to query this model
+General purpose filesystems are encouraged to design an object model on top of IPLD that would be specialized for file manipulation and have specific path algorithms to query this model.
 
 ### How do _merkle-paths_ work?
 
@@ -52,89 +52,53 @@ Where:
 - `ipfs` is a protocol namespace (to allow the computer to discern what to do)
 - `QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k` is a cryptographic hash.
 - `a/b/c/d` is a path _traversal_, as in unix.
-- this link traverses five objects.
 
-Suppose also that this path points to the object `{ "hello": "world" }`.
+Path traversal can either happen inside a single IPLD object, or can happen between objects throught *merkle-links*. The simple rule is that in case the traversal is possible in the same IPLD object, *merkle-links* should not be followed.
 
-Resolving it involves looking up each object and attaining a hash value, then traversing to the next.
+In order to specify a path that follows a *merkle-link* even in case the traversal can be done without fetching another IPLD object, there are two mechanisms:
 
-```
-      +-----------------------------+
-O_1 = | "a": {"link": "QmV76pU..."} |  whose hash value is QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k
-      +-----------------------------+
-                     |
-                     v
-      +-----------------------------+
-O_2 = | "b": {"link": "QmQmkZP..."} |  whose hash value is QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT
-      +-----------------------------+
-                     |
-                     v
-      +-----------------------------+
-O_3 = | "c": {"link": "QmWkyYN..."} |  whose hash value is QmQmkZPNPoRkPd7wj2xUJe5v5DsY6MX33MFaGhZKB2pRSE
-      +-----------------------------+
-                     |
-                     v
-      +-----------------------------+
-O_4 = | "d": {"link": "QmR8Bzg..."} |  whose hash value is QmWkyYNrN5wnHgX5vfs88q7QUaFKq52TVNTFeTzxm73UbT
-      +-----------------------------+
-                     |
-                     v
-           +-------------------+
-O_5 =      | "hello": "world"  |  whose hash value is QmR8Bzg59Y4FGWHeu9iTYhwhiP8PHCNFiaGhP1UjywA43j
-           +-------------------+
-```
+- Use `//` instead of `/` as a path separator when following the *merkle-link* is desired. This may not always be possible depending on the filesystem implementation.
 
-This entire _merkle-path_ traversal is a unix-style path traversal over a _merkle-dag_ which uses _merkle-links_ with names.
+- Use the special path component `/@link/` instead of a simple path separator. That also signifies the path needs to dereference the *merkle-link*
 
-#### Accessing properties within IPLD objects
+As a consequence, `@link` keys that are not *merkle-links* cannot be referenced in *merkle-paths*.
 
-Now, to travel within an IPLD object, we introduce a second separator: the dot (`.`). This separator can be used to avoid dereferencing `merkle-links` but travel within the IPLD object.
+#### Examples
 
-For example, suppose we have this _merkle-path_:
+The IPLD object with the hash `QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k` contains:
 
-```
-/ipfs/QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k/a.b/c.d
-```
+    a:
+      b:
+        @link: QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT
+        c: "d"
+        foo:
+          @link: QmQmkZPNPoRkPd7wj2xUJe5v5DsY6MX33MFaGhZKB2pRSE
 
-The link will:
+And the object `QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT` contains:
 
-- look up the first object `QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k` that we call `object0`
-- Look up the key `object0["a"]["b"]` and find here a _merkle-link_
-- Dereference this _merkle-link_ to get `object1`
-- Look up the key `object1["c"]["d"]` which will be returned as the result
+    c: "e"
+    d:
+      e: "f"
+    foo:
+      name: "second/foo"
 
-Note that if we added a trailing slash to the path (`/ipfs/QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k/a.b/c.d/`), we would perform a last _merkle-link_ dereferencing:
+And the object `QmQmkZPNPoRkPd7wj2xUJe5v5DsY6MX33MFaGhZKB2pRSE` contains:
 
-- look up the first object `QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k` that we call `object0`
-- Look up the key `object0["a"]["b"]` and find here a _merkle-link_
-- Dereference this _merkle-link_ to get `object1`
-- Look up the key `object1["c"]["d"]` and find a _merkle-link_
-- Dereference this _merkle-link_ and return the IPLD object as the result
+    name: "third"
 
-Also, in case the IPLD object does not contain a _merkle-link_, it is possible to use both the `/` or the `.` separator to access internal properties as there is no ambiguity.
+An example of the paths:
 
-To be able to access objects that are behind keys containing either a `/` or a `.` character, the individual path element can be character escaped using `\`.
-
-For example, resolving `/ipfs/QmUmg7B.../a\.b.c/d\/e/f\\g/` will:
-
-- look for the IPLD node that we call `object0` whose hash is `QmUmg7B...`
-- resolve _merkle-link_ found in `object0["a.b"]["c"]` to `object1`
-- resolve _merkle-link_ found in `object1["d/e"]` to `object2`
-- resolve _merkle-link_ found in `object2["f\\g"]` and return the result.
+- `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/c` will only traverse the first object and lead to string `d`.
+- `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b//c` will traverse both objects and lead to the string `e`
+- `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/@link/c` is equivalent
+- `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/d/e` traverse both objects and leads to the string `f`
+- `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/foo/name` traverse the first and last object and lead to string `third`
 
 #### Escaping algorithm
 
-To escape a path component you have to:
+Elements named `@link` that are not *merkle-links* are not addressable with this scheme. For example, if a `@link` key points to an array, it is not a valid *merkle-link*.
 
-- replace `.` by `\.`
-- replace `/` by `\/`
-- replace `\` by `\\`
-
-To unescape a path component you have to:
-
-- replace `\\` by `\`
-- replace `\/` by `/`
-- replace `\.` by `.`
+If this is not desirable, a simple escaping mechanism can be devised. For example any key matching the regular expression `^\@+link$` can be escaped by adding `@` at the beginning, or unescaped by removing one `@` sign.
 
 ## What is the IPLD Data Model?
 
