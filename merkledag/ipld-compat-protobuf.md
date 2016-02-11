@@ -39,8 +39,8 @@ This format is defined with the Protocol Buffers syntax as:
 
 The conversion to the IPLD data model must have the following properties:
 
-- It should be convertible back to protocol buffers, resulting in an identical byte stream (so the hash corresponds). This implies that ordering and duplicate links must be preserved in some way.
-- When using paths as defined earlier in this document, links should be accessible without further indirection. This requires the top node object to have keys corresponding to link names.
+- It MUST be convertible back to protocol buffers, resulting in an identical byte stream (so the hash corresponds). This implies that ordering and duplicate links must be preserved in some way.
+- When using paths as defined in the IPLD specification, links should be accessible without further indirection. This requires the top node object to have keys corresponding to link names.
 - Link names should be able to be any valid file name. As such, the encoding must ensure that link names do not conflict with other keys in the model.
 
 There is a canonical form which is described below:
