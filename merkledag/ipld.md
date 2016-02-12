@@ -34,8 +34,6 @@ Objects with merkle-links form a Graph (merkle-graph), which necessarily is both
 
 A merkle-path is a unix-style path (e.g. `/a/b/c/d`) which initially dereferences through a _merkle-link_ and allows access of elements of the referenced node and other nodes transitively.
 
-_Merkle-paths_ aren't suited for using them in a general purpose filesystem because it introduces many restrictions on file names. However, it can be used to work on special purpose filesystems. It can be compared to the `/proc` filesystem on unix computers or HTTP Web APIs where the allowed paths is restricted.
-
 General purpose filesystems are encouraged to design an object model on top of IPLD that would be specialized for file manipulation and have specific path algorithms to query this model.
 
 ### How do _merkle-paths_ work?
@@ -45,7 +43,7 @@ A _merkle-path_ is a unix-style path which initially dereferences through a _mer
 For example, suppose we have this _merkle-path_:
 
 ```
-/ipfs/QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k/a/b/c/d/
+/ipfs/QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k/a/b/c/d
 ```
 
 Where:
@@ -53,20 +51,33 @@ Where:
 - `QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k` is a cryptographic hash.
 - `a/b/c/d` is a path _traversal_, as in unix.
 
-Path traversal can either happen inside a single IPLD object, or can happen between objects throught *merkle-links*. The simple rule is that in case the traversal is possible in the same IPLD object, *merkle-links* should not be followed.
+Paths traversals are divided into two kinds :
 
-In order to specify a path that follows a *merkle-link* even in case the traversal can be done without fetching another IPLD object, there are two mechanisms:
+- **in-object traversals** traverse maps within the same object, and is denoted with `/`
+- **cross-object traversals** traverse across objects, resolving through merkle-links, and is denoted with `/` **(TODO)**, `//` or with `/@link/`.
 
-- Use `//` instead of `/` as a path separator when following the *merkle-link* is desired. This may not always be possible depending on the filesystem implementation.
+The case for strict path traversals:
 
-- Use the special path component `/@link/` instead of a simple path separator. That also signifies the path needs to dereference the *merkle-link*
+> We divide the traversals strictly, to avoid ambiguity in accessing properties within a *merkle-link* map itself. This is not transparent resolution, and thus a path reveals the objects it traverses. For example, `a/b//c/d//e` traverses across 3 objects.`
+>
+> We use `//` or `/@link/` for cross-object traversals depending on the filesystem implementation. For example, in unix filesystems, double slashes (`//`) are meaningless and often cleaned into a single slash (`/`). In such a case, the use of `/@link/` is required to traverse links.
 
-As a consequence, `@link` keys that are not *merkle-links* cannot be referenced in *merkle-paths*.
+The case for lenient path traversals:
+
+> We use `/` to transparently traverse inside a single IPLD object or traverse across multiple. A single slash (/) ALWAYS traverses in-object first, and cross-object otherwise. A double slash (//) or /@link/ ALWAYS traverses cross-object.
+>
+> To avoid potential ambiguity, we MUST use cross-object traversals (`//` or `/@link/`) wherever possible. For example, merkle-links can themselves carry properties and sub-maps. When `/` path traversals are ambiguous, they default to in-object (the local operation). In that case, we must use `//` or `/@link/` to traverse cross-object.
+
+Note: filesystem implementation might not be able to support the separator `//` as this is generally folded into `/` on unix. In that case, usage of `/@link/` is preferred.
+
+As a consequence of using the `@link` path component to denote cross-object traversals, this becomes a reserved path component and makes it impossible to access arbitrary `@link` keys that are not otherwise *merkle-links*. Escaping can be used to render access to those keys possible if so desired.
 
 #### Examples
 
-The IPLD object with the hash `QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k` contains:
+Using the following dataset:
 
+    > ipfs cat --fmt=yaml QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k
+    ---
     a:
       b:
         @link: QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT
@@ -74,23 +85,23 @@ The IPLD object with the hash `QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k` c
         foo:
           @link: QmQmkZPNPoRkPd7wj2xUJe5v5DsY6MX33MFaGhZKB2pRSE
 
-And the object `QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT` contains:
-
+    > ipfs cat --fmt=yaml QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT
+    ---
     c: "e"
     d:
       e: "f"
     foo:
       name: "second/foo"
 
-And the object `QmQmkZPNPoRkPd7wj2xUJe5v5DsY6MX33MFaGhZKB2pRSE` contains:
-
+    > ipfs cat --fmt=yaml QmQmkZPNPoRkPd7wj2xUJe5v5DsY6MX33MFaGhZKB2pRSE
+    ---
     name: "third"
 
 An example of the paths:
 
 - `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/c` will only traverse the first object and lead to string `d`.
 - `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b//c` will traverse both objects and lead to the string `e`
-- `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/@link/c` is equivalent
+- `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/@link/c` is equivalent (will traverse both objects and lead to the string `e`)
 - `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/d/e` traverse both objects and leads to the string `f`
 - `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/foo/name` traverse the first and last object and lead to string `third`
 
