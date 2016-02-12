@@ -32,7 +32,13 @@ Objects with merkle-links form a Graph (merkle-graph), which necessarily is both
 
 ### What is a _merkle-path_?
 
-A _merkle-path_ is a unix-style path (e.g. `/a/b/c/d`) which initially dereferences through a _merkle-link_ and then follows _named merkle-links_ in the intermediate objects. Following a name means looking into the object, finding the _name_ and resolving the associated _merkle-link_.
+A merkle-path is a unix-style path (e.g. `/a/b/c/d`) which initially dereferences through a _merkle-link_ and allows access of elements of the referenced node and other nodes transitively.
+
+General purpose filesystems are encouraged to design an object model on top of IPLD that would be specialized for file manipulation and have specific path algorithms to query this model.
+
+### How do _merkle-paths_ work?
+
+A _merkle-path_ is a unix-style path which initially dereferences through a _merkle-link_ and then follows _named merkle-links_ in the intermediate objects. Following a name means looking into the object, finding the _name_ and resolving the associated _merkle-link_.
 
 For example, suppose we have this _merkle-path_:
 
@@ -44,39 +50,66 @@ Where:
 - `ipfs` is a protocol namespace (to allow the computer to discern what to do)
 - `QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k` is a cryptographic hash.
 - `a/b/c/d` is a path _traversal_, as in unix.
-- this link traverses five objects.
 
-Suppose also that this path points to the object `{ "hello": "world" }`.
+Paths traversals are divided into two kinds :
 
-Resolving it involves looking up each object and attaining a hash value, then traversing to the next.
+- **in-object traversals** traverse maps within the same object, and is denoted with `/`
+- **cross-object traversals** traverse across objects, resolving through merkle-links, and is denoted with `/` **(TODO)**, `//` or with `/@link/`.
 
-```
-      +-------------------+
-O_1 = | "a": "QmV76pU..." |  whose hash value is QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k
-      +-------------------+
-                |
-                v
-      +-------------------+
-O_2 = | "b": "QmQmkZP..." |  whose hash value is QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT
-      +-------------------+
-                |
-                v
-      +-------------------+
-O_3 = | "c": "QmWkyYN..." |  whose hash value is QmQmkZPNPoRkPd7wj2xUJe5v5DsY6MX33MFaGhZKB2pRSE
-      +-------------------+
-                |
-                v
-      +-------------------+
-O_4 = | "d": "QmR8Bzg..." |  whose hash value is QmWkyYNrN5wnHgX5vfs88q7QUaFKq52TVNTFeTzxm73UbT
-      +-------------------+
-                |
-                v
-      +-------------------+
-O_5 = | "hello": "world"  |  whose hash value is QmR8Bzg59Y4FGWHeu9iTYhwhiP8PHCNFiaGhP1UjywA43j
-      +-------------------+
-```
+The case for strict path traversals:
 
-This entire _merkle-path_ traversal is a unix-style path traversal over a _merkle-dag_ which uses _merkle-links_ with names.
+> We divide the traversals strictly, to avoid ambiguity in accessing properties within a *merkle-link* map itself. This is not transparent resolution, and thus a path reveals the objects it traverses. For example, `a/b//c/d//e` traverses across 3 objects.`
+>
+> We use `//` or `/@link/` for cross-object traversals depending on the filesystem implementation. For example, in unix filesystems, double slashes (`//`) are meaningless and often cleaned into a single slash (`/`). In such a case, the use of `/@link/` is required to traverse links.
+
+The case for lenient path traversals:
+
+> We use `/` to transparently traverse inside a single IPLD object or traverse across multiple. A single slash (/) ALWAYS traverses in-object first, and cross-object otherwise. A double slash (//) or /@link/ ALWAYS traverses cross-object.
+>
+> To avoid potential ambiguity, we MUST use cross-object traversals (`//` or `/@link/`) wherever possible. For example, merkle-links can themselves carry properties and sub-maps. When `/` path traversals are ambiguous, they default to in-object (the local operation). In that case, we must use `//` or `/@link/` to traverse cross-object.
+
+Note: filesystem implementation might not be able to support the separator `//` as this is generally folded into `/` on unix. In that case, usage of `/@link/` is preferred.
+
+As a consequence of using the `@link` path component to denote cross-object traversals, this becomes a reserved path component and makes it impossible to access arbitrary `@link` keys that are not otherwise *merkle-links*. Escaping can be used to render access to those keys possible if so desired.
+
+#### Examples
+
+Using the following dataset:
+
+    > ipfs cat --fmt=yaml QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k
+    ---
+    a:
+      b:
+        @link: QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT
+        c: "d"
+        foo:
+          @link: QmQmkZPNPoRkPd7wj2xUJe5v5DsY6MX33MFaGhZKB2pRSE
+
+    > ipfs cat --fmt=yaml QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT
+    ---
+    c: "e"
+    d:
+      e: "f"
+    foo:
+      name: "second/foo"
+
+    > ipfs cat --fmt=yaml QmQmkZPNPoRkPd7wj2xUJe5v5DsY6MX33MFaGhZKB2pRSE
+    ---
+    name: "third"
+
+An example of the paths:
+
+- `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/c` will only traverse the first object and lead to string `d`.
+- `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b//c` will traverse both objects and lead to the string `e`
+- `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/@link/c` is equivalent (will traverse both objects and lead to the string `e`)
+- `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/d/e` traverse both objects and leads to the string `f`
+- `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/foo/name` traverse the first and last object and lead to string `third`
+
+#### Escaping algorithm
+
+Elements named `@link` that are not *merkle-links* are not addressable with this scheme. For example, if a `@link` key points to an array, it is not a valid *merkle-link*.
+
+If this is not desirable, a simple escaping mechanism can be devised. For example any key matching the regular expression `^\@+link$` can be escaped by adding `@` at the beginning, or unescaped by removing one `@` sign.
 
 ## What is the IPLD Data Model?
 
