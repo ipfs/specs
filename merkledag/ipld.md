@@ -308,11 +308,51 @@ On the subject of integers, there exist a variety of formats which represent int
 
 IPLD supports a variety of serialized data formats through [multicodec](https://github.com/jbenet/multicodec). These can be used however is idiomatic to the format, for example in `CBOR`, we can use `CBOR` type tags to represent the merkle-link, and avoid writing out the full string key `@link`. Users are encouraged to use the formats to their fullest, and to store and transmit IPLD data in whatever format makes the most sense. The only requirement **is that there MUST be a well-defined one-to-one mapping with the IPLD Canonical format.** This is so that data can be transformed from one format to another, and back, without changing its meaning nor its cryptographic hashes.
 
+### Serialised CBOR with tags
+
+IPLD links can be represented in CBOR using tags which are defined in [RFC 7049 section 2.4](http://tools.ietf.org/html/rfc7049#section-2.4).
+
+A tag `<tag-link-object>` is defined. This tag can be followed by:
+
+- a text string (major type 3) or byte string (major type 2) corresponding to the link target. This is the canonical format for links with no link properties.
+- an array (major type 4) containing as first element the link target (text or binary string) and as optional second argument the link properties (a map, major type 5)
+
+When encoding an IPLD object to CBOR, every IPLD object can be considered to be encoded using `<tag-link-object>` using this algorithm:
+
+- If the IPLD object doesn't contain a link property, it is encoded in CBOR as a map.
+- If the IPLD object contains a link property but it is not a string, it is encoded in CBOR as a map.
+- The link property is extracted and the object is converted to a map that doesn't contain the link.
+- If the link is a valid [multiaddress](https://github.com/jbenet/multiaddr) and converting that link text to the multiaddress binary string and back to text is guaranteed to result to the exact same text, the link is converted to a binary multiaddress stored in CBOR as a byte string (major type 2).
+- Else, the link is stored as text (major type 3)
+- If the map created earlier is empty, the resulting encoding is the `<tag-link-object>` followed by the CBOR representation of the link
+- If the map is not empty, the resulting encoding is the `<tag-link-object>` followed by an array of two elements containing the link followed by the map
+
+When decoding CBOR and converting it to IPLD, each occurences of `<tag-link-object>` is transformed by the following algorithm:
+
+- If the following value is an array, its elements are extracted. First the link followed by the link properties. If there are no link properties, an empty map is used instead.
+- Else, the following value must be the link, which is extracted. The link properties are created as an empty map.
+- If the link is a binary string, it is interpreted as a multiaddress and converted to a textual format. Else, the text string is used directly.
+- The map of the link properties is augmented with a new key value pair. The key is the standard IPLD link property, the value is the textual string containing the link.
+- This map should be interpreted as an IPLD object instead of the tag.
+- When iterating over the map in its canonical form, the link must be come before every other key even if the canonical CBOR order says otherwise.
+
+When an IPLD object contains these tags in the way explained here, the multicodec header used to represent the object codec must be `/cbor/ipld-tagsv1` instead of just `/cbor`. Readers should be able to use an optimized reading process to detect links using these tags.
+
+
+**TODO:**
+
+- [ ] register tag with IANA.
+
+
 ### Canonical Format
 
 In order to preserve merkle-linking's power, we must ensure that there is a single **_canonical_** serialized representation of an IPLD document. This ensures that applications arrive at the same cryptographic hashes. It should be noted --though-- that this is a system-wide parameter. Future systems might change it to evolve representations. However we estimate this would need to be done no more than once per decade.
 
-**The IPLD Canonical format is _canonicalized CBOR_.**
+**The IPLD Canonical format is _canonicalized CBOR with tags_.**
+
+The canonical CBOR format must follow rules defines in [RFC 7049 section 3.9](http://tools.ietf.org/html/rfc7049#section-3.9) in addition to the rules defined here.
+
+Users of this format should not expect any specific ordering of the keys, as the keys might be ordered differently in non canonical formats.
 
 The legacy canonical format is protocol buffers.
 
