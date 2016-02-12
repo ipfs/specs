@@ -37,43 +37,41 @@ This format is defined with the Protocol Buffers syntax as:
 
 ## Conversion to IPLD model
 
-The conversion to the IPLD data model must have the following properties:
-
-- It MUST be convertible back to protocol buffers, resulting in an identical byte stream (so the hash corresponds). This implies that ordering and duplicate links must be preserved in some way.
-- When using paths as defined in the IPLD specification, links should be accessible without further indirection. This requires the top node object to have keys corresponding to link names.
-- Link names should be able to be any valid file name. As such, the encoding must ensure that link names do not conflict with other keys in the model.
+The conversion to the IPLD data model MUST be convertible back to protocol buffers, resulting in an identical byte stream (so the hash corresponds). This implies that ordering and duplicate links must be preserved in some way. As such, they are stored in an array and not in a map indexed by their name.
 
 There is a canonical form which is described below:
 
     {
       "data": "<Data>",
-      "named-links": {
-        "<Links[0].Name>": {
-          "@link": "<Links[0].Hash.(base58)>",
+      "links": [
+        {
+          "@link": "/ipfs/<Links[0].Hash.(base58)>",
           "name": "<Links[0].Name>",
           "size": <Links[0].Tsize>
         },
-        "<Links[2].Name>": {
-          "@link": "<Links[1].Hash.(base58)>",
-          "name": "<Links[1].Name>",
+        {
+          "@link": "/ipfs/<Links[1].Hash.(base58)>",
+          "name": "<Link[1].Name>",
           "size": <Links[1].Tsize>
         },
-        ...
-      }
-      "ordered-links": [
-        "<Links[0].Name>",
         {
-          "name": "<Link[1].Name>",
-          "@link": "<Links[1].Hash.(base58)>",
-          "size": <Links[1].Tsize>
-        }
-        "<Links[2].Name>",
+          "@link": "/ipfs/<Links[2].Hash.(base58)>",
+          "name": "<Links[2].Name>",
+          "size": <Links[2].Tsize>
+        },
         ...
       ]
     }
 
-- Here we assume that the link #0 and #1 have the same name. As specified in [ipld.md](ipld.md) in paragraph **Duplicate property keys**, only the first link is present in the named link section. The other link is present in the `ordered-links` section for completeness and to allow recreating the original protocol buffer message.
+The main object contains:
 
-- Links are not accessible on the top level object. Applications that are using protocol buffer objects such as unixfs will have to handle that and special case for legacy objects.
+- A `data` key containing the binary data string
+- A `links` array containing links in the correct order
 
-- No escaping is needed and no conflict is possible
+Each link consists of:
+
+- A `@link` key containing the path to the destination document (Using the `/ipfs/` prefix)
+- A `name` key containing the link name (a text string)
+- A `size` unsigned integer containing the link size as stored in the Protocol Buffer object
+
+Implementations are free to add any other top level key they need. In particular it may be interesting to access the links indexed by their name. This is a purely optional feature and additional keys cannot possibly be encoded back to the protonal Protocol Buffer format.
