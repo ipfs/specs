@@ -76,7 +76,7 @@ As a consequence of using the `@link` path component to denote cross-object trav
 
 Using the following dataset:
 
-    > ipfs cat --fmt=yaml QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k
+    > ipfs object cat --fmt=yaml QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k
     ---
     a:
       b:
@@ -85,7 +85,7 @@ Using the following dataset:
         foo:
           @link: QmQmkZPNPoRkPd7wj2xUJe5v5DsY6MX33MFaGhZKB2pRSE
 
-    > ipfs cat --fmt=yaml QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT
+    > ipfs object cat --fmt=yaml QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT
     ---
     c: "e"
     d:
@@ -93,7 +93,7 @@ Using the following dataset:
     foo:
       name: "second/foo"
 
-    > ipfs cat --fmt=yaml QmQmkZPNPoRkPd7wj2xUJe5v5DsY6MX33MFaGhZKB2pRSE
+    > ipfs object cat --fmt=yaml QmQmkZPNPoRkPd7wj2xUJe5v5DsY6MX33MFaGhZKB2pRSE
     ---
     name: "third"
 
