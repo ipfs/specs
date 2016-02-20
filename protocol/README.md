@@ -19,7 +19,7 @@ protocol and how the system fits together.
 
 Note, this document is not meant to be an introduction of the concepts in IPFS
 and is not recommended as a first pass to understanding how IPFS works. For
-that, please refer to the [IPFS paper](http://static.benet.ai/t/ipfs.pdf).
+that, please refer to the [IPFS paper](https://github.com/ipfs/specs/tree/master/papers/ipfs.pdf).
 
 # Index
 
@@ -113,7 +113,7 @@ between any two IPFS nodes in the network. It handles:
 - supports encryption, signing, or clear communcations
 - multi-multiplexes -multiplexes connections, streams, protocols, peers, ...
 
-See more in the [network spec](network).
+See more in the [network spec](https://github.com/ipfs/specs/tree/master/libp2p).
 
 ### [3.2 Routing -- finding peers and data](routing)
 
@@ -132,7 +132,7 @@ of implementations. For example:
   to one of a set of supernodes. This is roughly like federated routing.
 - **dns:** ipfs routing could even happen over dns.
 
-See more in the [routing spec](https://github.com/ipfs/specs/tree/master/protocol/routing).
+See more in the [routing spec](https://github.com/ipfs/specs/tree/master/libp2p).
 
 ### [3.3 Block Exchange -- transfering content-addressed data](exchange)
 
@@ -274,7 +274,7 @@ design and implementation. Examples:
 
 - The [IPFS api](http://ipfs.io/docs/api) - an HTTP service
 - The [IPFS cli](http://ipfs.io/docs/commands/) - a unix cli
-- The IPFS libs - implementations in various languages
+- The [IPFS libs](https://github.com/ipfs/ipfs#api-client-libraries) - implementations in various languages
 - The IPFS gateways - nodes in the internet that serve HTTP over IPFS
 
 * * *
