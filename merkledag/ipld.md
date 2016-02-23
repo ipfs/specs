@@ -123,7 +123,7 @@ Some Constraints:
 - IPLD paths MUST layer cleanly over UNIX and The Web (use `/`, have deterministic transforms for ASCII systems).
 - Given the wide success of JSON, a huge number of systems present JSON interfaces. IPLD MUST be able to import and export to JSON trivially.
 - The JSON data model is also very simple and easy to use. IPLD MUST be just as easy to use.
-- Definining new datastructures MUST be trivially easy. It should not be cumbersome -- or require much knowledge -- to experiment with new definitions on top of IPLD.
+- Defining new datastructures MUST be trivially easy. It should not be cumbersome -- or require much knowledge -- to experiment with new definitions on top of IPLD.
 - Since IPLD is based on the JSON data model, it is fully compatible with RDF and Linked Data standards through JSON-LD.
 - IPLD Serialized Formats (on disk and on the wire) MUST be fast and space efficient. (should not use JSON as the storage format, and instead use CBOR or similar formats)
 - IPLD cryptographic hashes MUST be upgradeable (use [multihash](https://github.com/jbenet/multihash))
