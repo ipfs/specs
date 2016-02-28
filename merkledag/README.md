@@ -1,11 +1,11 @@
 # The merkledag
 
 
-Authors: [Juan Benet](github.com/jbenet)
+Authors: [Juan Benet](https://github.com/jbenet)
 
 Reviewers:
 
-- [Jeromy Johnson](github.com/whyrusleeping)
+- [Jeromy Johnson](https://github.com/whyrusleeping)
 
 * * *
 
@@ -116,8 +116,8 @@ A powerful result of content (and identity) addressing is that linked data defin
 
 There exist many implementations of the merkledag format:
 
-- [go-merkledag](github.com/ipfs/go-merkledag)
-- [node-merkledag](github.com/ipfs/node-merkledag)
+- [go-merkledag](https://github.com/ipfs/go-merkledag)
+- [node-merkledag](https://github.com/ipfs/node-merkledag)
 
 ## Merkledag Notation
 
