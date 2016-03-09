@@ -86,13 +86,11 @@ The default bootstrap peers form the following config tree:
 
 #### Version
 
-This is the `"Version"` config subtree, which is a set of static values *except* for `"Current"`, which evaluates to the IPFS program's current version literal (e.g. `"0.4.0-dev"`.
+This is the `"Version"` config subtree, which is just the key `"Current"`, which
+evaluates to the IPFS program's current version literal (e.g. `"0.4.0-dev"`.
 
 ```json
 "Version": {
-  "AutoUpdate": "minor",
-  "Check": "error",
-  "CheckPeriod": "172800000000000",  // 48 hours
   "Current": "v0.4.0-dev"
 }
 ```
@@ -105,10 +103,10 @@ There are some other various static values that also must be included in the con
 // setup the node's default addresses.
 // Note: two swarm listen addrs, one tcp, one utp.
 "Addresses": {
-	"Swarm": {
+	"Swarm": [
 		"/ip4/0.0.0.0/tcp/4001",
 		"/ip6/::/tcp/4001"
-	},
+	],
 	"API": "/ip4/127.0.0.1/tcp/5001",
 	"Gateway": "/ip4/127.0.0.1/tcp/8080"
 },
