@@ -87,7 +87,7 @@ The default bootstrap peers form the following config tree:
 #### Version
 
 This is the `"Version"` config subtree, which is just the key `"Current"`, which
-evaluates to the IPFS program's current version literal (e.g. `"0.4.0-dev"`.
+evaluates to the IPFS program's current version literal (e.g. `"0.4.0-dev"`).
 
 ```json
 "Version": {
@@ -150,7 +150,7 @@ If the flag `--empty-repo` was provided, this step should be skipped.
 
 Otherwise, add the `init-doc` directory to the repo and pin them.
 
-Finally, write
+If successful, write
 ```
 to get started, enter:
 
