@@ -88,7 +88,7 @@ Note that even in such a simple system, we already called out to two other syste
 - a _Public Key Infrastructure_ (PKI) that lets Alice and Bob know each other's keys, and verify the validity of messages authored by each other.
 - a _Time Infrastructure_ (TI) that lets Alice and Bob agree upon a common notion of time intervals and validity durations.
 
-Both of these are large systems on their own, which impose constraints and security parameters on the record system. For example, if Alice and Bob think that NTP timestamps are a good TI, the validity of their records is dependent on their ability to establish an accurate NTP timestamp scurely (i.e. they need secure access to shared clocks). Another TI might be to "use the last observed record", and this also is dependent on having a secure announcement channel.
+Both of these are large systems on their own, which impose constraints and security parameters on the record system. For example, if Alice and Bob think that NTP timestamps are a good TI, the validity of their records is dependent on their ability to establish an accurate NTP timestamp securely (i.e. they need secure access to shared clocks). Another TI might be to "use the last observed record", and this also is dependent on having a secure announcement channel.
 
 IPRS is _Validity Scheme Agnostic_, meaning that it seeks to establish a common way to craft and distribute records for users of a system without necessarily tying them down to specific world-views (e.g. "NTP is a secure way to keep time", "The CA system is a secure PKI"), or _forcing_ them to work around specific system choices that impose constraints unreasonable for their use case (e.g. "Real-Time Video Over TOR")
 
