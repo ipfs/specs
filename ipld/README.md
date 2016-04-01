@@ -1,10 +1,13 @@
-# IPLD -- the "thin-waist" merkle dag format.
+IPLD -- the "thin-waist" merkle dag format
+==========================================
+
+![](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square)
 
 There are a variety of systems that use merkle-tree and hash-chain inspired datastructures (e.g. git, bittorrent, ipfs, tahoe-lafs, sfsro). IPLD defines:
 
 - **_merkle-links_**: the core unit of a merkle-graph
 - **_merkle-dag_**: any graphs whose edges are _merkle-links_.
-- **_merkle-paths_**: unix-style paths for traversing _merkle-dags_ with _named merkle-links**
+- **_merkle-paths_**: unix-style paths for traversing _merkle-dags_ with _named merkle-links_
 - **IPLD Data Model**: a flexible, JSON-based data model for representing merkle-dags.
 - **IPLD Serialized Formats**: a set of formats in which IPLD objects can be represented, for example JSON, CBOR, CSON, YAML, Protobuf, XML, RDF, etc.
 - **IPLD Canonical Format**: a deterministic description on a serialized format that ensures the same _logical_ object is always serialized to _the exact same sequence of bits_. This is critical for merkle-linking, and all cryptographic applications.
