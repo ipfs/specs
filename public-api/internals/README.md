@@ -1,4 +1,7 @@
-# Internals
+Internals
+=========
+
+![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
 
 In addition to the APIs exposed to developers (cli, http and core), the IPFS spec provides a set of specifications for the IPFS subsystems (AKA modules), providing a clean understanding of the components that have to be constructed for a full IPFS implementation or even a clear knowledge of how to make a partial implementation, without compromissing due to the interdependencies of these subsystems.
 
