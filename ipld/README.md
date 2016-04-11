@@ -1,7 +1,7 @@
 IPLD -- the "thin-waist" merkle dag format
 ==========================================
 
-![](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square)
+![](https://img.shields.io/badge/status-draft-yellow.svg?style=flat-square)
 
 There are a variety of systems that use merkle-tree and hash-chain inspired datastructures (e.g. git, bittorrent, ipfs, tahoe-lafs, sfsro). IPLD defines:
 
