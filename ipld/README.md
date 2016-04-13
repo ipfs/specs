@@ -437,6 +437,7 @@ Split into multiple independent sub-Files.
     },
     {
       "@link": "QmAA1...",
+      "raw": true,
       "size": "120345"
     },
   ]
