@@ -40,9 +40,6 @@ Core API
   - add
   - ls
   - rm
-- log
-  - level
-  - tail
 
 ## Extensions
 
@@ -75,6 +72,9 @@ Core API
   - stat
   - unwant
   - wantlist
+- log
+  - level
+  - tail
 
 
 ## Tooling on top of the Core + Extentions
