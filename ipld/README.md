@@ -95,9 +95,6 @@ Path traversals, denoted with `/`, happen over two kinds of links:
 - **in-object traversals** traverse data within the same object.
 - **cross-object traversals** traverse from one object to another, resolving through a merkle-link.
 
-
-As a consequence of using the `@link` path component to denote cross-object traversals, this becomes a reserved path component and makes it impossible to access arbitrary `@link` keys that are not otherwise *merkle-links*. Escaping can be used to render access to those keys possible if so desired.
-
 #### Examples
 
 Using the following dataset:
@@ -132,11 +129,6 @@ An example of the paths:
 - `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/link/foo/name` traverse the first and second object and lead to string `second foo`
 - `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/foo/name` traverse the first and last object and lead to string `third foo`
 
-#### Escaping algorithm
-
-Objects named `@link` that are not *merkle-links* are not addressable with this scheme. For example, if a `@link` key points to an array, it is not a valid *merkle-link*.
-
-If this is not desirable, a simple escaping mechanism can be devised. For example any key matching the regular expression `^\@+link$` can be escaped by adding `@` at the beginning, or unescaped by removing one `@` sign.
 
 ## What is the IPLD Data Model?
 
