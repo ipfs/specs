@@ -29,7 +29,7 @@ This format is defined with the Protocol Buffers syntax as:
         optional string Name = 2;
         optional uint64 Tsize = 3;
     }
-    
+
     message PBNode {
         repeated PBLink Links = 2;
         optional bytes  Data = 1;
@@ -45,17 +45,17 @@ There is a canonical form which is described below:
       "data": "<Data>",
       "links": [
         {
-          "@link": "/ipfs/<Links[0].Hash.(base58)>",
+          "link": {"/": "/ipfs/<Links[0].Hash.(base58)>"},
           "name": "<Links[0].Name>",
           "size": <Links[0].Tsize>
         },
         {
-          "@link": "/ipfs/<Links[1].Hash.(base58)>",
+          "link": {"/": "/ipfs/<Links[1].Hash.(base58)>"},
           "name": "<Link[1].Name>",
           "size": <Links[1].Tsize>
         },
         {
-          "@link": "/ipfs/<Links[2].Hash.(base58)>",
+          "link": {"/": "/ipfs/<Links[2].Hash.(base58)>"},
           "name": "<Links[2].Name>",
           "size": <Links[2].Tsize>
         },

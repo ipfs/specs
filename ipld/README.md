@@ -1,7 +1,9 @@
 IPLD -- the "thin-waist" merkle dag format
 ==========================================
 
-![](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square)
+![](https://img.shields.io/badge/status-draft-green.svg?style=flat-square)
+
+UPDATE: we re-drafted this spec to deal with links. We hope to re-finalize it shortly. Sorry for any inconvenience. This was an important change to do before implementations shipped.
 
 There are a variety of systems that use merkle-tree and hash-chain inspired datastructures (e.g. git, bittorrent, ipfs, tahoe-lafs, sfsro). IPLD defines:
 
@@ -23,11 +25,45 @@ A _merkle-link_ is a link between two objects which is content-addressed with th
 - **Cryptographic Integrity Checking**: resolving a link's value can be tested by hashing. In turn, this allows wide, secure, trustless exchanges of data (e.g. git or bittorrent), as others cannot give you any data that does not hash to the link's value.
 - **Immutable Datastructures**: data structures with merkle links cannot mutate, which is a nice property for distributed systems. This is useful for versioning, for representing distributed mutable state (eg CRDTs), and for long term archival.
 
-A _merkle-link_ is represented in the IPLD object model by a map containing a key `@link` mapped to a string value: the actual link. When dereferencing the link, the map itself is to be replaced by the object it points to unless the link path is invalid.
+A _merkle-link_ is represented in the IPLD object model by a map containing a single key `/` mapped to a "link value". For example:
 
-The link can either be a base58 hash, in which case it is assumed that it is a link in the `/ipfs` hierarchy, or directly the absolute path to the object. Currently, only the `/ipfs` hierarchy is allowed.
 
-If an application wants to use the `@link` key for other purposes, the application itself is responsible to escape the keys in the IPLD object so that the application keys do not conflict with the `@link` key. When discussing application specific paths, it may be worth escaping all keys starting with `@` in case future versions of IPLD make use of other keys.
+**A link, represented in json as a "link object"**
+
+```js
+{ "/" : "/ipfs/QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k" }
+// "/" is the link key
+// "/ipfs/QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k" is the link value
+```
+
+**Object with a link at `foo/baz`**
+
+```js
+{
+  "foo": {
+    "bar": "/ipfs/QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k", // not a link
+    "baz": {"/": "/ipfs/QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k"} // link
+  }
+}
+
+**Object with pseudo "link object" at `files/cat.jpg` and actual link at `files/cat.jpg/link`**
+
+```js
+{
+  "files": {
+    "cat.jpg": { // give links properties wrapping them in another object
+      "link": {"/": "/ipfs/QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k"}, // the link
+      "mode": 0755,
+      "owner": "jbenet"
+  }
+}
+```
+
+When dereferencing the link, the map itself is to be replaced by the object it points to unless the link path is invalid.
+
+The link can either be a multihash, in which case it is assumed that it is a link in the `/ipfs` hierarchy, or directly the absolute path to the object. Currently, only the `/ipfs` hierarchy is allowed.
+
+If an application wants to use objects with a single `/` key for other purposes, the application itself is responsible to escape the `/` key in the IPLD object so that the application keys do not conflict with IPLD's special `/` key.
 
 ### What is a _merkle-graph_ or a _merkle-dag_?
 
@@ -54,26 +90,10 @@ Where:
 - `QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k` is a cryptographic hash.
 - `a/b/c/d` is a path _traversal_, as in unix.
 
-Paths traversals are divided into two kinds :
+Path traversals, denoted with `/`, happen over two kinds of links:
 
-- **in-object traversals** traverse maps within the same object, and is denoted with `/`
-- **cross-object traversals** traverse across objects, resolving through merkle-links, and is denoted with `/` **(TODO)**, `//` or with `/@link/`.
-
-The case for strict path traversals:
-
-> We divide the traversals strictly, to avoid ambiguity in accessing properties within a *merkle-link* map itself. This is not transparent resolution, and thus a path reveals the objects it traverses. For example, `a/b//c/d//e` traverses across 3 objects.`
->
-> We use `//` or `/@link/` for cross-object traversals depending on the filesystem implementation. For example, in unix filesystems, double slashes (`//`) are meaningless and often cleaned into a single slash (`/`). In such a case, the use of `/@link/` is required to traverse links.
-
-The case for lenient path traversals:
-
-> We use `/` to transparently traverse inside a single IPLD object or traverse across multiple. A single slash (/) ALWAYS traverses in-object first, and cross-object otherwise. A double slash (//) or /@link/ ALWAYS traverses cross-object.
->
-> To avoid potential ambiguity, we MUST use cross-object traversals (`//` or `/@link/`) wherever possible. For example, merkle-links can themselves carry properties and sub-maps. When `/` path traversals are ambiguous, they default to in-object (the local operation). In that case, we must use `//` or `/@link/` to traverse cross-object.
-
-Note: filesystem implementation might not be able to support the separator `//` as this is generally folded into `/` on unix. In that case, usage of `/@link/` is preferred.
-
-As a consequence of using the `@link` path component to denote cross-object traversals, this becomes a reserved path component and makes it impossible to access arbitrary `@link` keys that are not otherwise *merkle-links*. Escaping can be used to render access to those keys possible if so desired.
+- **in-object traversals** traverse data within the same object.
+- **cross-object traversals** traverse from one object to another, resolving through a merkle-link.
 
 #### Examples
 
@@ -83,10 +103,11 @@ Using the following dataset:
     ---
     a:
       b:
-        @link: QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT
+        link:
+          /: QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT
         c: "d"
         foo:
-          @link: QmQmkZPNPoRkPd7wj2xUJe5v5DsY6MX33MFaGhZKB2pRSE
+          /: QmQmkZPNPoRkPd7wj2xUJe5v5DsY6MX33MFaGhZKB2pRSE
 
     > ipfs object cat --fmt=yaml QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT
     ---
@@ -94,25 +115,20 @@ Using the following dataset:
     d:
       e: "f"
     foo:
-      name: "second/foo"
+      name: "second foo"
 
     > ipfs object cat --fmt=yaml QmQmkZPNPoRkPd7wj2xUJe5v5DsY6MX33MFaGhZKB2pRSE
     ---
-    name: "third"
+    name: "third foo"
 
 An example of the paths:
 
 - `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/c` will only traverse the first object and lead to string `d`.
-- `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b//c` will traverse both objects and lead to the string `e`
-- `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/@link/c` is equivalent (will traverse both objects and lead to the string `e`)
-- `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/d/e` traverse both objects and leads to the string `f`
-- `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/foo/name` traverse the first and last object and lead to string `third`
+- `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/link/e` will traverse two objects and lead to the string `e`
+- `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/link/d/e` traverse two objects and leads to the string `f`
+- `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/link/foo/name` traverse the first and second object and lead to string `second foo`
+- `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/foo/name` traverse the first and last object and lead to string `third foo`
 
-#### Escaping algorithm
-
-Elements named `@link` that are not *merkle-links* are not addressable with this scheme. For example, if a `@link` key points to an array, it is not a valid *merkle-link*.
-
-If this is not desirable, a simple escaping mechanism can be devised. For example any key matching the regular expression `^\@+link$` can be escaped by adding `@` at the beginning, or unescaped by removing one `@` sign.
 
 ## What is the IPLD Data Model?
 
@@ -189,7 +205,7 @@ Merkle-Linking between nodes is the reason for IPLD to exist. A Link in IPLD is 
 {
   "title": "As We May Think",
   "author": {
-    "@link": "QmAAA...AAA" // links to the node above.
+    "/": "QmAAA...AAA" // links to the node above.
   }
 }
 ```
@@ -201,7 +217,7 @@ Suppose this hashes to the multihash value `QmBBB...BBB`. This node links the _s
 {
   "title": "As We May Think",
   "author": {
-    "@link": "QmAAA...AAA" // links to the node above.
+    "/": "QmAAA...AAA" // links to the node above.
   }
 }
 
@@ -218,26 +234,28 @@ name: "Vannevar Bush"
 "Vannevar Bush"
 ```
 
-#### Link Properties
+#### Link Properties Convention
 
-IPLD allows for links to have other properties themselves. This is useful to encode other invormation into a link, such as the kind of relationship, or ancilliary data required in the link. This is _different from_ "Link Objects", discussed below, which are very useful in their own right. But sometimes, you just want to add a bit of data on the link and not have to make another object. IPLD doesn't get in your way.
+IPLD allows users to construct  complex datastructures, with other properties associated with links. This is useful to encode other information along with a link, such as the kind of relationship, or ancilliary data required in the link. This is _different from_ the "Link Objects Convention", discussed below, which are very useful in their own right. But sometimes, you just want to add a bit of data on the link and not have to make another object. IPLD doesn't get in your way. You can simply do it by nesting the actual IPLD link within another object, with the additional properties.
+
+> IMPORTANT NOTE: the link properties are not allowed directly in the link object because of travesal ambiguities. Read the spec history for a discussion on the difficulties.
 
 For example, supposed you have a file system, and want to assign metadata like permissions, or owners in the link between objects. Suppose you have a `directory` object with hash `QmCCC...CCC` like this:
 
 ```js
 {
-  "foo": {
-    "@link": "QmCCC...111"
+  "foo": { // link wrapper with more properties
+    "link": {"/": "QmCCC...111"} // the link
     "mode": "0755",
     "owner": "jbenet"
   },
   "cat.jpg": {
-    "@link": "QmCCC...222"
+    "link": {"/": "QmCCC...222"},
     "mode": "0644",
     "owner": "jbenet"
   },
   "doge.jpg": {
-    "@link": "QmCCC...333",
+    "link": {"/": "QmCCC...333"},
     "mode": "0644",
     "owner": "jbenet"
   }
@@ -249,15 +267,18 @@ or in YML
 ```yml
 ---
 foo:
-  @link: QmCCC...111
+  link:
+    /: QmCCC...111
   mode: 0755
   owner: jbenet
 cat.jpg:
-  @link: QmCCC...222
+  link:
+    /: QmCCC...222
   mode: 0644
   owner: jbenet
 doge.jpg:
-  @link: QmCCC...333
+  link:
+    /: QmCCC...333
   mode: 0644
   owner: jbenet
 ```
@@ -274,13 +295,13 @@ Though we have new properties in the links that are _specific to this datastruct
 {
   "subfiles": [
     {
-      "@link": "QmPHPs1P3JaWi53q5qqiNauPhiTqa3S1mbszcVPHKGNWRh"
+      "/": "QmPHPs1P3JaWi53q5qqiNauPhiTqa3S1mbszcVPHKGNWRh"
     },
     {
-      "@link": "QmPCuqUTNb21VDqtp5b8VsNzKEMtUsZCCVsEUBrjhERRSR"
+      "/": "QmPCuqUTNb21VDqtp5b8VsNzKEMtUsZCCVsEUBrjhERRSR"
     },
     {
-      "@link": "QmS7zrNSHEt5GpcaKrwdbnv1nckBreUxWnLaV4qivjaNr3"
+      "/": "QmS7zrNSHEt5GpcaKrwdbnv1nckBreUxWnLaV4qivjaNr3"
     }
   ]
 }
@@ -288,11 +309,11 @@ Though we have new properties in the links that are _specific to this datastruct
 > ipld cat --yml QmCCC...CCC/doge.jpg
 ---
 subfiles:
-  - @link: QmPHPs1P3JaWi53q5qqiNauPhiTqa3S1mbszcVPHKGNWRh
-  - @link: QmPCuqUTNb21VDqtp5b8VsNzKEMtUsZCCVsEUBrjhERRSR
-  - @link: QmS7zrNSHEt5GpcaKrwdbnv1nckBreUxWnLaV4qivjaNr3
+  - /: QmPHPs1P3JaWi53q5qqiNauPhiTqa3S1mbszcVPHKGNWRh
+  - /: QmPCuqUTNb21VDqtp5b8VsNzKEMtUsZCCVsEUBrjhERRSR
+  - /: QmS7zrNSHEt5GpcaKrwdbnv1nckBreUxWnLaV4qivjaNr3
 
-> ipld cat --json QmCCC...CCC/doge.jpg/subfiles/1
+> ipld cat --json QmCCC...CCC/doge.jpg/subfiles/1/
 {
   "data": "\u0008\u0002\u0012��\u0008����\u0000\u0010JFIF\u0000\u0001\u0001\u0001\u0000H\u0000H..."
 }
@@ -427,16 +448,16 @@ Split into multiple independent sub-Files.
   "size": "1424119",
   "subfiles": [
     {
-      "@link": "QmAAA...",
+      "link": {"/": "QmAAA..."},
       "size": "100324"
     },
     {
-      "@link": "QmAA1...",
+      "link": {"/": "QmAA1..."},
       "size": "120345",
       "repeat": "10"
     },
     {
-      "@link": "QmAA1...",
+      "link": {"/": "QmAA1..."},
       "size": "120345"
     },
   ]
@@ -448,17 +469,17 @@ Split into multiple independent sub-Files.
 ```js
 {
   "foo": {
-    "@link": "QmCCC...111"
+    "link": {"/": "QmCCC...111"},
     "mode": "0755",
     "owner": "jbenet"
   },
   "cat.jpg": {
-    "@link": "QmCCC...222"
+    "link": {"/": "QmCCC...222"},
     "mode": "0644",
     "owner": "jbenet"
   },
   "doge.jpg": {
-    "@link": "QmCCC...333",
+    "link": {"/": "QmCCC...333"},
     "mode": "0644",
     "owner": "jbenet"
   }
@@ -480,15 +501,15 @@ Split into multiple independent sub-Files.
 ```js
 {
   "foo": {
-    "@link": "QmCCC...111"
+    "link": {"/": "QmCCC...111"},
     "mode": "0755"
   },
   "cat.jpg": {
-    "@link": "QmCCC...222"
+    "link": {"/": "QmCCC...222"},
     "mode": "0644"
   },
   "doge.jpg": {
-    "@link": "QmCCC...333",
+    "link": {"/": "QmCCC...333"},
     "mode": "0644"
   }
 }
@@ -498,10 +519,10 @@ Split into multiple independent sub-Files.
 
 ```js
 {
-  "tree": {"@link": "e4647147e940e2fab134e7f3d8a40c2022cb36f3"},
+  "tree": {"/": "e4647147e940e2fab134e7f3d8a40c2022cb36f3"},
   "parents": [
-    {"@link": "b7d3ead1d80086940409206f5bd1a7a858ab6c95"},
-    {"@link": "ba8fbf7bc07818fa2892bd1a302081214b452afb"}
+    {"/": "b7d3ead1d80086940409206f5bd1a7a858ab6c95"},
+    {"/": "ba8fbf7bc07818fa2892bd1a302081214b452afb"}
   ],
   "author": {
     "name": "Juan Batiz-Benet",
@@ -523,8 +544,8 @@ Split into multiple independent sub-Files.
 
 ```js
 {
-  "parent": {"@link": "Qm000000002CPGAzmfdYPghgrFtYFB6pf1BqMvqfiPDam8"},
-  "transactions": {"@link": "QmTgzctfxxE8ZwBNGn744rL5R826EtZWzKvv2TF2dAcd9n"},
+  "parent": {"/": "Qm000000002CPGAzmfdYPghgrFtYFB6pf1BqMvqfiPDam8"},
+  "transactions": {"/": "QmTgzctfxxE8ZwBNGn744rL5R826EtZWzKvv2TF2dAcd9n"},
   "nonce": "UJPTFZnR2CPGAzmfdYPghgrFtYFB6pf1BqMvqfiPDam8"
 }
 ```
@@ -536,16 +557,16 @@ This time, im YML. TODO: make this a real txn
 ```yml
 ---
 inputs:
-  - input: {@link: Qmes5e1x9YEku2Y4kDgT6pjf91TPGsE2nJAaAKgwnUqR82}
+  - input: {/: Qmes5e1x9YEku2Y4kDgT6pjf91TPGsE2nJAaAKgwnUqR82}
     amount: 100
 outputs:
-  - output: {@link: Qmes5e1x9YEku2Y4kDgT6pjf91TPGsE2nJAaAKgwnUqR82}
+  - output: {/: Qmes5e1x9YEku2Y4kDgT6pjf91TPGsE2nJAaAKgwnUqR82}
     amount: 50
-  - output: {@link: QmbcfRVZqMNVRcarRN3JjEJCHhQBcUeqzZfa3zoWMaSrTW}
+  - output: {/: QmbcfRVZqMNVRcarRN3JjEJCHhQBcUeqzZfa3zoWMaSrTW}
     amount: 30
-  - output: {@link: QmV9PkR2gXcmUgNH7s7zMg9dsk7Hy7bLS18S9SHK96m7zV}
+  - output: {/: QmV9PkR2gXcmUgNH7s7zMg9dsk7Hy7bLS18S9SHK96m7zV}
     amount: 15
-  - output: {@link: QmP8r8fLUnEywGnRRUrHB28nnBKwmshMLiYeg8udzYg7TK}
+  - output: {/: QmP8r8fLUnEywGnRRUrHB28nnBKwmshMLiYeg8udzYg7TK}
     amount: 5
 script: OP_VERIFY
 ```
