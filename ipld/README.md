@@ -5,7 +5,7 @@ IPLD -- the "thin-waist" merkle dag format
 
 UPDATE: we re-drafted this spec to deal with links. We hope to re-finalize it shortly. Sorry for any inconvenience. This was an important change to do before implementations shipped.
 
-There are a variety of systems that use merkle-tree and hash-chain inspired datastructures (e.g. git, bittorrent, ipfs, tahoe-lafs, sfsro). IPLD defines:
+There are a variety of systems that use merkle-tree and hash-chain inspired datastructures (e.g. git, bittorrent, ipfs, tahoe-lafs, sfsro). IPLD (Inter Planetary Linked Data) defines:
 
 - **_merkle-links_**: the core unit of a merkle-graph
 - **_merkle-dag_**: any graphs whose edges are _merkle-links_.
