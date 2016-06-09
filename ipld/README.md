@@ -124,7 +124,7 @@ Using the following dataset:
 An example of the paths:
 
 - `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/c` will only traverse the first object and lead to string `d`.
-- `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/link/e` will traverse two objects and lead to the string `e`
+- `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/link/c` will traverse two objects and lead to the string `e`
 - `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/link/d/e` traverse two objects and leads to the string `f`
 - `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/link/foo/name` traverse the first and second object and lead to string `second foo`
 - `/ipfs/QmV76pUdAAukxEHt9Wp2xwyTpiCmzJCvjnMxyQBreaUeKT/a/b/foo/name` traverse the first and last object and lead to string `third foo`
