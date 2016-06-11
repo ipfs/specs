@@ -157,7 +157,7 @@ type Blocks.Block interface {
 // complex, like Bitswap.Node)
 type Blocks.Store interface {
   Put(*blocks.Block) error            // store a Block under its Key
-  Has(key.Key) (bool, error)          // check whethrer Block is in Block.Store
+  Has(key.Key) (bool, error)          // check whether Block is in Block.Store
   Get(key.Key) (*blocks.Block, error) // retreive Block by its Key
   Delete(key.Key) error               // stop storing a Block
 
