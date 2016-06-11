@@ -203,7 +203,7 @@ type DAG.Store interface {
   Get(context.Context, key.Key) (*Node, error)
   Remove(*Node) error
 
-  // GetDAG returns, in order, all the single leve child
+  // GetDAG returns, in order, all the single leaf child
   // nodes of the passed in node.
   GetDAG(context.Context, *Node) []NodeGetter
   GetNodes(context.Context, []key.Key) []NodeGetter
