@@ -45,6 +45,7 @@ A _merkle-link_ is represented in the IPLD object model by a map containing a si
     "baz": {"/": "/ipfs/QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k"} // link
   }
 }
+```
 
 **Object with pseudo "link object" at `files/cat.jpg` and actual link at `files/cat.jpg/link`**
 
