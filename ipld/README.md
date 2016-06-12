@@ -370,29 +370,20 @@ IPLD supports a variety of serialized data formats through [multicodec](https://
 
 IPLD links can be represented in CBOR using tags which are defined in [RFC 7049 section 2.4](http://tools.ietf.org/html/rfc7049#section-2.4).
 
-A tag `<tag-link-object>` is defined. This tag can be followed by:
+A tag `<tag-link-object>` is defined. This tag can be followed by a text string (major type 3) or byte string (major type 2) corresponding to the link target.
 
-- a text string (major type 3) or byte string (major type 2) corresponding to the link target. This is the canonical format for links with no link properties.
-- an array (major type 4) containing as first element the link target (text or binary string) and as optional second argument the link properties (a map, major type 5)
+When encoding an IPLD "link object" to CBOR, use this algorithm:
 
-When encoding an IPLD object to CBOR, every IPLD object can be considered to be encoded using `<tag-link-object>` using this algorithm:
-
-- If the IPLD object doesn't contain a link property, it is encoded in CBOR as a map.
-- If the IPLD object contains a link property but it is not a string, it is encoded in CBOR as a map.
-- The link property is extracted and the object is converted to a map that doesn't contain the link.
-- If the link is a valid [multiaddress](https://github.com/jbenet/multiaddr) and converting that link text to the multiaddress binary string and back to text is guaranteed to result to the exact same text, the link is converted to a binary multiaddress stored in CBOR as a byte string (major type 2).
-- Else, the link is stored as text (major type 3)
-- If the map created earlier is empty, the resulting encoding is the `<tag-link-object>` followed by the CBOR representation of the link
-- If the map is not empty, the resulting encoding is the `<tag-link-object>` followed by an array of two elements containing the link followed by the map
+- The *link value* is extracted.
+- If the *link value* is a valid [multiaddress](https://github.com/jbenet/multiaddr) and converting that link text to the multiaddress binary string and back to text is guaranteed to result to the exact same text, the link is converted to a binary multiaddress stored in CBOR as a byte string (major type 2).
+- Else, the *link value* is stored as text (major type 3)
+- The resulting encoding is the `<tag-link-object>` followed by the CBOR representation of the *link value*
 
 When decoding CBOR and converting it to IPLD, each occurences of `<tag-link-object>` is transformed by the following algorithm:
 
-- If the following value is an array, its elements are extracted. First the link followed by the link properties. If there are no link properties, an empty map is used instead.
-- Else, the following value must be the link, which is extracted. The link properties are created as an empty map.
+- The following value must be the *link value*, which is extracted.
 - If the link is a binary string, it is interpreted as a multiaddress and converted to a textual format. Else, the text string is used directly.
-- The map of the link properties is augmented with a new key value pair. The key is the standard IPLD link property, the value is the textual string containing the link.
-- This map should be interpreted as an IPLD object instead of the tag.
-- When iterating over the map in its canonical form, the link must be come before every other key even if the canonical CBOR order says otherwise.
+- A map is created with a single key value pair. The key is the standard IPLD *link key* `/`, the value is the textual string containing the *link value*.
 
 When an IPLD object contains these tags in the way explained here, the multicodec header used to represent the object codec must be `/cbor/ipld-tagsv1` instead of just `/cbor`. Readers should be able to use an optimized reading process to detect links using these tags.
 
