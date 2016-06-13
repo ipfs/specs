@@ -47,13 +47,13 @@ A _merkle-link_ is represented in the IPLD object model by a map containing a si
 }
 ```
 
-**Object with pseudo "link object" at `files/cat.jpg` and actual link at `files/cat.jpg/link`**
+**Object with pseudo "link object" at `files/cat.jpg` and actual link at `files/cat.jpg/content`**
 
 ```js
 {
   "files": {
     "cat.jpg": { // give links properties wrapping them in another object
-      "link": {"/": "/ipfs/QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k"}, // the link
+      "content": {"/": "/ipfs/QmUmg7BZC1YP1ca66rRtWKxpXp77WgVHrnv263JtDuvs2k"}, // the link
       "mode": 0755,
       "owner": "jbenet"
   }
@@ -245,18 +245,27 @@ For example, supposed you have a file system, and want to assign metadata like p
 
 ```js
 {
-  "foo": { // link wrapper with more properties
-    "link": {"/": "QmCCC...111"} // the link
+  "foo.txt": { // link wrapper with more properties
+    "size": "1234",
+    "content": {"/": "QmCCC...111"} // the link
     "mode": "0755",
     "owner": "jbenet"
   },
   "cat.jpg": {
-    "link": {"/": "QmCCC...222"},
+    "size": "1234",
+    "content": {"/": "QmCCC...222"},
+    "mode": "0644",
+    "owner": "jbenet"
+  },
+  "cat2.jpg": { // identical to cat.jpg, but without an external link
+    "size": "1234",
+    "content": {"$binary": "c3VyZS4="},
     "mode": "0644",
     "owner": "jbenet"
   },
   "doge.jpg": {
-    "link": {"/": "QmCCC...333"},
+    "size": "1234",
+    "content": {"/": "QmCCC...333"},
     "mode": "0644",
     "owner": "jbenet"
   }
@@ -267,18 +276,26 @@ or in YML
 
 ```yml
 ---
-foo:
-  link:
+foo.txt:
+  size: 1234
+  content:
     /: QmCCC...111
   mode: 0755
   owner: jbenet
 cat.jpg:
-  link:
+  size: 1234
+  content:
     /: QmCCC...222
   mode: 0644
   owner: jbenet
+cat2.jpg:
+  size: 1234
+  content: !!binary "c3VyZS4="
+  mode: 0644
+  owner: jbenet
 doge.jpg:
-  link:
+  size: 1234
+  content:
     /: QmCCC...333
   mode: 0644
   owner: jbenet
@@ -287,63 +304,42 @@ doge.jpg:
 Though we have new properties in the links that are _specific to this datastructure_, we can still resolve links just fine:
 
 ```js
-> ipld cat --json QmCCC...CCC/cat.jpg
-{
-  "data": "\u0008\u0002\u0012��\u0008����\u0000\u0010JFIF\u0000\u0001\u0001\u0001\u0000H\u0000H..."
-}
+> ipld cat --json QmCCC...CCC/foo.txt/content
+"Hello, world!"
 
-> ipld cat --json QmCCC...CCC/doge.jpg
-{
-  "subfiles": [
-    {
-      "/": "QmPHPs1P3JaWi53q5qqiNauPhiTqa3S1mbszcVPHKGNWRh"
-    },
-    {
-      "/": "QmPCuqUTNb21VDqtp5b8VsNzKEMtUsZCCVsEUBrjhERRSR"
-    },
-    {
-      "/": "QmS7zrNSHEt5GpcaKrwdbnv1nckBreUxWnLaV4qivjaNr3"
-    }
-  ]
-}
+> ipld cat --json QmCCC...CCC/cat.jpg/content
+{"$binary": "c3VyZS4="} // EJSON
 
-> ipld cat --yml QmCCC...CCC/doge.jpg
+> ipld cat --json QmCCC...CCC/cat2.jpg/content
+{"$binary": "c3VyZS4="} // EJSON
+
+> ipld cat --json QmCCC...CCC/doge.jpg/content
+[
+  {"/": "QmPHPs1P3JaWi53q5qqiNauPhiTqa3S1mbszcVPHKGNWRh"},
+  {"/": "QmPCuqUTNb21VDqtp5b8VsNzKEMtUsZCCVsEUBrjhERRSR"},
+  {"/": "QmS7zrNSHEt5GpcaKrwdbnv1nckBreUxWnLaV4qivjaNr3"}
+]
+
+> ipld cat --yml QmCCC...CCC/doge.jpg/content
 ---
-subfiles:
-  - /: QmPHPs1P3JaWi53q5qqiNauPhiTqa3S1mbszcVPHKGNWRh
-  - /: QmPCuqUTNb21VDqtp5b8VsNzKEMtUsZCCVsEUBrjhERRSR
-  - /: QmS7zrNSHEt5GpcaKrwdbnv1nckBreUxWnLaV4qivjaNr3
+- /: QmPHPs1P3JaWi53q5qqiNauPhiTqa3S1mbszcVPHKGNWRh
+- /: QmPCuqUTNb21VDqtp5b8VsNzKEMtUsZCCVsEUBrjhERRSR
+- /: QmS7zrNSHEt5GpcaKrwdbnv1nckBreUxWnLaV4qivjaNr3
 
-> ipld cat --json QmCCC...CCC/doge.jpg/subfiles/1/
-{
-  "data": "\u0008\u0002\u0012��\u0008����\u0000\u0010JFIF\u0000\u0001\u0001\u0001\u0000H\u0000H..."
-}
+> ipld cat --json QmCCC...CCC/doge.jpg/content/1
+{"$binary": "c3VyZS4="} // EJSON
 ```
 
 But we can't extract the link as nicely as other properties, as links are meant to _resolve through_.
 
 #### Duplicate property keys
 
-Note that having two properties with _the same_ name IS NOT ALLOWED, but actually impossible to prevent (someone will do it and feed it to parsers), so to be safe, we define the value of the path traversal to be _the first_ entry in the serialized representation. For example, suppose we have the object:
+Note that having two properties with _the same_ name IS NOT ALLOWED. Therefore, CBOR decoders should operate in **Strict Mode** as defined by [RFC 7049 section 3.10](https://tools.ietf.org/html/rfc7049#section-3.10), ensuring that different decoders reach the same (semantically equivalent) results, even in the presence of potentially malicious data:
 
-```json
-{
-  "name": "J.C.R. Licklider",
-  "name": "Hans Moravec"
-}
-```
-
-Suppose _this_ was the _exact order_ in the _Canonical Format_ (not json, but cbor), and it hashes to `QmDDD...DDD`. We would _ALWAYS_ get:
-
-```sh
-> ipld cat --json QmDDD...DDD
-{
-  "name": "J.C.R. Licklider",
-  "name": "Hans Moravec"
-}
-> ipld cat --json QmDDD...DDD/name
-"J.C.R. Licklider"
-```
+> In particular, a strict decoder needs to have an API that reports an error (and does not return data) for a CBOR data item that contains any of the following:
+> -  a map (major type 5) that has more than one entry with the same key
+> - a tag that is used on a data item of the incorrect type
+> - a data item that is incorrectly formatted for the type given to it, such as invalid UTF-8 or data that cannot be interpreted with the specific tag that it has been tagged with
 
 
 #### Path Restrictions
@@ -355,11 +351,13 @@ TODO:
 - [ ] list path resolving restrictions
 - [ ] show examples
 
-#### Integers in JSON
+#### Integers and Bytestrings in JSON
 
 IPLD is _directly compatible_ with JSON, to take advantage of JSON's successes, but it need not be _held back_ by JSON's mistakes. This is where we can afford to follow format idiomatic choices, though care MUST be given to ensure there is always a well-defined 1:1 mapping.
 
-On the subject of integers, there exist a variety of formats which represent integers as strings in JSON, for example, [EJSON](https://www.meteor.com/ejson). These can be used and conversion to and from other formats should happen naturally-- that is, when converting JSON to CBOR, an EJSON integer should be transformed naturally to a proper CBOR integer, instead of representing it as a map with string values.
+On the subject of integers, there exist a variety of formats which represent integers as strings in JSON, for example, [EJSON](http://docs.meteor.com/api/ejson.html). These can be used and conversion to and from other formats should happen naturally-- that is, when converting JSON to CBOR, an EJSON integer should be transformed naturally to a proper CBOR integer, instead of representing it as a map with string values.
+
+Similarly, EJSON Binary types (eg. `{"$binary": "c3VyZS4="}`) should be transformed to a CBOR bytestring (major type 2).
 
 
 ## Serialized Data Formats
@@ -422,6 +420,10 @@ In the same way, when the receiver is storing the object, it must make sure that
 
 A simple way to store such objects with their format is to store them with their multicodec header.
 
+#### Raw objects
+
+An exception to the above is when the entire CBOR object is a single bytestring (major type 2) or UTF-8 string (major type 3). In this case, **the raw sequence of bytes _only_** should be stored, with the multicodec header being either `/bin` or `/utf8` respectively.
+
 
 ## Datastructure Examples
 
@@ -435,8 +437,10 @@ It is important that IPLD be a simple, nimble, and flexible format that does not
 
 ```js
 {
-  "data": "hello world",
-  "size": "11"
+  "content": "hello world",
+  "size": "11",
+  "mode": "0644",
+  "owner": "jbenet"
 }
 ```
 
@@ -447,21 +451,13 @@ Split into multiple independent sub-Files.
 ```js
 {
   "size": "1424119",
-  "subfiles": [
-    {
-      "link": {"/": "QmAAA..."},
-      "size": "100324"
-    },
-    {
-      "link": {"/": "QmAA1..."},
-      "size": "120345",
-      "repeat": "10"
-    },
-    {
-      "link": {"/": "QmAA1..."},
-      "size": "120345"
-    },
-  ]
+  "content": [
+    {"/": "QmAAA..."},
+    {"/": "QmAA1..."},
+    {"/": "QmAA1..."},
+  ],
+  "mode": "0644",
+  "owner": "jbenet"
 }
 ```
 
@@ -470,17 +466,20 @@ Split into multiple independent sub-Files.
 ```js
 {
   "foo": {
-    "link": {"/": "QmCCC...111"},
+    "size": "1234",
+    "content": {"/": "QmCCC...111"},
     "mode": "0755",
     "owner": "jbenet"
   },
   "cat.jpg": {
-    "link": {"/": "QmCCC...222"},
+    "size": "1234",
+    "content": {"/": "QmCCC...222"},
     "mode": "0644",
     "owner": "jbenet"
   },
   "doge.jpg": {
-    "link": {"/": "QmCCC...333"},
+    "size": "1234",
+    "content": {"/": "QmCCC...333"},
     "mode": "0644",
     "owner": "jbenet"
   }
@@ -492,9 +491,7 @@ Split into multiple independent sub-Files.
 #### git blob
 
 ```js
-{
-  "data": "hello world"
-}
+"hello world"
 ```
 
 #### git tree
@@ -502,15 +499,15 @@ Split into multiple independent sub-Files.
 ```js
 {
   "foo": {
-    "link": {"/": "QmCCC...111"},
+    "content": {"/": "QmCCC...111"},
     "mode": "0755"
   },
   "cat.jpg": {
-    "link": {"/": "QmCCC...222"},
+    "content": {"/": "QmCCC...222"},
     "mode": "0644"
   },
   "doge.jpg": {
-    "link": {"/": "QmCCC...333"},
+    "content": {"/": "QmCCC...333"},
     "mode": "0644"
   }
 }
