@@ -139,7 +139,7 @@ The IPLD Data Model defines a simple JSON-based _structure_ for all merkle-dags,
 
 Some Constraints:
 - IPLD paths MUST be unambiguous. A given path string MUST always deterministically traverse to the same object. (e.g. avoid duplicating link names)
-- IPLD paths MUST be universal and avoid opressing non-english societies (e.g. use UTF-8, not ASCII).
+- IPLD paths MUST be universal and avoid oppressing non-english societies (e.g. use UTF-8, not ASCII).
 - IPLD paths MUST layer cleanly over UNIX and The Web (use `/`, have deterministic transforms for ASCII systems).
 - Given the wide success of JSON, a huge number of systems present JSON interfaces. IPLD MUST be able to import and export to JSON trivially.
 - The JSON data model is also very simple and easy to use. IPLD MUST be just as easy to use.
