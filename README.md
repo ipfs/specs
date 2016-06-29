@@ -73,7 +73,7 @@ The specs contained in this repository are:
 
 **Records and Record Systems:**
 - [IPRS](/iprs-interplanetary-record-system) - InterPlanetary Record System
-- [IPNS](ipns-interplanetary-naming-system) - InterPlanetary Naming System
+- IPNS - InterPlanetary Naming System
 
 **Key Management:**
 - [KeyStore](/keystore) - Key management on IPFS
