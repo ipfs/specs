@@ -1,7 +1,5 @@
 # The Keychain
 
-## THIS WIP IS JUST A NOTES PLACEHOLDER ATM
-
 Authors: [Juan Benet](github.com/jbenet)
 
 Reviewers:
@@ -9,6 +7,10 @@ Reviewers:
 * * *
 
 This is the [Spec](../) for the IPFS Keychain.
+
+![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
+
+**THIS WIP IS JUST A NOTES PLACEHOLDER ATM**
 
 ## Abstract
 

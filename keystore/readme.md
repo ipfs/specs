@@ -1,9 +1,11 @@
 # ipfs keystore proposal
 Author[s]: [whyrusleeping](github.com/whyrusleeping)
 
-Reviewer[s]: 
+Reviewer[s]:
 
 * * *
+
+![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
 
 Note: This spec is currently in the `wip` phase, things are likely to change very quickly.
 
@@ -88,7 +90,7 @@ DESCRIPTION:
 	the user for the missing fields.
 
 ```
-##### Comments: 
+##### Comments:
 
 Similar to ssh's `ssh-keygen` with the `-t` option and interactive prompts.
 
@@ -107,7 +109,7 @@ DESCRIPTION:
 
     'ipfs key send' is a command used to share keypairs with other trusted users.
 
-	It will first look up the peer specified and print out their information and 
+	It will first look up the peer specified and print out their information and
 	prompt the user "are you sure? [y/n]" before sending the keypair. The target
 	peer must be online and dialable in order for the key to be sent.
 
@@ -118,7 +120,7 @@ DESCRIPTION:
 
 ##### Comments:
 
-Ensure that the user knows the implications of sending a key. 
+Ensure that the user knows the implications of sending a key.
 
 * * *
 
@@ -168,7 +170,7 @@ We will also need to make additions to support keys in other commands, these cha
 
 - `ipfs name publish`
 	- Support for a `-key` option to select which keyspace to publish to
-	
+
 ### Code Changes/Additions
 An outline of which packages or submodules will be affected.
 
@@ -201,7 +203,7 @@ does not linger in memory.
 - new node types, 'encrypted' and 'signed', probably shouldnt be in unixfs, just understood by it
 - if new node types are not unixfs nodes, special consideration must be given to the interop
 
-- DagReader needs to be able to access keystore to seamlessly stream encrypted data we have keys for 
+- DagReader needs to be able to access keystore to seamlessly stream encrypted data we have keys for
 	- also needs to be able to verify signatures
 
 #### Importer
@@ -215,8 +217,8 @@ does not linger in memory.
 
 Should contain code for crypto operations on dags.
 
-Encryption of dags should work by first generating a symmetric key, and using 
-that key to encrypt all the data. That key should then be encrypted with the 
+Encryption of dags should work by first generating a symmetric key, and using
+that key to encrypt all the data. That key should then be encrypted with the
 public key chosen and stored in the Encrypted DAG structure.
 
 Note: One option is to simply add it to the key interface.
@@ -257,5 +259,3 @@ Encrypted DAG:
 	}
 }
 ```
-
-
