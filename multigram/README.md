@@ -1,6 +1,6 @@
 # Multigram -- protocol negotiation and multiplexing over datagrams
 
-For multiplexing different protocols on the same datagram socket, multigram prepends a 1-byte header to every packet. This header represents an index in a table of protocols shared between both endpoints. This protocol table is negotiated by exchanging the intersection of the endpoint's supported protocols. The protocol table's size of 256 tuples can be increased by nesting multiple multigram headers.
+For multiplexing different protocols on the same datagram connection, multigram prepends a 1-byte header to every packet. This header represents an index in a table of protocols shared between both endpoints. This protocol table is negotiated by exchanging the intersection of the endpoint's supported protocols. The protocol table's size of 256 tuples can be increased by nesting multiple multigram headers.
 
 TODO: analyze the properties vs. other approaches (e.g. an identifier on every packet).
 
@@ -21,10 +21,10 @@ TODO: analyze the properties vs. other approaches (e.g. an identifier on every p
 The protocol table MUST be append-only and immutable. It MUST initially contain exactly one tuple:
 
 ```
-0x00,/multigram-table/0.1.0
+0x00,/multigram-setup/0.1.0
 ```
 
-The `/multigram-table` protocol is used for appending to the shared protocol table.
+The `/multigram-setup` protocol is used for appending to the shared protocol table.
 
 ```
                   1               2               3               4
@@ -36,11 +36,11 @@ The `/multigram-table` protocol is used for appending to the shared protocol tab
   +
 ```
 
-- Note how the Table Index field is set to `0x00`, selecting the `/multigram-table` protocol.
+- Note how the Table Index field is set to `0x00`, selecting the `/multigram-setup` protocol.
 - The Operation field MUST support at least the `/cbor/` multicodec format. It SHOULD support the `/protobuf/` and `/json/` formats.
 - In the future, an `/ipfs/` format can be used to resolve code and specification for supporting the format.
 
-## Protocol table operations / multigram-table
+## Protocol table operations / multigram-setup
 
 Either endpoint can send `append` proposals, and the other endpoint will reply with the result, based on their own supported protocols.
 
@@ -74,7 +74,7 @@ Either endpoint can send `append` proposals, and the other endpoint will reply w
 
 Any field in the operation data starting in `0x` is considered for being appended.
 Any other field names can be used e.g. for checksums, detecting packet loss, or communicating errors.
-This is subject to updates of the multigram-table protocol.
+This is subject to updates of the multigram-setup protocol.
 
 ## Nested multigrams
 
