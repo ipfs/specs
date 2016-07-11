@@ -544,7 +544,7 @@ Split into multiple independent sub-Files.
 
 #### Bitcoin Transaction
 
-This time, im YML. TODO: make this a real txn
+This time, in YML. TODO: make this a real txn
 
 ```yml
 ---
