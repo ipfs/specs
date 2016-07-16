@@ -1,6 +1,6 @@
 # IPFS Implementation Doc
 
-This short document aims to give a quick guide to anyone implementing IPFS -- it is modelled after go-ipfs, and serving as a template for js-ipfs and py-ipfs.
+This short document aims to be a quick guide for anyone implementing IPFS -- it is modelled after go-ipfs, and serves as a template for js-ipfs and py-ipfs.
 
 Sections:
 - IPFS Types
@@ -10,7 +10,7 @@ Sections:
 
 ## Libraries First
 
-There are a number of non-ipfs specific things that have been built for ipfs, that ipfs depends on. Implement these first
+There are a number of non-ipfs specific things that have been built for ipfs, that ipfs depends on. Implement these first.
 
 ### The Multis
 
@@ -23,20 +23,19 @@ There are a number of self-describing protocols/formats in use all over ipfs.
 
 ### libp2p
 
-All complex peer-to-peer protocols for IPFS have been abstracted out into a separate library called libp2p. libp2p is a thin veneer over a wealth of modules that interface well with each other.
+All the complex peer-to-peer protocols for IPFS have been abstracted out into a separate library called `libp2p`. `libp2p` is a thin veneer over a wealth of modules that interface well with each other.
 
 Implementations:
 - [go-libp2p](https://github.com/ipfs/go-libp2p)
 - [js-libp2p](https://github.com/ipfs/js-libp2p)
 
-
-libp2p may in fact be _the bulk_ of an ipfs implementation. the rest is very simple.
+`libp2p` may in fact be _the bulk_ of an ipfs implementation. The rest is very simple.
 
 ## Core Pieces
 
 ### IPLD
 
-IPLD is the format for IPFS objects, but it can be used outside of ipfs (hence a module). Its layered on top of multihash and multicodec, and provides the heart of ipfs: the merkledag.
+IPLD is the format for IPFS objects, but it can be used outside of ipfs (hence a module). It's layered on top of `multihash` and `multicodec`, and provides the heart of ipfs: the merkledag.
 
 Implementations:
 - [go-ipld](https://github.com/ipfs/go-ipld)
@@ -44,7 +43,7 @@ Implementations:
 
 ### IPRS
 
-IPRS is the record system for IPFS, but it can be used outside of ipfs (hence a module). This deals with p2p system records -- it is also used by libp2p.
+IPRS is the record system for IPFS, but it can be used outside of ipfs (hence a module). This deals with p2p system records -- it is also used by `libp2p`.
 
 Implementations:
 - [go-iprs](https://github.com/ipfs/go-iprs)
@@ -56,7 +55,7 @@ IPNS provides name resolution on top of IPRS -- and a choice of record routing s
 
 ### IPFS-Repo
 
-The IFPS-Repo is an IPFS Node's "local storage" or "database", though the storage may not be in a database nor local at all (e.g. s3-repo). There are common formats so that multiple implementations can read and write to the same repos. Though today we only have one repo format, more are easy to add so that we can create IPFS nodes on top of other storage solutions.
+The IPFS-Repo is an IPFS Node's "local storage" or "database", though the storage may not be in a database nor local at all (e.g. `s3-repo`). There are common formats so that multiple implementations can read and write to the same repos. Though today we only have one repo format, more are easy to add so that we can create IPFS nodes on top of other storage solutions.
 
 Implementations:
 - [go-ipfs-repo](https://github.com/ipfs/go-ipfs-repo)
@@ -68,18 +67,18 @@ Implementations:
 
 ## IPFS Core
 
-The Core of IPFS is an interface of functions layered over all of the other pieces.
+The Core of IPFS is an interface of functions layered over all the other pieces.
 
 ### IPFS Node
 
-The IPFS Node is an entity that bundles all the other pieces, and implements the interface (below). In its most basic sense, an IPFS node is really just:
+The IPFS Node is an entity that bundles all the other pieces together, and implements the interface (described below). In its most basic sense, an IPFS node is really just:
 
 ```go
 type ipfs.Node struct {
 
     Config      // has a configuration
     repo.Repo   // has a Repo for storing all the local data
-    libp2p.Node // has an embedded libp2p.Node, and thus a peer.ID, and keys.
+    libp2p.Node // has an embedded libp2p.Node, and thus a peer.ID, and keys
     dag.Store   // has a DAG Store (over the repo + network)
 
 }
@@ -89,9 +88,9 @@ IPFS itself is very, very simple. The complexity lies within `libp2p.Node` and h
 
 ### IPFS Node Config
 
-IPFS Nodes can be configured. The basic configuration format is a JSON file, and so naturally converters to other formats can be made. eventually, the configuration will be an ipfs object itself.
+IPFS Nodes can be configured. The basic configuration format is a JSON file, and so naturally converters to other formats can be made. Eventually, the configuration will be an ipfs object itself.
 
-The config is stored in the IPFS Repo, but is separate because some implementations may give it knowledge of other packages (like routing, http, etc)
+The config is stored in the IPFS Repo, but is separate because some implementations may give it knowledge of other packages (like routing, http, etc).
 
 ### IPFS Interface or API
 
@@ -188,7 +187,7 @@ Importing data into IPFS can be done in a variety of ways. These are use-case sp
 
 ### `unixfs` datastructure
 
-It's worth mentioning the `unixfs` datastructure, as it provides support for representing unix (posix) files in ipfs. It's simple, but powerful And it is first class, in that several basic commands make use of it.
+It's worth mentioning the `unixfs` datastructure, as it provides support for representing unix (posix) files in ipfs. It's simple, but powerful. And it is first class, in that several basic commands make use of it.
 
 ### Interesting Data Structure questions
 
@@ -202,5 +201,4 @@ Sometimes one graph maps to another, for example a unixfs graph shards big files
 
 **mixing data structures**
 
-Some data structures are meant to be interspersed with others, meaning that they provide meaning to arbitrary things. One example is a `keychain.Signature` a cryptographic signature on any other object. Another example is a `versioning.Commit` which represents a specific revision in a version history over any other object. It is still not entirely clear how to build nice tooling that handles these transparently.
-
+Some data structures are meant to be interspersed with others, meaning that they provide meaning to arbitrary things. One example is a `keychain.Signature`, which provides a cryptographic signature on any other object. Another example is a `versioning.Commit` which represents a specific revision in a version history over any other object. It is still not entirely clear how to build nice tooling that handles these transparently.
