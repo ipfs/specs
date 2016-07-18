@@ -7,38 +7,38 @@ Protocol Driven Development
 
 # Introduction
 
-Cross compatibility through several implementations and runtimes is historically an hard goal to achieve. Each framework/language offers different testing suits and implement a different flavour of testing (BDD, TDD, RDD, etc). We need a better way to test compatibility across different implementations.
+Cross compatibility between several implementations and runtimes is historically a hard goal to achieve. Each framework/language offers different testing suites and encourages a different flavour of testing (BDD, TDD, RDD, etc). We need a better way to test compatibility across different implementations.
 
-Instead of the common API tests, we can achieve cross implementation testing by leveraging interfaces offered through the network and defined by the Protocol. We call this Protocol Driven Development.
+Instead of typical API tests, we can achieve cross-implementation testing by leveraging interfaces offered through the network and defined by the Protocol. We call this Protocol Driven Development.
 
-In order for a code artefact to be PDD compatible
-- Expose a connection (duplex stream) interface, may be synchronous (online, interactive) or asynchronous.
-- Implement a well defined Protocol spec
+In order for a code artefact to be PDD compatible, it must:
+- Expose a connection (duplex stream) interface; the interface may be synchronous (online, interactive) or asynchronous
+- Implement a well-defined Protocol spec
 
 ## Objectives
 
 The objectives for Protocol Driven Development are:
-- Well defined process to test Protocol Spec implementations
-- Standard definition of implementation requirements to comply with a certain protocol
-- Automate cross implementation tests
-- Have a general purpose proxy for packet/message capture 
+- Provide a well-defined process to test Protocol Spec implementations
+- Define a standard set of implementation requirements to comply with a certain protocol
+- Automate cross-implementation tests
+- Create a general purpose proxy for packet/message capture
 
 # Process
 
 In order to achieve compliance, we have to follow four main steps:
 
-1 - Define the desired Protocol Spec that is going to be implemented
-2 - Design the compliance tests that prove that a certain implementation conforms with the spec
-3 - Once an implementation is done, capture the messages traded on the wire using that implementation, so that the behaviour of both participants can be replicated without the agent
-4 - Create the Protocol Compliance Tests (consisting on injecting the packets/messages generated in the last step in the other implementations and comparing outputs)
+1. Define the desired Protocol Spec that is going to be implemented.
+2. Design the compliance tests that prove that a certain implementation conforms with the spec.
+3. Once an implementation is done, capture the messages traded on the wire using that implementation, so that the behaviour of both participants can be replicated without the agent.
+4. Create the Protocol Compliance Tests (consisting of injecting the packets/messages generated in the last step into the other implementations and comparing the outputs).
 
 ## Protocol Spec
 
-Should define the goals, motivation, messages traded between participants and some use cases. It should not cover language or framework specifics.
+A Protocol Spec should define the goals and motivation for the protocol, the messages traded between participants in it, and some use cases. It should not cover language or framework specifics.
 
 ## Protocol Compliance Tests Spec
 
-Defines what are the necessary “use stories” in which the Protocol implementation must be tested to assure it complies with the Protocol Spec. For e.g:
+A Protocol Compliance Tests Spec should define what the necessary “use stories” are for which the Protocol implementation must be tested to assure it complies with the Protocol Spec. For example:
 
 ```
 # Protocol that should always ACK messages of type A and not messages of type B
@@ -66,7 +66,7 @@ Tests should be deterministic, so that different implementations produce the sam
                 └─────────┘    └───────────────┘
 ```
 
-So that a diff between two results should yield 0 results
+So that a diff between two output files should not show differences.
 
 ```
 $ diff output.go.txt output.node.txt
@@ -75,10 +75,10 @@ $
 
 ## Interchange Packet/Message Capture
 
-Since most of these protocols define leverage some type of encoded format for messages, we have to replicate the transformations applied to those messages before being sent. The other option is capturing the messages being sent by one of the implementations, which should suffice the majority of the scenarios.
+Since most of these protocols leverage some type of encoded format for messages, we have to replicate the transformations applied to those messages before being sent. The other option is capturing the messages being sent by one of the implementations, which should suffice for the majority of the scenarios.
 
 ## Protocol Compliance Tests Suite
 
-These tests offer the last step to test different implementations independently. By sending the packets/messages and evaluating their responses and comparing across different implementations, we can infer that in fact they are compatible
+These tests offer the last step to test different implementations independently. By sending the packets/messages and evaluating their responses and comparing across different implementations, we can infer that in fact they are compatible.
 
 #### [Example use case - go-multistream and node-multistream tests](/PDD-multistream.md)

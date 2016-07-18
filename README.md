@@ -80,7 +80,7 @@ The specs contained in this repository are:
 - [KeyChain](/keychain) - Distribution of cryptographic Artificats
 
 **Other/related/included:**
-- [PDD](/pdd-protocol-driven-developement) - Protocol Driven Development
+- [PDD](/pdd-protocol-driven-development) - Protocol Driven Development
 
 ## Collaborating
 
