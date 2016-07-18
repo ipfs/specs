@@ -34,7 +34,7 @@ In order to achieve compliance, we have to follow four main steps:
 
 ## Protocol Spec
 
-A Protocol Spec should define the goals & motivation for the protocol, the messages traded between participants in it, and some use cases. It should not cover language or framework specifics.
+A Protocol Spec should define the goals and motivation for the protocol, the messages traded between participants in it, and some use cases. It should not cover language or framework specifics.
 
 ## Protocol Compliance Tests Spec
 
@@ -66,7 +66,7 @@ Tests should be deterministic, so that different implementations produce the sam
                 └─────────┘    └───────────────┘
 ```
 
-So that a diff between two output files should show not differences.
+So that a diff between two output files should not show differences.
 
 ```
 $ diff output.go.txt output.node.txt
