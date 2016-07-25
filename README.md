@@ -45,7 +45,7 @@ The specs contained in this repository are:
 
 **Data Structures and formats:**
 - [MerkleDAG](/merkledag) - The MerkleDAG layer (pre IPLD).
-- [IPLD](/ipld) - InterPlanetary Linked Data.
+- [IPLD](https://github.com/ipld/spec) - InterPlanetary Linked Data.
 - [unixfs](/unixfs)
 - [multihash](https://github.com/jbenet/multihash) - self-describing hash digest format.
 - [multiaddr](https://github.com/jbenet/multiaddr) - self-describing addressing format.
