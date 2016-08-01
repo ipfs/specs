@@ -1,22 +1,82 @@
 # Multigram -- protocol negotiation and multiplexing over datagrams
 
-For multiplexing different protocols on the same datagram connection, multigram prepends a 1-byte header to every packet. This header represents an index in a table of protocols shared between both endpoints. This protocol table is negotiated by exchanging the intersection of the endpoint's supported protocols. The protocol table's size of 256 tuples can be increased by nesting multiple multigram headers.
+This document describes:
+- Multigram, a self-describing packet format for multiplexing different protocols on the same datagram connection.
+- Multigram-Setup, a protocol for negotiating a shared table of protocol identifiers for use with Multigram.
 
-TODO: analyze the properties vs. other approaches (e.g. an identifier on every packet).
+Multigram is part of the [Multiformats family][multiformats].
 
-# Packet layout
+- Introduction
+- Protocol table
+- Multigram-Setup
+- Implementations
+
+Note: this document makes use of the [Multiaddr format][multiaddr] whenever it mentions network addresses.
+
+[multiformats]: https://github.com/multiformats
+[multiaddr]: https://github.com/multiformats/multiaddr
+
+
+## Introduction
+
+Multigram operates on datagrams, which can be UDP packets, Ethernet frames, etc. and which are unreliable and unordered.
+All it does is prepend a field to the packet, which signifies the protocol of this packet.
+The endpoints of the connection can then use different packet handlers per protocol.
+
+If you're looking for similar functionality on top of reliable streams, check out the [Multistream format][multistream].
+
+[multistream]: https://github.com/multistream
+
+
+## Packet layout
 
 ```
                   1               2               3               4
    0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7
   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 0 |  Table Index  |                                               |
-  +-+-+-+-+-+-+-+-+             Variable-length data              +
+  +-+-+-+-+-+-+-+-+                Packet Payload                 +
 4 |                                                               |
   +
 ```
 
+- **Table Index:**
+  - Type: `varint`
+  - The numerical identifier signifying the protocol of this packet, as per the protocol table.
+- **Packet Payload:**
+  - Type: `[]byte`
+  - The raw data of this packet. This is what the packet handler gets to see.
+
+
+
+
+
+
+For multiplexing different protocols on the same datagram connection, multigram prepends a 1-byte header to every packet. This header represents an index in a table of protocols shared between both endpoints. This protocol table is negotiated by exchanging the intersection of the endpoint's supported protocols. The protocol table's size of 256 tuples can be increased by nesting multiple multigram headers.
+
+TODO: analyze the properties vs. other approaches (e.g. an identifier on every packet).
+
+- whyrusleeping
+  - setup packets and data packets are always separate (proto =0 vs. proto >0)
+  - just start sending data packets
+    - the other end will respond with error packets
+    - the other end MAY buffer packets with a proto it doesn't know yet
+    - until you get an ack, send a setup packet for every packet of the given protocol
+  - dont do table exchange, setup protocols as needed
+- jbenet
+  - include checksum
+    - so we can work on raw ip
+    - udp checksums suck
+    - would be great to fit in 3/7/11/15 bytes, to fit 4-byte word length
+    - out of scope, should be another format: multisum
+      - we'll have multiple mutligrams per packet, one checksum for each is a MUST NOT
+
+
 ## Protocol table
+
+Multigram assumes an independent protocol table for each remote address.
+For example, datagrams from/to `/ip4/1.2.3.4/udp/4737` will build up their own protocol table
+independent from datagrams from/to `/ip4/5.6.7.8/udp/4737`.
 
 The protocol table MUST be append-only and immutable. It MUST initially contain exactly one tuple:
 
