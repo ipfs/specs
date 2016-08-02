@@ -1,0 +1,280 @@
+\documentclass[border=2mm]{standalone}
+
+\usepackage{hyperref}  % \href
+\usepackage{textcomp}  % \textrightarrow
+\usepackage{pgf}
+\usepackage{tikz}
+
+\setlength{\parindent}{0pt}
+\thispagestyle{empty}
+
+\usetikzlibrary{backgrounds}  % background-layer library
+\usetikzlibrary{positioning}  % node-placement library
+\usetikzlibrary{shapes.misc}  % for 'rounded rectangle'
+
+\hypersetup{colorlinks}
+\hypersetup{urlcolor=black}
+\hypersetup{filecolor=red}  % \href{non-URL-placeholder}{text}
+
+% Helper for code-like font styling
+\newcommand{\code}{\small\ttfamily}
+
+% \method{name}{arguments}{results}
+%
+% If <results> is non-empty, formatted as:
+%
+%   <name>(<arguments>) -> <results>
+%
+% otherwise formatted as:
+%
+%   <name>(<arguments>)
+\newcommand{\method}[3]{
+  \code\color{gray}
+  #1(#2)
+  \ifx\\#3\\
+  \else
+    \textrightarrow\ #3
+  \fi
+}
+
+% \event{text}
+%
+% An event that can trigger notifiee callbacks
+\newcommand{\event}[1]{\code\color{brown}#1}
+
+% \target{text}{node-name}
+%
+% Target text for a TikZ line
+\newcommand{\target}[2]{\tikz[baseline] \node[target] (#2) {#1};}
+
+\pgfdeclarelayer{background}
+\pgfdeclarelayer{foreground}
+\pgfsetlayers{background,main,foreground}
+
+\tikzstyle{data}=[
+  rounded rectangle,
+  draw=black!50,
+  fill=black!5,
+  thick,
+]
+
+\tikzstyle{protocol}=[
+  rounded rectangle,
+  draw=blue!50,
+  fill=blue!5,
+  thick,
+]
+
+\tikzstyle{interface}=[
+  rectangle,
+  draw=green!50,
+  fill=green!5,
+  thick,
+  align=flush left
+]
+
+\tikzstyle{actor}=[
+  rectangle,
+  draw=brown!50,
+  fill=brown!5,
+  thick,
+  align=flush left
+]
+
+\tikzstyle{module}=[
+  rounded rectangle,
+  draw=black!50,
+  dashed,
+]
+
+\tikzstyle{module-label}=[
+  rounded rectangle,
+]
+
+\tikzstyle{merkle-link}=[
+  draw=blue
+]
+
+\tikzstyle{extend}=[
+  draw=red!50!black
+]
+
+\tikzstyle{process}=[
+  draw=red
+]
+
+\tikzstyle{notify}=[
+  draw=brown
+]
+
+\tikzstyle{use}=[
+  draw=green!50!black
+]
+
+\tikzstyle{target}=[
+  inner sep=0,
+  text=green!50!black,
+  anchor=text
+]
+
+\tikzstyle{every picture}+=[remember picture]  % links between pictures
+
+\begin{document}
+\begin{tikzpicture}
+  \node[data] (merkle) {
+    \href{https://github.com/ipfs/specs/tree/master/protocol#merkledag----making-sense-of-data}{
+      Merkle object
+    }
+    % Also in https://github.com/ipfs/specs/pull/7
+  };
+
+  \node[data] (key) [above of=merkle] {
+    \href{https://github.com/ipfs/specs/pull/7}{Key}
+    % Also in https://github.com/ipfs/specs/tree/master/keystore#structures
+  };
+  \draw[extend] (merkle) -- (key);
+  \node[data] (signature) [above=of key] {
+    \href{https://github.com/ipfs/specs/pull/7}{Signature}
+    % https://github.com/ipfs/specs/tree/master/keystore#structures
+  };
+  \draw[extend,bend right=45] (merkle) to (signature);
+  \draw[merkle-link,->] (signature) -- (key);
+
+  \node[data,align=left] (record) [right=of key] {
+    \href{https://github.com/ipfs/specs/pull/7}{Record} \\
+    \method{Compare}{other}{\{-1|0|1\}}
+  };
+  \draw[extend,bend right=5] (merkle) to (record);
+
+  \node[data] (record-list) [above=2 of record] {
+    \href{https://github.com/ipfs/specs/pull/7}{Record list} \\
+  };
+
+  \node[data] (layout) [left=1.5 of key] {
+    \href{https://github.com/ipfs/specs/issues/10}{Layout}
+  };
+  \draw[extend] (merkle) -- (layout);
+  \node[data] (chunk) [left=of layout] {
+    \href{Chunking spec?}{Chunk}
+  };
+  \draw[extend,bend left=5] (merkle) to (chunk);
+
+  \node[data] (file) [above=of chunk] {
+    \href{https://github.com/ipfs/specs/tree/master/protocol#unixfs----representing-traditional-files}{File}
+  };
+  \draw[extend] (chunk) -- (file);
+  \node[data] (directory) [above=of layout] {
+    \href{https://github.com/ipfs/specs/tree/master/protocol#unixfs----representing-traditional-files}{Directory}
+  };
+  \draw[extend] (layout) -- (directory);
+
+  \node[data] (block) [right=6 of merkle] {
+    \href{https://gist.github.com/jbenet/d1fedddfef85f0c4efd5}{Block}
+  };
+  \draw[process,<->] (merkle) -- (block);
+
+  \node[protocol] (multihash) [above=of block] {
+    \href{https://github.com/jbenet/multihash/}{Multihash}
+  };
+  \draw[process,->] (block) -- (multihash);
+
+  \node[interface] (blockstore) [right=of multihash] {
+    \href{https://gist.github.com/jbenet/d1fedddfef85f0c4efd5}{Blockstore} \\
+    \method{Put}{\target{Value}{blockstore-value}, Hash, DigestSize}{} \\
+    \method{Get}{\target{Key}{blockstore-key}}{Value} \\
+    \method{Has}{Key}{bool} \\
+    \method{Delete}{Key}{} \\
+    \method{AllKeys}{}{KeyIterator}
+  };
+  \draw[use,bend right] (multihash) to (blockstore-key);
+  \draw[use,bend right] (block) to (blockstore-value);
+
+  \node[interface] (datastore) [below=of blockstore] {
+    \href{https://gist.github.com/jbenet/d1fedddfef85f0c4efd5}{Datastore} \\
+    \method{Put}{Key, Value}{} \\
+    \method{Get}{Key}{Value} \\
+    \method{Has}{Key}{bool} \\
+    \method{Delete}{Key}{} \\
+    \method{AllKeys}{}{KeyIterator}
+  };
+  \draw[extend] (datastore) -- (blockstore);
+
+  \node[actor] (garbage-collector) [above left=0.3 of blockstore] {
+    \href{GC spec?  Example?}{Garbage collector}
+  };
+  \draw[use] (blockstore) -- (garbage-collector);
+
+  \node[interface] (notifier) [right=0.3 of blockstore] {
+    \href{https://gist.github.com/jbenet/d1fedddfef85f0c4efd5}{Notifier} \\
+    \method{Notifiees}{}{NotifieeIterator} \\
+    \method{AddNotifiee}{Notifiee}{} \\
+    \method{RemoveNotifiee}{Notifiee}{}
+  };
+
+  \node[actor] (exchange-server) [above=of blockstore] {
+    \href{https://gist.github.com/jbenet/d1fedddfef85f0c4efd5}{Exchange server} \\
+    \method{Put}{Value, Hash, DigestSize}{} \\
+    \method{Get}{Key}{Value} \\
+    \method{Has}{Key}{bool} \\
+    \method{Delete}{Key}{} \\
+    \event{BlockPut} \\
+    \event{NewBlockPut} \\
+    \event{BlockDeleted}
+  };
+  \draw[extend] (blockstore) -- (exchange-server);
+  \draw[extend,bend right] (notifier) to (exchange-server);
+
+  \node[interface] (exchange-client) [above right=of exchange-server] {
+    \href{https://gist.github.com/jbenet/d1fedddfef85f0c4efd5}{Exchange client} \\
+    \method{GetBlock}{Key}{Block}
+  };
+  \draw[use] (exchange-server) -- (exchange-client);
+
+  \node[interface] (recordstore) [above=3 of record] {
+    \href{https://github.com/ipfs/specs/pull/7}{Record store (distributed)} \\
+    \method{Put}{Key, \target{Value}{recordstore-value}}{} \\
+    \method{Get}{Context, Key}{ValueIterator}
+  };
+  \draw[use] (record) to [out=140,in=-90] (signature.east) to [out=90,in=-120] (recordstore-value);
+  \draw[use] (signature.east) to [out=90,in=-120] (record-list);
+  \draw[use,bend left=10] (record-list) to (recordstore-value);
+
+  \node[interface] (ipns) [above=of recordstore] {
+    \href{https://github.com/ipfs/specs/tree/master/protocol#naming----pki-namespace-and-mutable-pointers}{IPNS} \\
+    \method{Publish}{Key, Link}{} \\
+    \method{Resolve}{Key}{}
+  };
+  \draw[use] (recordstore) -- (ipns);
+
+  \node[interface] (provider-table) [above left=0.5 of exchange-server] {
+    \href{TODO: Providers spec}{Provider table} \\
+    \small and routing
+  };
+  \draw[use] (recordstore) -- (provider-table);
+  \draw[notify] (exchange-server) -- (provider-table);
+  \draw[use,bend left=10] (provider-table) to (exchange-client);
+
+  \node[interface] (ipfs) [above=2 of exchange-server] {
+    \href{https://github.com/ipfs/specs/tree/master/protocol#naming----pki-namespace-and-mutable-pointers}{IPFS}
+  };
+  \draw[use] (exchange-server) -- (ipfs);
+  \draw[use] (exchange-client) -- (ipfs);
+  \draw[use] (provider-table) -- (ipfs);
+
+  \begin{pgfonlayer}{background}
+    \path (file.west)+(-0.5,0.6) node (unixfs-a) {};
+    \path (directory.east)+(+0.3,-0.6) node (unixfs-b) {};
+    \path[module,fill=yellow!5] (unixfs-a) rectangle (unixfs-b);
+    \node[module-label,fill=yellow!5] (unixfs) [right=3mm of unixfs-a] {
+      \href{https://github.com/ipfs/specs/tree/master/protocol#unixfs----representing-traditional-files}{Unix filesystem}
+    };
+
+    \path (signature.west)+(-0.3,0.6) node (crypto-a) {};
+    \path (signature.east)+(+0.3,-2) node (crypto-b) {};
+    \path[module,fill=orange!5] (crypto-a) rectangle (crypto-b);
+    \node[module-label,fill=orange!5] (crypto) [above=0.2 of signature] {
+      \href{https://github.com/ipfs/specs/tree/master/keystore}{Cryptography}
+    };
+  \end{pgfonlayer}
+\end{tikzpicture}
+\end{document}
