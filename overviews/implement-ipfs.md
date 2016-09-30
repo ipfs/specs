@@ -26,8 +26,8 @@ There are a number of self-describing protocols/formats in use all over ipfs.
 All the complex peer-to-peer protocols for IPFS have been abstracted out into a separate library called `libp2p`. `libp2p` is a thin veneer over a wealth of modules that interface well with each other.
 
 Implementations:
-- [go-libp2p](https://github.com/ipfs/go-libp2p)
-- [js-libp2p](https://github.com/ipfs/js-libp2p)
+- [go-libp2p](https://github.com/libp2p/go-libp2p)
+- [js-libp2p](https://github.com/libp2p/js-libp2p)
 
 `libp2p` may in fact be _the bulk_ of an ipfs implementation. The rest is very simple.
 
