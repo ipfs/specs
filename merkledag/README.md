@@ -1,6 +1,6 @@
 # The merkledag
 
-**This spec has been depricated in favor of [IPLD](https://github.com/ipld/specs/tree/master/ipld)**
+**This spec has been deprecated in favor of [IPLD](https://github.com/ipld/specs/tree/master/ipld)**
 
 Authors: [Juan Benet](https://github.com/jbenet)
 
