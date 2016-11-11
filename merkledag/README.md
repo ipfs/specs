@@ -1,11 +1,12 @@
 # The merkledag
 
+**This spec has been deprecated in favor of [IPLD](https://github.com/ipld/specs/tree/master/ipld)**
 
-Authors: [Juan Benet](github.com/jbenet)
+Authors: [Juan Benet](https://github.com/jbenet)
 
 Reviewers:
 
-- [Jeromy Johnson](github.com/whyrusleeping)
+- [Jeromy Johnson](https://github.com/whyrusleeping)
 
 * * *
 
@@ -111,13 +112,6 @@ In a sense, IPFS is a "web of data-structures", with the merkledag as the common
 The merkledag is a type of Linked-Data. The links do not follow the standard URI format, and instead opt for a more general and flexible UNIX filesystem path format, but the power is all there. One can trivially map formats like JSON-LD directly onto IPFS (IPFS-LD), making IPFS applications capable of using the full-power of the semantic web.
 
 A powerful result of content (and identity) addressing is that linked data definitions can be distributed directly with the content itself, and do not need to be served from the original location. This enables the creation of Linked Data defintions, specs, and applications which can operate faster (no need to fetch it over the network), disconnected, or even completely offline.
-
-## Implementations
-
-There exist many implementations of the merkledag format:
-
-- [go-merkledag](github.com/ipfs/go-merkledag)
-- [node-merkledag](github.com/ipfs/node-merkledag)
 
 ## Merkledag Notation
 
