@@ -1,13 +1,22 @@
-Specifications
-==============
+# Specifications
+
+![](media-artifacts/ipfs-splash.png)
 
 [![](https://img.shields.io/badge/made%20by-Protocol%20Labs-blue.svg?style=flat-square)](http://ipn.io)
 [![](https://img.shields.io/badge/project-IPFS-blue.svg?style=flat-square)](http://ipfs.io/)
 [![](https://img.shields.io/badge/freenode-%23ipfs-blue.svg?style=flat-square)](http://webchat.freenode.net/?channels=%23ipfs)
+[![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
-![](media-artifacts/ipfs-splash.png)
+> This repository contains the specs for the IPFS Protocol and associated subsystems.
 
-> This repository contains the specs for the IPFS Protocol and associated subsystems. Some day we will hopefully transform these specs into RFCs. For now, they assume a high level of familiarity with the concepts.
+Some day we will hopefully transform these specs into RFCs. For now, they assume a high level of familiarity with the concepts.
+
+## Table of Contents
+
+- [Work In Progress](#work-in-progress)
+- [Specs](#specs)
+- [Contribute](#contribute)
+- [License](#license)
 
 ## Work In Progress
 
@@ -82,8 +91,18 @@ The specs contained in this repository are:
 **Other/related/included:**
 - [PDD](/pdd-protocol-driven-development) - Protocol Driven Development
 
-## Collaborating
+## Contribute
 
 Suggestions, contributions, criticisms are welcome. Though please make sure to familiarize yourself deeply with IPFS, the models it adopts, and the principles it follows.
 
 Please be aware that specs are really hard to design by committee. Treat this space like you would the workshop of an artist. Please suggest improvements, but please don't be disappointed if we say no to something. What we leave out is often more important than what we add in.
+
+Feel free to join in. All welcome. Open an [issue](https://github.com/ipfs/specs/issues)!
+
+This repository falls under the IPFS [Code of Conduct](https://github.com/ipfs/community/blob/master/code-of-conduct.md).
+
+[![](https://cdn.rawgit.com/jbenet/contribute-ipfs-gif/master/img/contribute.gif)](https://github.com/ipfs/community/blob/master/contributing.md)
+
+## License
+
+TBD. See https://github.com/ipfs/specs/issues/137.
