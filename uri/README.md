@@ -29,10 +29,10 @@ The discussion on what URI schemes that are needed is concluded [here](https://g
     * /ipfs/Qm.../filename
     * /ipns/Qm.../dir/filename
 
- * **[ipfs:](./ipfs.md)** style URI that references IPFS content with the multihash and filepath.
+ * **[ipfs://](./ipfs.md)** style URI that references IPFS content with the multihash and filepath.
 
- * **[fs:](./fs.md)** style URI referencing ipfs-specific AND non-ipfs specific hash resolution mechanisms
-     * fs:/ipns/Qm.../foo/bar
+ * **[fs://](./fs.md)** style URI referencing ipfs-specific AND non-ipfs specific hash resolution mechanisms
+     * fs://ipns/Qm.../foo/bar
 
 # Notes
 

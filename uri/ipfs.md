@@ -6,10 +6,10 @@ Status: provisional
 Applications/protocols that use this scheme name: ipfs
 
 Scheme syntax:
-   ipfs:/ipfs/&lt;multihash&gt;
-   ipfs:/ipfs/&lt;multihash&gt;/path
-   ipfs:/ipns/&lt;multihash&gt;
-   ipfs:/ipns/&lt;multihash&gt;/path
+   ipfs://ipfs/&lt;multihash&gt;
+   ipfs://ipfs/&lt;multihash&gt;/path
+   ipfs://ipns/&lt;multihash&gt;
+   ipfs://ipns/&lt;multihash&gt;/path
 
 Scheme semantics:
    "ipfs links"
