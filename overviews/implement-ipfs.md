@@ -16,10 +16,10 @@ There are a number of non-ipfs specific things that have been built for ipfs, th
 
 There are a number of self-describing protocols/formats in use all over ipfs.
 
-- [multiaddr](https://github.com/jbenet/multiaddr)
-- [multihash](https://github.com/jbenet/multihash)
-- [multicodec](https://github.com/jbenet/multicodec)
-- [multistream](https://github.com/jbenet/multistream)
+- [multiaddr](https://github.com/multiformats/multiaddr)
+- [multihash](https://github.com/multiformats/multihash)
+- [multicodec](https://github.com/multiformats/multicodec)
+- [multistream](https://github.com/multiformats/multistream)
 
 ### libp2p
 
@@ -39,7 +39,7 @@ IPLD is the format for IPFS objects, but it can be used outside of ipfs (hence a
 
 Implementations:
 - [go-ipld](https://github.com/ipfs/go-ipld)
-- [js-ipld](https://github.com/ipfs/js-ipld)
+- [js-ipld](https://github.com/ipld/js-ipld-dag-cbor)
 
 ### IPRS
 
