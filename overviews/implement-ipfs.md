@@ -58,7 +58,7 @@ IPNS provides name resolution on top of IPRS -- and a choice of record routing s
 The IPFS-Repo is an IPFS Node's "local storage" or "database", though the storage may not be in a database nor local at all (e.g. `s3-repo`). There are common formats so that multiple implementations can read and write to the same repos. Though today we only have one repo format, more are easy to add so that we can create IPFS nodes on top of other storage solutions.
 
 Implementations:
-- go-ipfs-repo _Forthcoming_
+- [go-ipfs-repo](https://github.com/ipfs/go-ipfs/tree/master/repo)
 - [js-ipfs-repo](https://github.com/ipfs/js-ipfs-repo)
 
 ## IPFS Core
