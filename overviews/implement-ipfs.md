@@ -60,8 +60,6 @@ The IPFS-Repo is an IPFS Node's "local storage" or "database", though the storag
 Implementations:
 - go-ipfs-repo _Forthcoming_
 - [js-ipfs-repo](https://github.com/ipfs/js-ipfs-repo)
-  - js-ipfs-repo-fs - in filesystem. _Forthcoming_
-  - js-ipfs-repo-browser - in the browser. _Forthcoming_
 
 ## IPFS Core
 
