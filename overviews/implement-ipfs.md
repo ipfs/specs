@@ -16,10 +16,10 @@ There are a number of non-ipfs specific things that have been built for ipfs, th
 
 There are a number of self-describing protocols/formats in use all over ipfs.
 
-- [multiaddr](https://github.com/jbenet/multiaddr)
-- [multihash](https://github.com/jbenet/multihash)
-- [multicodec](https://github.com/jbenet/multicodec)
-- [multistream](https://github.com/jbenet/multistream)
+- [multiaddr](https://github.com/multiformats/multiaddr)
+- [multihash](https://github.com/multiformats/multihash)
+- [multicodec](https://github.com/multiformats/multicodec)
+- [multistream](https://github.com/multiformats/multistream)
 
 ### libp2p
 
@@ -39,7 +39,7 @@ IPLD is the format for IPFS objects, but it can be used outside of ipfs (hence a
 
 Implementations:
 - [go-ipld](https://github.com/ipfs/go-ipld)
-- [js-ipld](https://github.com/ipfs/js-ipld)
+- [js-ipld](https://github.com/ipld/js-ipld-dag-cbor)
 
 ### IPRS
 
@@ -47,7 +47,7 @@ IPRS is the record system for IPFS, but it can be used outside of ipfs (hence a 
 
 Implementations:
 - [go-iprs](https://github.com/ipfs/go-iprs)
-- [js-iprs](https://github.com/ipfs/js-iprs)
+- js-iprs _Forthcoming_
 
 ### IPNS
 
@@ -58,12 +58,8 @@ IPNS provides name resolution on top of IPRS -- and a choice of record routing s
 The IPFS-Repo is an IPFS Node's "local storage" or "database", though the storage may not be in a database nor local at all (e.g. `s3-repo`). There are common formats so that multiple implementations can read and write to the same repos. Though today we only have one repo format, more are easy to add so that we can create IPFS nodes on top of other storage solutions.
 
 Implementations:
-- [go-ipfs-repo](https://github.com/ipfs/go-ipfs-repo)
-  - [go-ipfs-repo-fs](https://github.com/ipfs/go-ipfs-repo/fs) - in filesystem
-  - [go-ipfs-repo-s3](https://github.com/ipfs/go-ipfs-repo/s3) - in amazon s3
+- [go-ipfs-repo](https://github.com/ipfs/go-ipfs/tree/master/repo)
 - [js-ipfs-repo](https://github.com/ipfs/js-ipfs-repo)
-  - [js-ipfs-repo-fs](https://github.com/ipfs/js-ipfs-repo/fs) - in filesystem
-  - [js-ipfs-repo-browser](https://github.com/ipfs/js-ipfs-repo/browser) - in local storage
 
 ## IPFS Core
 
