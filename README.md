@@ -43,7 +43,7 @@ The specs contained in this repository are:
 - [overviews](/overviews) - quick overviews of the various parts of IPFS
 
 **Networking layer:**
-- [libp2p](/libp2p) - libp2p is a modular and extensible network stack, built and use by IPFS, but that it can be reused as a standalone project. Covers:
+- [libp2p](https://github.com/libp2p/spec) - libp2p is a modular and extensible network stack, built and use by IPFS, but that it can be reused as a standalone project. Covers:
   - network - the network layer spec
   - routing - the routing layer spec
     - kademlia - Kademlia DHT
