@@ -23,7 +23,7 @@ A (distributed) `record` is a piece of data meant to be transmitted and stored i
 
 ### Record System
 
-A (distributed) `record system` is a protocol which defines a method for crafting, formating, distributing, verifying, and using records over computer networks. (e.g. the Domain Name System).
+A (distributed) `record system` is a protocol which defines a method for crafting, serializing, distributing, verifying, and using records over computer networks. (e.g. the Domain Name System).
 
 
 - `crafting` - construction of a record (the process of calculating the values of a record)
