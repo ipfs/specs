@@ -3,11 +3,11 @@ CLI - Command Line Interface
 
 ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
 
-# Commands
+## Commands
 
 - `> ipfs commands`
 
-### Daemon
+## Daemon
 
 - `> ipfs daemon`
 - `> ipfs id`
@@ -23,12 +23,28 @@ CLI - Command Line Interface
 - `> ipfs update`
 - `> ipfs version`
 
-### DAG
+## DAG
 
 - `> ipfs dag get`
 - `> ipfs dag put`
 
-### Files
+#### `ipfs dag get <[cid, cid+path]>`
+
+The `dag get` call will be able to fetch nodes and resolve paths, the options for this command are:
+
+**Options:**
+- `--local-resolve` - It will try to resolve everything it can within the scope of the first object, returning the last value it could + the remainerPath
+
+#### `ipfs dag put <node>`
+
+The `dag put` call will store a single node at each time and return its respective CID
+
+**Options:**
+- `--format` - The multicodec of the format (dag-pb, dag-cbor, etc)
+- `--hash-alg` - The hash algorithm to be used
+- `--input-enc` - The input encoding of how the object is being passed. This is just a requirement to make sense of a blob of characters from a CLI context.
+
+## Files
 
 > discussion:
 > - https://github.com/ipfs/specs/issues/98
@@ -50,42 +66,42 @@ CLI - Command Line Interface
 - `> ipfs tar add`
 - `> ipfs tar cat`
 
-### Bitswap
+## Bitswap
 
 - `> ipfs bitswap`
 - `> ipfs bitswap stat`
 - `> ipfs bitswap unwant`
 - `> ipfs bitswap wantlist`
 
-### Block
+## Block
 
 - `> ipfs block`
 - `> ipfs block get`
 - `> ipfs block put`
 - `> ipfs block stat`
 
-### Bootstrap
+## Bootstrap
 
 - `> ipfs bootstrap`
 - `> ipfs bootstrap add`
 - `> ipfs bootstrap list`
 - `> ipfs bootstrap rm`
 
-### Config
+## Config
 
 - `> ipfs config`
 - `> ipfs config edit`
 - `> ipfs config replace`
 - `> ipfs config show`
 
-### Name
+## Name
 
 - `> ipfs dns`
 - `> ipfs name publish`
 - `> ipfs name resolve`
 - `> ipfs resolve`
 
-### DHT
+## DHT
 
 - `> ipfs dht`
 - `> ipfs dht findpeer`
@@ -94,7 +110,7 @@ CLI - Command Line Interface
 - `> ipfs dht put`
 - `> ipfs dht query`
 
-### Object
+## Object
 
 - `> ipfs object data`
 - `> ipfs object get`
@@ -108,13 +124,13 @@ CLI - Command Line Interface
 - `> ipfs object put`
 - `> ipfs object stat`
 
-### Pinning
+## Pinning
 
 - `> ipfs pin add`
 - `> ipfs pin ls`
 - `> ipfs pin rm`
 
-### Network
+## Network
 
 - `> ipfs ping`
 - `> ipfs swarm`
@@ -127,14 +143,14 @@ CLI - Command Line Interface
 - `> ipfs swarm filters rm`
 - `> ipfs swarm peers`
 
-### Repo
+## Repo
 
 - `> ipfs refs`
 - `> ipfs refs local`
 - `> ipfs repo`
 - `> ipfs repo gc`
 
-### Misc
+## Misc
 
 - `> ipfs tour`
 - `> ipfs tour list`
