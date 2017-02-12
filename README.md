@@ -76,9 +76,9 @@ The specs contained in this repository are:
 - [Files Impl and API](/files) - Virtual File System interface, unix like, on top of the MerkleDAG
 
 **Public APIs:**
-- [Core API](/public-api/core) - IPFS programmatic interface
-- [HTTP API](https://github.com/ipfs/http-api-spec) - IPFS HTTP API specification
 - [CLI](/public-api/cli) - Command Line Interface
+- [HTTP API](https://github.com/ipfs/http-api-spec) - IPFS HTTP API specification
+- [Core API](/public-api/core) - IPFS programatic interface
 
 **Records and Record Systems:**
 - [IPRS](/iprs-interplanetary-record-system) - InterPlanetary Record System

@@ -3,9 +3,7 @@ Core API
 
 > The `core` API is the programmatic interface for IPFS, it defines the method signatures.
 
-# Status
-
-![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
+# Status ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
 
 ## Required for compliant IPFS implementation
 
@@ -114,3 +112,5 @@ Core API
 - records (iprs)
   - put
   - get
+
+# [Interface definition and test suite](https://github.com/ipfs/interface-ipfs-core)
