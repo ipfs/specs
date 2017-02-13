@@ -41,7 +41,7 @@ For example, suppose Alice and Bob want to store records on a public bulletin bo
 ```go
 type Record struct {
   Value     []byte
-  Expires   time.Duration
+  Expires   time.Time
   Signature []byte
 }
 
