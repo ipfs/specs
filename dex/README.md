@@ -1,7 +1,10 @@
-RFC - IPFS Data Importing
+RFC - DEX (name still under consideration)
 =========================
 
 Authors:
+
+- David Dias
+- Juan Benet
 
 Reviewers:
 
@@ -17,6 +20,13 @@ IPFS Data Importing spec describes the several importing mechanisms used by IPFS
 # Status of this spec
 
 > **This spec is a Work In Progress (WIP).**
+
+Lots of discussions around this topic, some of them here:
+
+- https://github.com/ipfs/notes/issues/204
+- https://github.com/ipfs/notes/issues/216
+- https://github.com/ipfs/notes/issues/205
+- https://github.com/ipfs/notes/issues/144
 
 # Organization of this document
 
