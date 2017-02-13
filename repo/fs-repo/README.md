@@ -42,10 +42,12 @@ The repo interface is defined [here](../).
 
 ### api
 
-`api` is a file that exists only if there is currently a live api listening
-for requests. This is used when the `repo.lock` prevents access. Clients may
-opt to use the api service, or wait untill the process holding `repo.lock`
-exits. The file's content is the api multiaddr
+`./api` is a file that exists to denote an API endpoint to listen to.
+- It MAY exist even if the endpoint is no longer live (i.e. it is a _stale_ or left-over `./api` file).
+
+In the presence of an `./api` file, ipfs tools (eg go-ipfs `ipfs daemon`) MUST attempt to delegate to the endpoint, and MAY remove the file if resonably certain the file is stale. (e.g. endpoint is local, but no process is live)
+
+The `./api` file is used in conjunction with the `repo.lock`. Clients may opt to use the api service, or wait until the process holding `repo.lock` exits. The file's content is the api endoint as a [multiaddr](https://github.com/jbenet/multiaddr)
 
 ```
 > cat .ipfs/api
@@ -56,6 +58,31 @@ Notes:
 - The API server must remove the api file before releasing the `repo.lock`.
 - It is not enough to use the `config` file, as the API addr of a daemon may
   have been overridden via ENV or flag.
+
+#### api file for remote control
+
+One use case of the `api` file is to have a repo directory like:
+
+```
+> tree $IPFS_PATH
+/Users/jbenet/.ipfs
+└── api
+
+0 directories, 1 files
+
+> cat $IPFS_PATH/api
+/ip4/1.2.3.4/tcp/5001
+```
+
+In go-ipfs, this has the same effect as:
+
+```
+ipfs --api /ip4/1.2.3.4/tcp/5001 <cmd>
+```
+
+Meaning that it makes ipfs tools use an ipfs node at the given endpoint, instead of the local directory as a repo.
+
+In this use case, the rest of the `$IPFS_PATH` may be completely empty, and no other information is necessary. It cannot be said it is a _repo_ per-se. (TODO: come up with a good name for this).
 
 ### blocks/
 
@@ -119,9 +146,9 @@ timestamp of their creation. For example:
 
 ### repo.lock
 
-`repo.lock` prevents concurrent access to the repo. Its content is the PID
-of the process currently holding the lock. This allows clients to detect
-a failed lock cleanup.
+`repo.lock` prevents concurrent access to the repo. Its content SHOULD BE the
+PID of the process currently holding the lock. This allows clients to detect
+a failed lock and cleanup.
 
 ```
 > cat .ipfs/repo.lock
@@ -130,17 +157,32 @@ a failed lock cleanup.
 42 ttys000   79:05.83 ipfs daemon
 ```
 
+**TODO, ADDRESS DISCREPANCY:** the go-ipfs implementation does not currently store the PID in the file, which in some systems causes failures after a failure or a teardown. This SHOULD NOT require any manual intervention-- a present lock should give new processes enough information to recover. Doing this correctly in a portable, safe way, with good UX is very tricky. We must be careful with TOCTTOU bugs, and multiple concurrent processes capable of running at any moment. The goal is for all processes to operate safely, to avoid bothering the user, and for the repo to always remain in a correct, consistent state.
+
 ### version
 
-The `version` file contains the repo implementation name and version
+The `version` file contains the repo implementation name and version. This format has changed over time:
 
 ```
-> cat version
-fs-repo: 1
+# in version 0
+> cat $repo-at-version-0/version
+cat: /Users/jbenet/.ipfs/version: No such file or directory
+
+# in versions 1 and 2
+> cat $repo-at-version-1/version
+1
+> cat $repo-at-version-2/version
+2
+
+# in versions >3
+> cat $repo-at-version-3/version
+fs-repo/3
 ```
 
-_Any_ fs-repo implementation of _any_ versions MUST be able to read the
-`version` file. It MUST NOT change between versions.
+_Any_ fs-repo implementation of _any_ versions `>0` MUST be able to read the
+`version` file. It MUST NOT change format between versions. The sole exception is version 0, which had no file.
+
+**TODO: ADDRESS DISCREPANCY:** versions 1 and 2 of the go-ipfs implementation use just the integer number. It SHOULD have used `fs-repo/<version-number>`. We could either change the spec and always just use the int, or change go-ipfs in version `>3`. we will have to be backwards compatible.
 
 ## Datastore
 
@@ -188,8 +230,21 @@ For example:
   filesystems are case insensitive.
 - the multihash prefix is two bytes, which would waste two directory levels,
   thus these are combined into one.
-- the git `idx` and `pack` file could be used to coalesce objects
+- the git `idx` and `pack` file formats could be used to coalesce objects
 
+**TODO: ADDRESS DISCREPANCY:**
+
+the go-ipfs fs-repo in version 2 uses a different `blocks/` dir layout:
+
+```
+/Users/jbenet/.ipfs/blocks
+├── 12200007
+│   └── 12200007d4e3a319cd8c7c9979280e150fc5dbaae1ce54e790f84ae5fd3c3c1a0475.data
+├── 1220000f
+│   └── 1220000fadd95a98f3a47c1ba54a26c77e15c1a175a975d88cf198cc505a06295b12.data
+```
+
+We MUST address whether we should change the fs-repo spec to match go-ipfs in version 2, or we should change go-ipfs to match the fs-repo spec (more tiers). We MUST also address whether the levels are a repo version parameter or a config parameter. There are filesystems in which a different fanout will have wildly different performance. These are mostly networked and legacy filesystems.
 
 ### Reading without the `repo.lock`
 
