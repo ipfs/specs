@@ -7,9 +7,12 @@ The IPFS address scheme is described in [the IPFS whitepaper](https://github.com
 
 The discussions around `ipfs:` vs. `dweb:` is a confusing one that's been going on since @jbenet published the [IPFS whitepaper](https://ipfs.io/ipfs/QmR7GSQM93Cx5eAg6a6yRzNde1FQv7uL6X1o4k7zrJa3LX/ipfs.draft3.pdf), with a number of other approaches being  proposed. That design discussion has been going on for a long time, with many lengthy discussions in github issues.
 
+## Competing Goals
+
 There are a few goals tugging against each other:
+
 1. The Noble Goal: Unify the filesystem-database-web rift
-2. The Quick Fix: Conform to URL orthodoxy
+2. The Goal of a Quick Fix: Conform to URL orthodoxy
 3. The Design Goal: Create Addresses that People will Love Using
 4. The Clean-Namespaces Goal: Avoid polluting the scheme namespace with multiple schemes
 
@@ -18,11 +21,11 @@ This has led to some competing approaches -- mainly the 'dweb:' Approach and the
 Regardless of which goals and approaches resonate with you, there are a number of important factors that have to be handled by any schema.  A number of those factors are collected & discussed in these issues:
 https://github.com/ipfs/in-web-browsers/issues?q=is%3Aissue+label%3Aspecs
 
-## The Noble Goal: Unify the filesystem-database-web rift
+### The Noble Goal: Unify the filesystem-database-web rift
 
 In short, @jbenet (creator of IPFS) wants to fix a mistake that happened 25-30 years ago and sees this current decision as an inflection point where we either A) use this "decentralization" moment to fix the problem or B) let all these decentralized protocols worsen the problem by going along with the existing momentum. In @gozala's words (voicing the perspective of web browser implementers), "While I think that’s a very noble goal, I think it would be hard to sell for a very pragmatic crowd".
 
-### Unify the filesystem-database-web rift
+#### Unify the filesystem-database-web rift
 
 In conversations documented [here](https://github.com/ipfs/in-web-browsers/issues/4), @jbenet and @gozala cover this topic relatively concisely.
 
@@ -38,7 +41,7 @@ also
 
 > A minor reason is not having to force people to swallow N shemes (ipfs:// ipns:// ipld:// and counting), and instead use one that muxes.
 
-### ... but don't let it prevent pragmatism.
+#### ... but don't let it prevent pragmatism.
 
 @gozala encouraged pragmatism:
 > While I think that’s a very noble goal, I think it would be hard to sell for a very pragmatic crowd like browser vendors. I frequently see standardization process taking specs into least ambitious and most pragmatic direction, I often disagree, but I think often times that’s only way to make progress. Maybe some version of this goal could be articulated in [less] perfectionistic manner and in a more pragmatic one ?
@@ -46,15 +49,15 @@ also
 @jbenet agreed to that pragmatism:
 > **These goals are secondary in time to getting browser adoption. Meaning that we CAN do things like recommend ipfs:// ipns:// ipld://** IF browser vendors think that it's unlikely to get adoption this way now. We can work on unifying the fs-db-web rift later. **We're not dogmatic, we're pragmatic.** But we want to make sure we push in the right places and try to make as much as we can better.
 
-## The Quick Fix: Conform to URL orthodoxy.
+### The Goal of a Quick Fix: Conform to URL orthodoxy.
 
 The short-term fix that people reach for is to create an `ipfs:` schema, as proposed in https://github.com/ipfs/specs/pull/139. This would conform to established habits around the use of URLs.
 
-## The Design Goal: Create Addresses that People will Love Using
+### The Design Goal: Create Addresses that People will Love Using
 
 From a design perspective, the challenge is to create a schema that makes intuitive sense, maximizes possibilities, and allows people to identify content with addresses that are reliable, powerful, and pleasant to use.
 
-## The Clean-Namespaces Goal: Avoid polluting the scheme namespace with multiple schemes
+### The Clean-Namespaces Goal: Avoid polluting the scheme namespace with multiple schemes
 
 If we do this wrong, the growth of decentralized web technologies will cause a proliferation of schemes that will quickly become unwieldy, will discourage interoperability, and will maintain a high barrier to innovation in the protocol space.
 
@@ -63,6 +66,11 @@ If we do this wrong, the growth of decentralized web technologies will cause a p
 ### Strengths of this Approach
 
 _PLEASE HELP FILL THESE_
+
+#### Strength: Prevents Proliferation of Schemes and Namespaces
+
+NOT doing this now effectively shuts down future possibilities by making new namespaces "not worth doing the work of introducing a URL scheme".
+
 #### Strength: Getting away from the `://`
 as @lidel [comments](https://github.com/ipfs/specs/pull/153#discussion_r104291285)
 > I kinda like this _aesthetic_. No matter what prefix is picked, it looks better than anything with `://`
@@ -74,6 +82,18 @@ as @lidel [comments](https://github.com/ipfs/specs/pull/153#discussion_r10429128
 ### Criticisms of this Approach
 _PLEASE HELP FILL THESE_
 
+#### Criticism: It's not clear how this helps the whole ecosystem
+@lidel [comments](https://github.com/ipfs/specs/pull/152#discussion_r104291969)
+> I feel it should be explicitly stated in the document if this single scheme aims to be for IPFS ecosystem only, or something that can be adopted by other distributed systems.
+>
+> If we want to share it with others, eg. Ethereum, Tor Onion Services etc, then I see potential problem with single scheme: who is responsible for muxing when multiple vendors are in play?
+Let's say we have: `dweb://ipfs/Qmbar..` and `dweb://foo/buz`.  If IPFS browser add-on provides handler for `dweb://`, FOO is unable to handle its own URIs.
+We should plan for this now, and have contingency written down..
+
+#### Criticism: Doesn't fit with the way Browsers identify origins
+
+Some current browsers have trouble with the construction: origin = a:/b/c because they expect: `origin = a:/b`, even though that's not in the URI spec.
+
 ### Designing the `dweb:` Schema
 
 A draft spec for the `dweb:` schema is under way at https://github.com/ipfs/in-web-browsers/issues/28
@@ -81,6 +101,14 @@ A draft spec for the `dweb:` schema is under way at https://github.com/ipfs/in-w
 ## The `ipfs:` Approach
 
 The short-term fix that people reach for is to create an `ipfs:` schema, as proposed in https://github.com/ipfs/specs/pull/139. That approach seems simple at first, but it's got problems.
+
+### Strengths of this Approach
+
+#### Strength: Fits with Established Conventions & Expectations around URLs
+
+#### Strength: Fits with the way browsers identify origins
+
+When enforcing the Single Origin Policy, some current browsers expect: `origin = a:/b`, even though that's not what the URI spec calls for. The `ipfs:` approach fits with that expectation, with URIs like `ipfs:/<root-hash>/foo/bar`, the origin would be `ipfs:/<root-hash>`
 
 ### Criticisms of this Approach
 
@@ -91,6 +119,9 @@ The `dweb:` schema dodges this by treating IPFS and IPNS as namespaces within a 
 
 #### Criticism 2: This would worsen the filesystem-database-web rift
 See [The Noble Goal: Unify the filesystem-database-web rift](#the-noble-goal-unify-the-filesystem-database-web-rift) above.
+
+#### Criticism 3: Will Prevent Innovation by making it hard to mint new namespaces
+If we don't push for the `dweb:` approach it will prevent innovation by making it hard to mint new namespaces on the (content-addressed) web.
 
 ## Possible Compromises
 
