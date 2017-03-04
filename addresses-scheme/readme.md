@@ -9,10 +9,13 @@ The discussions around `ipfs:` vs. `dweb:` is a confusing one that's been going 
 
 There are a few goals tugging against each other:
 1. The Noble Goal: Unify the filesystem-database-web rift
-2. The Quick Fix: Follow URL orthodoxy
+2. The Quick Fix: Conform to URL orthodoxy
 3. The Design Goal: Create Addresses that People will Love Using
+4. The Clean-Namespaces Goal: Avoid polluting the scheme namespace with multiple schemes
 
-Regardless of which goals resonate with you, there are a number of important factors that have to be handled by any schema.  A number of those factors are collected & discussed in these issues:
+This has led to some competing approaches -- mainly the 'dweb:' Approach and the 'ipfs:' Approach -- and some possible compromises.
+
+Regardless of which goals and approaches resonate with you, there are a number of important factors that have to be handled by any schema.  A number of those factors are collected & discussed in these issues:
 https://github.com/ipfs/in-web-browsers/issues?q=is%3Aissue+label%3Aspecs
 
 ## The Noble Goal: Unify the filesystem-database-web rift
@@ -43,6 +46,20 @@ also
 @jbenet agreed to that pragmatism:
 > **These goals are secondary in time to getting browser adoption. Meaning that we CAN do things like recommend ipfs:// ipns:// ipld://** IF browser vendors think that it's unlikely to get adoption this way now. We can work on unifying the fs-db-web rift later. **We're not dogmatic, we're pragmatic.** But we want to make sure we push in the right places and try to make as much as we can better.
 
+## The Quick Fix: Conform to URL orthodoxy.
+
+The short-term fix that people reach for is to create an `ipfs:` schema, as proposed in https://github.com/ipfs/specs/pull/139. This would conform to established habits around the use of URLs.
+
+## The Design Goal: Create Addresses that People will Love Using
+
+From a design perspective, the challenge is to create a schema that makes intuitive sense, maximizes possibilities, and allows people to identify content with addresses that are reliable, powerful, and pleasant to use.
+
+## The Clean-Namespaces Goal: Avoid polluting the scheme namespace with multiple schemes
+
+If we do this wrong, the growth of decentralized web technologies will cause a proliferation of schemes that will quickly become unwieldy, will discourage interoperability, and will maintain a high barrier to innovation in the protocol space.
+
+## The `dweb:` Approach
+
 ### Strengths of this Approach
 
 _PLEASE HELP FILL THESE_
@@ -57,28 +74,23 @@ as @lidel [comments](https://github.com/ipfs/specs/pull/153#discussion_r10429128
 ### Criticisms of this Approach
 _PLEASE HELP FILL THESE_
 
-
 ### Designing the `dweb:` Schema
 
 A draft spec for the `dweb:` schema is under way at https://github.com/ipfs/in-web-browsers/issues/28
 
-## The Quick Fix: Follow URL orthodoxy.
+## The `ipfs:` Approach
 
 The short-term fix that people reach for is to create an `ipfs:` schema, as proposed in https://github.com/ipfs/specs/pull/139. That approach seems simple at first, but it's got problems.
 
 ### Criticisms of this Approach
 
-#### Reason 1: We want IPFS, IPNS and IPLD to be handled by a single schema
+#### Criticism 1: We want IPFS, IPNS and IPLD to be handled by a single schema
 Creating an `ipfs:` schema would not be enough because `ipfs:` only refers to mutable content. You would, at the very least, need an `ipns:` schema too.
 
 The `dweb:` schema dodges this by treating IPFS and IPNS as namespaces within a single `dweb` address scheme
 
-#### Reason 2: This would worsen the filesystem-database-web rift
+#### Criticism 2: This would worsen the filesystem-database-web rift
 See [The Noble Goal: Unify the filesystem-database-web rift](#the-noble-goal-unify-the-filesystem-database-web-rift) above.
-
-## The Design Goal: Create Addresses that People will Love Using
-
-From a design perspective, the challenge is to create a schema that makes intuitive sense, maximizes possibilities, and allows people to identify content with addresses that are reliable, powerful, and pleasant to use.
 
 ## Possible Compromises
 
