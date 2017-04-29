@@ -70,10 +70,10 @@ The specs contained in this repository are:
 - [MerkleDAG](/merkledag) - The MerkleDAG layer (pre IPLD).
 - [IPLD](https://github.com/ipld/spec) - InterPlanetary Linked Data.
 - [unixfs](/unixfs)
-- [multihash](https://github.com/jbenet/multihash) - self-describing hash digest format.
-- [multiaddr](https://github.com/jbenet/multiaddr) - self-describing addressing format.
-- [multicodec](https://github.com/jbenet/multicodec) - self-describing protocol/encoding streams (note: a file is a stream).
-- [multistream](https://github.com/jbenet/multistream) - multistream is a format -- or simple protocol -- for disambiguating, and layering streams. It is extremely simple.
+- [multihash](https://github.com/multiformats/multihash) - self-describing hash digest format.
+- [multiaddr](https://github.com/multiformats/multiaddr) - self-describing addressing format.
+- [multicodec](https://github.com/multiformats/multicodec) - self-describing protocol/encoding streams (note: a file is a stream).
+- [multistream](https://github.com/multiformats/multistream) - multistream is a format -- or simple protocol -- for disambiguating, and layering streams. It is extremely simple.
 
 **Block Exchanges:**
 - [bitswap](/bitswap) - BitTorrent-inspired exchange
