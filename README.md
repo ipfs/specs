@@ -95,7 +95,7 @@ The specs contained in this repository are:
 - [Core API](/public-api/core) - IPFS programatic interface
 
 **Records and Record Systems:**
-- [IPRS](/iprs-interplanetary-record-system) - InterPlanetary Record System
+- [IPRS](/iprs) - InterPlanetary Record System
 - IPNS - InterPlanetary Naming System
 
 **Key Management:**
