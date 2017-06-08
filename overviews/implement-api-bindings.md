@@ -13,7 +13,7 @@ Sections:
 IPFS uses a set of type values that are useful to enumerate up front:
 
 - `<ipfs-path>` is a unix-style path, beginning with `/ipfs/<hash>/...` or `/ipns/<hash>/...` or `/ipns/<domain>/...`.
-- `<hash>` is a base58 encoded [multihash](https://github.com/jbenet/multihash) (there are [many implementations](https://github.com/jbenet/multihash#implementations)). It is usually the hash of an ipfs object (or merkle dag node).
+- `<hash>` is a base58 encoded [multihash](https://github.com/multiformats/multihash) (there are [many implementations](https://github.com/multiformats/multihash#implementations)). It is usually the hash of an ipfs object (or merkle dag node).
 
 A note on streams: IPFS is a streaming protocol. Everything about it can be streamed. When importing files, API requests should aim to stream the data in, and handle back-pressure correctly, so that the IPFS node can handle it sequentially without too much memory pressure. (If using HTTP, this is typically handled for you by writes to the request body blocking.)
 
@@ -44,9 +44,9 @@ In HTTP, our API layering uses a REST-like mapping, where:
 
 ## API Commands
 
-There is a "standard IPFS API" with a set of commands, which we are documenting clearly soon. But this is not yet extracted into its own document. Perhaps -- as part of this API Bindings effort -- we can document it all. It is currently defined as "all the commands exposed by the go-ipfs implementation". You can see [a listing here](https://github.com/ipfs/go-ipfs/blob/916f987de2c35db71815b54bbb9a0a71df829838/core/commands/root.go#L82-L111), or by running `ipfs commands` locally. **The good news is: we should be able to easily write a program that outputs a markdown API specification!**
+There is a "standard IPFS API" with a set of commands, which we are documenting clearly soon. But this is not yet extracted into its own document. Perhaps -- as part of this API Bindings effort -- we can document it all. It is currently defined as "all the commands exposed by the go-ipfs implementation". You can see [a listing here](https://github.com/ipfs/go-ipfs/blob/eef022cd5ecfc818205b6d015772f411bc18a3e8/core/commands/root.go#L94-L130), or by running `ipfs commands` locally. **The good news is: we should be able to easily write a program that outputs a markdown API specification!**
 
-(Note: the go-ipfs [commands library](https://github.com/ipfs/go-ipfs/tree/916f987de2c35db71815b54bbb9a0a71df829838/commands) also makes sure to keep the CLI and the HTTP API exactly in sync.)
+(Note: the go-ipfs [commands library](https://github.com/ipfs/go-ipfs/tree/eef022cd5ecfc818205b6d015772f411bc18a3e8/commands) also makes sure to keep the CLI and the HTTP API exactly in sync.)
 
 ## Implementing bindings for the HTTP API
 
@@ -60,16 +60,16 @@ As mentioned above, the API commands map to HTTP where:
 To date, we have two different HTTP API clients:
 
 - [js-ipfs-api](https://github.com/ipfs/js-ipfs-api) - simple javascript wrapper -- best to look at
-- [go-ipfs/commands/http](https://github.com/ipfs/go-ipfs/tree/916f987de2c35db71815b54bbb9a0a71df829838/commands/http) - generalized transport based on the [command definitions](https://github.com/ipfs/go-ipfs/tree/916f987de2c35db71815b54bbb9a0a71df829838/core/commands)
+- [go-ipfs/commands/http](https://github.com/ipfs/go-ipfs/tree/eef022cd5ecfc818205b6d015772f411bc18a3e8/commands/http) - generalized transport based on the [command definitions](https://github.com/ipfs/go-ipfs/tree/eef022cd5ecfc818205b6d015772f411bc18a3e8/core/commands)
 
 The Go implementation is good to look at to answer harder questions, like how multipart is handled, or what headers should be set for edge cases. But the Javascript implementation is very concise, and easy to follow.
 
 ### Anatomy of js-ipfs-api
 
 Currently, js-ipfs-api has three main files:
-- [src/index.js](https://github.com/ipfs/js-ipfs-api/blob/66d1462bd02181d46e8baf4cd9d476b213426ad8/src/index.js) defines the functions that clients of the API module will use. It uses `RequestAPI`, and translates function call parameters to the API almost directly.
-- [src/get-files-stream.js](https://github.com/ipfs/js-ipfs-api/blob/66d1462bd02181d46e8baf4cd9d476b213426ad8/src/get-files-stream.js) implements the hardest part: file streaming. This one uses multipart.
-- [src/request-api.js](https://github.com/ipfs/js-ipfs-api/blob/66d1462bd02181d46e8baf4cd9d476b213426ad8/src/request-api.js) contains a generic function used to perform the actual HTTP requests.
+- [src/index.js](https://github.com/ipfs/js-ipfs-api/blob/1b8557ef8807c1749749468f0b4d1c6ccf453022/src/index.js) defines the functions that clients of the API module will use. It uses `RequestAPI`, and translates function call parameters to the API almost directly.
+- [src/get-files-stream.js](https://github.com/ipfs/js-ipfs-api/blob/1b8557ef8807c1749749468f0b4d1c6ccf453022/src/get-files-stream.js) implements the hardest part: file streaming. This one uses multipart.
+- [src/request-api.js](https://github.com/ipfs/js-ipfs-api/blob/1b8557ef8807c1749749468f0b4d1c6ccf453022/src/request-api.js) contains a generic function used to perform the actual HTTP requests.
 
 ### Note on multipart + inspecting requests
 
@@ -168,4 +168,4 @@ foo
 
 ```
 
-which produces: http://gateway.ipfs.io/ipfs/QmNtpA5TBNqHrKf3cLQ1AiUKXiE4JmUodbG5gXrajg8wdv
+which produces: http://ipfs.io/ipfs/QmNtpA5TBNqHrKf3cLQ1AiUKXiE4JmUodbG5gXrajg8wdv
