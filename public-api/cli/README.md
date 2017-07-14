@@ -16,7 +16,6 @@ CLI - Command Line Interface
 - `> ipfs log level`
 - `> ipfs log tail`
 - `> ipfs diag`
-- `> ipfs diag net`
 - `> ipfs diag sys`
 - `> ipfs stats`
 - `> ipfs stats bw`
