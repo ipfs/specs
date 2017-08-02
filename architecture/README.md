@@ -92,7 +92,7 @@ These are briefly described bottom-up.
 The **network** provides point-to-point transports (reliable and unreliable) between any two IPFS nodes in the network. It handles:
 - NAT traversal - hole punching, port mapping, and relay
 - supports multiple transports - TCP, SCTP, UTP, ...
-- supports encryption, signing, or clear communcations
+- supports encryption, signing, or clear communications
 - multi-multiplexes -multiplexes connections, streams, protocols, peers, ...
 
 See more in the [network spec](https://github.com/ipfs/specs/tree/master/libp2p).
