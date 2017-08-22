@@ -180,7 +180,7 @@ See more in the namin spec (TODO).
 
 # [4. Applications and Datastructures -- on top of IPFS]()
 
-The stack described so far is enough to represent arbitrary datastructures and replicate them accross the internet. It is also enough to build and deploy decentralized websites.
+The stack described so far is enough to represent arbitrary datastructures and replicate them across the internet. It is also enough to build and deploy decentralized websites.
 
 Applications and datastructures on top of IPFS are represented as merkledags. Users can create arbitrary datastructures that extend the merkledag and deploy them to the rest of the world using any of the tools that understand IPFS.
 
