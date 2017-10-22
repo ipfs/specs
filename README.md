@@ -26,7 +26,7 @@ Some day we will hopefully transform these specs into RFCs. For now, they assume
   - [MerkleDAG (deprecated, see IPLD)](/merkledag)
   - [Repo](/repo)
   - [Public API (CLI, HTTP and Core)](/public-api)
-  - [Protocol Driven Development](/pdd)
+  - [Protocol Driven Development](https://github.com/ipfs/pdd)
   - [IPLD](https://github.com/ipld/specs)
   - [libp2p](https://github.com/libp2p/specs)
 - [Contribute](#contribute)
@@ -103,7 +103,7 @@ The specs contained in this repository are:
 - [KeyChain](/keychain) - Distribution of cryptographic Artificats
 
 **Other/related/included:**
-- [PDD](/pdd) - Protocol Driven Development
+- [PDD](https://github.com/ipfs/pdd) - Protocol Driven Development
 
 ## Contribute
 
