@@ -14,7 +14,10 @@ Reviewers:
 
 # Abstract
 
-Bitswap is the data trading module for ipfs, it manages requesting and sending blocks to and from other peers in the network. Bitswap has two main jobs, the first is to acquire blocks requested by the client from the network. The second is to judiciously send blocks in its posession to other peers who want them.
+Bitswap is the data trading module for IPFS. Its purpose is to request blocks from and send blocks to other peers in the network. Bitswap has two primary jobs:
+
+1.  Attempt to acquire blocks from the network that have been requested by the client.
+2.  Judiciously (though strategically) send blocks in its possession to other peers who want them.
 
 # Status of this spec
 
@@ -22,29 +25,49 @@ Bitswap is the data trading module for ipfs, it manages requesting and sending b
 
 # Organization of this document
 
-This spec is organized by chapters described on the *Table of contents* section. Each of the chapters can be found in its own file.
-
-# Table of contents
-
-  - [1]()
-  - [2]()
-  - […]()
+TODO
 
 # Introduction
 
-Bitswap is IPFS’ main block exchange protocol. It handles the requests made by a IPFS user, human or an application, to fetch data blocks from the network. It interacts with other Bitswap agents present in other IPFS nodes, exchanging (fetching + serving) blocks as it needs.
+Bitswap is IPFS's central block exchange protocol. It handles the requests made by an IPFS user, human, or application to fetch data blocks from the network. It interacts with other Bitswap agents present in other IPFS nodes, exchanging (fetching + serving) blocks as it needs.
 
-Bitswap is a message based protocol, as opposed to response-reply. All messages contain wantlists, or blocks. Upon receiving a wantlist, an IPFS node should consider sending out wanted blocks if it has them. Upon receiving blocks, the node should send out a notification called a ‘Cancel’ signifying that they no longer want the block. At a protocol level, bitswap is very simple.
+Bitswap is a message based protocol, as opposed to response-reply. All messages contain wantlists, or blocks. Upon receiving a wantlist, an IPFS node should consider sending out wanted blocks if it has them. Upon receiving blocks, the node should send out a notification called a 'Cancel' signifying that they no longer want the block. At the protocol level, Bitswap is very simple.
 
-Bitswap is a simple protocol overall. However, to make it fast and low on memory footprint, there are several implementation details that are important to get right. We document these details to our best capability on this document, so that other implementers can learn from the knowledge gather over the several iterations of bitswap.
+While Bitswap is a relatively simple protocol, a time- and memory- performant implementation requires that many details be carefully thought out. We aim to document these details here so that future implementers may build upon the knowledge gathered over the several iterations of Bitswap.
 
-# Bitswap flows
+# Systems
 
-Inside bitswap, there are two main flows: requesting blocks and serving blocks to other peers.
+![](https://cloud.githubusercontent.com/assets/1211152/21071077/4620387a-be4a-11e6-895c-aa8f2b06aa4e.png)
 
-## Requesting blocks
+## Wantlist Manager
 
-Client requests for new blocks are handled by the want manager, for every new block (or set of blocks) wanted, the `WantBlocks` method is invoked. The want manager then ensures that connected peers are notified of the new block that we want by sending the new entries to a message queue for each peer. The message queue will loop while there is work available and do the following:
+TODO
+
+## Decision Engine
+
+TODO
+
+### Strategies
+
+TODO: Link to strategy impl docs
+
+## Message Queue
+
+TODO
+
+## Network
+
+TODO
+
+# Bitswap Flows
+
+There are two primary flows that Bitswap manages: requesting blocks from and serving blocks to peers.
+
+## Requesting Blocks
+
+**TODO**: continue editing from here
+
+Client requests for new blocks are handled by the wantlist manager. For every new block (or set of blocks) wanted, the `WantBlocks` method is invoked. The want manager then ensures that connected peers are notified of the new block that we want by sending the new entries to a message queue for each peer. The message queue will loop while there is work available and do the following:
 
 1.  Ensure it has a connection to its peer
 2.  Grab the message to be sent
@@ -52,7 +75,7 @@ Client requests for new blocks are handled by the want manager, for every new bl
 
 If new messages are added while the loop is in steps 1 or 3, the messages are combined into one to avoid having to keep an actual queue and send multiple messages. The same process occurs when the client receives a block and sends a cancel message for it.
 
-## Serving blocks
+## Serving Blocks
 
 Internally, when a message with a wantlist is received, it is sent to the decision engine to be considered, and blocks that we have that are wanted are placed into the peer request queue. Any block we possess that is wanted by another peer has a task in the peer request queue created for it.
 
@@ -82,16 +105,16 @@ message Message {
 }
 ```
 
-# Implementation details
+# Implementation Details
 
 Also, make sure to read - <https://github.com/ipfs/go-ipfs/tree/master/exchange/bitswap#go-ipfs-implementation>
 
 Implementation suggestions:
 
-  - maintain a peer set of “live partners”
+  - maintain a peer set of "live partners"
   - protocol listener accept streams for partners to receive messages
   - protocol sender opens streams to partners to send messages
-  - separate out a decision engine that selects which blocks to send to which partners, and at what time. (this is a bit tricky, but it’s super easy to make as a whole if the engine is separated out)
+  - separate out a decision engine that selects which blocks to send to which partners, and at what time. (this is a bit tricky, but it's super easy to make as a whole if the engine is separated out)
 
 Sender:
 
