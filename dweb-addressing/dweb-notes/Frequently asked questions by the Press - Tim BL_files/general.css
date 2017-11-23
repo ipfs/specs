@@ -1,0 +1,73 @@
+/* this style sheet defines the basic style for all W3C pages */
+/* you can point to this by adding:
+
+     <LINK rel="Stylesheet" href="general">
+
+
+   in the HEAD of your HTML document */
+
+body {
+  font-family: Trebuchet MS, Palatino, sans-serif;
+  color: black;
+  background: white;
+}
+
+p , ul, ol { text-indent : 1em ;
+     margin-left: 3em  ; /* a bit of white space */ }
+pre { margin-left: 5em; }
+
+li { text-indent: 0; }
+
+h1 { text-align: center }
+h3 { font-style: italic; 
+     margin-left: 1em; }   /* distinguish from h2 */
+
+address { text-align: right }
+
+a:link, a:active {
+  color: #00e;
+  background: transparent;
+  text-decoration: none;
+}
+
+a:visited {
+  color: #529;
+  background: transparent;
+}
+
+div.intro {
+  margin-left: 5%;
+  margin-right: 5%;
+  font-style: italic
+}
+
+.navside { float:left }
+.navside td { background-color: #eee }
+
+pre {
+  font-family: monospace
+}
+
+.key {font-size: 50%}
+
+a:link img, a:visited img {
+   border-style: none
+}
+
+a img {
+  color: white;		/* The only way to hide the border in NS 4.x */
+}
+
+UL.toc {
+  list-style: disc;
+  list-style: none;
+}
+
+div.issue {
+  padding: 0.5em;
+  border: none;
+  margin-right: 5%;
+}
+
+.hideme { display: none }
+

@@ -1,0 +1,404 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"/><meta name="author" content="Eager"/><meta name="generator" content="Eager"/><link rel="canonical" href="https://eager.io/blog/the-history-of-the-url-path-fragment-query-auth/"/><link rel="alternate" type="application/rss+xml" title="RSS Feed for the Eager Blog" href="https://eager.io/blog/feed.xml"/><meta property="og:url" content="https://eager.io/blog/the-history-of-the-url-path-fragment-query-auth/"/><link href="/images/favicon.ico" rel="icon" type="image/x-icon"/><link rel="stylesheet" href="/blog/7856f0cbb250_css/lib.css"/><link rel="stylesheet" href="/blog/069b19a49cd3_css/app.css"/><meta charset="utf-8"/><meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width, minimal-ui"/><meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1"/><title>The History of the URL: Path, Fragment, Query, and Auth - Eager Blog</title><meta property="og:title" content="The History of the URL: Path, Fragment, Query, and Auth - Eager Blog"/><meta name="twitter:title" content="The History of the URL: Path, Fragment, Query, and Auth - Eager Blog"/><meta name="description" content="The History of the URL: Path, Fragment, Query, and Auth"/><meta property="og:description" content="The History of the URL: Path, Fragment, Query, and Auth"/><meta name="twitter:description" content="The History of the URL: Path, Fragment, Query, and Auth"/><script src="//use.typekit.net/gwr5cpo.js"></script><script>try{Typekit.load({classes:false});}catch(e){}</script><script src="//fast.eager.io/eager-blog.js"></script></head><body><div class="blog-outer"><div class="top-bar with-marketing-navigation"><div class="centered-page with-marketing-navigation"><ul class="marketing-navigation"><li><a href="/blog" class="link">Blog</a></li><li><a href="/" class="link">Home</a></li><li><a href="/about" class="link">About</a></li><li class="nav-button"><a href="/apps" class="button small slim tertiary transparent">App Store</a></li></ul><div class="top-bar-inner"><a href="/" class="logo-link"><div class="logo"><svg viewBox="0 0 1030 454" version="1.1" role="img" aria-label="Eager logo"><title>Eager logo</title><desc>The logo for Eager, the Eager App Store, and Eager Platform Co.</desc><defs><linearGradient id="eager-logo-gradient-261ddb-fa015d-id-496070880" x1="0%" y1="0%" x2="100%" y2="100%"><stop stop-color="#261ddb" offset="0%"></stop><stop stop-color="#fa015d" offset="100%"></stop></linearGradient></defs><g fill-rule="evenodd"><path fill="url(#eager-logo-gradient-261ddb-fa015d-id-496070880)" d="M935.924851,64.5881693 C958.756923,64.5881693 975.334624,82.6874243 973.450007,105.557504 L969.278062,156.184622 C967.393445,179.054701 947.832793,197.153956 925.000721,197.153956 L899.35713,197.153956 L910.215184,64.5881693 L935.924851,64.5881693 Z M991.760496,232.94505 C993.527047,235.279778 995.177021,237.693546 996.70563,240.179084 C1006.66689,256.37622 1011.47433,275.621077 1009.8031,295.901602 L997.496701,445.241434 L940.458235,445.241434 L952.764636,295.901602 C954.649253,273.031523 938.071552,254.932268 915.23948,254.932268 L889.565119,254.894675 L873.879528,445.241434 L816.841063,445.241434 L851.816707,20.8072627 L852.863882,8.09965276 L865.550374,8.09965276 L935.579807,8.09965276 C989.475635,8.09965276 1029.88403,52.2168559 1025.43533,106.202401 L1021.26338,156.829519 C1019.62364,176.728065 1011.88678,195.815296 999.763718,211.772766 C998.516961,213.41386 997.223813,215.021853 995.886136,216.594223 C995.346073,217.229038 994.798752,217.858047 994.244295,218.481084 C992.625343,220.278446 991.519314,221.451616 990.387704,222.60112 C988.746579,224.268194 987.129644,225.762971 986.547653,226.294975 C988.547018,228.78049 988.52292,228.824386 990.486586,231.300604 C990.917711,231.84426 991.342369,232.392441 991.760496,232.94505 Z M818.587426,8.09965276 L805.900934,8.09965276 L674.367391,8.09965276 L661.6809,8.09965276 L660.633725,20.8072627 L626.705255,432.533824 L625.65808,445.241434 L638.344572,445.241434 L774.749727,445.241434 L787.436219,445.241434 L788.483394,432.533824 L791.097143,400.81563 L792.144318,388.10802 L779.457826,388.10802 L687.332903,388.057189 L698.252844,255.542233 L759.325425,255.542233 L772.011916,255.542233 L773.059091,242.834623 L775.723104,210.506464 L776.770279,197.798854 L764.083788,197.798854 L703.094642,197.707782 L714.04116,65.233067 L801.192835,65.233067 L813.879327,65.233067 L814.926502,52.5254571 L817.540251,20.8072627 L818.587426,8.09965276 Z M611.635208,213.962934 L507.098519,213.962934 L502.39042,271.096348 L549.893181,271.041281 L542.587218,359.700138 C540.878702,378.702398 524.01229,394.207635 504.931855,394.207673 C485.753517,394.207673 471.410565,378.548279 472.993596,359.337991 L494.858609,94.0030958 C496.44164,74.7928081 513.365427,59.1334142 532.54379,59.1334142 C551.722153,59.1334142 566.065105,74.7928081 564.482074,94.0030958 L558.984385,160.718295 L616.566093,154.125978 L621.52054,94.0030958 C625.717915,43.0673768 588.102959,2 537.251889,2 C486.400819,2 442.017519,43.0673768 437.820144,94.0030958 L415.95513,359.337991 C411.757755,410.27371 449.372711,451.341087 500.223781,451.341087 C551.082892,451.335249 595.459841,410.269652 599.656886,359.337939 L611.635208,213.962934 Z M320.334075,137.138937 L330.279236,282.584027 L286.140818,282.584027 C286.140818,282.584027 286.095024,282.705582 287.575221,276.412555 L320.334075,137.138937 Z M186.575854,445.241434 L243.932867,445.241434 L268.481926,339.717441 L330.111325,339.799569 L337.851248,445.241434 L395.146032,445.241434 L364.575109,8.09965276 L289.192416,8.09965276 L186.575854,445.241434 Z M195.701062,8.09965276 L183.01457,8.09965276 L51.481027,8.09965276 L38.7945356,8.09965276 L37.7473606,20.8072627 L3.8188912,432.533824 L2.77171622,445.241434 L15.4582076,445.241434 L151.863363,445.241434 L164.549855,445.241434 L165.59703,432.533824 L168.210779,400.81563 L169.257954,388.10802 L156.571462,388.10802 L64.446539,388.057189 L75.3664797,255.542233 L136.439061,255.542233 L149.125552,255.542233 L150.172727,242.834623 L152.83674,210.506464 L153.883915,197.798854 L141.197424,197.798854 L80.2082777,197.707782 L91.1547962,65.233067 L178.306471,65.233067 L190.992963,65.233067 L192.040138,52.5254571 L194.653887,20.8072627 L195.701062,8.09965276 Z"></path></g></svg></div></a></div></div></div><div class="blog-post"><div class="blog-post-header"><h1>The History of the URL: Path, Fragment, Query, and Auth</h1><div class="blog-post-author blog-post-author-zack"><div class="name">Zack Bloom</div><div class="separator"></div><a href="https://twitter.com/zackbloom" target="_blank" class="twitter-link"><div class="at">@</div><div class="username">zackbloom</div></a></div></div><div class="blog-post-content markdown"><blockquote>
+<p>
+URLs were
+never intended to be what they’ve become: an arcane
+way for a user to identify a site on the Web. 
+Unfortunately, we’ve never been able to standardize
+URNs, which would give us a more useful naming system. 
+Arguing that the current URL system is sufficient
+is like praising the DOS command line, and stating
+that most people should simply learn to use command
+line syntax.  The reason we have windowing systems
+is to make computers easier to use, and more widely
+used.  The same thinking should lead us to a superior
+way of locating specific sites on the Web.<br/></p>
+<p>
+— Dale Dougherty <a href="https://lists.w3.org/Archives/Public/www-talk/1996JanFeb/0075.html"><code class="year">1996</code></a>
+</p>
+</blockquote>
+
+<p>There are several different ways to understand the ‘Internet’.  One is as a
+system of computers connected using a computer network.  That version of the
+Internet came into being in 1969 with the creation of the ARPANET.  Mail, files
+and chat all moved over that network before the creation of HTTP, HTML, or the
+‘web browser’.</p>
+<p>In 1992 Tim Berners-Lee created three things, giving birth to what <em>we</em>
+consider the Internet. The HTTP protocol, HTML, and the URL.  His goal was to
+bring ‘Hypertext’ to life.  Hypertext at its simplest is the ability to
+create documents which link to one another.  At the time it was viewed more as a
+science fiction panacea, to be complimented by
+<a href="https://en.wikipedia.org/wiki/Hypermedia">Hypermedia</a>, and any other word you
+could add ‘Hyper’ in front of.</p>
+<p>The key requirement of Hypertext was the ability to link from one document to
+another.  In TBL’s time though, these documents were hosted in a multitude of
+formats and accessed through protocols like
+<a href="https://en.wikipedia.org/wiki/Gopher_(protocol)">Gopher</a> and FTP.  He needed a
+consistent way to refer to a file which encoded its protocol, its host on the
+Internet, and where it existed on that host.</p>
+<p>At <a href="https://www.w3.org/Conferences/IETF92/WWX_BOF_mins.html">the original</a>
+World-Wide Web presentation in March of 1992 TBL described it as a ‘Universal
+Document Identifier’ (UDI).  Many <a href="https://www.w3.org/Protocols/old/osi-ds-29-00.txt">different
+formats</a> were considered for
+this identifier:</p>
+<pre><code>protocol: aftp host: xxx.yyy.edu path: /pub/doc/README
+PR=aftp; H=xx.yy.edu; PA=/pub/doc/README;
+PR:aftp/xx.yy.edu/pub/doc/README
+/aftp/xx.yy.edu/pub/doc/README)
+</code></pre><p>This document also explains why spaces must be encoded in URLs (%20):</p>
+<blockquote>
+<p>The use of white space characters has been avoided  in UDIs: spaces
+are not legal characters.   This was done because of the frequent
+introduction of extraneous white space when lines are wrapped by
+systems such as mail, or sheer necessity of narrow column width, and
+because of the  inter-conversion of various forms of white space
+which occurs during character code conversion and the transfer of
+text between applications.</p>
+</blockquote>
+<p>What’s most important to understand is that the URL was fundamentally just an
+abbreviated way of refering to the combination of scheme, domain, port,
+credentials and path which previously had to be understood contextually for
+each different communication system.</p>
+<p>It was first
+officially defined in an <a href="https://www.ietf.org/rfc/rfc1738.txt">RFC</a> published in 1994.</p>
+<pre><code>scheme:[//[user:<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e494859797938b9680a4">[email&#160;protected]</a>]host[:port]][/]path[?query][#fragment]
+</code></pre><p>This system made it possible to refer to different systems from within
+Hypertext, but now that virtually all content is hosted over HTTP, may not be
+as necessary anymore.  As early as
+<a href="https://lists.w3.org/Archives/Public/www-talk/1996JanFeb/0075.html">1996</a>
+browsers were already inserting the <code>http://</code> and <code>www.</code> for users
+automatically (rendering any advertisement which still contains them truly
+ridiculous).</p>
+<h3 id="path">Path</h3>
+<blockquote>
+<p>
+I do not think the question is whether people can learn the meaning of the URL,
+I just find it it morally abhorrent to force grandma or grandpa to understand
+what, in the end, are UNIX file system conventions.  </p>
+<p>
+— Israel del Rio <a href="https://lists.w3.org/Archives/Public/www-talk/1996JanFeb/0041.html"><code class="year">1996</code></a>
+</p>
+</blockquote>
+
+<p>The slash separated path component of a URL should be familiar to any user of
+any computer built in the last fifty years.  The hierarchal filesystem itself
+was introduced by the <a href="http://www.multicians.org/">MULTICS</a> system.  Its
+creator, in turn, attributes it to <a href="http://www.csl.sri.com/users/neumann/">a two hour conversation with Albert
+Einstein</a> he had in 1952.</p>
+<p>MULTICS used the greater than symbol (<code>&gt;</code>) to separated file path components.
+For example:</p>
+<pre><code>&gt;usr&gt;bin&gt;local&gt;awk
+</code></pre><p>That was perfectly logical, but unfortunately the Unix folks
+<a href="https://www.bell-labs.com/usr/dmr/www/cacm.html">decided</a> to use <code>&gt;</code> to
+represent redirection, delegating path separation to the forward slash (<code>/</code>). </p>
+<h3 id="snapchat-the-supreme-court">Snapchat the Supreme Court</h3>
+<blockquote>
+<p>
+Wrong. We are I now see clearly <em>disagreeing</em>. You and I.
+</p>
+<p>
+...
+</p>
+<p>
+As a person I reserve the right to use different criteria for different
+purposes. I want to be able to give names to generic works, AND to particular
+translations AND to particular versions. I want a richer world than you
+propose. I don’t want to be constrained by your two-level system of “documents”
+and “variants”.  </p>
+<p>
+— Tim Berners-Lee <a href="http://1997.webhistory.org/www.lists/www-talk.1993q3/1003.html"><code class="year">1993</code></a>
+</p>
+</blockquote>
+
+<p><a href="http://journals.cambridge.org/action/displayAbstract?fromPage=online&amp;aid=9282809&amp;fileId=S1472669614000255">One
+half</a>
+of the URLs referenced by US Supreme Court opinions point to pages which no
+longer exist.  If you were reading an academic paper in 2011, written in 2001,
+you have better than even odds that any given URL won’t
+<a href="http://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-14-S14-S5">be valid</a>.</p>
+<p>There was <a href="http://1997.webhistory.org/www.lists/www-talk.1993q2/0234.html">a fervent
+belief</a> in 1993
+that the URL would die, in favor of the ‘URN’.  The Uniform Resource Name is a
+permanent reference to a given piece of content which, unlike a URL, will never
+change or break.  Tim Berners-Lee first described the “urgent need” for them as
+early as <a href="http://1997.webhistory.org/www.lists/www-talk.1991/0018.html">1991</a>.</p>
+<p>The simplest way to craft a URN might be to simply use a cryptographic hash of
+the contents of the page, for example: <code>urn:791f0de3cfffc6ec7a0aacda2b147839</code>.
+This method doesn’t meet the criteria of the web community though, as it wasn’t
+really possible to figure out who to ask to turn that hash into a piece of real
+content.  It also didn’t account for the format changes which often happen to
+files (compressed vs uncompressed for example) which nevertheless represent the
+same content.</p>
+<p><img src="https://static-content.springer.com/image/art%3A10.1186%2F1471-2105-14-S14-S5/MediaObjects/12859_2013_Article_6083_Fig2_HTML.jpg" alt="Reliability of
+URLs"/></p>
+<p>In 1996 Keith Shafer and several others proposed a solution to the problem
+of broken URLs.  <a href="http://purl.oclc.org/OCLC/PURL/INET96">The
+link</a> to this solution is now broken.
+Roy Fielding posted an implementation suggestion in July of 1995.  <a href="http://ftp.ics.uci.edu/pub/ietf/uri/draft-ietf-uri-roy-urn-urc-00.txt">The
+link</a> is
+now broken.</p>
+<p>I was able to find these pages through Google, which has functionally
+made page titles the URN of today.  The URN format was ultimately finalized in
+1997, and has essentially never been used since.  The implementation is itself
+interesting.  Each URN is composed of two components, an <code>authority</code> who can
+resolve a given type of URN, and the specific ID of this document in whichever
+format the <code>authority</code> understands.  For example, <code>urn:isbn:0131103628</code> will
+identify a book, forming a permanent link which can (hopefully) be turned into
+a set of URLs by your local <code>isbn</code> resolver.</p>
+<p>Given the power of search engines, it’s possible the best URN format today
+would be a simple way for files to point to their former URLs.  We could allow
+the search engines to index this information, and link us as appropriate:</p>
+<pre><code class="lang-html">&lt;!-- On http://zack.is/history --&gt;
+&lt;link rel=&#34;past-url&#34; href=&#34;http://zackbloom.com/history.html&#34;&gt;
+&lt;link rel=&#34;past-url&#34; href=&#34;http://zack.is/history.html&#34;&gt;
+</code></pre>
+<h3 id="query-params">Query Params</h3>
+<blockquote>
+<p>
+The application/x-www-form-urlencoded format is in many ways an aberrant
+monstrosity, the result of many years of implementation accidents and
+compromises leading to a set of requirements necessary for interoperability,
+but in no way representing good design practices.  </p>
+<p>
+— <a href="https://url.spec.whatwg.org#application/x-www-form-urlencoded">WhatWG URL Spec</a>
+</p>
+</blockquote>
+
+<p>If you’ve used the web for any period of time, you are familiar with query
+parameters.  They follow the path portion of the URL, and encode options like
+<code>?name=zack&amp;state=mi</code>.  It may seem odd to you that queries use the ampersand
+character (<code>&amp;</code>) which is the same character used in HTML to encode special
+characters.  In fact, if you’ve used HTML for any period of time, you likely
+have had to encode ampersands in URLs, turning <code>http://host/?x=1&amp;y=2</code> into
+<code>http://host/?x=1&amp;amp;y=2</code> or <code>http://host?x=1&amp;#38;y=2</code> (that particular
+confusion has <a href="http://1997.webhistory.org/www.lists/www-talk.1992/0447.html">always
+existed</a>).</p>
+<p>You may have also noticed that cookies follow a similar, but different format:
+<code>x=1;y=2</code> which doesn’t actually conflict with HTML character encoding at all.
+This idea was not lost on the W3C, who encouraged implementers to support <code>;</code>
+as well as <code>&amp;</code> in query parameters as early as
+<a href="https://tools.ietf.org/html/rfc1866#section-8.2.1">1995</a>.</p>
+<p>Originally, this section of the URL was strictly used for searching ‘indexes’.
+The Web was originally created (and its funding was based on it creating) a
+method of collaboration for high energy physicists.  This is not to say Tim
+Berners-Lee didn’t know he was really creating a general-purpose communication
+tool.  He <a href="http://1997.webhistory.org/www.lists/www-talk.1993q1/0286.html">didn’t add
+support</a> for
+tables for years, which is probably something physicists would have needed.</p>
+<p>In any case, these ‘physicists’ needed a way of encoding and linking to
+information, and a way of searching that information.  To provide that, Tim
+Berners-Lee created the
+<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/isindex"><code>&lt;ISINDEX&gt;</code></a>
+tag.  If <code>&lt;ISINDEX&gt;</code> appeared on a page, it would inform the browser that this
+is a page which can be searched.  The browser should show a search field, and
+allow the user to send a query to the server.</p>
+<p>That
+<a href="https://www.w3.org/History/19921103-hypertext/hypertext/WWW/Addressing/Search.html">query</a>
+was formatted as keywords separated by plus characters (<code>+</code>):</p>
+<pre><code>http://cernvm/FIND/?sgml+cms
+</code></pre><p>In fantastic Internet fashion, this tag was quickly abused to do all manner of
+things including providing an input to calculate square roots.  It was <a href="https://lists.w3.org/Archives/Public/www-talk/1992NovDec/0042.html">quickly
+proposed</a>
+that perhaps this was too specific, and we really needed a general purpose
+<code>&lt;input&gt;</code> tag.</p>
+<p>That particular proposal actually uses plus signs to separate the components of
+what otherwise looks like a modern GET query:</p>
+<pre><code>http://somehost.somewhere/some/path?x=xxxx+y=yyyy+z=zzzz
+</code></pre><p>This was far from universally acclaimed.  <a href="https://lists.w3.org/Archives/Public/www-talk/1992NovDec/0032.html">Some
+believed</a>
+we needed a way of saying that the content on the other side of links should be searchable:</p>
+<pre><code class="lang-html">&lt;a HREF=&#34;wais://quake.think.com/INFO&#34; INDEX=1&gt;search&lt;/a&gt;
+</code></pre>
+<p>Tim Berners-Lee
+<a href="https://lists.w3.org/Archives/Public/www-talk/1992NovDec/0044.html">thought</a>
+we should have a way of defining strongly-typed queries:</p>
+<pre><code class="lang-html">&lt;ISINDEX TYPE=&#34;iana:/www/classes/query/personalinfo&#34;&gt;
+</code></pre>
+<p>I can be somewhat confident in saying, in retrospect, I am glad the more
+generic solution won out.</p>
+<p>The real work on <code>&lt;INPUT&gt;</code>
+<a href="http://1997.webhistory.org/www.lists/www-talk.1993q1/0079.html">began</a> in
+January of 1993 based on an older SGML type.  It was (perhaps unfortunately),
+<a href="http://1997.webhistory.org/www.lists/www-talk.1993q1/0085.html">decided</a> that
+<code>&lt;SELECT&gt;</code> inputs needed a separate, richer, structure:</p>
+<pre><code class="lang-html">&lt;select name=FIELDNAME type=CHOICETYPE [value=VALUE] [help=HELPUDI]&gt;
+&lt;choice&gt;item 1
+&lt;choice&gt;item 2
+&lt;choice&gt;item 3
+&lt;/select&gt;
+</code></pre>
+<p>If you’re curious, reusing <code>&lt;li&gt;</code>, rather than introducing the <code>&lt;option&gt;</code>
+element was
+<a href="http://1997.webhistory.org/www.lists/www-talk.1993q2/0188.html">absolutely</a>
+considered.  There were, of course, alternative form proposals.
+<a href="http://1997.webhistory.org/www.lists/www-talk.1993q2/0168.html">One</a> included
+some variable substituion evocative of what Angular might do today:</p>
+<pre><code class="lang-html">&lt;ENTRYBLANK TYPE=int LENGTH=length DEFAULT=default VAR=lval&gt;
+Prompt &lt;/ENTRYBLANK&gt;
+&lt;QUESTION TYPE=float DEFAULT=default VAR=lval&gt; Prompt &lt;/QUESTION&gt;
+&lt;CHOICE DEFAULT=default VAR=lval&gt;
+&lt;ALTERNATIVE VAL=value1&gt; Prompt1
+...
+&lt;ALTERNATIVE VAL=valuen&gt; Promptn
+&lt;/CHOICE&gt;
+</code></pre>
+<p>In this example the inputs are checked against the type specified in <code>type</code>,
+and the <code>VAR</code> values are available on the page for use in <a href="http://1997.webhistory.org/www.lists/www-talk.1993q2/0150.html">string
+substitution</a>
+in URLs, à la:</p>
+<pre><code>http://eager.io/apps/$appId
+</code></pre><p>Additional
+<a href="http://1997.webhistory.org/www.lists/www-talk.1993q2/0188.html">proposals</a>
+actually used <code>@</code>, rather than <code>=</code>, to separate query components:</p>
+<pre><code><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="cfa1aea2aa8fb9aea3baaa">[email&#160;protected]</a><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ae85c0cfc3cbee">[email&#160;protected]</a>(value&amp;value)
+</code></pre><p>It was Marc Andreessen who
+<a href="http://1997.webhistory.org/www.lists/www-talk.1993q3/0812.html">suggested</a> our
+current method based on what he had already implemented in Mosaic:</p>
+<pre><code>name=value&amp;name=value&amp;name=value
+</code></pre><p>Just <a href="http://1997.webhistory.org/www.lists/www-talk.1993q4/0437.html">two months
+later</a> Mosaic
+would add support for <code>method=POST</code> forms, and ‘modern’ HTML forms were born.</p>
+<p>Of course, it was also Marc Andreessen’s company
+<a href="https://web.archive.org/web/19990421025406/http://home.mcom.com/newsref/std/cookie_spec.html">Netscape</a>
+who would create the cookie format (using a different separator).  Their
+proposal was itself painfully shortsighted, led to the attempt to introduce a
+<a href="https://www.ietf.org/rfc/rfc2965.txt"><code>Set-Cookie2</code></a> header, and introduced
+fundamental structural issues we still deal with at Eager to this day.</p>
+<h3 id="fragments">Fragments</h3>
+<p>The portion of the URL following the ‘#’ is known as the fragment.  Fragments
+were a part of URLs since their <a href="https://www.w3.org/History/19921103-hypertext/hypertext/WWW/Addressing/Addressing.html">initial
+specification</a>,
+used to link to a specific location on the page being loaded.  For example, if
+I have an anchor on my site:</p>
+<pre><code class="lang-html">&lt;a name=&#34;bio&#34;&gt;&lt;/a&gt;
+</code></pre>
+<p>I can link to it:</p>
+<pre><code>http://zack.is/#bio
+</code></pre><p>This concept was gradually extended to any element (rather than just anchors),
+and moved to the <code>id</code> attribute rather than <code>name</code>:</p>
+<pre><code class="lang-html">&lt;h1 id=&#34;bio&#34;&gt;Bio&lt;/h1&gt;
+</code></pre>
+<p>Tim Berners-Lee decided to use this character based on its connection to
+addresses in the United States (despite the fact that he’s British by birth).
+In <a href="https://www.w3.org/People/Berners-Lee/FAQ.html#etc">his words</a>:</p>
+<blockquote>
+<p>In a snail mail address in the US at least, it is common to use the number sign
+for an apartment number or suite number within a building.
+So 12 Acacia Av #12 means “The building at 12 Acacia Av, and then within that
+the unit known numbered 12”. It seemed to be a natural character for the task.
+Now, <a href="http://www.example.com/foo#bar">http://www.example.com/foo#bar</a> means “Within resource
+<a href="http://www.example.com/foo">http://www.example.com/foo</a>, the particular view of it known as bar”.</p>
+</blockquote>
+<p>It turns out that the <a href="https://en.wikipedia.org/wiki/NLS_(computer_system)">original Hypertext system</a>,
+created by Douglas Englebart, also used the ‘#’ character for the same purpose.
+This may be coincidental or it could be a case of accidental “idea borrowing”.</p>
+<p>Fragments are explicitly not included in HTTP requests, meaning they only live
+inside the browser.  This concept proved very valuable when it came time to
+implement client-side navigation (before
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/History_API">pushState</a> was
+introduced). Fragments were also very valuable when it came time to think about
+how we can store state in URLs without actually sending it to the server.  What
+could that mean? Let’s explore:</p>
+<h3 id="molehills-and-mountains">Molehills and Mountains</h3>
+<blockquote>
+<p>
+There is a whole standard, as yukky as SGML, on Electronic data 
+Intercahnge [sic], meaning forms and form submission. I know no more
+except it looks like fortran backwards with no spaces.
+</p>
+<p>
+— Tim Berners-Lee <a href="http://1997.webhistory.org/www.lists/www-talk.1993q1/0091.html"><code>1993</code></a>
+</p>
+</blockquote>
+
+<p>There is a popular perception that the internet standards bodies didn’t do much
+from the finalization of HTTP 1.1 and HTML 4.01 in 2002 to when HTML 5 really
+got on track.  This period is also known (only by me) as the Dark Age of XHTML.
+The truth is though, the standardization folks were <em>fantastically busy</em>.  They
+were just doing things which ultimately didn’t prove all that valuable.</p>
+<p>One such effort was the Semantic Web.  The dream was to create a Resource
+Description Framework (editorial note: run away from any team which seeks to
+create a framework), which would allow metadata about content to be universally
+expressed.  For example, rather than creating a nice web page about my Corvette
+Stingray, I could make an RDF document describing its size, color, and the
+number of speeding tickets I had gotten while driving it.</p>
+<p>This is, of course, in no way a bad idea.  But the format was XML based, and
+there was a big chicken-and-egg problem between having the entire world
+documented, and having the browsers do anything useful with that documentation.</p>
+<p>It did however provide a powerful environment for philosophical argument.  One
+of the best such arguments lasted at least ten years, and was known by the
+masterful codename
+‘<a href="https://www.w3.org/2001/tag/issues.html#httpRange-14">httpRange-14</a>’.</p>
+<p>httpRange-14 sought to answer the fundamental question of what a URL is.  Does
+a URL always refer to a document, or can it refer to anything? Can I have a URL
+which points to my car?</p>
+<p>They didn’t attempt to answer that question in any satisfying manner.  Instead
+they focused on how and when we can use 303 redirects to point users from links
+which aren’t documents to ones which are, and when we can use URL fragments
+(the bit after the ‘#’) to <a href="http://blog.iandavis.com/2010/11/a-guide-to-publishing-linked-data-without-redirects/">point users to linked
+data</a>.</p>
+<p>To the pragmatic mind of today, this might seem like a silly question.  To many
+of us, you can use a URL for whatever you manage to use it for, and people will
+use your thing or they won’t.  But the Semantic Web cares for nothing more than
+semantics, so it was on.</p>
+<p>This particular topic was discussed on <a href="http://www.w3.org/2002/07/01-tag-summary#arch-doc">July 1st
+2002</a>, <a href="http://www.w3.org/2002/07/15-tag-summary#L3330">July 15th
+2002</a>, <a href="http://www.w3.org/2002/07/22-tag-summary#L3974">July 22nd
+2002</a>, <a href="http://www.w3.org/2002/07/29-tag-summary#httpRange-14">July 29th
+2002</a>, <a href="http://lists.w3.org/Archives/Public/www-tag/2002Sep/0127">September 16th
+2002</a>, and at least
+20 other occasions through 2005.  It was resolved by the great ‘<a href="https://lists.w3.org/Archives/Public/www-tag/2005Jun/0039.html">httpRange-14
+resolution</a>’ of
+2005, then reopened by complaints in
+<a href="https://lists.w3.org/Archives/Public/www-tag/2007Jul/0034.html">2007</a> and
+<a href="https://lists.w3.org/Archives/Public/public-awwsw/2011Jan/0021.html">2011</a> and
+<a href="https://www.w3.org/2001/tag/doc/uddp/change-proposal-call.html">a call for new
+solutions</a> in 2012.
+The question was heavily discussed by the <a href="https://groups.google.com/forum/#!searchin/pedantic-web/httprange-14/pedantic-web/iLY6VFvN-H0/SXQwc-lOpM8J">pedantic
+web</a>
+group, which is very aptly named.  The one thing which didn’t happen is all
+that much semantic data getting put on the web behind any sort of URL.</p>
+<h3 id="auth">Auth</h3>
+<p>As you may know, you can include a username and password in URLs:</p>
+<pre><code>http://zack:<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="691a0101010101012913080a0247001a">[email&#160;protected]</a>
+</code></pre><p>The browser then encodes this authentication data into
+<a href="https://en.wikipedia.org/wiki/Base64">Base64</a>, and sends it as a header:</p>
+<pre><code>Authentication: Basic emFjazpzaGhoaGho
+</code></pre><p>The only reason for the Base64 encoding is to allow characters which might not
+be valid in a header, it provides no obscurity to the username and password
+values.</p>
+<p>Particularily over the pre-SSL internet, this was very problematic.  Anyone who
+could snoop on your connection could easily see your password.  <a href="http://1997.webhistory.org/www.lists/www-talk.1993q3/0297.html">Many
+alternatives</a>
+were proposed including
+<a href="https://en.wikipedia.org/wiki/Kerberos_(protocol)">Kerberos</a> which is a widely
+used security protocol both then and now.</p>
+<p>As with so many of these examples though, the simple <a href="http://1997.webhistory.org/www.lists/www-talk.1993q3/0882.html">basic auth
+proposal</a> was
+easiest for browser manufacturers (Mosaic) to implement.  This made it the
+first, and ultimately the only, solution until developers were given the tools
+to build their own authentication systems.</p>
+<h3 id="the-web-application">The Web Application</h3>
+<p>In the world of web applications, it can be a little odd to think of the basis
+for the web being the hyperlink.  It is a method of linking one document to another,
+which was gradually augmented with styling, code execution, sessions,
+authentication, and ultimately became the social shared computing experience so
+many 70s researchers were trying (and failing) to create.  Ultimately, the
+conclusion is just as true for any project or startup today as it was then: all
+that matters is adoption.  If you can get people to use it, however slipshod it
+might be, they will help you craft it into what they need.  The corollary is,
+of course, no one is using it, it doesn’t matter how technically sound it might
+be.  There are countless tools which millions of hours of work went into which
+precisely no one uses today.</p>
+<hr/>
+
+<p>If you haven’t had a chance, feel free to take a look at the
+<a href="https://eager.io/blog/the-history-of-the-url-domain-and-protocol/">first portion</a>
+of this post, covering the Domain, Protocol and Port.  As always, if you enjoyed
+this post and think you might like other posts like it feel free to subscribe below.</p>
+<hr class="blog-post-footer-hr"/><div class="blog-share-container"><h3>Like this post? Share it with your followers.</h3><div class="blog-share-container-content"></div></div><div class="blog-subscribe-form-container"><form accept-charset="UTF-8" action="https://formkeep.com/f/846f54b00bac" method="POST" class="form blog-subscribe-form"><h3 class="blog-subscribe-form-text">Sign up to get our next post delivered to your inbox.</h3><div class="blog-subscribe-form-inner"><input type="email" name="email" placeholder="Enter your email address" spellcheck="false" disabled="" class="standard"/><button type="submit" disabled="" class="primary slim more with-spinner-icon"><div class="icon spinner-icon"></div><span class="button-content">Sign up</span></button></div></form></div></div><div class="blog-post-footer"><script data-cfasync="false" src="/cdn-cgi/scripts/af2821b0/cloudflare-static/email-decode.min.js"></script><script>(function(){
+  // TODO - move this into the Eager Disqus app
+  window.disqus_identifier = 'the-history-of-the-url-path-fragment-query-auth/';
+  window.disqus_title = 'The History of the URL: Path, Fragment, Query, and Auth';
+  window.disqus_url = 'https://eager.io/blog/the-history-of-the-url-path-fragment-query-auth/';
+})();
+</script><div class="blog-post-comments"></div></div></div></div><div class="blog-elsewhere"><h3>Follow us to get our latest updates.</h3><div class="blog-elsewhere-inner"><a href="http://twitter.com/EagerIO" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" viewBox="10 10 40 40" role="img" class="twitter-icon"><path d="M30,12.218c-9.82,0-17.781,7.961-17.781,17.781c0,9.822,7.961,17.783,17.781,17.783 s17.781-7.961,17.781-17.783C47.781,20.179,39.82,12.218,30,12.218z M37.07,26.374c0.008,0.156,0.012,0.312,0.012,0.473 c0,4.82-3.67,10.379-10.381,10.379c-2.061,0-3.977-0.604-5.592-1.639c0.287,0.033,0.576,0.051,0.869,0.051 c1.711,0,3.283-0.582,4.531-1.562c-1.596-0.029-2.943-1.084-3.406-2.533c0.221,0.041,0.449,0.066,0.686,0.066 c0.332,0,0.654-0.047,0.961-0.129c-1.668-0.336-2.928-1.811-2.928-3.576c0-0.016,0-0.031,0-0.047 c0.494,0.273,1.057,0.438,1.654,0.457c-0.979-0.654-1.623-1.771-1.623-3.037c0-0.668,0.18-1.297,0.494-1.834 c1.799,2.207,4.488,3.66,7.52,3.811c-0.062-0.266-0.096-0.543-0.096-0.83c0-2.016,1.635-3.646,3.648-3.646 c1.049,0,1.998,0.441,2.664,1.15c0.83-0.164,1.611-0.467,2.316-0.887c-0.273,0.854-0.852,1.568-1.605,2.02 c0.74-0.088,1.443-0.285,2.096-0.572C38.402,25.218,37.783,25.86,37.07,26.374z" role="presentation"></path></svg></a><a href="http://facebook.com/EagerIO" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="10 10 40 40" role="img" class="facebook-icon"><path d="M30,12.218c-9.82,0-17.781,7.962-17.781,17.782c0,9.822,7.961,17.782,17.781,17.782 S47.781,39.822,47.781,30C47.781,20.18,39.82,12.218,30,12.218z M33.809,30.006h-2.49c0,3.981,0,8.885,0,8.885h-3.693 c0,0,0-4.854,0-8.885h-1.756v-3.138h1.756v-2.032c0-1.455,0.691-3.727,3.727-3.727l2.734,0.01v3.049c0,0-1.662,0-1.984,0 c-0.324,0-0.783,0.16-0.783,0.854v1.846h2.814L33.809,30.006z" role="presentation"></path></svg></a><a href="http://linkedin.com/in/../company/eager" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-.8325 -.8325 68.65 68.65" role="img" class="linkedin-icon"><path d="M49.837,48.137V36.425c0-6.275-3.35-9.195-7.816-9.195  c-3.604,0-5.219,1.983-6.119,3.374V27.71h-6.79c0.09,1.917,0,20.427,0,20.427h6.79V36.729c0-0.609,0.044-1.219,0.224-1.655  c0.49-1.22,1.607-2.483,3.482-2.483c2.458,0,3.44,1.873,3.44,4.618v10.929H49.837z M21.959,24.922c2.367,0,3.842-1.57,3.842-3.531  c-0.044-2.003-1.475-3.528-3.797-3.528s-3.841,1.524-3.841,3.528c0,1.961,1.474,3.531,3.753,3.531H21.959z M33,64  C16.432,64,3,50.568,3,34C3,17.431,16.432,4,33,4s30,13.431,30,30C63,50.568,49.568,64,33,64z M25.354,48.137V27.71h-6.789v20.427  H25.354z" role="presentation"></path></svg></a><a href="http://github.com/EagerIO" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-75 -75 1350 1350" role="img" class="github-icon"><g fill-rule="evenodd"><g><path d="M600,0 C268.62914,0 0,268.62914 0,600 C0,931.37086 268.62914,1200 600,1200 C931.37086,1200 1200,931.37086 1200,600 C1200,268.62914 931.37086,0 600,0 L600,0 Z M374.561944,261.764017 C361.106565,300.873442 356.441817,343.321346 368.478542,380.394343 C353.936313,396.532094 342.644932,415.07078 334.565705,436.052824 C313.030481,504.116053 318.290435,591.063822 365.436638,643.671916 C381.998735,661.828696 404.468613,676.755941 432.744573,688.457575 C461.020331,700.157768 497.361849,707.62189 541.796255,710.850196 C511.973257,724.786041 490.949983,733.301014 483.613829,764.114175 C450.347775,786.342971 409.895494,781.038694 380.580929,756.865633 C357.414573,739.950824 346.919716,709.888416 321.233354,698.747818 C319.61796,697.134287 314.571933,695.930824 306.089266,695.123547 C297.606192,694.316057 290.938365,696.722789 286.090943,702.37208 C283.667246,704.792897 283.846181,707.379182 286.673522,710.20321 C306.119088,726.018293 324.834421,742.780038 335.795271,762.884406 C346.298195,784.672711 357.168331,800.625306 368.478542,810.711978 C399.853569,831.913136 441.931787,842.943351 478.76001,829.480532 C474.465353,855.396779 486.051417,895.867475 477.530241,919.051858 C474.298214,925.507623 469.674882,931.166448 463.615506,936.008276 C458.215134,941.27628 441.472033,947.866914 444.847155,955.941749 C446.462559,959.573036 452.108748,961.800939 461.80337,962.60796 C483.144337,962.063024 504.389006,953.434973 516.944104,936.590643 C521.388086,930.538522 523.61028,922.651891 523.61028,912.968253 L523.61028,813.753882 C523.61028,802.456492 526.011418,794.39052 530.85883,789.548701 C535.706243,784.707085 540.994579,781.454549 546.650303,779.841028 L546.650303,910.573742 C546.650303,921.871122 545.628674,931.562846 543.608399,939.632521 C541.588336,947.702275 539.787591,953.361101 538.171993,956.58901 C534.463432,962.808986 527.373307,968.548885 527.234551,975.939939 C527.234551,978.360827 528.678874,979.743358 531.50602,980.146736 C552.730392,979.225991 577.356182,966.775258 585.999556,949.275583 C592.86704,934.750337 596.290011,919.464399 596.290011,903.325199 L596.290011,774.986997 L622.954297,774.986997 L622.954297,903.325199 C622.954297,919.464399 626.62062,934.750337 633.891739,949.275583 C641.162849,963.801129 653.298169,973.134937 670.26391,977.169602 C679.150211,979.59049 685.153247,980.550203 688.385274,980.146736 C691.6173,979.743358 693.060387,978.360827 692.656744,975.939939 C690.710605,968.607912 686.655979,962.333946 682.366288,956.58901 C676.710768,949.326171 673.88819,933.975781 673.88819,910.573742 L673.88819,779.841028 C679.543702,781.454549 685.011186,784.707085 690.262233,789.548701 C695.513076,794.39052 698.093141,802.456492 698.093141,813.753882 L698.093141,912.968253 C698.093141,922.651891 700.315344,930.538522 704.759325,936.590643 C718.264409,953.765186 738.616458,962.477978 759.900051,962.60796 C769.594681,961.800939 775.241083,959.573036 776.856266,955.941749 C778.471873,952.310462 777.271105,949.301959 773.232004,946.881019 C769.193115,944.460122 764.147088,940.850069 758.087915,936.008276 C752.028548,931.166448 747.405215,925.507623 744.173198,919.051858 C740.546435,877.424487 744.080673,832.801814 741.131285,790.713858 C735.309049,744.78333 717.630473,729.672811 682.366288,712.079965 C724.377209,708.851659 758.917778,701.144396 785.981775,689.039941 C866.885084,649.730868 889.256587,588.961953 889.597262,507.502795 C888.321306,455.07696 873.187795,409.343597 838.663175,374.310544 C843.510588,355.750739 844.954717,336.432115 842.934636,316.257552 C840.914582,296.08298 836.647663,277.903014 830.184864,261.764017 C800.296204,263.377547 775.246067,269.394244 755.04602,279.88539 C734.848252,290.376306 720.311811,299.286836 711.425298,306.549676 C639.837833,290.297406 563.20246,290.199438 494.551483,308.94439 C459.422538,280.213438 415.886521,264.20719 374.561944,261.764017 L374.561944,261.764017 Z" role="presentation"></path></g></g></svg></a></div></div><div class="marketing-page-footer-navigation abutted"><a class="marketing-page-footer-logo"><div class="logo"><svg viewBox="0 0 1030 454" version="1.1" role="img" aria-label="Eager logo"><title>Eager logo</title><desc>The logo for Eager, the Eager App Store, and Eager Platform Co.</desc><defs><linearGradient id="eager-logo-gradient-b8b8b8-b8b8b8-id-913701304" x1="0%" y1="0%" x2="100%" y2="100%"><stop stop-color="#b8b8b8" offset="0%"></stop><stop stop-color="#b8b8b8" offset="100%"></stop></linearGradient></defs><g fill-rule="evenodd"><path fill="url(#eager-logo-gradient-b8b8b8-b8b8b8-id-913701304)" d="M935.924851,64.5881693 C958.756923,64.5881693 975.334624,82.6874243 973.450007,105.557504 L969.278062,156.184622 C967.393445,179.054701 947.832793,197.153956 925.000721,197.153956 L899.35713,197.153956 L910.215184,64.5881693 L935.924851,64.5881693 Z M991.760496,232.94505 C993.527047,235.279778 995.177021,237.693546 996.70563,240.179084 C1006.66689,256.37622 1011.47433,275.621077 1009.8031,295.901602 L997.496701,445.241434 L940.458235,445.241434 L952.764636,295.901602 C954.649253,273.031523 938.071552,254.932268 915.23948,254.932268 L889.565119,254.894675 L873.879528,445.241434 L816.841063,445.241434 L851.816707,20.8072627 L852.863882,8.09965276 L865.550374,8.09965276 L935.579807,8.09965276 C989.475635,8.09965276 1029.88403,52.2168559 1025.43533,106.202401 L1021.26338,156.829519 C1019.62364,176.728065 1011.88678,195.815296 999.763718,211.772766 C998.516961,213.41386 997.223813,215.021853 995.886136,216.594223 C995.346073,217.229038 994.798752,217.858047 994.244295,218.481084 C992.625343,220.278446 991.519314,221.451616 990.387704,222.60112 C988.746579,224.268194 987.129644,225.762971 986.547653,226.294975 C988.547018,228.78049 988.52292,228.824386 990.486586,231.300604 C990.917711,231.84426 991.342369,232.392441 991.760496,232.94505 Z M818.587426,8.09965276 L805.900934,8.09965276 L674.367391,8.09965276 L661.6809,8.09965276 L660.633725,20.8072627 L626.705255,432.533824 L625.65808,445.241434 L638.344572,445.241434 L774.749727,445.241434 L787.436219,445.241434 L788.483394,432.533824 L791.097143,400.81563 L792.144318,388.10802 L779.457826,388.10802 L687.332903,388.057189 L698.252844,255.542233 L759.325425,255.542233 L772.011916,255.542233 L773.059091,242.834623 L775.723104,210.506464 L776.770279,197.798854 L764.083788,197.798854 L703.094642,197.707782 L714.04116,65.233067 L801.192835,65.233067 L813.879327,65.233067 L814.926502,52.5254571 L817.540251,20.8072627 L818.587426,8.09965276 Z M611.635208,213.962934 L507.098519,213.962934 L502.39042,271.096348 L549.893181,271.041281 L542.587218,359.700138 C540.878702,378.702398 524.01229,394.207635 504.931855,394.207673 C485.753517,394.207673 471.410565,378.548279 472.993596,359.337991 L494.858609,94.0030958 C496.44164,74.7928081 513.365427,59.1334142 532.54379,59.1334142 C551.722153,59.1334142 566.065105,74.7928081 564.482074,94.0030958 L558.984385,160.718295 L616.566093,154.125978 L621.52054,94.0030958 C625.717915,43.0673768 588.102959,2 537.251889,2 C486.400819,2 442.017519,43.0673768 437.820144,94.0030958 L415.95513,359.337991 C411.757755,410.27371 449.372711,451.341087 500.223781,451.341087 C551.082892,451.335249 595.459841,410.269652 599.656886,359.337939 L611.635208,213.962934 Z M320.334075,137.138937 L330.279236,282.584027 L286.140818,282.584027 C286.140818,282.584027 286.095024,282.705582 287.575221,276.412555 L320.334075,137.138937 Z M186.575854,445.241434 L243.932867,445.241434 L268.481926,339.717441 L330.111325,339.799569 L337.851248,445.241434 L395.146032,445.241434 L364.575109,8.09965276 L289.192416,8.09965276 L186.575854,445.241434 Z M195.701062,8.09965276 L183.01457,8.09965276 L51.481027,8.09965276 L38.7945356,8.09965276 L37.7473606,20.8072627 L3.8188912,432.533824 L2.77171622,445.241434 L15.4582076,445.241434 L151.863363,445.241434 L164.549855,445.241434 L165.59703,432.533824 L168.210779,400.81563 L169.257954,388.10802 L156.571462,388.10802 L64.446539,388.057189 L75.3664797,255.542233 L136.439061,255.542233 L149.125552,255.542233 L150.172727,242.834623 L152.83674,210.506464 L153.883915,197.798854 L141.197424,197.798854 L80.2082777,197.707782 L91.1547962,65.233067 L178.306471,65.233067 L190.992963,65.233067 L192.040138,52.5254571 L194.653887,20.8072627 L195.701062,8.09965276 Z"></path></g></svg></div></a><ul class="marketing-page-footer-navigation-list"><li><a href="/blog">Blog</a></li><li><a href="/apps">App Store</a></li><li><a href="/developer">Developers</a></li><li><a href="/about">About</a></li><li><a href="/contact">Contact</a></li><li><a href="/help">Help</a></li></ul></div><script src="/blog/cd797b6aee00_js/lib.js"></script><script src="/blog/839700a7359e_js/app.js"></script></body></html>

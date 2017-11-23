@@ -1,0 +1,869 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html><head>
+<title>Richardson Maturity Model</title>
+<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+<meta content="summary_large_image" name="twitter:card">
+
+<meta content="16665197" name="twitter:site:id">
+
+<meta content="Richardson Maturity Model" property="og:title">
+
+<meta content="https://martinfowler.com/articles/richardsonMaturityModel.html" property="og:url">
+
+<meta content="Leonard Richardson's model for understanding a RESTful architecture as steps in a maturity model. Levels are (1) resources, (2) HTTP verbs and return codes, and (3) hypertext controls." property="og:description">
+
+<meta content="https://martinfowler.com/articles/images/richardsonMaturityModel/overview.png" property="og:image">
+
+<meta content="martinfowler.com" property="og:site_name">
+
+<meta content="article" property="og:type">
+
+<meta content="2010-03-18 14:02 GMT" property="og:article:modified_time">
+
+<meta content="width=device-width, initial-scale=1" name="viewport">
+
+<link href="Richardson%20Maturity%20Model_files/article.css" rel="stylesheet" type="text/css">
+</head>
+
+<body><div id="banner" style="background-image: url(&quot;/banner.png&quot;); background-repeat: no-repeat">
+ <a href="https://martinfowler.com/">
+    <img class="name-logo" src="Richardson%20Maturity%20Model_files/mf-name-white.png">
+<!--[if lte IE 6]>
+<img class = 'ie6-name-logo' src = '/mf-name-white-solid.png'/>
+<![endif]-->
+  </a>
+  
+  <div class="search">
+    <!-- SiteSearch Google -->
+    <form method="GET" action="https://www.google.com/search">
+      <input name="ie" value="UTF-8" type="hidden">
+      <input name="oe" value="UTF-8" type="hidden">
+      <input class="field" name="q" size="15" maxlength="255" type="text">
+      <button class="button" type="submit" name="btnG" value=" " title="Search">
+      <input name="domains" value="martinfowler.com" type="hidden">
+      <input name="sitesearch" value="" type="hidden"> 
+      <input name="sitesearch" value="martinfowler.com" type="hidden">
+    
+  </button></form></div>
+
+<div class="menu-button navmenu-button"><a class="icon-bars" href="#navmenu-bottom"></a></div>
+
+<div class="main-navigation"><ul>
+  <li><a href="https://www.martinfowler.com/intro.html">Intro</a></li>
+  <li><a href="https://www.martinfowler.com/videos.html">Videos</a></li>
+  <li><a href="https://www.martinfowler.com/design.html">Design</a></li>
+  <li><a href="https://www.martinfowler.com/agile.html">Agile</a></li>
+  <li><a href="http://refactoring.com/">Refactoring</a></li>
+  <li><a href="https://www.martinfowler.com/faq.html">FAQ</a></li>
+  <li>
+    <p><a href="https://www.martinfowler.com/aboutMe.html">About Me</a></p>
+
+    </li><li class="navmenu-button"><p><a href="#bottom-navmenu">All Sections <span class="icon-bars" title="Menu"></span></a></p></li>
+
+    <li><p>
+      <a href="http://www.thoughtworks.com/" class="tw">ThoughtWorks</a>
+</p></li>
+
+    <li><p>
+  <a href="https://www.martinfowler.com/feed.atom" title="feed" class="icon-rss">
+  </a>
+ </p></li>
+
+    <li><p>
+  <a href="http://www.twitter.com/martinfowler" title="Twitter stream" class="icon-twitter">
+  </a>
+ </p></li>
+  
+</ul>
+
+</div>
+</div>
+<div class="div" id="top-navmenu">
+<ul class="navmenu">
+<li class="top-line"><a class="link-home" href="https://www.martinfowler.com/">home</a>  <div class="search">
+    <!-- SiteSearch Google -->
+    <form method="GET" action="https://www.google.com/search">
+      <input name="ie" value="UTF-8" type="hidden">
+      <input name="oe" value="UTF-8" type="hidden">
+      <input class="field" name="q" size="15" maxlength="255" type="text">
+      <button class="button" type="submit" name="btnG" value=" " title="Search">
+      <input name="domains" value="martinfowler.com" type="hidden">
+      <input name="sitesearch" value="" type="hidden"> 
+      <input name="sitesearch" value="martinfowler.com" type="hidden">
+    
+  </button></form></div>
+
+<span class="close" title="close"></span>
+</li>
+
+<li class="group"><span class="group-label">topics</span>
+<ul class="group-contents">
+<li class="item"><a href="https://www.martinfowler.com/agile.html">agile</a></li>
+
+<li class="item"><a href="http://refactoring.com/">refactoring</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/design.html">design</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/nosql.html">noSQL</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/dsl.html">DSL</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/delivery.html">continuous&nbsp;delivery</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/microservices">microservices</a></li>
+</ul>
+</li>
+
+<li class="group"><span class="group-label">media</span>
+<ul class="group-contents">
+<li class="item"><a href="https://www.martinfowler.com/books">books</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/videos.html">video</a></li>
+</ul>
+</li>
+
+<li class="group"><span class="group-label">site</span>
+<ul class="group-contents">
+<li class="item"><a href="https://www.martinfowler.com/intro.html">site&nbsp;introduction</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/aboutMe.html">about&nbsp;me</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/faq.html">FAQ</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/tags">content&nbsp;index</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/photos">photos</a></li>
+</ul>
+</li>
+
+<li class="group"><span class="group-label">catalogs</span>
+<ul class="group-contents">
+<li class="item"><a href="http://refactoring.com/catalog">refactoring</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/eaaCatalog">P&nbsp;of&nbsp;EAA</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/eaaDev">EAA&nbsp;dev</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/dslCatalog">DSL</a></li>
+</ul>
+</li>
+
+<li class="group"><span class="group-label">feeds</span>
+<ul class="group-contents">
+<li class="item"><a href="http://www.twitter.com/martinfowler">twitter</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/feed.atom">rss</a></li>
+
+<li class="item"><a href="https://www.facebook.com/martinFowlerThoughtWorks">facebook</a></li>
+</ul>
+</li>
+
+<li class="group"><span class="group-label">popular</span>
+<ul class="group-contents">
+<li class="item"><a href="https://www.martinfowler.com/articles/microservices.html">microservices</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/articles/injection.html">dependency&nbsp;injection</a></li>
+</ul>
+</li>
+
+<li class="group"><span class="group-label">ThoughtWorks</span>
+<ul class="group-contents">
+<li class="item"><a href="http://thoughtworks.com/blogs">blogs</a></li>
+
+<li class="item"><a href="http://thoughtworks.com/careers">careers</a></li>
+
+<li class="item"><a href="https://www.thoughtworks.com/products">products</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+<div class="contents dropdown-container">
+<button class="dropdown-button">
+<h2>Contents</h2>
+</button>
+
+<div class="hidden" id="dropdownLinks"><a href="#level0">Level 0</a><a href="#level1">Level 1 - Resources</a><a href="#level2">Level 2 - HTTP Verbs</a><a href="#level3">Level 3 - Hypermedia Controls</a><a href="#TheMeaningOfTheLevels">The Meaning of the Levels</a></div>
+</div>
+
+<div id="content">
+<h1>Richardson Maturity Model</h1>
+
+<p class="subtitle">steps toward the glory of REST</p>
+
+<p class="abstract"><i>
+    A model (developed by Leonard Richardson) that breaks down the
+    principal elements of a REST approach into three steps. These
+    introduce resources, http verbs, and hypermedia controls.
+  </i></p>
+
+<div class="frontMatter">
+<div class="frontLeft">
+<p class="date">18 March 2010</p>
+
+<div class="author"><img alt="Photo of Martin Fowler" src="Richardson%20Maturity%20Model_files/mf.jpg" width="80">
+<p class="name"><a href="https://www.martinfowler.com/" rel="author">Martin Fowler</a></p>
+</div>
+
+<div class="clear"></div>
+
+<div class="translations"><b>Translations: </b><a href="http://jinson.tistory.com/190">Korean</a>&nbsp;· <a href="http://www.boaglio.com/index.php/2016/11/03/modelo-de-maturidade-de-richardson-os-passos-para-a-gloria-do-rest/">Portuguese</a>&nbsp;· <a href="http://refactor.ir/2017/05/05/richardson-maturity-model/">Persian</a></div>
+
+<div class="tags">Find <b>similar articles</b> to this by looking at these tags: <a href="https://www.martinfowler.com/tags/application%20integration.html">application integration</a>&nbsp;· <a href="https://www.martinfowler.com/tags/web%20services.html">web services</a></div>
+</div>
+
+<div class="frontRight">
+<div class="contents">
+<h2>Contents</h2>
+
+<ul>
+<li><a href="#level0">Level 0</a></li>
+
+<li><a href="#level1">Level 1 - Resources</a></li>
+
+<li><a href="#level2">Level 2 - HTTP Verbs</a></li>
+
+<li><a href="#level3">Level 3 - Hypermedia Controls</a></li>
+
+<li><a href="#TheMeaningOfTheLevels">The Meaning of the Levels</a></li>
+</ul>
+</div>
+</div>
+</div>
+
+<div class="paperBody">
+<p>Recently I've been reading drafts of <a href="https://www.amazon.com/gp/product/0596805829?ie=UTF8&amp;tag=martinfowlerc-20&amp;linkCode=as2&amp;camp=1789&amp;creative=9325&amp;creativeASIN=0596805829">Rest In Practice</a><img src="Richardson%20Maturity%20Model_files/ir.gif" alt="" style="width: 1px !important; height: 1px !important; border: medium none !important; margin: 0px !important; display: none !important;" width="1" border="0" hidden="" height="1">: a book that a couple of my
+  colleagues have been working on. Their aim is to explain how to use
+  Restful web services to handle many of the integration problems that
+  enterprises face. At the heart of the book is the notion that the
+  web is an existence proof of a massively scalable distributed system
+  that works really well, and we can take ideas from that to build
+  integrated systems more easily.</p>
+
+<div class="figure " id="images_richardsonMaturityModel_overview.png"><img src="Richardson%20Maturity%20Model_files/overview.png">
+<p class="photoCaption">Figure 1: Steps
+  toward REST</p>
+</div>
+
+<div class="clear"></div>
+
+<p>To help explain the specific properties of a web-style system,
+  the authors use a model of restful maturity that was developed by
+  <a href="http://www.crummy.com/">Leonard Richardson</a> and <a href="http://www.crummy.com/writing/speaking/2008-QCon/act3.html">explained</a>
+  at a QCon talk. The model is nice way to think about using these
+  techniques, so I thought I'd take a stab of my own explanation of
+  it. (The protocol examples here are only illustrative, I didn't feel it
+  was worthwhile to code and test them up, so there may be problems in
+  the detail.)</p>
+
+<div id="level0"><hr class="topSection">
+<h2>Level 0</h2>
+
+<p>The starting point for the model is using HTTP as a transport
+    system for remote interactions, but without using any of the
+    mechanisms of the web. Essentially what you are doing here is
+    using HTTP as a tunneling mechanism for your own remote
+    interaction mechanism, usually based on <a href="http://www.eaipatterns.com/EncapsulatedSynchronousIntegration.html">Remote
+    Procedure Invocation</a>.</p>
+
+<div class="figure " id="images_richardsonMaturityModel_level0.png"><img src="Richardson%20Maturity%20Model_files/level0.png">
+<p class="photoCaption">Figure 2: An example
+    interaction at Level 0</p>
+</div>
+
+<div class="clear"></div>
+
+<p>Let's assume I want to book an appointment with my doctor. My
+    appointment software first needs to know what open slots my doctor
+    has on a given date, so it makes a request of the hospital
+    appointment system to obtain that information. In a level 0
+    scenario, the hospital will expose a service endpoint at some
+    URI. I then post to that endpoint a document containing the
+    details of my request.</p>
+
+<pre>POST /appointmentService HTTP/1.1
+[various other headers]
+
+&lt;openSlotRequest date = "2010-01-04" doctor = "mjones"/&gt;
+</pre>
+
+<p>The server then will return a document giving me this information</p>
+
+<pre>HTTP/1.1 200 OK
+[various headers]
+
+&lt;openSlotList&gt;
+  &lt;slot start = "1400" end = "1450"&gt;
+    &lt;doctor id = "mjones"/&gt;
+  &lt;/slot&gt;
+  &lt;slot start = "1600" end = "1650"&gt;
+    &lt;doctor id = "mjones"/&gt;
+  &lt;/slot&gt;
+&lt;/openSlotList&gt;
+</pre>
+
+<p>I'm using XML here for the example, but the content can
+    actually be anything: JSON, YAML, key-value pairs, or any custom
+    format.</p>
+
+<p>My next step is to book an appointment, which I can again do
+    by posting a document to the endpoint.</p>
+
+<pre>POST /appointmentService HTTP/1.1
+[various other headers]
+
+&lt;appointmentRequest&gt;
+  &lt;slot doctor = "mjones" start = "1400" end = "1450"/&gt;
+  &lt;patient id = "jsmith"/&gt;
+&lt;/appointmentRequest&gt;
+</pre>
+
+<p>If all is well I get a response saying my appointment is
+    booked.</p>
+
+<pre>HTTP/1.1 200 OK
+[various headers]
+
+&lt;appointment&gt;
+  &lt;slot doctor = "mjones" start = "1400" end = "1450"/&gt;
+  &lt;patient id = "jsmith"/&gt;
+&lt;/appointment&gt;
+</pre>
+
+<p>If there is a problem, say someone else got in before me, then
+    I'll get some kind of error message in the reply body.</p>
+
+<pre>HTTP/1.1 200 OK
+[various headers]
+
+&lt;appointmentRequestFailure&gt;
+  &lt;slot doctor = "mjones" start = "1400" end = "1450"/&gt;
+  &lt;patient id = "jsmith"/&gt;
+  &lt;reason&gt;Slot not available&lt;/reason&gt;
+&lt;/appointmentRequestFailure&gt;
+</pre>
+
+<p>So far this is a straightforward RPC style system. It's simple
+    as it's just slinging plain old XML (POX) back and forth. If you
+    use SOAP or XML-RPC it's basically the same mechanism, the only
+    difference is that you wrap the XML messages in some kind of
+    envelope.</p>
+</div>
+
+<div id="level1"><hr class="topSection">
+<h2>Level 1 - Resources</h2>
+
+<p>The first step towards the Glory of Rest in the RMM is to
+    introduce resources. So now rather than making all our requests to
+    a singular service endpoint, we now start talking to individual
+    resources.</p>
+
+<div class="figure " id="images_richardsonMaturityModel_level1.png"><img src="Richardson%20Maturity%20Model_files/level1.png">
+<p class="photoCaption">Figure 3: Level 1
+    adds resources</p>
+</div>
+
+<div class="clear"></div>
+
+<p>So with our initial query, we might have a resource for given
+    doctor.</p>
+
+<pre>POST /doctors/mjones HTTP/1.1
+[various other headers]
+
+&lt;openSlotRequest date = "2010-01-04"/&gt;
+</pre>
+
+<p>The reply carries the same basic information, but each slot is
+    now a resource that can be addressed individually.</p>
+
+<pre>HTTP/1.1 200 OK
+[various headers]
+
+
+&lt;openSlotList&gt;
+  &lt;slot id = "1234" doctor = "mjones" start = "1400" end = "1450"/&gt;
+  &lt;slot id = "5678" doctor = "mjones" start = "1600" end = "1650"/&gt;
+&lt;/openSlotList&gt;
+</pre>
+
+<p>With specific resources booking an appointment means posting to
+    a particular slot.</p>
+
+<pre>POST /slots/1234 HTTP/1.1
+[various other headers]
+
+&lt;appointmentRequest&gt;
+  &lt;patient id = "jsmith"/&gt;
+&lt;/appointmentRequest&gt;
+</pre>
+
+<p>If all goes well I get a similar reply to before.</p>
+
+<pre>HTTP/1.1 200 OK
+[various headers]
+
+&lt;appointment&gt;
+  &lt;slot id = "1234" doctor = "mjones" start = "1400" end = "1450"/&gt;
+  &lt;patient id = "jsmith"/&gt;
+&lt;/appointment&gt;
+</pre>
+
+<p>The difference now is that if anyone needs to do anything about
+    the appointment, like book some tests, they first get hold of the
+    appointment resource, which might have a URI like
+    <code>http://royalhope.nhs.uk/slots/1234/appointment</code>, and post to
+    that resource.</p>
+
+<p>To an object guy like me this is like the notion of object
+    identity. Rather than calling some function in the ether and
+    passing arguments, we call a method on one particular object
+    providing arguments for the other information.</p>
+</div>
+
+<div id="level2"><hr class="topSection">
+<h2>Level 2 - HTTP Verbs</h2>
+
+<p>I've used HTTP POST verbs for all my interactions here in level
+    0 and 1, but some people use GETs instead or in addition. At these
+    levels it doesn't make much difference, they are both being used
+    as tunneling mechanisms allowing you to tunnel your interactions
+    through HTTP. Level 2 moves away from this, using the HTTP verbs
+    as closely as possible to how they are used in HTTP itself.</p>
+
+<div class="figure " id="images_richardsonMaturityModel_level2.png"><img src="Richardson%20Maturity%20Model_files/level2.png">
+<p class="photoCaption">Figure 4: Level 2
+    addes HTTP verbs</p>
+</div>
+
+<div class="clear"></div>
+
+<p>For our the list of slots, this means we want to use
+    GET.</p>
+
+<pre>GET /doctors/mjones/slots?date=20100104&amp;status=open HTTP/1.1
+Host: royalhope.nhs.uk
+</pre>
+
+<p>The reply is the same as it would have been with the POST</p>
+
+<pre>HTTP/1.1 200 OK
+[various headers]
+
+&lt;openSlotList&gt;
+  &lt;slot id = "1234" doctor = "mjones" start = "1400" end = "1450"/&gt;
+  &lt;slot id = "5678" doctor = "mjones" start = "1600" end = "1650"/&gt;
+&lt;/openSlotList&gt;
+</pre>
+
+<p>At Level 2, the use of GET for a request like this is
+    crucial. HTTP defines GET as a safe operation, that is it doesn't
+    make any significant changes to the state of anything. This allows
+    us to invoke GETs safely any number of times in any order and get
+    the same results each time. An important consequence of this is
+    that it allows any participant in the routing of requests to use
+    caching, which is a key element in making the web perform as well
+    as it does. HTTP includes various measures to support caching,
+    which can be used by all participants in the communication. By
+    following the rules of HTTP we're able to take advantage of that
+    capability.</p>
+
+<p>To book an appointment we need an HTTP verb that does change state,
+    a POST or a PUT. I'll use the same POST that I did earlier.</p>
+
+<pre>POST /slots/1234 HTTP/1.1
+[various other headers]
+
+&lt;appointmentRequest&gt;
+  &lt;patient id = "jsmith"/&gt;
+&lt;/appointmentRequest&gt;
+</pre>
+
+<p>The trade-offs between using POST and PUT here are more than I
+    want to go into here, maybe I'll do a separate article on them
+    some day. But I do want to point out that some people incorrectly
+    make a correspondence between POST/PUT and create/update. The
+    choice between them is rather different to that.</p>
+
+<p>Even if I use the same post as level 1, there's another
+    significant difference in how the remote service responds. If all
+    goes well, the service replies with a response code of 201 to
+    indicate that there's a new resource in the world.</p>
+
+<pre>HTTP/1.1 201 Created
+Location: slots/1234/appointment
+[various headers]
+
+&lt;appointment&gt;
+  &lt;slot id = "1234" doctor = "mjones" start = "1400" end = "1450"/&gt;
+  &lt;patient id = "jsmith"/&gt;
+&lt;/appointment&gt;
+</pre>
+
+<p>The 201 response includes a location attribute with a URI that
+    the client can use to GET the current state of that resource in
+    the future. The response here also includes a representation of
+    that resource to save the client an extra call right now.</p>
+
+<p>There is another difference if something
+    goes wrong, such as someone else booking the session.</p>
+
+<pre>HTTP/1.1 409 Conflict
+[various headers]
+
+&lt;openSlotList&gt;
+  &lt;slot id = "5678" doctor = "mjones" start = "1600" end = "1650"/&gt;
+&lt;/openSlotList&gt;
+</pre>
+
+<p>The important part of this response is the use of an HTTP
+    response code to indicate something has gone wrong. In this case a
+    409 seems a good choice to indicate that someone else has already
+    updated the resource in an incompatible way. Rather than using a
+    return code of 200 but including an error response, at level 2 we
+    explicitly use some kind of error response like this. It's up to
+    the protocol designer to decide what codes to use, but there
+    should be a non-2xx response if an error crops up. Level 2
+    introduces using HTTP verbs and HTTP response codes.</p>
+
+<p>There is an inconsistency creeping in here. REST advocates talk
+    about using all the HTTP verbs. They also justify their approach
+    by saying that REST is attempting to learn from the practical
+    success of the web. But the world-wide web doesn't use PUT or
+    DELETE much in practice. There are sensible reasons for using
+    PUT and DELETE more, but the existence proof of the web isn't one
+    of them.</p>
+
+<p>The key elements that are supported by the existence of the
+    web are the strong separation between safe (eg GET) and non-safe
+    operations, together with using status codes to help communicate
+    the kinds of errors you run into.</p>
+</div>
+
+<div id="level3"><hr class="topSection">
+<h2>Level 3 - Hypermedia Controls</h2>
+
+<p>The final level introduces something that you often hear
+    referred to under the ugly acronym of HATEOAS (Hypertext As The
+    Engine Of Application State). It addresses the question of how to
+    get from a list open slots to knowing what to do to book an
+    appointment.</p>
+
+<div class="figure " id="images_richardsonMaturityModel_level3.png"><img src="Richardson%20Maturity%20Model_files/level3.png">
+<p class="photoCaption">Figure 5: Level 3
+    adds hypermedia controls</p>
+</div>
+
+<div class="clear"></div>
+
+<p>We begin with the same initial GET that we sent in level 2</p>
+
+<pre>GET /doctors/mjones/slots?date=20100104&amp;status=open HTTP/1.1
+Host: royalhope.nhs.uk
+</pre>
+
+<p>But the response has a new element</p>
+
+<pre>HTTP/1.1 200 OK
+[various headers]
+
+&lt;openSlotList&gt;
+  &lt;slot id = "1234" doctor = "mjones" start = "1400" end = "1450"&gt;
+     &lt;link rel = "/linkrels/slot/book" 
+           uri = "/slots/1234"/&gt;
+  &lt;/slot&gt;
+  &lt;slot id = "5678" doctor = "mjones" start = "1600" end = "1650"&gt;
+     &lt;link rel = "/linkrels/slot/book" 
+           uri = "/slots/5678"/&gt;
+  &lt;/slot&gt;
+&lt;/openSlotList&gt;
+</pre>
+
+<p>Each slot now has a link element which contains a URI to tell
+    us how to book an appointment.</p>
+
+<p>The point of hypermedia controls is that they tell us what we
+    can do next, and the URI of the resource we need to manipulate to
+    do it. Rather than us having to know where to post our appointment
+    request, the hypermedia controls in the response tell us how to do
+    it.</p>
+
+<p>The POST would again copy that of level 2</p>
+
+<pre>POST /slots/1234 HTTP/1.1
+[various other headers]
+
+&lt;appointmentRequest&gt;
+  &lt;patient id = "jsmith"/&gt;
+&lt;/appointmentRequest&gt;
+</pre>
+
+<p>And the reply contains a number of hypermedia controls for
+    different things to do next.</p>
+
+<pre>HTTP/1.1 201 Created
+Location: http://royalhope.nhs.uk/slots/1234/appointment
+[various headers]
+
+&lt;appointment&gt;
+  &lt;slot id = "1234" doctor = "mjones" start = "1400" end = "1450"/&gt;
+  &lt;patient id = "jsmith"/&gt;
+  &lt;link rel = "/linkrels/appointment/cancel"
+        uri = "/slots/1234/appointment"/&gt;
+  &lt;link rel = "/linkrels/appointment/addTest"
+        uri = "/slots/1234/appointment/tests"/&gt;
+  &lt;link rel = "self"
+        uri = "/slots/1234/appointment"/&gt;
+  &lt;link rel = "/linkrels/appointment/changeTime"
+        uri = "/doctors/mjones/slots?date=20100104@status=open"/&gt;
+  &lt;link rel = "/linkrels/appointment/updateContactInfo"
+        uri = "/patients/jsmith/contactInfo"/&gt;
+  &lt;link rel = "/linkrels/help"
+        uri = "/help/appointment"/&gt;
+&lt;/appointment&gt;
+</pre>
+
+<p>One obvious benefit of hypermedia controls is that it allows
+    the server to change its URI scheme without breaking clients. As
+    long as clients look up the "addTest" link URI then the server
+    team can juggle all URIs other than the initial entry points.</p>
+
+<p>A further benefit is that it helps client developers explore
+    the protocol. The links give client developers a hint as to what
+    may be possible next. It doesn't give all the information: both
+    the "latest" and "cancel" controls point to the same URI - they need
+    to figure out that one is a GET and the other a DELETE. But at
+    least it gives them a starting point as to what to think about for
+    more information and to look for a similar URI in the protocol
+    documentation.</p>
+
+<p>Similarly it allows the server team to advertise new
+    capabilities by putting new links in the responses. If the client
+    developers are keeping an eye out for unknown links these links
+    can be a trigger for further exploration.</p>
+
+<p>There's no absolute standard as to how to represent hypermedia
+    controls. What I've done here is to use the current
+    recommendations of the REST in Practice team, which is to follow
+    ATOM (<a href="https://tools.ietf.org/html/rfc4287">RFC 4287</a>) I
+    use a <code>&lt;link&gt;</code> element with a <code>uri</code>
+    attribute for the target URI and a <code>rel</code> attribute for
+    to describe the kind of relationship. A well known relationship
+    (such as <code>self</code> for a reference to the element itself)
+    is bare, any specific to that server is a fully qualified
+    URI. ATOM states that the definition for well-known linkrels is
+    the <a href="http://www.iana.org/assignments/link-relations.html">Registry of
+    Link Relations </a>. As I write these are confined to what's done
+    by ATOM, which is generally seen as a leader in level 3
+    restfulness.</p>
+</div>
+
+<div id="TheMeaningOfTheLevels"><hr class="topSection">
+<h2>The Meaning of the Levels</h2>
+
+<p>I should stress that the RMM, while a good way to think about
+    what the elements of REST, is not a definition of levels of REST
+    itself. Roy Fielding has made it clear that <a href="http://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">level
+    3 RMM is a pre-condition of REST</a>. Like many terms in software,
+    REST gets lots of definitions, but since Roy Fielding coined the
+    term, his definition should carry more weight than most.</p>
+
+<p>What I find useful about this RMM is that it provides a good
+    step by step way to understand the basic ideas behind restful
+    thinking. As such I see it as tool to help us learn about the
+    concepts and not something that should be used in some kind of assessment
+    mechanism. I don't think we have enough examples yet to be really
+    sure that the restful approach is the right way to integrate systems, I
+    do think it's a very attractive approach and the one that I would
+    recommend in most situations.</p>
+
+<p>Talking about this with Ian Robinson, he stressed that
+    something he found attractive about this model when Leonard
+    Richardson first presented it was its relationship to common design
+    techniques.</p>
+
+<ul>
+<li>Level 1 tackles the question of handling complexity by using
+      divide and conquer, breaking a large service endpoint down into
+      multiple resources.</li>
+
+<li>Level 2 introduces a standard set of verbs so that we handle
+      similar situations in the same way, removing unnecessary
+      variation.</li>
+
+<li>Level 3 introduces discoverability, providing a way of
+      making a protocol more self-documenting.</li>
+</ul>
+
+<p>The result is a model that helps us think about the kind of
+    HTTP service we want to provide and frame the expectations of
+    people looking to interact with it.</p>
+</div>
+
+<hr class="bodySep">
+
+<div class="end-box">
+<div class="shares">
+<div class="icons"><span class="label">Share:</span><a href="https://twitter.com/intent/tweet?url=https://martinfowler.com/articles/richardsonMaturityModel.html&amp;text=Richardson%20Maturity%20Model%20%E2%9E%99" title="Share on Twitter"><img src="Richardson%20Maturity%20Model_files/t_mini-a.png"></a><a href="https://facebook.com/sharer.php?u=https://martinfowler.com/articles/richardsonMaturityModel.html" title="Share on Facebook"><img src="Richardson%20Maturity%20Model_files/fb-icon-20.png"></a><a href="https://plus.google.com/share?url=https://martinfowler.com/articles/richardsonMaturityModel.html" title="Share on Google Plus"><img src="Richardson%20Maturity%20Model_files/gplus-16.png"></a></div>
+
+<div class="comment">if you found this article useful, please share it. I appreciate the feedback and encouragement</div>
+</div>
+
+<div class="clear"></div>
+
+<h2>For articles on similar topics…</h2>
+
+<p>…take a look at the following tags:</p>
+
+<p class="tags"><a href="https://www.martinfowler.com/tags/application%20integration.html">application integration</a> <a href="https://www.martinfowler.com/tags/web%20services.html">web services</a></p>
+</div>
+</div>
+
+<div class="appendix">
+<div id="Acknowledgements"><hr class="topSection">
+<h2>Acknowledgements</h2>
+
+<p>Savas Parastatidis, Ian Robinson, and Jim Webber made
+    substantial comments on the drafts. Leonard Richardson was very
+    helpful in answering my questions so that I could minimize any
+    misinterpretations of his ideas. Aaron Swartz corrected some
+    errors with my level 3 URIs.</p>
+</div>
+</div>
+
+<div class="appendix">
+<h2>
+<a name="SignificantRevisions"></a>
+Significant Revisions</h2>
+
+<p><i>18 March 2010: </i>Initial posting</p>
+</div>
+</div>
+
+<div class="div" id="bottom-navmenu" style="display: none;">
+<ul class="navmenu">
+<li class="top-line"><a class="link-home" href="https://www.martinfowler.com/">home</a>  <div class="search">
+    <!-- SiteSearch Google -->
+    <form method="GET" action="https://www.google.com/search">
+      <input name="ie" value="UTF-8" type="hidden">
+      <input name="oe" value="UTF-8" type="hidden">
+      <input class="field" name="q" size="15" maxlength="255" type="text">
+      <button class="button" type="submit" name="btnG" value=" " title="Search">
+      <input name="domains" value="martinfowler.com" type="hidden">
+      <input name="sitesearch" value="" type="hidden"> 
+      <input name="sitesearch" value="martinfowler.com" type="hidden">
+    
+  </button></form></div>
+
+<span class="close" title="close"></span>
+</li>
+
+<li class="group"><span class="group-label">topics</span>
+<ul class="group-contents">
+<li class="item"><a href="https://www.martinfowler.com/agile.html">agile</a></li>
+
+<li class="item"><a href="http://refactoring.com/">refactoring</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/design.html">design</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/nosql.html">noSQL</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/dsl.html">DSL</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/delivery.html">continuous&nbsp;delivery</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/microservices">microservices</a></li>
+</ul>
+</li>
+
+<li class="group"><span class="group-label">media</span>
+<ul class="group-contents">
+<li class="item"><a href="https://www.martinfowler.com/books">books</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/videos.html">video</a></li>
+</ul>
+</li>
+
+<li class="group"><span class="group-label">site</span>
+<ul class="group-contents">
+<li class="item"><a href="https://www.martinfowler.com/intro.html">site&nbsp;introduction</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/aboutMe.html">about&nbsp;me</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/faq.html">FAQ</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/tags">content&nbsp;index</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/photos">photos</a></li>
+</ul>
+</li>
+
+<li class="group"><span class="group-label">catalogs</span>
+<ul class="group-contents">
+<li class="item"><a href="http://refactoring.com/catalog">refactoring</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/eaaCatalog">P&nbsp;of&nbsp;EAA</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/eaaDev">EAA&nbsp;dev</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/dslCatalog">DSL</a></li>
+</ul>
+</li>
+
+<li class="group"><span class="group-label">feeds</span>
+<ul class="group-contents">
+<li class="item"><a href="http://www.twitter.com/martinfowler">twitter</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/feed.atom">rss</a></li>
+
+<li class="item"><a href="https://www.facebook.com/martinFowlerThoughtWorks">facebook</a></li>
+</ul>
+</li>
+
+<li class="group"><span class="group-label">popular</span>
+<ul class="group-contents">
+<li class="item"><a href="https://www.martinfowler.com/articles/microservices.html">microservices</a></li>
+
+<li class="item"><a href="https://www.martinfowler.com/articles/injection.html">dependency&nbsp;injection</a></li>
+</ul>
+</li>
+
+<li class="group"><span class="group-label">ThoughtWorks</span>
+<ul class="group-contents">
+<li class="item"><a href="http://thoughtworks.com/blogs">blogs</a></li>
+
+<li class="item"><a href="http://thoughtworks.com/careers">careers</a></li>
+
+<li class="item"><a href="https://www.thoughtworks.com/products">products</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div id="footer">
+  <div class="tw-logo">
+    <a href="http://www.thoughtworks.com/">
+      <img src="Richardson%20Maturity%20Model_files/TW_smb.jpg">
+    </a>
+  </div>
+  <div class="menu-button">
+    <div class="icon-bars navmenu-button"></div>
+  </div>
+  <div class="copyright">
+    <p>© Martin Fowler | <a href="http://www.thoughtworks.com/privacy-policy">Privacy Policy</a> | <a href="https://www.martinfowler.com/aboutMe.html#disclosures">Disclosures</a></p>
+  </div>
+</div>
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-17005812-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async="" src="Richardson%20Maturity%20Model_files/analytics.js"></script>
+<!-- End Google Analytics -->
+
+<script src="Richardson%20Maturity%20Model_files/jquery-1.js" type="text/javascript"></script>
+
+<script src="Richardson%20Maturity%20Model_files/mfcom.js" type="text/javascript"></script>
+
+
+</body></html>

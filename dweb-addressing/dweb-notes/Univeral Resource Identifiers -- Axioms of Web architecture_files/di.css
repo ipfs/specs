@@ -1,0 +1,75 @@
+/* Style for design issues documents */
+
+body {
+  font-family: serif;
+  background-color: #f8fff8;
+  color: black; 
+  margin: 2em 8% 2em 10%;   /* T R B L */
+}
+
+table {
+    background: #f3fff3; /* paler same axis */
+}
+
+th { background: white;
+     text-align: left;}
+
+h1, h2, h3 {
+  font-family: sans-serif;
+  margin: 1em 0 0.5em 0;  /* Was 1em 0 0.5em -5% */
+}
+
+h1 { font-size: 150% }
+h2 { font-size: 120% }
+h3 { font-size: 100%; font-style: italic;}
+h4 {  }
+
+P { margin: 0  0 1em 0 ;    /* top right bottom left */
+/*  text-indent: 2em ;    first-line indent - nope not this style. */
+
+/*  line-height: 2.0;     only for double-space */
+
+  /* font-size: 12pt; */  /* use user's default */
+}
+
+
+td, th{ padding: 1em; }
+
+li {padding: 0.6em; }
+
+.tbd {color: #888; }
+
+.ramble {font-size: 80%; font-weight: 80%; }
+
+.cols {
+  -webkit-column-width: 24em; /* Chrome, Safari, Opera */
+  -moz-column-width: 24em; /* Firefox */  
+  column-width: 24em;
+
+  -webkit-column-gap: 1em; /* Chrome, Safari, Opera */
+  -moz-column-gap: 1em; /* Firefox */  
+  column-gap: 1em;
+}
+    
+    pre { font-size: 80%; }
+
+.note { color: #485 }
+
+blockquote {
+    font-style: italic;
+    font-family: sanserif;
+}
+
+.abstract {
+    font-style: italic;
+    font-family: serif;
+    margin: 0.5em 3em 0.5em 3em;
+}
+
+.number {font-family: monospace;}
+
+.detail {font-size: 80%; }
+
+.axiom  { margin: 1em; border: thin; background-color: white }
+
+/* ends */

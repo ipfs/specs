@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+  <title>The essentials of a specification - Tim BL</title>
+  <link rel="stylesheet" href="The%20essentials%20of%20a%20specification%20-%20Tim%20BL_files/base.css">
+  <!-- Changed by: tbl 19990524 -->
+</head>
+
+<body lang="en">
+<p><a href="https://www.w3.org/1999/"><img alt="W3" src="The%20essentials%20of%20a%20specification%20-%20Tim%20BL_files/w3c_home.png" border="0" width="72" height="48"></a></p>
+
+<h1>The essentials of a specification</h1>
+
+<blockquote>
+  <p>This note is a little <em>motherhood and apple pie</em> about how a
+  specification should be couched so as to clearly add a new well-defined
+  piece to the technology.</p>
+</blockquote>
+
+<p>A technical specification defines something.  The document must  specify
+the thing being defined as well as give its definition: a "left hand side" as
+well as a "right hand side".  Both must be done quite precisely.</p>
+
+<p>Typically, technical specifications for the web specify a language  or a
+protocol.  A protocol is a language for messages, plus a set of constraints on
+the sequence of messages. A language is a set of symbols, the syntactic
+constraints on the way their are combined, and the semantics of what they
+"mean" at some (possibly more than one) level.  (See also <a href="https://www.w3.org/DesignIssues/Meaning.html">Meaning of web documents</a>)</p>
+
+<p>The test of a good specification is that it clearly defines what
+implementation (document, message, program) conforms, and of course that it
+ensures by its design that whatever conforms works to provides the required
+function.</p>
+
+<h2>The left hand side</h2>
+
+<p>The document should state what sort of things is being defined.  It should
+introduce a new term which characterizes that which conforms to the
+specification. Examples of a conformance term could be</p>
+<ul>
+  <li>A well-formed XML 1.0 document</li>
+  <li>A conforming HTTP 1.1 server</li>
+  <li>An xml-schema-valid XML document</li>
+  <li>A W3C/WAI  "AAA" accessible web site</li>
+  <li>The SVG 1.0 language</li>
+</ul>
+
+<p>The same specification document can define more than one term. such as a
+"strictly conforming WWidget" and a "loosely conforming WWidget" but one
+should beware of diluting the "WWidget" brand.</p>
+
+<p>As systems become more self-describing, the term is given a formal
+identifier. Examples could be</p>
+<ul>
+  <li>The MIME type "image/svg1"</li>
+  <li>The XML Namespace "http://www.w3.org/1999/asdf-2-0"</li>
+</ul>
+
+<p>In this case where a MIME type or namespace has an identifier, then this is
+obviously the crucial term to use to be unambiguous.</p>
+
+<p>Wherever possible, conformance phrases will be grounded in the Web:
+identified by a URI.</p>
+
+<h2>The Right Hand Side</h2>
+
+<p>More has already been written on this, and most of it seems to be in
+consensus in the W3C.</p>
+
+<p>It is important to remember what you are defining as you write the text.
+For example, if you are defining a "foo-valid document" then using "is
+invalid" in the text can be assumed to apply to this but "is incorrect" or "is
+wrong" or "produces an error" does not unless the language is explicitly
+linked to the conformance term.</p>
+
+<p>A good spec similarly pays attention to:</p>
+<ul>
+  <li>The distinction between the use of MUST, as opposed to MAY (etc., see <a href="#Bradner,">Bradner's BCP14</a>)</li>
+  <li>The use of this distinction in defining the conformance term
+  precisely;</li>
+  <li>The distinction between normative and non-normative parts of the
+    specification.</li>
+</ul>
+
+<p>When defining a language, whenever possible specify directly the meaning
+rather than the sort of thing you would expect some software to do with it.
+Typical behaviors of an agent may be very  useful to explain the intent
+non-normatively.</p>
+
+<p>For example,</p>
+
+<blockquote>
+  <p>"x" indicated that the check is void</p>
+</blockquote>
+
+<p>is better than</p>
+
+<blockquote>
+  <p>"x" indicates that the check should be rejected with a fatal error.</p>
+</blockquote>
+
+<p>You can tell people what something means, you can't tell them what to do
+about it, unless you are defining a protocol. When defining a protocol, then
+the constraints should ideally be given as a state transition diagram or table
+to make them totally clear.</p>
+
+<p>When defining a message which in fact binds to human social entities, then
+this must be clear.  You could end up in court explaining it if not.  ("The
+MMTP protocol defines the meaning of a message sent by or on behalf of a party
+herein referred to as the "debtor" to a party referred to as the "creditor".
+The creditor is identified by the foo-email-address...)</p>
+
+<p>When defining a part of a specification deliberately to be similar to
+another specification,</p>
+<ul>
+  <li>Make it clear that you have noticed the similarity;</li>
+  <li>Make it clear whether the similarity is exact and if not where not (and
+    why not);</li>
+  <li>Ideally, it clear that the existing specification is being referred to
+    normatively and is definitive, and that what is in this specification is a
+    non-normative copy for information only.</li>
+  <li>Make it clear whether the use in this specification will track any new
+    version of the referenced specification.</li>
+  <li>Think about whether there is any way in which such changes could break
+    this system.</li>
+  <li>If necessary negotiate constraints with the authority for changes to the
+    referenced specification.</li>
+</ul>
+
+<h2>Test questions</h2>
+
+<p>A few examples of things to ask about a spec -- though generalization is
+difficult.</p>
+<ul>
+  <li>Does the spec give enough information to determine, for any arbitrary
+    object,  whether  the conformance term applies to it?</li>
+  <li>Could you write a program to test conformance?</li>
+  <li>Is conformance alone enough to ensure that systems build using this
+    language will function as intended and with integrity?</li>
+  <li>Can you prove important properties of the system from the state
+    transition tables etc?</li>
+</ul>
+
+<p>So much for another bit of folklore. Comments, suggestions welcome.</p>
+
+<p></p>
+<address>
+  <a href="https://www.w3.org/People/Berners-Lee">Tim BL</a> 
+</address>
+
+<p></p>
+
+<h3>References</h3>
+
+<p><a href="ftp://ftp.isi.edu/in-notes/bcp/bcp14.txt" name="Bradner,">S.
+Bradner, "Key words for use in RFCs to Indicate Requirement Levels",
+BCP0041</a></p>
+
+<p></p>
+<hr>
+
+
+<p><em>These are some of the raw bits of standards which I picked up from
+Peggie Rimmer at CERN, and from working with IEEE, IETF and W3C specifications
+over the years.  I am sure others have written books on it. Comments,
+suggestions welcome</em></p>
+
+<p><small>Last change $Id: blank.html,v 1.1 1999/05/24 14:24:19 timbl Exp
+$</small></p>
+<address>
+  <a href="https://www.w3.org/People/Berners-Lee">Tim BL</a> 
+</address>
+
+
+</body></html>

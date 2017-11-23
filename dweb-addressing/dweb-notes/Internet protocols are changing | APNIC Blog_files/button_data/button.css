@@ -1,0 +1,165 @@
+body, html
+{
+	margin: 0px;
+	padding: 0px;
+	overflow: visible;
+	text-align: center;
+	font-family: "HelveticaNeue", Arial, sans-serif;
+	background: transparent;
+}
+
+.ajximg
+{
+	position: absolute;
+	left: -789em;
+}
+
+.widget 
+{
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	text-align: center;
+	white-space: nowrap;
+}
+.widget.center 
+{ 
+	position: relative;
+	margin: 0px auto;
+}
+.widget.right 
+{ 
+	width: auto !important;
+	left: auto;
+	right: 0px;
+}
+.widget.pocket { width: 60px; }
+.widget.save { width: 60px; }
+.widget.pocket.vertical { width: 60px; }
+.widget.save.vertical { width: 60px; }
+.widget.horizontal { width: 115px; }
+
+#btn
+{
+	display: block;
+	cursor: pointer;
+}
+#btn span
+{
+	position: relative;
+	display: block;
+	border: 1px solid #bbb;
+	font-weight: bold;
+	color: #777;
+	background: #FFF;
+}
+#btn:hover span
+{
+	color: #555;
+}
+.horizontal #btn span
+{
+	float: left;
+	height: 18px;
+	padding: 0px 6px;
+	line-height: 18px;
+	font-size: 11px;
+	font-weight: normal;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-ms-border-radius: 3px;
+	-o-border-radius: 3px;
+	border-radius: 3px;
+}
+.vertical #btn span
+{
+	height: 33px;
+	line-height: 33px;
+	margin-bottom: 8px;
+	font-size: 14px;
+}
+#btn span em
+{
+	font-style: normal;
+	-moz-transition: opacity 0.3s;
+	-webkit-transition: opacity 0.3s;
+	-ms-transition: opacity 0.3s;
+	-o-transition: opacity 0.3s;
+}
+#btn span em.fadeOut
+{
+	opacity: 0;
+}
+#btn span i,
+#btn span u
+{
+	display: block;
+	position: absolute;
+	border: 4px transparent solid;
+	width: 0px;
+	height: 0px;
+	line-height: 0px;
+	zoom: 1;
+	z-index: 10;
+}
+.vertical #btn span i,
+.vertical #btn span u
+{
+	left: 50%;
+	bottom: 0px;
+	margin: 0px 0px -4px -4px;
+	border-bottom: 0;
+}
+.vertical #btn span i
+{
+	border-top-color: #aaa;
+}
+.vertical #btn span u
+{
+	margin-bottom: -3px;
+	border-top-color: #fff;
+}
+.horizontal #btn span i,
+.horizontal #btn span u
+{
+	top: 50%;
+	left: 0px;
+	margin: -4px 0px 0px -4px;
+	border-left: 0;
+}
+.horizontal #btn span i
+{
+	border-right-color: #aaa;
+}
+.horizontal #btn span u
+{
+	margin-left: -3px;
+	border-right-color: #fff;
+}
+#btn b
+{
+	display: block;
+	height: 20px;
+	line-height: 20px;
+	font-size: 12px;
+	background: url(https://d7x5nblzs94me.cloudfront.net/v1/i/pocket_button.png?v=3) top center no-repeat;
+	background-size: 60px;
+}
+#btn:hover b { background-position: center; }
+#btn.saved b { background-position: center bottom; }
+.pocket #btn b { width: 60px; }
+.horizontal.pocket #btn { padding-left: 66px; }
+.save #btn b { width: 60px; }
+/*.horizontal.save #btn { padding-left: 62px; }*/
+.horizontal #btn b { position: absolute; top: 0px; left: 0px; }
+.save #btn b 
+{ 
+	background-size: 60px;
+	background-image: url(https://d7x5nblzs94me.cloudfront.net/v1/i/save_button.png?v=3); 
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min-resolution: 144dpi) 
+{
+    #btn b { background-image: url(https://d7x5nblzs94me.cloudfront.net/v1/i/pocket_button-2x.png?v=3); }
+    .save #btn b { background-image: url(https://d7x5nblzs94me.cloudfront.net/v1/i/save_button-2x.png?v=2); }
+}

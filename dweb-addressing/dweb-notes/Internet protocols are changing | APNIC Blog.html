@@ -1,0 +1,2239 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]> <html class="ie ie6" lang="en-US" prefix="og: http://ogp.me/ns#"> <![endif]-->
+<!--[if IE 7 ]> <html class="ie ie7" lang="en-US" prefix="og: http://ogp.me/ns#"> <![endif]-->
+<!--[if IE 8 ]> <html class="ie ie8" lang="en-US" prefix="og: http://ogp.me/ns#"> <![endif]-->
+<!--[if IE 9 ]> <html class="ie ie9" lang="en-US" prefix="og: http://ogp.me/ns#"> <![endif]-->
+<!--[if IE 10 ]> <html class="ie ie10" lang="en-US" prefix="og: http://ogp.me/ns#"> <![endif]-->
+<!--[if IE 11 ]> <html class="ie ie11" lang="en-US" prefix="og: http://ogp.me/ns#"> <![endif]-->
+<!--[if (gt IE 11)|!(IE)]><!-->
+<html prefix="og: http://ogp.me/ns#" class="js fa-events-icons-ready" lang="en-US"><!--<![endif]--><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Internet protocols are changing | APNIC Blog</title>
+
+        <link rel="profile" href="http://gmpg.org/xfn/11">
+        <link rel="pingback" href="https://blog.apnic.net/xmlrpc.php">
+
+        <link rel="shortcut icon" href="https://blog.apnic.net/favicon.ico">
+
+        <script type="text/javascript" async="" src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/external.js" style="color: rgba(3, 7, 17, 0.5);"></script><script id="facebook-jssdk" src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/sdk.js"></script><script id="twitter-wjs" src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/widgets.js"></script><script async="" src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/analytics.js"></script><script src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/312d511a1e.js"></script><link href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/312d511a1e.css" media="all" rel="stylesheet">
+
+        <!-- Timeline (http://timeline.knightlab.com/) -->
+        <link title="timeline-styles" rel="stylesheet" href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/timeline.css">
+        <script src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/timeline.js"></script>
+
+
+<!-- This site is optimized with the Yoast SEO plugin v5.9.3 - https://yoast.com/wordpress/plugins/seo/ -->
+<link rel="canonical" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/">
+<link rel="publisher" href="https://plus.google.com/u/0/117390936449873910629/posts">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Internet protocols are changing | APNIC Blog">
+<meta property="og:description" content="Guest Post: Learn about the significant recent changes being made to the core Internet protocols.">
+<meta property="og:url" content="https://blog.apnic.net/2017/12/12/internet-protocols-changing/">
+<meta property="og:site_name" content="APNIC Blog">
+<meta property="article:publisher" content="https://www.facebook.com/APNIC">
+<meta property="article:tag" content="DNS">
+<meta property="article:tag" content="DOH">
+<meta property="article:tag" content="Guest Post">
+<meta property="article:tag" content="HTTP">
+<meta property="article:tag" content="IETF">
+<meta property="article:tag" content="QUIC">
+<meta property="article:tag" content="TLS">
+<meta property="article:tag" content="protocol">
+<meta property="article:section" content="Tech matters">
+<meta property="article:published_time" content="2017-12-12T12:56:00+10:00">
+<meta property="article:modified_time" content="2017-12-20T15:49:53+10:00">
+<meta property="og:updated_time" content="2017-12-20T15:49:53+10:00">
+<meta property="og:image" content="https://blog.apnic.net/wp-content/uploads/2017/12/evolution.png">
+<meta property="og:image:secure_url" content="https://blog.apnic.net/wp-content/uploads/2017/12/evolution.png">
+<meta property="og:image:width" content="555">
+<meta property="og:image:height" content="203">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:description" content="Guest Post: Learn about the significant recent changes being made to the core Internet protocols.">
+<meta name="twitter:title" content="Internet protocols are changing | APNIC Blog">
+<meta name="twitter:site" content="@apnic">
+<meta name="twitter:image" content="https://blog.apnic.net/wp-content/uploads/2017/12/evolution.png">
+<meta name="twitter:creator" content="@mnot">
+<script type="application/ld+json">{"@context":"http:\/\/schema.org","@type":"WebSite","@id":"#website","url":"https:\/\/blog.apnic.net\/","name":"APNIC Blog","alternateName":"APNIC","potentialAction":{"@type":"SearchAction","target":"https:\/\/blog.apnic.net\/?s={search_term_string}","query-input":"required name=search_term_string"}}</script>
+<script type="application/ld+json">{"@context":"http:\/\/schema.org","@type":"Organization","url":"https:\/\/blog.apnic.net\/2017\/12\/12\/internet-protocols-changing\/","sameAs":["https:\/\/www.facebook.com\/APNIC","http:\/\/www.linkedin.com\/company\/apnic","https:\/\/plus.google.com\/u\/0\/117390936449873910629\/posts","https:\/\/www.youtube.com\/channel\/UCo0B_Z741VvRv7xUiIkH2Cw","https:\/\/twitter.com\/apnic"],"@id":"#organization","name":"APNIC","logo":"https:\/\/blog.apnic.net\/wp-content\/uploads\/2015\/09\/Formal-APNIC-logo_web.jpg"}</script>
+<!-- / Yoast SEO plugin. -->
+
+<link rel="dns-prefetch" href="https://s0.wp.com/">
+<link rel="dns-prefetch" href="https://secure.rating-widget.com/">
+<link rel="dns-prefetch" href="https://s.w.org/">
+<link rel="alternate" type="application/rss+xml" title="APNIC Blog » Feed" href="https://blog.apnic.net/feed/">
+<link rel="alternate" type="application/rss+xml" title="APNIC Blog » Comments Feed" href="https://blog.apnic.net/comments/feed/">
+<link rel="alternate" type="application/rss+xml" title="APNIC Blog » Internet protocols are changing Comments Feed" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/feed/">
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.3\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.3\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/blog.apnic.net\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.9.1"}};
+			!function(a,b,c){function d(a,b){var c=String.fromCharCode;l.clearRect(0,0,k.width,k.height),l.fillText(c.apply(this,a),0,0);var d=k.toDataURL();l.clearRect(0,0,k.width,k.height),l.fillText(c.apply(this,b),0,0);var e=k.toDataURL();return d===e}function e(a){var b;if(!l||!l.fillText)return!1;switch(l.textBaseline="top",l.font="600 32px Arial",a){case"flag":return!(b=d([55356,56826,55356,56819],[55356,56826,8203,55356,56819]))&&(b=d([55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447],[55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447]),!b);case"emoji":return b=d([55358,56794,8205,9794,65039],[55358,56794,8203,9794,65039]),!b}return!1}function f(a){var c=b.createElement("script");c.src=a,c.defer=c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var g,h,i,j,k=b.createElement("canvas"),l=k.getContext&&k.getContext("2d");for(j=Array("flag","emoji"),c.supports={everything:!0,everythingExceptFlag:!0},i=0;i<j.length;i++)c.supports[j[i]]=e(j[i]),c.supports.everything=c.supports.everything&&c.supports[j[i]],"flag"!==j[i]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[j[i]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(h=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",h,!1),a.addEventListener("load",h,!1)):(a.attachEvent("onload",h),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),g=c.source||{},g.concatemoji?f(g.concatemoji):g.wpemoji&&g.twemoji&&(f(g.twemoji),f(g.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script><script src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/wp-emoji-release.js" type="text/javascript" defer="defer"></script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<link rel="stylesheet" id="validate-engine-css-css" href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/validationEngine.css" type="text/css" media="all">
+<link rel="stylesheet" id="cptch_stylesheet-css" href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/front_end_style.css" type="text/css" media="all">
+<link rel="stylesheet" id="dashicons-css" href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/dashicons.css" type="text/css" media="all">
+<link rel="stylesheet" id="cptch_desktop_style-css" href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/desktop_style.css" type="text/css" media="all">
+<link rel="stylesheet" id="rw-site-rating-css" href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/site-rating.css" type="text/css" media="all">
+<link rel="stylesheet" id="default-template-css" href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/default-popup.css" type="text/css" media="all">
+<link rel="stylesheet" id="twentytwelve-style-css" href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/style.css" type="text/css" media="all">
+<!--[if lt IE 9]>
+<link rel='stylesheet' id='twentytwelve-ie-css'  href='https://blog.apnic.net/wp-content/themes/twentytwelve/css/ie.css?ver=20121010' type='text/css' media='all' />
+<![endif]-->
+<link rel="stylesheet" id="rw_toprated-css" href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/toprated.css" type="text/css" media="all">
+<link rel="stylesheet" id="rw_recommendations-css" href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/recommendations.css" type="text/css" media="all">
+<link rel="stylesheet" id="jetpack-authors-widget-css" href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/style_002.css" type="text/css" media="all">
+<link rel="stylesheet" id="easy_table_style-css" href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/style_004.css" type="text/css" media="all">
+<link rel="stylesheet" id="otw-shortcode-general_foundicons-css" href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/general_foundicons.css" type="text/css" media="all">
+<link rel="stylesheet" id="otw-shortcode-social_foundicons-css" href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/social_foundicons.css" type="text/css" media="all">
+<link rel="stylesheet" id="otw-shortcode-jquery-ui-css" href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/jquery-ui-1.css" type="text/css" media="all">
+<link rel="stylesheet" id="otw-shortcode-css" href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/otw_shortcode.css" type="text/css" media="all">
+<link rel="stylesheet" id="jetpack_css-css" href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/jetpack.css" type="text/css" media="all">
+<script type="text/javascript" src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/jquery-1.js"></script>
+<script type="text/javascript" src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/otw_shortcode_core.js"></script>
+<script type="text/javascript" src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/otw_shortcode.js"></script>
+<link rel="https://api.w.org/" href="https://blog.apnic.net/wp-json/">
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://blog.apnic.net/xmlrpc.php?rsd">
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://blog.apnic.net/wp-includes/wlwmanifest.xml"> 
+<meta name="generator" content="WordPress 4.9.1">
+<link rel="shortlink" href="https://wp.me/p4XXJg-4XS">
+<link rel="alternate" type="application/json+oembed" href="https://blog.apnic.net/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fblog.apnic.net%2F2017%2F12%2F12%2Finternet-protocols-changing%2F">
+<link rel="alternate" type="text/xml+oembed" href="https://blog.apnic.net/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fblog.apnic.net%2F2017%2F12%2F12%2Finternet-protocols-changing%2F&amp;format=xml">
+
+<link rel="dns-prefetch" href="https://v0.wordpress.com/">
+<style type="text/css">img#wpstats{display:none}</style><!-- CSS Core -->
+<!-- Respond.js (for IE8) only works with local copy of CSS (bootstrap must be same domain) -->
+<!--[if lt IE 9]>
+    <link href='https://blog.apnic.net/wp-content/themes/apnic-corporate-identity/css/bootstrap.min.css' rel='stylesheet'>
+    <link href='https://blog.apnic.net/wp-content/themes/apnic-corporate-identity/css/custom.css' rel='stylesheet'>
+<![endif]-->
+    <link href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/fonts.css">
+    <link href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/custom.css" rel="stylesheet">
+    <link href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/apnic-web-style-guide-1.css" rel="stylesheet">
+    <link href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/blog.css" rel="stylesheet">
+<!-- JS Core -->
+    <script src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/underscore-min.js"></script>
+    <script src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/bootstrap.js"></script>
+    <script src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/jquery_002.js"></script>
+    <script src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/jquery_004.js"></script>
+    <script src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/scripts.js"></script>
+<!-- IE Support -->
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+        <script src="https://blog.apnic.net/wp-content/themes/apnic-corporate-identity/js/html5shiv.min.js"></script>
+        <script src="https://blog.apnic.net/wp-content/themes/apnic-corporate-identity/js/respond.min.js"></script>
+<![endif]-->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-3140864-13', 'auto');
+  ga('send', 'pageview');
+
+</script>
+<meta name="google-translate-customization" content="d88cace3b7aaffe8-082857802b91df40-g98533559d8524ac4-e">
+<link type="text/css" rel="stylesheet" href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/style_003.css" media="screen"><link type="text/css" rel="stylesheet" href="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/theme.css" media="screen"><style type="text/css" id="rw_class_blog-post_custom_style">.rw-class-blog-post.rw-ui-star.rw-ui-container.rw-style-custom .rw-ui-stars li { background-image: url(''); }
+.rw-class-blog-post.rw-rtl.rw-ui-star.rw-ui-container.rw-style-custom .rw-ui-stars li { background-image: url(''); }
+</style></head>
+
+<body class="post-template-default single single-post postid-19088 single-format-standard theme-blog">
+
+    <div class="page">
+
+        <!-- Twitter, Facebook, etc -->
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+<!-- Include the JavaScript SDK on your page once, ideally right after the opening <body> tag.  -->
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v2.0";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+        		<!--
+		<div id="banner">
+			<a href="//www.apnic.net/"><img src="https://www.apnic.net/__data/assets/image/0003/69384/apnic-logotype-200x55.png" alt="APNIC"></a>
+		   <div id="utilities" class="pull-right hidden-print">
+			   			   <form class="pull-right searchform" action="http://blog.apnic.net/" id="searchform" role="search"><input type="text" name="s" placeholder="Search blog..." id="search"><input type="submit" name="sa" value="Go" id="go" /></form>
+				<ul class="list-inline pull-right">
+
+					<li><a href="http://www.apnic.net/about-APNIC/organization/contact-APNIC"><span>Contact us</span></a></li>
+					<li><a href="http://www.apnic.net/jobs"><span>Jobs</span></a></li>
+					<li><a href="http://www.apnic.net/apnic-info/site-map"><span>Site map</span></a></li>
+				</ul>
+				<p id="ip">Your IP address:</p>
+			</div>
+			<div id="glyph" class="apnic-sprite apnic-sprite-glyphs glyph-blue-1 hidden-print"></div>
+			<div class="apnic-sprite apnic-sprite-icons" id="bg-glyphs"></div>
+		</div>
+	-->
+
+	<!--
+		<svg class="hidden" xmlns="http://www.w3.org/2000/svg">
+			<symbol id="twitter" viewBox="-95 218.9 405 405">
+				<title>Twitter</title>
+				<path d="M217.7,363.2c0.1,2.4,0.2,4.8,0.2,7.3c0,74.1-56.4,159.6-159.6,159.6c-31.7,0-61.2-9.3-86-25.2c4.4,0.5,8.9,0.8,13.4,0.8 c26.3,0,50.5-9,69.7-24c-24.5-0.5-45.3-16.7-52.4-39c3.4,0.7,6.9,1,10.6,1c5.1,0,10.1-0.7,14.8-2c-25.7-5.2-45-27.8-45-55 c0-0.2,0-0.5,0-0.7c7.6,4.2,16.2,6.7,25.4,7c-15-10.1-25-27.2-25-46.7c0-10.3,2.8-19.9,7.6-28.2c27.7,33.9,69,56.3,115.6,58.6 c-1-4.1-1.5-8.4-1.5-12.8c0-31,25.1-56.1,56.1-56.1c16.1,0,30.7,6.8,40.9,17.7c12.8-2.5,24.8-7.2,35.6-13.6 c-4.2,13.1-13.1,24.1-24.7,31c11.3-1.4,22.2-4.4,32.2-8.8C238.2,345.4,228.7,355.3,217.7,363.2z"/>
+				<image src="https://www.apnic.net/_designs/corporate-identity/img/icons/twitter.png" xlink:href="">
+			</symbol>
+			<symbol id="facebook" viewBox="-95 218.9 405 405">
+				<title>Facebook</title>
+				<path d="M121.2,623.9V467.1H68.4V406h52.8v-45.1c0-52.3,31.9-80.8,78.6-80.8c22.4,0,41.6,1.7,47.2,2.4v54.7h-32.4 c-25.4,0-30.3,12.1-30.3,29.8v39h60.6l-7.9,61.1h-52.6v156.8L121.2,623.9L121.2,623.9z"/>
+				<image src="https://www.apnic.net/_designs/corporate-identity/img/icons/facebook.png" xlink:href="">
+			</symbol>
+			<symbol id="youtube" viewBox="-95 218.9 405 405">
+				<title>YouTube</title>
+				<path d="M255,361.2c0,0-2.9-20.7-12-29.9c-11.4-12-24.3-12-30.2-12.7c-42.1-3-105.3-3-105.3-3h-0.1c0,0-63.2,0-105.3,3 c-5.9,0.7-18.7,0.8-30.2,12.7c-9,9.1-12,29.9-12,29.9s-3,24.4-3,48.7v22.8c0,24.4,3,48.7,3,48.7s2.9,20.7,12,29.9 c11.5,12,26.5,11.6,33.2,12.9c24.1,2.3,102.3,3,102.3,3s63.2-0.1,105.4-3.1c5.9-0.7,18.7-0.8,30.2-12.7c9-9.1,12-29.9,12-29.9 s3-24.4,3-48.7v-22.8C258,385.6,255,361.2,255,361.2z M76.4,460.4l0-84.6l81.3,42.4L76.4,460.4z"/>
+				<image src="https://www.apnic.net/_designs/corporate-identity/img/icons/youtube.png" xlink:href="">
+			</symbol>
+			<symbol id="flickr" viewBox="-95 218.9 405 405">
+				<title>Flickr</title>
+				<path d="M189.4,359.8c17,0,31.6,6,43.6,18c12,12,18,26.5,18,43.6v0c0,17-6,31.6-18,43.6c-12,12-26.5,18-43.6,18 c-17,0-31.6-6-43.6-18c-12-12-18-26.5-18-43.6c0-17,6-31.6,18-43.6C157.9,365.8,172.4,359.8,189.4,359.8z M-18,377.8 c-12,12-18,26.5-18,43.6c0,17,6,31.6,18,43.6c12,12,26.5,18,43.6,18c17,0,31.6-6,43.6-18c12-12,18-26.5,18-43.6v0 c0-17-6-31.6-18-43.6c-12-12-26.5-18-43.6-18C8.5,359.8-6,365.8-18,377.8z"/>
+				<image src="https://www.apnic.net/_designs/corporate-identity/img/icons/flickr.png" xlink:href="">
+			</symbol>
+			<symbol id="weibo" viewBox="-95 218.9 405 405">
+				<title>Weibo</title>
+				<path d="M82.7,547.6c-19.8-0.4-39.2-3.1-58.1-8.9c-16.2-4.9-31.4-11.9-44.7-22.4c-11.8-9.3-21-20.6-25.5-35.3 c-3.1-10.3-3.1-20.5-0.8-31c3-13.7,8.9-26.1,16.3-37.9c6.6-10.3,14.2-19.7,22.5-28.7c12.2-13.1,25.7-24.7,40.7-34.5 c9.9-6.4,20.3-11.8,31.6-15.2c7.4-2.2,15-3.7,22.8-2.4c11.6,1.8,18.3,9.3,19.2,21.1c0.5,7.3-0.9,14.2-2.9,21.1 c-0.1,0.3-0.2,0.6-0.3,0.9c-0.7,2.8,0.8,4.5,3.6,4c2.1-0.4,4.3-1.1,6.3-2c10.3-4.1,20.9-7.4,32-8.8c8.8-1.1,17.5-1.1,25.9,2.4 c7.9,3.4,12.3,9.5,13.1,18.1c0.6,7.1-1.3,13.8-3.8,20.3c-1.7,4.4-0.9,6.2,3.6,7.6c8,2.5,15.6,5.8,22.3,10.9 c7.7,5.8,13.3,13.1,15.7,22.6c2.3,9.2,1,18.2-2.4,26.9c-3.5,9-8.9,16.8-15.3,23.9c-9.9,10.9-21.7,19.3-34.6,26.2 c-19.8,10.5-41.1,16.5-63.3,19.1C98.8,546.7,90.7,547,82.7,547.6z M70.9,529.8c3.3-0.2,8.7-0.5,14.2-1.1c3.5-0.3,6.9-0.9,10.4-1.6 c15.2-2.9,29.7-8.1,42.8-16.4c10.4-6.6,19.5-14.7,25.6-25.5c7.5-13.1,8.8-26.7,2.3-40.7c-4.4-9.5-11.5-16.6-20.1-22.3 c-15-10-31.8-14.6-49.5-16.2c-8.8-0.8-17.6-0.7-26.4,0.2c-11.1,1.1-21.9,3.4-32.3,7.2c-15,5.4-28.7,13.1-39.8,24.9 c-8.5,9-14.3,19.5-15,32.1c-0.6,10.1,2.4,19.1,8.2,27.3c6.9,9.6,16.2,16.3,26.8,21.3C34,526.7,51.1,529.6,70.9,529.8z M189.1,319.2 c12.8,1.8,23.8,7.3,33,16.2c5.2,5.1,9.4,10.9,12.4,17.6c5.6,12.2,6.7,24.9,3.8,38c-0.7,3-1.6,6-1.7,9c-0.2,4.6,3.3,8.8,7.7,10.2 c4.7,1.5,9.9,0,12.7-3.6c2.1-2.7,2.7-5.9,3.5-9c2.1-8.3,2.9-16.8,2.3-25.4c-0.2-2.5-0.4-4.9-0.8-7.4c-1.6-10-4.8-19.5-9.9-28.3 c-4.9-8.4-11-15.8-18.5-22.1c-8.6-7.2-18.3-12.4-29.1-15.6c-7.6-2.2-15.3-3.5-23.2-3.6c-5.7-0.1-11.3,0.7-16.8,1.8 c-6.7,1.3-10.3,5.9-9.9,12.6c0.3,6.3,6.8,11.3,13,10.3c4.4-0.7,8.8-1.2,12.5-1.7C183.6,318.6,186.4,318.8,189.1,319.2z M176.7,338 c-1.3,0.1-2.7,0.4-4,0.6c-5.3,1-8.8,6.1-7.8,11.4c1.2,5.9,6,9,12.1,8c2.2-0.4,4.6-0.5,6.9-0.1c11.5,1.6,19.7,13.6,16.2,25.2 c-0.5,1.6-0.7,3.4-0.5,5c0.6,4.8,4,8.1,8.4,8.5c5.4,0.4,9.3-2.1,10.8-7c1.6-5.1,2.2-10.4,1.7-15.8c-0.8-8.6-4-16.2-9.7-22.6 c-7.9-8.9-17.9-13.4-29.9-13.2C179.5,337.9,178.1,337.9,176.7,338z M66.7,516.9c-12.5-0.1-23.2-3.1-32.2-10.6 c-13.4-11-17.5-28.9-10.2-44.9c5.9-13,16.1-21.6,29.2-26.7c14.6-5.7,29.3-5.8,43.6,1c11.5,5.5,19.1,14.4,21.7,27 c2,10-0.1,19.4-5.3,28.1c-8.4,13.9-21.1,21.6-36.7,25c-1.3,0.3-2.6,0.5-4,0.6C70.4,516.7,68.1,516.8,66.7,516.9z M71.6,481.5 c0-6.8-3.3-11.5-8.5-13.6c-9.6-3.7-21.5,1.9-24.8,11.8c-2.6,7.8,1.5,15.4,9.4,17.6c4.4,1.2,8.7,0.8,12.7-1.2 C67.1,493,71.1,487.9,71.6,481.5z M80.8,459.5c-3.9,0-7.3,3.1-7.3,6.7c0,3,2.4,5.2,5.5,5.2c3.8,0,7.4-3.4,7.3-6.8 C86.4,461.7,84,459.5,80.8,459.5z"/>
+				<image src="https://www.apnic.net/_designs/corporate-identity/img/icons/weibo.png" xlink:href="">
+			</symbol>
+			<symbol id="slideshare" viewBox="-95 218.9 405 405">
+				<title>Slideshare</title>
+				<path d="M202.5,463.6c1.7,11,3.8,21.2,4.8,31.4c1.7,18.5-2.4,35.8-14.1,50.7c-12.6,15.9-29.3,22.2-49.3,19.8 c-12.2-1.4-22-10.2-24.8-22.5c-3-13.2-1.8-26.6-1.1-39.5c31.3-16,36.5-20.1,38.2-31C138,483.7,118.9,486,98,479.9 c-0.3,4-0.7,6.8-0.7,9.7c-0.1,13.1-0.4,26.2,0,39.3c1,27.6-17.1,42.4-46.6,35.6c-20.8-4.8-33.2-19.3-39.8-39.1 c-5.2-15.5-4.3-31.2-1.1-46.9c0.9-4.5,1.8-8.9,2.9-14.4c-2.5-1.7-5.1-3.6-7.9-5.3c-17.1-10.7-31.3-24.2-40.8-42.2 c-1-1.9-1.9-3.8-2.7-5.8c-3.4-8.9-0.9-12.7,8.5-12.7c1.2,0,2.3,0,4.6,0c0-4,0-7.6,0-11.2c0-25.9-0.1-51.8,0.1-77.7 c0-5.1,0.5-10.5,2.2-15.2c3.8-10.7,11.6-16.9,23.3-17.3c2.1-0.1,4.3-0.1,6.4-0.1c67.3,0,134.6,0,201.9,0.1c5.1,0,10.5,0.2,15.3,1.8 c12.1,4,18.9,14.4,19,28.3c0.2,26.8,0.1,53.6,0.1,80.4c0,3.6,0,7.2,0,10.8c12.2,0.4,14.6,3.8,10.2,14c-7.8,17.8-20.7,31.4-36.4,42.4 C212,457.5,207.4,460.4,202.5,463.6z M226.2,416.4c0.3-2.1,0.7-3.3,0.7-4.5c0-35.6,0.2-71.2,0-106.8c-0.1-10.1-3.9-13.4-14.2-13.5 c-23.1-0.1-46.2,0-69.4,0c-44.7,0-89.4-0.1-134.2,0.1c-4.3,0-9,1.2-12.9,3.2c-4.6,2.4-4.5,7.6-4.5,12.2c0,33.8,0,67.5,0,101.3 c0,2.7,0.5,5.4,0.8,7.9c11.5,8.6,23.9,14.2,37.2,17.9c15.2,4.3,30.7,4.1,46.2,3.4c9.7-0.5,17.8,2,24.8,9.1c3.6,3.6,8.1,6.5,12.3,9.3 c1.8,1.2,4.2,1.6,6.4,2.4c3.1-17.5,7.2-20.8,24.7-20.7c8.5,0.1,17.1,0.5,25.5-0.1C190.5,436.2,209.3,429.3,226.2,416.4z M94.6,387.5 c0.4-18.8-15.6-35.1-34.6-35c-18.6,0-34.3,15.6-34.4,34.2C25.5,405.2,41,421,59.7,421.2C78.2,421.5,94.2,406.1,94.6,387.5z  M154.3,421.2c19,0.3,35.2-15.7,35.1-34.5c-0.1-18.6-15.8-34.2-34.4-34.3c-18.6-0.1-34.3,15.4-34.5,34.1 C120.3,405.3,135.5,420.9,154.3,421.2z"/>
+				<image src="https://www.apnic.net/_designs/corporate-identity/img/icons/slideshare.png" xlink:href="">
+			</symbol>
+			<symbol id="rss" viewBox="-95 218.9 405 405">
+				<title>RSS</title>
+				<path d="M17.2,466.6c24.9,0,45.2,20.2,45.2,45.2s-20.2,45.2-45.2,45.2S-28,536.7-28,511.7S-7.8,466.6,17.2,466.6z M-28,421.4 c74.8,0,135.5,60.7,135.5,135.5h45.2c0-99.8-80.9-180.7-180.7-180.7V421.4z M-28,331.1c124.7,0,225.8,101.1,225.8,225.8H243 c0-149.7-121.3-271-271-271V331.1z"/>
+				<image src="https://www.apnic.net/_designs/corporate-identity/img/icons/rss.png" xlink:href="">
+			</symbol>
+			<symbol id="linkedin" viewBox="-115 218.9 405 405">
+				<title>LinkedIn</title>
+				<path d="M248.3,502.7c3.1-0.4,4.7-2.1,4.7-5c0-3.5-2.1-5.2-6.5-5.2h-7V511h2.6v-8h3.3l0.1,0.1l5.1,7.9h2.8l-5.4-8.2L248.3,502.7z M245.2,500.8h-3.1v-6.2h3.9c2,0,4.3,0.3,4.3,3C250.4,500.6,248.1,500.8,245.2,500.8z M245.5,484.3c-9.8,0-17.5,7.7-17.5,17.4 c0,9.8,7.7,17.4,17.5,17.4c9.8,0,17.5-7.7,17.5-17.4C263,492,255.3,484.3,245.5,484.3z M245.5,516.9c-8.3,0-14.9-6.6-14.9-15.2 c0-8.6,6.6-15.2,14.9-15.2c8.4,0,14.9,6.6,14.9,15.2C260.4,510.3,253.9,516.9,245.5,516.9z M197.3,289H-28.5 C-39.2,289-48,297.5-48,308v226.7c0,10.5,8.8,19.1,19.5,19.1h225.7c10.8,0,19.6-8.6,19.6-19.1V308C216.9,297.5,208.1,289,197.3,289z M30.6,514.7H-8.8V388.3h39.3V514.7z M10.9,371c-12.6,0-22.8-10.2-22.8-22.8c0-12.6,10.2-22.8,22.8-22.8c12.6,0,22.8,10.2,22.8,22.8 C33.7,360.8,23.5,371,10.9,371z M177.7,514.7h-39.3v-61.5c0-14.7-0.3-33.5-20.4-33.5c-20.4,0-23.6,16-23.6,32.5v62.5H55.2V388.3 h37.7v17.3h0.5c5.2-9.9,18.1-20.4,37.2-20.4c39.8,0,47.1,26.2,47.1,60.2V514.7z"/>
+				<image src="https://www.apnic.net/_designs/corporate-identity/img/icons/linkedin.png" xlink:href="">
+			</symbol>
+			<symbol id="search" viewBox="0 0 50 50">
+				<title>Search</title>
+				<path d="M40.9,38l-8.6-8.6c1.5-2,2.4-4.4,2.4-7.1c0-6.5-5.3-11.8-11.8-11.8s-11.8,5.3-11.8,11.8s5.3,11.8,11.8,11.8 c2,0,4-0.5,5.7-1.4l8.8,8.8L40.9,38z M15.1,22.3c0-4.3,3.5-7.8,7.8-7.8s7.8,3.5,7.8,7.8c0,4.3-3.5,7.8-7.8,7.8S15.1,26.6,15.1,22.3z"/>
+			</symbol>
+			</svg>
+
+		<div class="awci-container">
+
+	<div class="banner" role="header">
+
+	<a class="banner__logo" href="https://www.apnic.net" title="Home">
+	<svg viewBox="0 0 537.3 146.5" xmlns="http://www.w3.org/2000/svg">
+	<path d="M132.4,143.9H130h-4.2H97.9h-2.5h-1.4l-0.4-1.3l-0.6-2.2l-5.5-20.1h-42l-6.3,20.2l-0.6,2.1l-0.4,1.3H37h-2.4H6.7H2.5H0 l0.8-2.4l1.1-3.7L44.3,3.5l0.6-2.1l0.4-1.3h1.3H49h35h2.4h1.3l0.4,1.3l0.7,2.1l41.7,134.3l1.2,3.7L132.4,143.9L132.4,143.9z  M54.1,91.6h25.3L66.9,47.2l-0.2,0.2L56,84.3L54.1,91.6z M175.2,143.9h-1.8h-2.9h-26.6H141h-1.8v-1.7v-0.1V8V2.1V0.3h1.8h2.9H192 c16,0,28.6,3.5,37.5,10.5c9.6,7.5,14.6,20.4,14.6,35.8c0,15.7-5.3,29.6-14.6,37c-8.8,7-21.5,10.5-37.5,10.5h-16.9v45.1v2.9V143.9 L175.2,143.9z M175.2,62.9h16.7c16.4,0,18.7-6.7,18.7-16.3c0-9.5-2.3-16.1-18.7-16.1h-16.7V62.9L175.2,62.9z M257.5,144V2.7h20.6 l46.7,71.5c10.8,16.6,19.3,31.5,26.2,45.9l0.4-0.2c-1.7-18.9-2.2-36.1-2.2-58.1V2.7H367V144h-19l-46.3-71.7 c-10.2-15.7-19.9-31.9-27.3-47.2l-0.6,0.2c1.1,17.8,1.5,34.8,1.5,58.3V144H257.5z M411.5,2.7V144h-18.8V2.7H411.5z M533.4,124.9 c-9.9,3.8-18.5,5.3-29.3,5.3c-33.2,0-54.8-23.3-54.8-58.8c0-32.3,21.4-55.4,51.3-55.4c12.2,0,21.7,2.6,31.2,8.4l4.8-15.8 c-2.8-1.6-5.3-2.7-8.8-3.9C519.6,1.5,510.6,0,501.4,0c-40.4,0-71,31.2-71,72.5c0,43.4,30.2,74,72.7,74c6.6,0,12.4-0.6,19.5-2.4 c5.8-1.4,9.1-2.5,14.8-5L533.4,124.9z"></path>
+	<image src="https://www.apnic.net/__data/assets/image/0003/69384/apnic-logotype-200x55.png" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="">
+	</image></svg>
+	</a>
+
+	<div class="banner__utils">
+					<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'en',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    gaTrack: true,
+    gaId: 'UA-3140864-13'
+  }, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script>
+$('#google_translate_element').hide();
+function changeLanguageText() {
+  if ($('.goog-te-menu-value span:first-child').text() == "Select Language") {    
+    $('.goog-te-menu-value span:first-child').html('Google Translate');
+    $('#google_translate_element').show();
+  } else {
+    setTimeout(changeLanguageText, 50);
+  }
+}
+changeLanguageText();
+</script>        
+<style>
+#banner #google_translate_element img {
+    width: inherit;
+    height: inherit;
+    position: inherit;
+    top: inherit;
+}
+#google_translate_element{
+    display: inline;
+    float:left;
+}
+</style>
+	<a class="awci-button awci-button--brand banner__utils-login" href="https://myapnic.net">MyAPNIC</a>
+	<a class="awci-button banner__utils-contact" href="https://www.apnic.net/about-APNIC/organization/contact-APNIC">CONTACT US</a>
+	<form action="http://blog.apnic.net/" id="searchform" role="search" class="awci-form banner__utils-search search">
+	<input class="awci-form-input search-text-input" type="search" name="s" placeholder="SEARCH BLOG">
+	<button class="awci-button search-button" type="submit" name="sa" value="Go">
+	<svg class="search-button-icon" role="presentation">
+	<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#search"></use>
+	<image src="https://www.apnic.net/_designs/corporate-identity/img/icons/search.png" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href=""></image>
+	</svg>
+	</button>
+	</form>
+	</div>
+
+	<div class="banner__glyph banner__glyph--blue-1"></div>
+
+	</div>
+
+	</div>
+
+<script>
+	(function(){
+		// Set a random glyph
+
+		// Random colour by default, but some sections are themed a particular colour
+		var colour = _.sample(["blue" , "darkgreen" , "lightgreen" , "orange" , "purple" , "yellow"]);
+		colour = "blue";
+		var position = _.random(1, 5);
+		var selector = "banner__glyph banner__glyph--" + colour + "-" + position;
+		$('.banner__glyph').attr('class',selector);
+
+		// Add your IP address
+		$.ajax({
+			url: "https://cgi1.apnic.net/cgi-bin/my-ip.php",
+			jsonp: "callback",
+			dataType: "jsonp",
+			success: function( response ) {
+				var $node = $('#ip');
+				var txt = $node.text();
+				var ip = response.ip;
+				var ipv6 = ip.indexOf(':')!=-1;
+				var url = "https://www.apnic.net/apnic-info/whois_search/your-ip";
+				var markup = txt + " <a href='" + url + "'>" + ip + "</a>";
+				$node.html(markup);
+				if(ipv6){
+					$node.prepend('<strong id="via-ipv6" class="apnic-sprite apnic-sprite-icons"><span>Connected Via IPv6</span></strong>');
+				}
+			}
+		});
+	}).call(this);
+</script>
+
+-->
+
+<a class="skip-link sr-only" href="#content">Skip to content</a>
+
+<div class="utilities">
+	<div class="container">
+		<div id="search" class="utility utility-search">
+			<form role="search" method="get" action="https://blog.apnic.net" class="utility-search-form form">
+				<div class="form-group form-group-sm">
+					<label for="s" class="sr-only">Blog </label>
+					<div class="input-group">
+						<input id="form-search" class="form-control" name="s" placeholder="BLOG SEARCH" type="text"><span class="input-group-btn">
+							<button type="submit" class="btn btn-s">
+								<span class="sr-only">Search</span>
+								<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+							</button>
+						</span>
+					</div>
+					<span class="help-block"><a class="btn btn-s" href="https://wq.apnic.net/whois-search/static/search.html">
+						<span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Advanced Whois</a>
+					</span>
+				</div>
+			</form>
+			</div><!--
+		--><div class="utility"><a href="https://wq.apnic.net/whois-search/static/search.html">Advanced Whois <span class="glyphicon glyphicon-cog" aria-hidden="true"></span></a></div><!--
+		--><div class="utility"><a href="https://www.apnic.net/get-ip/apnic-membership/billing-procedure/make-a-payment/">Make a payment</a></div><!--
+		--><div class="utility"><a href="https://myapnic.net/">Login</a></div>
+	</div>
+</div>
+
+
+<header class="header">
+
+	<div class="container">
+
+		<div class="header-logo">
+			<a href="https://www.apnic.net/" class="header-logo-image"><img src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/apnic.svg" alt="APNIC"></a>
+		</div>
+		<!-- .header-logo -->
+
+		<div id="glyph" class="header-glyph header-glyph-blue-0"></div>
+		<!-- .header-glyph -->
+
+		<div class="header-mobile">
+
+			<a id="navigation-toggle" href="#navigation" class="header-mobile-cell header-mobile-navigation-toggle">
+				<span class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
+			</a>
+			<!-- #navigation-toggle -->
+
+			<span class="header-mobile-cell header-mobile-logo"><a href="#"><img src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/apnic-reverse.svg" alt="APNIC"></a>
+			</span>
+			<!-- .header-mobile-logo -->
+
+			<a id="search-toggle" href="#search" class="header-mobile-cell header-mobile-search-toggle">
+				<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+			</a>
+			<!-- #search-toggle -->
+
+		</div>
+		<!-- .header-mobile -->
+
+	</div>
+	<!-- .container -->
+
+</header>
+<!-- .header -->
+
+<div class="container">
+
+    <nav id="navigation" class="navigation">
+
+        <ul class="navigation-menu navigation-more is-hidden">
+            <li class="navigation-item has-dropdown"><span>More</span>
+                <ul class="navigation-sub-menu"></ul>
+            </li>
+        </ul>
+
+        <ul class="navigation-menu navigation-visible">
+            <li class="navigation-item has-dropdown"><a href="https://www.apnic.net/get-ip/">Get IP</a>
+                <ul class="navigation-sub-menu">
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/get-ip/get-ip-addresses-asn/">Get IP
+                            Addresses / ASN</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/get-ip/apnic-membership/billing-procedure/make-a-payment/">Make
+                            a payment</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/get-ip/helpdesk/">Helpdesk</a></li>
+                    <li class="navigation-sub-item is-active"><a href="https://www.apnic.net/get-ip/apnic-membership/">Membership</a>
+                    </li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/get-ip/faqs/">FAQs</a></li>
+                </ul>
+            </li>
+            <li class="navigation-item has-dropdown"><a href="https://www.apnic.net/manage-ip/">Manage IP</a>
+                <ul class="navigation-sub-menu">
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/manage-ip/myapnic/">MyAPNIC</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/manage-ip/manage-resources/transfer-resources/">Transfer IP
+                            and ASNs</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/manage-ip/using-whois/">Using
+                            Whois</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/community/ipv6/">Go IPv6</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/manage-ip/manage-resources/reverse-dns/">Reverse DNS</a>
+                    </li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/manage-ip/apnic-services/routing-registry/">Routing
+                            Registry</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/get-ip/apnic-membership/billing-procedure/make-a-payment/">Make
+                            a payment</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/get-ip/faqs/">FAQs </a></li>
+                </ul>
+            </li>
+            <li class="navigation-item has-dropdown"><a href="https://training.apnic.net/">Training</a>
+                <ul class="navigation-sub-menu">
+                    <li class="navigation-sub-item"><a href="https://training.apnic.net/about/">About</a></li>
+                    <li class="navigation-sub-item"><a href="https://training.apnic.net/events">Events</a></li>
+                    <li class="navigation-sub-item"><a href="https://training.apnic.net/courses">Courses</a></li>
+                    <li class="navigation-sub-item"><a href="https://training.apnic.net/sponsor/">Sponsor</a></li>
+                    <li class="navigation-sub-item"><a href="https://training.apnic.net/fees/">Fees</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.youtube.com/user/APNICTraining/">Videos</a>
+                    </li>
+                    <li class="navigation-sub-item"><a href="https://training.apnic.net/community-trainers/">Community
+                            Trainers</a></li>
+                    <li class="navigation-sub-item"><a href="https://academy.apnic.net/">APNIC Academy</a></li>
+                </ul>
+            </li>
+            <li class="navigation-item has-dropdown"><a href="https://www.apnic.net/events/">Events</a>
+                <ul class="navigation-sub-menu">
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/events/conferences/">Conferences</a>
+                    </li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/events/calendar/">Calendar</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/events/sponsor-an-event">Sponsorship</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/events/apnic-community-code-of-conduct/">Code of Conduct</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="navigation-item has-dropdown"><a href="https://labs.apnic.net/">Research</a>
+                <ul class="navigation-sub-menu">
+                    <li class="navigation-sub-item"><a href="https://labs.apnic.net/">Labs</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/statistics/">Statistics</a></li>
+                </ul>
+            </li>
+            <li class="navigation-item has-dropdown"><a href="https://www.apnic.net/community/">Community</a>
+                <ul class="navigation-sub-menu">
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/community/policy/">Policy
+                            Development</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/community/policy/current/">Addressing
+                            policies</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/community/ecosystem/">Internet
+                            community</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/events/apnic-community-code-of-conduct/">Code of Conduct</a>
+                    </li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/community/support/technical-assistance/">Technical
+                            Assistance</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/community/support/root-servers/">Root
+                            servers</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/community/security/">Security at
+                            APNIC</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/community/support/isif/">ISIF
+                            Asia</a></li>
+                    <li class="navigation-sub-item"><a href="https://apnic.foundation/">APNIC Foundation</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/community/participate/elections/nro-elections/">NRO NC</a>
+                    </li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/community/participate/mailinglists/">Mailing
+                            lists</a></li>
+                </ul>
+            </li>
+            <li class="navigation-item is-active"><a href="https://blog.apnic.net/">Blog</a></li>
+            <li class="navigation-item has-dropdown is-right"><a href="https://www.apnic.net/about-apnic/">About</a>
+                <ul class="navigation-sub-menu">
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/about-apnic/organization/apnics-region/">APNIC Region</a>
+                    </li>
+                    <li class="navigation-sub-item is-active"><a href="https://www.apnic.net/get-ip/apnic-membership/">APNIC
+                            Membership</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/about-apnic/organization/structure/apnic-executive-council/">Executive
+                            Council</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/about-apnic/service-updates/">Service
+                            updates</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/about-apnic/team/">Team</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/about-apnic/corporate-documents/annual-reports/">Annual
+                            Reports</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/about-apnic/transparency/">Transparency</a>
+                    </li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/about-apnic/corporate-documents/">Corporate
+                            Documents</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/about-apnic/publications-archive/">Publications
+                            Archive</a></li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/about-apnic/employment/">Careers</a>
+                    </li>
+                    <li class="navigation-sub-item"><a href="https://www.apnic.net/about-apnic/a-z-glossary/">Glossary</a></li>
+                </ul>
+            </li>
+            <li class="navigation-item"><a href="https://www.apnic.net/about-apnic/organization/contact-apnic/">Contact</a></li>
+        </ul>
+        <ul class="navigation-menu navigation-actions">
+            <li class="navigation-item navigation-item-login"><a href="https://myapnic.net/">MyAPNIC</a></li>
+        </ul>
+
+    </nav>
+    <!-- .navigation -->
+
+</div>
+<!-- .container -->
+        <!-- Site Top Level Nav -->
+
+        <div id="page" class="hfeed site container">
+            <div class="content">
+            	<div id="main" class="grid grid-inline grid-gutter">
+	<section id="primary" class="site-content col size-md-9-of-12">
+		<div id="content" role="main" class="grid grid-float grid-gutter">
+
+			
+<div class="col col size-md-4-of-12">
+		<header class="entry-header">
+			<h1 class="entry-title">Internet protocols are changing</h1>
+                        <p class="meta-author-and-date">By <a href="https://blog.apnic.net/author/mark-nottingham/" title="Posts by Mark Nottingham" rel="author">Mark Nottingham</a> on 12 Dec 2017</p>
+<p>Category:
+<a href="https://blog.apnic.net/category/tech-matters/" title="View all posts in Tech matters">Tech matters</a></p><p>Tags: <a href="https://blog.apnic.net/tag/dns/" rel="tag">DNS</a>, <a href="https://blog.apnic.net/tag/doh/" rel="tag">DOH</a>, <a href="https://blog.apnic.net/tag/guest-post/" rel="tag">Guest Post</a>, <a href="https://blog.apnic.net/tag/http/" rel="tag">HTTP</a>, <a href="https://blog.apnic.net/tag/ietf/" rel="tag">IETF</a>, <a href="https://blog.apnic.net/tag/quic/" rel="tag">QUIC</a>, <a href="https://blog.apnic.net/tag/tls/" rel="tag">TLS</a>, <a href="https://blog.apnic.net/tag/protocol/" rel="tag">protocol</a></p><p><a href="#comments">24 Comments</a></p>
+<div id="social_media_widgets"><div class="fb-like" data-href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/" data-layout="button_count" data-action="like" data-show-faces="false" data-share="true"></div><a href="https://twitter.com/share" class="twitter-share-button">Tweet</a><div class="pocket-btn"><iframe id="pocket-button-0" allowtransparency="true" scrolling="NO" src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/button.html" width="66" height="22" frameborder="0"></iframe></div>
+<script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script></div>
+                    <p id="back-to-home" class="hidden-print"><a href="https://blog.apnic.net/"><span class="glyphicon glyphicon-chevron-left"></span> Blog home</a></p>
+		</header><!-- .entry-header -->
+<style>
+.down-arrow{font-size:10px;}
+</style>
+</div><!-- /.col-md-4-->
+<div class="col size-md-8-of-12">
+
+		<div class="entry-content">
+                            <img src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/evolution-555x202.png" class="attachment-featuredImageLarge size-featuredImageLarge wp-post-image" alt="" srcset="https://blog.apnic.net/wp-content/uploads/2017/12/evolution.png 555w, https://blog.apnic.net/wp-content/uploads/2017/12/evolution-300x110.png 300w, https://blog.apnic.net/wp-content/uploads/2017/12/evolution-206x75.png 206w, https://blog.apnic.net/wp-content/uploads/2017/12/evolution-256x93.png 256w" sizes="(max-width: 555px) 100vw, 555px" width="555" height="202">			<p>When
+ the Internet started to become widely used in the 1990s, most traffic 
+used just a few protocols: IPv4 routed packets, TCP turned those packets
+ into connections, SSL (later TLS) encrypted those connections, DNS 
+named hosts to connect to, and HTTP was often the application protocol 
+using it all.</p>
+<p>For many years, there were negligible changes to these core Internet 
+protocols; HTTP added a few new headers and methods, TLS slowly went 
+through minor revisions, TCP adapted congestion control, and DNS 
+introduced features like DNSSEC. The protocols themselves looked about 
+the same ‘on the wire’ for a very long time (excepting IPv6, which 
+already gets its fair amount of attention in the network operator 
+community.)</p>
+<p>As a result, network operators, vendors, and policymakers that want 
+to understand (and sometimes, control) the Internet have adopted a 
+number of practices based upon these protocols’ wire ‘footprint’ — 
+whether intended to debug issues, improve quality of service, or impose 
+policy.</p>
+<p>Now, significant changes to the core Internet protocols are underway.
+ While they are intended to be compatible with the Internet at large 
+(since they won’t get adoption otherwise), they might be disruptive to 
+those who have taken liberties with undocumented aspects of protocols or
+ made an assumption that things won’t change.</p>
+<h4>Why we need to change the Internet</h4>
+<p>There are a number of factors driving these changes.</p>
+<p>First, the limits of the core Internet protocols have become 
+apparent, especially regarding performance. Because of structural 
+problems in the application and transport protocols, the network was not
+ being used as efficiently as it could be, leading to end-user perceived
+ performance (in particular, latency).</p>
+<p>This translates into a strong motivation to evolve or replace those protocols because there is a <a href="https://www.smashingmagazine.com/2015/09/why-performance-matters-the-perception-of-time/" target="_blank" rel="noopener">large body of experience showing the impact of even small performance gains</a>.</p>
+<p>Second, the ability to evolve Internet protocols — at any layer — has
+ become more difficult over time, largely thanks to the unintended uses 
+by networks discussed above. For example, HTTP proxies that tried to 
+compress responses made it more difficult to deploy new compression 
+techniques; TCP optimization in middleboxes made it more difficult to 
+deploy improvements to TCP.</p>
+<p>Finally, <a href="https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/46197.pdf" target="_blank" rel="noopener">we are in the midst of a shift towards more use of encryption on the Internet</a>,
+ first spurred by Edward Snowden’s revelations in 2015. That’s really a 
+separate discussion, but it is relevant here in that encryption is one 
+of best tools we have to ensure that protocols can evolve.</p>
+<p>Let’s have a look at what’s happened, what’s coming next, how it might impact networks, and how networks impact protocol design.</p>
+<h4>HTTP/2</h4>
+<p><a href="https://http2.github.io/" target="_blank" rel="noopener">HTTP/2</a>
+ (based on Google’s SPDY) was the first notable change — standardized in
+ 2015, it multiplexes multiple requests onto one TCP connection, thereby
+ avoiding the need to queue requests on the client without blocking each
+ other. It is now widely deployed, and supported by all major browsers 
+and web servers.</p>
+<p>From a network’s viewpoint, HTTP/2 made a few notable changes. First,
+ it’s a binary protocol, so any device that assumes it’s HTTP/1.1 is 
+going to break.</p>
+<p>That breakage was one of the primary reasons for another big change 
+in HTTP/2; it effectively requires encryption. This gives it a better 
+chance of avoiding interference from intermediaries that assume it’s 
+HTTP/1.1, or do more subtle things like strip headers or block new 
+protocol extensions — both things that had been seen by some of the 
+engineers working on the protocol, causing significant support problems 
+for them.</p>
+<p><a href="http://httpwg.org/specs/rfc7540.html#TLSUsage" target="_blank" rel="noopener">HTTP/2 also requires TLS/1.2 to be used when it is encrypted</a>, and <a href="http://httpwg.org/specs/rfc7540.html#BadCipherSuites" target="_blank" rel="noopener">blacklists </a>cipher
+ suites that were judged to be insecure — with the effect of only 
+allowing ephemeral keys. See the TLS 1.3 section for potential impacts 
+here.</p>
+<p>Finally, HTTP/2 allows more than one host’s requests to be <a href="http://httpwg.org/specs/rfc7540.html#reuse" target="_blank" rel="noopener">coalesced onto a connection</a>, to improve performance by reducing the number of connections (and thereby, congestion control contexts) used for a page load.</p>
+<p>For example, you could have a connection for <tt>www.example.com</tt>, but also use it for requests for <tt>images.example.com</tt>. <a href="https://tools.ietf.org/html/draft-bishop-httpbis-http2-additional-certs" target="_blank" rel="noopener">Future protocol extensions might also allow additional hosts to be added to the connection</a>,
+ even if they weren’t listed in the original TLS certificate used for 
+it. As a result, assuming that the traffic on a connection is limited to
+ the purpose it was initiated for isn’t going to apply.</p>
+<p>Despite these changes, it’s worth noting that HTTP/2 doesn’t appear 
+to suffer from significant interoperability problems or interference 
+from networks.</p>
+<h4>TLS 1.3</h4>
+<p><a href="https://datatracker.ietf.org/doc/draft-ietf-tls-tls13/" target="_blank" rel="noopener">TLS 1.3</a> is just going through the final processes of standardization and is already supported by some implementations.</p>
+<p>Don’t be fooled by its incremental name; this is effectively a new 
+version of TLS, with a much-revamped handshake that allows application 
+data to flow from the start (often called ‘0RTT’). The new design relies
+ upon ephemeral key exchange, thereby ruling out static keys.</p>
+<p>This has caused concern from some network operators and vendors — in 
+particular those who need visibility into what’s happening inside those 
+connections.</p>
+<p>For example, consider the datacentre for a bank that has regulatory 
+requirements for visibility. By sniffing traffic in the network and 
+decrypting it with the static keys of their servers, they can log 
+legitimate traffic and identify harmful traffic, whether it be attackers
+ from the outside or employees trying to leak data from the inside.</p>
+<p>TLS 1.3 doesn’t support that particular technique for intercepting traffic, since it’s also <a href="https://en.wikipedia.org/wiki/Forward_secrecy" target="_blank" rel="noopener">a form of attack that ephemeral keys protect against</a>.
+ However, since they have regulatory requirements to both use modern 
+encryption protocols and to monitor their networks, this puts those 
+network operators in an awkward spot.</p>
+<p>There’s been much debate about whether regulations require static 
+keys, whether alternative approaches could be just as effective, and 
+whether weakening security for the entire Internet for the benefit of 
+relatively few networks is the right solution. Indeed, it’s still 
+possible to decrypt traffic in TLS 1.3, but you need access to the 
+ephemeral keys to do so, and by design, they aren’t long-lived.</p>
+<p>At this point it doesn’t look like TLS 1.3 will change to accommodate
+ these networks, but there are rumblings about creating another protocol
+ that allows a third party to observe what’s going on— and perhaps more —
+ for these use cases. Whether that gets traction remains to be seen.</p>
+<h4>QUIC</h4>
+<p>During work on HTTP/2, it became evident that TCP has similar 
+inefficiencies. Because TCP is an in-order delivery protocol, the loss 
+of one packet can prevent those in the buffers behind it from being 
+delivered to the application. For a multiplexed protocol, this can make a
+ big difference in performance.</p>
+<p><a href="https://quicwg.github.io/" target="_blank" rel="noopener">QUIC</a>
+ is an attempt to address that by effectively rebuilding TCP semantics 
+(along with some of HTTP/2’s stream model) on top of UDP. Like HTTP/2, 
+it started as a Google effort and is now in the IETF, with an initial 
+use case of HTTP-over-UDP and a goal of becoming a standard in late 
+2018. However, since Google has already deployed QUIC in the Chrome 
+browser and on its sites, it already accounts for more than 7% of 
+Internet traffic.</p>
+<p><strong>Read </strong><a href="https://blog.apnic.net/2016/08/30/questions-answered-quic/"><strong>Your questions answered about QUIC</strong></a></p>
+<p>Besides the shift from TCP to UDP for such a sizable amount of 
+traffic (and all of the adjustments in networks that might imply), both 
+Google QUIC (gQUIC) and IETF QUIC (iQUIC) require encryption to operate 
+at all; there is no unencrypted QUIC.</p>
+<p>iQUIC uses TLS 1.3 to establish keys for a session and then uses them
+ to encrypt each packet. However, since it’s UDP-based, a lot of the 
+session information and metadata that’s exposed in TCP gets encrypted in
+ QUIC.</p>
+<p>In fact, iQUIC’s current <a href="https://quicwg.github.io/base-drafts/draft-ietf-quic-transport.html#short-header" target="_blank" rel="noopener">‘short header’</a>
+ — used for all packets except the handshake — only exposes a packet 
+number, an optional connection identifier, and a byte of state for 
+things like the encryption key rotation schedule and the packet type 
+(which might end up encrypted as well).</p>
+<p>Everything else is encrypted — including ACKs, to raise the bar for <a href="https://www.mjkranch.com/docs/CODASPY17_Kranch_Reed_IdentifyingHTTPSNetflix.pdf" target="_blank" rel="noopener">traffic analysis</a> attacks.</p>
+<p>However, this means that passively estimating RTT and packet loss by 
+observing connections is no longer possible; there isn’t enough 
+information. This lack of observability has caused a significant amount 
+of concern by some in the operator community, who say that passive 
+measurements like this are critical for debugging and understanding 
+their networks.</p>
+<p>One proposal to meet this need is the ‘<a href="https://tools.ietf.org/html/draft-trammell-quic-spin" target="_blank" rel="noopener">Spin Bit</a>‘
+ — a bit in the header that flips once a round trip, so that observers 
+can estimate RTT. Since it’s decoupled from the application’s state, it 
+doesn’t appear to leak any information about the endpoints, beyond a 
+rough estimate of location on the network.</p>
+<h4>DOH</h4>
+<p>The newest change on the horizon is DOH — <a href="https://datatracker.ietf.org/wg/doh/about/" target="_blank" rel="noopener">DNS over HTTP</a>. A <a href="https://datatracker.ietf.org/meeting/99/materials/slides-99-maprg-fingerprint-based-detection-of-dns-hijacks-using-ripe-atlas/" target="_blank" rel="noopener">significant amount of research has shown that networks commonly use DNS as a means of imposing policy</a> (whether on behalf of the network operator or a greater authority).</p>
+<p>Circumventing this kind of control with encryption has been <a href="https://datatracker.ietf.org/wg/dprive/about/" target="_blank" rel="noopener">discussed for a while</a>,
+ but it has a disadvantage (at least from some standpoints) — it is 
+possible to discriminate it from other traffic; for example, by using 
+its port number to block access.</p>
+<p>DOH addresses that by piggybacking DNS traffic onto an existing HTTP 
+connection, thereby removing any discriminators. A network that wishes 
+to block access to that DNS resolver can only do so by blocking access 
+to the website as well.</p>
+<p>For example, if Google was to deploy its <a href="https://developers.google.com/speed/public-dns/" target="_blank" rel="noopener">public DNS service over DOH</a> on <tt>www.google.com</tt>
+ and a user configures their browser to use it, a network that wants (or
+ is required) to stop it would have to effectively block all of Google 
+(thanks to how they host their services).</p>
+<p>DOH has just started its work, but there’s already a fair amount of 
+interest in it, and some rumblings of deployment. How the networks (and 
+governments) that use DNS to impose policy will react remains to be 
+seen.</p>
+<p><strong>Read <a href="https://blog.apnic.net/2017/11/17/ietf-100-singapore-dns-http-doh/"><strong>IETF 100, Singapore: DNS over HTTP (DOH!)</strong></a></strong></p>
+<h4>Ossification and grease</h4>
+<p>To return to motivations, one theme throughout this work is how 
+protocol designers are increasingly encountering problems where networks
+ make assumptions about traffic.</p>
+<p>For example, TLS 1.3 has had a number of last-minute issues with 
+middleboxes that assume it’s an older version of the protocol. gQUIC 
+blacklists several networks that throttle UDP traffic, because they 
+think that it’s harmful or low-priority traffic.</p>
+<p>When a protocol can’t evolve because deployments ‘freeze’ its extensibility points, we say it has <em>ossified</em>.
+ TCP itself is a severe example of ossification; so many middleboxes do 
+so many things to TCP — whether it’s blocking packets with TCP options 
+that aren’t recognized, or ‘optimizing’ congestion control.</p>
+<p>It’s necessary to prevent ossification, to ensure that protocols can 
+evolve to meet the needs of the Internet in the future; otherwise, it 
+would be a ‘tragedy of the commons’ where the actions of some individual
+ networks — although well-intended — would affect the health of the 
+Internet overall.</p>
+<p>There are many ways to prevent ossification; if the data in question 
+is encrypted, it cannot be accessed by any party but those that hold the
+ keys, preventing interference. If an extension point is unencrypted but
+ commonly used in a way that would break applications visibly (for 
+example, HTTP headers), it’s less likely to be interfered with.</p>
+<p>Where protocol designers can’t use encryption and an extension point 
+isn’t used often, artificially exercising the extension point can help; 
+we call this <em>greasing</em> it.</p>
+<p>For example, QUIC encourages endpoints to use a range of decoy values in its <a href="https://quicwg.github.io/base-drafts/draft-ietf-quic-transport.html#rfc.section.3.7" target="_blank" rel="noopener">version negotiation</a>,
+ to avoid implementations assuming that it will never change (as was 
+often encountered in TLS implementations, leading to significant 
+problems).</p>
+<h4>The network and the user</h4>
+<p>Beyond the desire to avoid ossification, these changes also reflect 
+the evolving relationship between networks and their users. While for a 
+long time people assumed that networks were always benevolent — or at 
+least disinterested — parties, this is no longer the case, thanks not 
+only to <a href="https://tools.ietf.org/html/rfc7258" target="_blank" rel="noopener">pervasive monitoring</a> but also attacks like <a href="http://codebutler.com/firesheep" target="_blank" rel="noopener">Firesheep</a>.</p>
+<p>As a result, there is growing tension between the needs of Internet 
+users overall and those of the networks who want to have access to some 
+amount of the data flowing over them. Particularly affected will be 
+networks that want to impose policy upon those users; for example, 
+enterprise networks.</p>
+<p>In some cases, they might be able to meet their goals by installing 
+software (or a CA certificate, or a browser extension) on their users’ 
+machines. However, this isn’t as easy in cases where the network doesn’t
+ own or have access to the computer; for example, BYOD has become 
+common, and IoT devices seldom have the appropriate control interfaces.</p>
+<p>As a result, a lot of discussion surrounding protocol development in 
+the IETF is touching on the sometimes competing needs of enterprises and
+ other ‘leaf’ networks and the good of the Internet overall.</p>
+<h4>Get involved</h4>
+<p>For the Internet to work well in the long run, it needs to provide 
+value to end users, avoid ossification, and allow networks to operate. 
+The changes taking place now need to meet all three goals, but we need 
+more input from network operators.</p>
+<p>If these changes affect your network — or won’t— please leave comments below, or better yet, get involved in the <a href="https://www.ietf.org/" target="_blank" rel="noopener">IETF</a> by attending a meeting, joining a mailing list, or providing feedback on a draft.</p>
+<p>Thanks to Martin Thomson and Brian Trammell for their review.</p>
+<p><i><span style="color: #808080;">Mark Nottingham is a member of the Internet Architecture Board and co-chairs the IETF’s HTTP and QUIC Working Groups.</span><br>
+</i></p>
+<table class="rw-rating-table rw-ltr rw-left"><tbody><tr><td style="width: 118px; float: left;"><nobr>Rate this article</nobr></td><td style="float: left;"><div class="rw-left"><div class="rw-ui-container rw-urid-190890 rw-ui-star rw-size-small rw-dir-ltr rw-halign-right rw-valign-middle rw-style-oxygen rw-active rw-class-blog-post" data-img="https://blog.apnic.net/wp-content/uploads/2017/12/evolution.png" data-urid="190890" style=""><div class="rw-action-area"><ul class="rw-ui-stars"><li class="rw-ui-star-0 rw-ui-star-selected"></li><li class="rw-ui-star-1 rw-ui-star-selected"></li><li class="rw-ui-star-2 rw-ui-star-selected"></li><li class="rw-ui-star-3 rw-ui-star-selected"></li><li class="rw-ui-star-4 rw-ui-star-selected"></li></ul><a class="rw-report-link" target="_blank" href="https://rating-widget.com/my-rating-report/star/oxygen/rating-161924092-5/" rel="nofollow"></a></div><span class="rw-ui-info-container" style="background-color: rgb(255, 255, 255);"><i aria-hidden="true" class="rw-ui-info-nub rw-ui-info-outer-nub" style="border-right-color: rgba(0, 0, 0, 0.5);"></i><i aria-hidden="true" class="rw-ui-info-nub rw-ui-info-inner-nub" style="border-right-color: rgb(255, 255, 255);"></i><span class="rw-ui-info-inner-container" style="border-color: rgba(0, 0, 0, 0.5);"><span class="rw-ui-info" style="color: rgb(0, 0, 0);">Rate this (211 Votes)</span></span></span></div></div></td></tr></tbody></table>			<hr>
+
+<p id="views-disclaimer">The views expressed by the authors of this blog are their own and do not necessarily reflect the views of APNIC. Please note a <a href="http://blog.apnic.net/?p=395">Code of Conduct</a> applies to this blog.</p>
+		</div><!-- .entry-content -->
+
+		
+<div id="comments" class="comments-area">
+
+	
+			<h2 class="comments-title">
+			24 Comments		</h2>
+
+		<ol class="commentlist">
+				<li class="comment even thread-even depth-1" id="li-comment-48968">
+		<article id="comment-48968" class="comment">
+			<header class="comment-meta comment-author vcard">
+				<cite><b class="fn">Bill</b> </cite><a href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#comment-48968"><time datetime="2017-12-12T23:53:23+00:00">December 12, 2017 at 11:53 pm</time></a>			</header><!-- .comment-meta -->
+
+			
+			<section class="comment-content comment">
+				<p>Wow, maybe there is hope for an encrypted and unencumbered 
+internet for our future. This was a refreshing read, thanks for the 
+post.</p>
+<p>And I suppose thanks to all the engineers at the IETF (et al) that 
+are working their hardest to preserve a free-as-in-freedom and open 
+internet.</p>
+<p>My only comment is that, although enterprises and banks etc all have a
+ legitimate usecase for crippling the security of their employees and 
+other client software, despite that legit use, it is still a crippling 
+of security. Bending to such needs is how we got into the situation 
+where all modern x86 chips around the world are necessarily remotely 
+owned with no workaround or way to disable it. I ask that you do not 
+acquiesce to these requests, that you do not allow a general way in the 
+various protocols for networks to, as you describe it, “impose policies”
+ on their users. That is nothing less than the destruction of liberty 
+and openness on the internet, and it’s in everyone’s best interest to 
+preserve that to the utter maximum extent possible. I’m not sure how to 
+solve the problem where business legitimately need to control their own 
+computers remotely, but it should not be by the crippling of public and 
+global protocols.</p>
+<p>Thanks again for the years of hard, unrecognized service on these topics, and thanks for taking the time to share this post.</p>
+							</section><!-- .comment-content -->
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/?replytocom=48968#respond" onclick='return addComment.moveForm( "comment-48968", "48968", "respond", "19088" )' aria-label="Reply to Bill">Reply</a> <span>↓</span>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+	</li><!-- #comment-## -->
+	<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-48969">
+		<article id="comment-48969" class="comment">
+			<header class="comment-meta comment-author vcard">
+				<cite><b class="fn">Kyle</b> </cite><a href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#comment-48969"><time datetime="2017-12-13T02:25:20+00:00">December 13, 2017 at 2:25 am</time></a>			</header><!-- .comment-meta -->
+
+			
+			<section class="comment-content comment">
+				<p>Thank you for looking at ways to engineer a robust open platform.
+ Experience has shown we cannot rely on political action nor network 
+benevolence to guarantee it. I echo Bill’s concerns about not 
+acquiescing to the needs of “leaf” networks — if enterprise networks 
+absolutely must “enforce policy” in certain ways, then they need to be 
+responsible for deploying the intentionally-crippled hardware to their 
+employees, rather than demanding the network itself be crippled so they 
+can foist the cost of hardware onto their workers.</p>
+							</section><!-- .comment-content -->
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/?replytocom=48969#respond" onclick='return addComment.moveForm( "comment-48969", "48969", "respond", "19088" )' aria-label="Reply to Kyle">Reply</a> <span>↓</span>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+	</li><!-- #comment-## -->
+	<li class="comment even thread-even depth-1" id="li-comment-48970">
+		<article id="comment-48970" class="comment">
+			<header class="comment-meta comment-author vcard">
+				<cite><b class="fn">Jack Smith</b> </cite><a href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#comment-48970"><time datetime="2017-12-13T02:42:08+00:00">December 13, 2017 at 2:42 am</time></a>			</header><!-- .comment-meta -->
+
+			
+			<section class="comment-content comment">
+				<p>Think one of the most interesting is the Google network stack they developed for Spanner.</p>
+<p>It is a determinate network stack and kind of like a virtual circuit 
+switch.   Lowers cost for network gear with the smarts on the edges.</p>
+<p>Google has a paper that covers the protocol and highly recommend.</p>
+							</section><!-- .comment-content -->
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/?replytocom=48970#respond" onclick='return addComment.moveForm( "comment-48970", "48970", "respond", "19088" )' aria-label="Reply to Jack Smith">Reply</a> <span>↓</span>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+	</li><!-- #comment-## -->
+	<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-48971">
+		<article id="comment-48971" class="comment">
+			<header class="comment-meta comment-author vcard">
+				<cite><b class="fn">Rana Sircar</b> </cite><a href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#comment-48971"><time datetime="2017-12-13T03:45:09+00:00">December 13, 2017 at 3:45 am</time></a>			</header><!-- .comment-meta -->
+
+			
+			<section class="comment-content comment">
+				<p>Thanks for the details. One query – how are these and ETSI NGP initiative related?</p>
+							</section><!-- .comment-content -->
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/?replytocom=48971#respond" onclick='return addComment.moveForm( "comment-48971", "48971", "respond", "19088" )' aria-label="Reply to Rana Sircar">Reply</a> <span>↓</span>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+	</li><!-- #comment-## -->
+	<li class="comment even thread-even depth-1" id="li-comment-48974">
+		<article id="comment-48974" class="comment">
+			<header class="comment-meta comment-author vcard">
+				<cite><b class="fn">Sam</b> </cite><a href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#comment-48974"><time datetime="2017-12-13T04:38:23+00:00">December 13, 2017 at 4:38 am</time></a>			</header><!-- .comment-meta -->
+
+			
+			<section class="comment-content comment">
+				<p>“Finally, we are in the midst of a shift towards more use of 
+encryption on the Internet, first spurred by Edward Snowden’s 
+revelations in 2015.”</p>
+<p>Citation, please?  The linked paper shows that SSL usage has been 
+increasing steadily since at least 2013 (the earliest year it measured),
+ and there’s no noticeable spurt that would correspond to Snowden.  The 
+paper doesn’t mention him at all.</p>
+<p>We’ve known about Room 641A for a decade.  I don’t think Snowden’s 
+reveal was a revelation for anyone who knew what HTTPS was, or had the 
+means to implement it.</p>
+							</section><!-- .comment-content -->
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/?replytocom=48974#respond" onclick='return addComment.moveForm( "comment-48974", "48974", "respond", "19088" )' aria-label="Reply to Sam">Reply</a> <span>↓</span>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+	<ol class="children">
+	<li class="comment odd alt depth-2" id="li-comment-48984">
+		<article id="comment-48984" class="comment">
+			<header class="comment-meta comment-author vcard">
+				<cite><b class="fn">Evan</b> </cite><a href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#comment-48984"><time datetime="2017-12-13T16:39:38+00:00">December 13, 2017 at 4:39 pm</time></a>			</header><!-- .comment-meta -->
+
+			
+			<section class="comment-content comment">
+				<p>I think it might be that Snowden et. al. pushing the idea of 
+vulnerability on the mainstream has more end users desiring 
+encryption/etc., motivating companies like Google that make a living 
+collecting/storing user data to try and make their users feel safe. Like
+ yeah a journalist in Iran has always been conscious of data security 
+but mass surveillance pushed into the public eye more and more makes 
+average Joe want to encrypt his email too.</p>
+							</section><!-- .comment-content -->
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/?replytocom=48984#respond" onclick='return addComment.moveForm( "comment-48984", "48984", "respond", "19088" )' aria-label="Reply to Evan">Reply</a> <span>↓</span>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+	</li><!-- #comment-## -->
+</ol><!-- .children -->
+</li><!-- #comment-## -->
+	<li class="comment even thread-odd thread-alt depth-1" id="li-comment-48975">
+		<article id="comment-48975" class="comment">
+			<header class="comment-meta comment-author vcard">
+				<cite><b class="fn">Kathleen</b> </cite><a href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#comment-48975"><time datetime="2017-12-13T04:46:41+00:00">December 13, 2017 at 4:46 am</time></a>			</header><!-- .comment-meta -->
+
+			
+			<section class="comment-content comment">
+				<p>Several of the efforts to make it easier to encrypt, like, “Let’s
+ Encrypt” got buy in for IETF standardization after Snowden and the 
+publication of RFC7258.  Other similar efforts had come before it, but 
+timing and running code helped this one and it has had a substantial 
+impact on the increase for web traffic. There was en EFF report and 
+other statistics right after Snowden that showed a clear connection, but
+ the efforts after that were motivated by Snowden can be seen in various
+ IETF presentations.</p>
+							</section><!-- .comment-content -->
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/?replytocom=48975#respond" onclick='return addComment.moveForm( "comment-48975", "48975", "respond", "19088" )' aria-label="Reply to Kathleen">Reply</a> <span>↓</span>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+	</li><!-- #comment-## -->
+	<li class="comment odd alt thread-even depth-1" id="li-comment-48977">
+		<article id="comment-48977" class="comment">
+			<header class="comment-meta comment-author vcard">
+				<cite><b class="fn">Chip Sharp</b> </cite><a href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#comment-48977"><time datetime="2017-12-13T07:19:59+00:00">December 13, 2017 at 7:19 am</time></a>			</header><!-- .comment-meta -->
+
+			
+			<section class="comment-content comment">
+				<p>Mark,<br>
+It would be very useful to include the status of each effort and whether it is standards-track or informational.</p>
+							</section><!-- .comment-content -->
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/?replytocom=48977#respond" onclick='return addComment.moveForm( "comment-48977", "48977", "respond", "19088" )' aria-label="Reply to Chip Sharp">Reply</a> <span>↓</span>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+	</li><!-- #comment-## -->
+	<li class="comment even thread-odd thread-alt depth-1" id="li-comment-48978">
+		<article id="comment-48978" class="comment">
+			<header class="comment-meta comment-author vcard">
+				<cite><b class="fn">Jeroen</b> </cite><a href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#comment-48978"><time datetime="2017-12-13T09:17:59+00:00">December 13, 2017 at 9:17 am</time></a>			</header><!-- .comment-meta -->
+
+			
+			<section class="comment-content comment">
+				<p>The real reason for “moar TLS” is not Snowden (though it 
+definitely helped and did good to release all that data: more paranoia 
+at TLAs) but availability of common fast crypto hardware (read AES 
+support in standard cpus and loadbalancer gear) and more importantly: 
+that the large advertising networks did not want their ads to be 
+changed/removed by inline filtering devices….</p>
+							</section><!-- .comment-content -->
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/?replytocom=48978#respond" onclick='return addComment.moveForm( "comment-48978", "48978", "respond", "19088" )' aria-label="Reply to Jeroen">Reply</a> <span>↓</span>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+	</li><!-- #comment-## -->
+	<li class="comment odd alt thread-even depth-1" id="li-comment-48980">
+		<article id="comment-48980" class="comment">
+			<header class="comment-meta comment-author vcard">
+				<cite><b class="fn">bunny</b> </cite><a href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#comment-48980"><time datetime="2017-12-13T12:35:46+00:00">December 13, 2017 at 12:35 pm</time></a>			</header><!-- .comment-meta -->
+
+			
+			<section class="comment-content comment">
+				<p>DOH + Http over UDP + ??? = thoroughly confusing.<br>
+No wonder people prefer the ossified version</p>
+							</section><!-- .comment-content -->
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/?replytocom=48980#respond" onclick='return addComment.moveForm( "comment-48980", "48980", "respond", "19088" )' aria-label="Reply to bunny">Reply</a> <span>↓</span>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+	</li><!-- #comment-## -->
+	<li class="comment even thread-odd thread-alt depth-1" id="li-comment-48981">
+		<article id="comment-48981" class="comment">
+			<header class="comment-meta comment-author vcard">
+				<cite><b class="fn">Iqbal Ahmed</b> </cite><a href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#comment-48981"><time datetime="2017-12-13T16:02:46+00:00">December 13, 2017 at 4:02 pm</time></a>			</header><!-- .comment-meta -->
+
+			
+			<section class="comment-content comment">
+				<p>Thanks for sharing.</p>
+							</section><!-- .comment-content -->
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/?replytocom=48981#respond" onclick='return addComment.moveForm( "comment-48981", "48981", "respond", "19088" )' aria-label="Reply to Iqbal Ahmed">Reply</a> <span>↓</span>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+	</li><!-- #comment-## -->
+	<li class="comment odd alt thread-even depth-1" id="li-comment-48982">
+		<article id="comment-48982" class="comment">
+			<header class="comment-meta comment-author vcard">
+				<cite><b class="fn">Toerless Eckert</b> </cite><a href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#comment-48982"><time datetime="2017-12-13T16:30:09+00:00">December 13, 2017 at 4:30 pm</time></a>			</header><!-- .comment-meta -->
+
+			
+			<section class="comment-content comment">
+				<p>“Google Browser support protocols” would have been a more 
+appropriate title to describe the majority of protocols discussed here.</p>
+<p>Of course Google never said “L’Internet c’est moi!”, like Louis XIV 
+never said “L’état c’est moi!”, but it’s easy to assume they did.</p>
+							</section><!-- .comment-content -->
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/?replytocom=48982#respond" onclick='return addComment.moveForm( "comment-48982", "48982", "respond", "19088" )' aria-label="Reply to Toerless Eckert">Reply</a> <span>↓</span>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+	</li><!-- #comment-## -->
+	<li class="comment even thread-odd thread-alt depth-1" id="li-comment-48983">
+		<article id="comment-48983" class="comment">
+			<header class="comment-meta comment-author vcard">
+				<cite><b class="fn">Lukas</b> </cite><a href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#comment-48983"><time datetime="2017-12-13T16:37:50+00:00">December 13, 2017 at 4:37 pm</time></a>			</header><!-- .comment-meta -->
+
+			
+			<section class="comment-content comment">
+				<p>The blog posting says the Snowden revelations were in 2015, but they were in 2013.</p>
+							</section><!-- .comment-content -->
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/?replytocom=48983#respond" onclick='return addComment.moveForm( "comment-48983", "48983", "respond", "19088" )' aria-label="Reply to Lukas">Reply</a> <span>↓</span>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+	<ol class="children">
+	<li class="comment odd alt depth-2" id="li-comment-48998">
+		<article id="comment-48998" class="comment">
+			<header class="comment-meta comment-author vcard">
+				<cite><b class="fn"><a href="https://www.mnot.net/" rel="external nofollow" class="url">Mark Nottingham</a></b> </cite><a href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#comment-48998"><time datetime="2017-12-14T11:10:54+00:00">December 14, 2017 at 11:10 am</time></a>			</header><!-- .comment-meta -->
+
+			
+			<section class="comment-content comment">
+				<p>Bah, a horrible slip of the keyboard – thanks!</p>
+							</section><!-- .comment-content -->
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/?replytocom=48998#respond" onclick='return addComment.moveForm( "comment-48998", "48998", "respond", "19088" )' aria-label="Reply to Mark Nottingham">Reply</a> <span>↓</span>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+	</li><!-- #comment-## -->
+</ol><!-- .children -->
+</li><!-- #comment-## -->
+	<li class="comment even thread-even depth-1" id="li-comment-48987">
+		<article id="comment-48987" class="comment">
+			<header class="comment-meta comment-author vcard">
+				<cite><b class="fn">Kshitij Atrya</b> </cite><a href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#comment-48987"><time datetime="2017-12-13T18:29:36+00:00">December 13, 2017 at 6:29 pm</time></a>			</header><!-- .comment-meta -->
+
+			
+			<section class="comment-content comment">
+				<p>Thanks for sharing this.</p>
+							</section><!-- .comment-content -->
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/?replytocom=48987#respond" onclick='return addComment.moveForm( "comment-48987", "48987", "respond", "19088" )' aria-label="Reply to Kshitij Atrya">Reply</a> <span>↓</span>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+	</li><!-- #comment-## -->
+	<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-48993">
+		<article id="comment-48993" class="comment">
+			<header class="comment-meta comment-author vcard">
+				<cite><b class="fn">Joe Mele</b> </cite><a href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#comment-48993"><time datetime="2017-12-14T00:15:32+00:00">December 14, 2017 at 12:15 am</time></a>			</header><!-- .comment-meta -->
+
+			
+			<section class="comment-content comment">
+				<p>In addition to this, why cant we move to a system where  domain 
+names are like crypto currency on a blockchain. so registrar and their 
+fees are not needed. we all know the right owner of domain name would be
+ in the block chain. a wallet would have public ip address for the 
+domain to point to. and the wallet in the blockchain is the current 
+owner of the domain. etc</p>
+							</section><!-- .comment-content -->
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/?replytocom=48993#respond" onclick='return addComment.moveForm( "comment-48993", "48993", "respond", "19088" )' aria-label="Reply to Joe Mele">Reply</a> <span>↓</span>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+	</li><!-- #comment-## -->
+	<li class="comment even thread-even depth-1" id="li-comment-48995">
+		<article id="comment-48995" class="comment">
+			<header class="comment-meta comment-author vcard">
+				<cite><b class="fn">Jim Shields</b> </cite><a href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#comment-48995"><time datetime="2017-12-14T00:28:33+00:00">December 14, 2017 at 12:28 am</time></a>			</header><!-- .comment-meta -->
+
+			
+			<section class="comment-content comment">
+				<p>Excellent article.  Thank you for putting all this information together.  Now we just need more folks to read it …</p>
+							</section><!-- .comment-content -->
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/?replytocom=48995#respond" onclick='return addComment.moveForm( "comment-48995", "48995", "respond", "19088" )' aria-label="Reply to Jim Shields">Reply</a> <span>↓</span>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+	</li><!-- #comment-## -->
+	<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-49005">
+		<article id="comment-49005" class="comment">
+			<header class="comment-meta comment-author vcard">
+				<cite><b class="fn"><a href="https://copsewood.net/" rel="external nofollow" class="url">Richard Kay</a></b> </cite><a href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#comment-49005"><time datetime="2017-12-15T00:48:45+00:00">December 15, 2017 at 12:48 am</time></a>			</header><!-- .comment-meta -->
+
+			
+			<section class="comment-content comment">
+				<p>@Joe Mele: “why cant we move to a system where domain names are like crypto currency on a blockchain” </p>
+<p>1. See Metcalfe’s Law – objects already have a popular globally 
+unique naming system and it will be difficult for a new protocol to 
+compete with the existing DNS network. Properties for a new protocol to 
+be accepted have to add sufficient value to be used, e.g. see Tor/Onion 
+routed hidden services.</p>
+<p>2. So who pays for the mining, and you think this is cheaper than the
+ current system ? Also because protocols where 1KWh == 1 vote are bad 
+for the planet, so won’t be used or accepted and will be actively 
+blocked by those who care. Blockchain consensus systems which avoid 
+wasted electricity involve central authority (e.g. a trusted CA signing 
+node keys accepted by user community as contributing to network 
+consensus). Having a central authority will have to be funded, hence no 
+advantage over the current system.</p>
+							</section><!-- .comment-content -->
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/?replytocom=49005#respond" onclick='return addComment.moveForm( "comment-49005", "49005", "respond", "19088" )' aria-label="Reply to Richard Kay">Reply</a> <span>↓</span>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+	</li><!-- #comment-## -->
+	<li class="comment even thread-even depth-1" id="li-comment-49018">
+		<article id="comment-49018" class="comment">
+			<header class="comment-meta comment-author vcard">
+				<cite><b class="fn">wtarreau</b> </cite><a href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#comment-49018"><time datetime="2017-12-15T17:07:54+00:00">December 15, 2017 at 5:07 pm</time></a>			</header><!-- .comment-meta -->
+
+			
+			<section class="comment-content comment">
+				<p>Hi Mark!</p>
+<p>We still need to find the right spot between policy enforcement and 
+end-user security, otherwise we’ll end up preventing new protocols from 
+being adopted. For example, networks *need* protections such as 
+firewalls to prevent against remote attacks. By making protocols harder 
+to inspect, we’re effectively making them harder to follow, and stateful
+ firewalls will be harder to build, if at all (eg: QUIC doesn’t even 
+allow to detect an ACK). This will cause leaf nodes to be permanently 
+connected to the net without any form of network protection, thus 
+reachable from outside on UDP from port 443. Nowadays most leaf nodes 
+run behind NAT due to the shortage of IPv4 address space.</p>
+<p>Those of us having IPv6 at home know that their IPv6 nodes tend to be
+ a bit less protected by being permanently visible from outside and 
+absolutely need to be protected by a firewall. I fear that by making it 
+harder to protect leaf nodes against attacks on future protocols, we’ll 
+make IPv6 perceived as much more dangerous for leaf nodes, which itself 
+will become a real pain as it will still not allow transparent 
+end-to-end communications. I already predict that we’ll see a new class 
+of malware deployed on leaf nodes using UDP because it’s impossible to 
+differenciate their traffic from outgoing QUIC traffic, and that may 
+more leaf nodes will permanently be part of botnets. For example many 
+firewalls only allow one or a few packets from port 53 in response to an
+ outgoing packet to prevent unauthorized traffic from claiming to be DNS
+ traffic and allowing intruders to access an end point. Here it will not
+ be possible from source port 443 since we’ll never know when a 
+connection is terminated, if it was at all started.</p>
+<p>Thus my point is that we need to be very careful that building 
+devices to protect infrastructure and end points is still possible 
+without making it easy to build devices to inspect contents and 
+communications.</p>
+							</section><!-- .comment-content -->
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/?replytocom=49018#respond" onclick='return addComment.moveForm( "comment-49018", "49018", "respond", "19088" )' aria-label="Reply to wtarreau">Reply</a> <span>↓</span>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+	</li><!-- #comment-## -->
+	<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-49060">
+		<article id="comment-49060" class="comment">
+			<header class="comment-meta comment-author vcard">
+				<cite><b class="fn"><a href="https://shawnmoorecisco.blogspot.com/" rel="external nofollow" class="url">Shawn Moore</a></b> </cite><a href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#comment-49060"><time datetime="2017-12-19T09:40:14+00:00">December 19, 2017 at 9:40 am</time></a>			</header><!-- .comment-meta -->
+
+			
+			<section class="comment-content comment">
+				<p>This a good read, and will be interesting on how things pan out. 
+As mentioned ease of use will be important as I feel that’s reason most 
+of us are still on IPv4.<br>
+People are scared to even understand IPv6 address formatting because of 
+the 128 bit addressing let alone implement it, even in a test 
+environment.</p>
+							</section><!-- .comment-content -->
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/?replytocom=49060#respond" onclick='return addComment.moveForm( "comment-49060", "49060", "respond", "19088" )' aria-label="Reply to Shawn Moore">Reply</a> <span>↓</span>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+	</li><!-- #comment-## -->
+	<li class="comment even thread-even depth-1" id="li-comment-49074">
+		<article id="comment-49074" class="comment">
+			<header class="comment-meta comment-author vcard">
+				<cite><b class="fn"><a href="https://www.linkedin.com/in/georgiveselinovivanov/" rel="external nofollow" class="url">Georgi Ivanov</a></b> </cite><a href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#comment-49074"><time datetime="2017-12-22T03:42:03+00:00">December 22, 2017 at 3:42 am</time></a>			</header><!-- .comment-meta -->
+
+			
+			<section class="comment-content comment">
+				<p>I wonder why there is nothing about SMTP.  All the mail protocols
+ are so old and there is almost nothing new in the last 10-20 years.</p>
+							</section><!-- .comment-content -->
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/?replytocom=49074#respond" onclick='return addComment.moveForm( "comment-49074", "49074", "respond", "19088" )' aria-label="Reply to Georgi Ivanov">Reply</a> <span>↓</span>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+	</li><!-- #comment-## -->
+	<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-49091">
+		<article id="comment-49091" class="comment">
+			<header class="comment-meta comment-author vcard">
+				<cite><b class="fn"><a href="http://www.dantechservices.com/" rel="external nofollow" class="url">Dan Foote</a></b> </cite><a href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#comment-49091"><time datetime="2017-12-24T12:26:22+00:00">December 24, 2017 at 12:26 pm</time></a>			</header><!-- .comment-meta -->
+
+			
+			<section class="comment-content comment">
+				<p>I find it interesting that none of the comments that favor 
+“unrestricted, unfettered flow of traffic that’s encrypted” because “it 
+breaks the internet and security” fail to acknowledge that w upwards of 
+70% of all traffic now encrypted, so is the malware that infects 
+machines. Expecting reliance on anti-virus alone makes little sense and 
+not decrypting packets at the perimeter means that any sort of gateway 
+anti-virus is also ineffective.<br>
+Businesses must have the ability to examine &amp; inspect traffic onto 
+their networks or else they’ll be sitting ducks for future waves of 
+malware, ransomware, et al.</p>
+							</section><!-- .comment-content -->
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/?replytocom=49091#respond" onclick='return addComment.moveForm( "comment-49091", "49091", "respond", "19088" )' aria-label="Reply to Dan Foote">Reply</a> <span>↓</span>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+	</li><!-- #comment-## -->
+	<li class="comment even thread-even depth-1" id="li-comment-49196">
+		<article id="comment-49196" class="comment">
+			<header class="comment-meta comment-author vcard">
+				<cite><b class="fn">Etienne</b> </cite><a href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#comment-49196"><time datetime="2018-01-04T21:30:11+00:00">January 4, 2018 at 9:30 pm</time></a>			</header><!-- .comment-meta -->
+
+			
+			<section class="comment-content comment">
+				<p>All the changes listed still assume a top/down relationship, a 
+provider/consumer model. Would be nice to have a “I want this file 
+(UUID)” from consumer to be served by a computer as close as possible, 
+to reduce network duplicate transmission. Allows mesh network, 
+cryptographic signature might be served by initial server, download only
+ once software updates, fonts, popular videos, …</p>
+							</section><!-- .comment-content -->
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/?replytocom=49196#respond" onclick='return addComment.moveForm( "comment-49196", "49196", "respond", "19088" )' aria-label="Reply to Etienne">Reply</a> <span>↓</span>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+	</li><!-- #comment-## -->
+	<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-49294">
+		<article id="comment-49294" class="comment">
+			<header class="comment-meta comment-author vcard">
+				<cite><b class="fn">Baldeep</b> </cite><a href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#comment-49294"><time datetime="2018-01-14T01:54:06+00:00">January 14, 2018 at 1:54 am</time></a>			</header><!-- .comment-meta -->
+
+			
+			<section class="comment-content comment">
+				<p>Coping with larger amounts of data it keep end users happy is key.</p>
+<p>User experience will help drive repeat visits and enable website 
+owners to be rewarded when they offer services relevant to the customer.</p>
+							</section><!-- .comment-content -->
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/?replytocom=49294#respond" onclick='return addComment.moveForm( "comment-49294", "49294", "respond", "19088" )' aria-label="Reply to Baldeep">Reply</a> <span>↓</span>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+	</li><!-- #comment-## -->
+		</ol><!-- .commentlist -->
+
+		
+		
+	
+		<div id="respond" class="comment-respond">
+		<h3 id="reply-title" class="comment-reply-title">Leave a Reply <small><a rel="nofollow" id="cancel-comment-reply-link" href="https://blog.apnic.net/2017/12/12/internet-protocols-changing/#respond" style="display:none;">Cancel reply</a></small></h3>			<form action="https://blog.apnic.net/wp-comments-post.php" method="post" id="commentform" class="comment-form">
+				<p class="comment-notes"><span id="email-notes">Your email address will not be published.</span> Required fields are marked <span class="required">*</span></p><p class="comment-form-comment"><label for="comment">Comment</label> <textarea id="comment" name="comment" cols="45" rows="8" maxlength="65525" aria-required="true" required="required"></textarea></p><p class="comment-form-author"><label for="author">Name <span class="required">*</span></label> <input id="author" name="author" size="30" maxlength="245" aria-required="true" required="required" type="text"></p>
+<p class="comment-form-email"><label for="email">Email <span class="required">*</span></label> <input id="email" name="email" size="30" maxlength="100" aria-describedby="email-notes" aria-required="true" required="required" type="text"></p>
+<p class="comment-form-url"><label for="url">Website</label> <input id="url" name="url" size="30" maxlength="200" type="text"></p>
+<p class="cptch_block"><span class="cptch_title">Please answer the math question<span class="required"> *</span></span><script class="cptch_to_remove">
+				(function( timeout ) {
+					setTimeout(
+						function() {
+							var notice = document.getElementById("cptch_time_limit_notice_55");
+							if ( notice )
+								notice.style.display = "block";
+						},
+						timeout
+					);
+				})(120000);
+			</script>
+			<span id="cptch_time_limit_notice_55" class="cptch_time_limit_notice cptch_to_remove">Time limit is exhausted. Please reload CAPTCHA.</span><span class="cptch_wrap cptch_math_actions">
+				<label class="cptch_label" for="cptch_input_55"><span class="cptch_span"><input id="cptch_input_55" class="cptch_input cptch_wp_comments" autocomplete="off" name="cptch_number" maxlength="2" size="2" aria-required="true" required="required" style="margin-bottom:0;display:inline;font-size: 12px;width: 40px;" type="text"></span>
+					<span class="cptch_span">&nbsp;+&nbsp;</span>
+					<span class="cptch_span">3</span>
+					<span class="cptch_span">&nbsp;=&nbsp;</span>
+					<span class="cptch_span"><img class="cptch_img " src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAABhQTFRFAAAA////h4eHUVFRtLS019fX8/Pz+vr6WsFzWgAABolJREFUeNrs3FtOHEkURdGM9/xn3D8tP2hoKQBZrnvWnkHhpUNGVJqnKbrHjwAAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAAADAjwAAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAJQO4PlbGwAAAEAwgH4AsAAAAABA6q8AACwAAAAA4BQAgAUAAAAAnAIAsAAAAACAUwAAFgAAAABwCgDAAgAAAABOAQBYAAAAAMApAAALAAAAADgFAGABAPAQCMDLAlgARAN4yd8AAHxfE4BoAGMDEA3gJR8BAfi+DgDRAF50AACIPgMCEH4GfE0A+0/VAwbA3wn8H2g3A3AAKNe8uQTaAJTr5hFgNwCSB6A3AMo9AYyIAQDgWwYAgHqNhDMgAB+2rs6AB4BqTwA3l0CzWYDkAXjtHyEA7xYzAAC8/xvg6hLoAJA8AL1ZgOgBWACUaya8CADAh50R8wgIQPoAAPBOI+JFAAA++gWwMl4EAOA7BqA3AKq1gs6AALzT1SXQAaDaE8DOGgAAvjIAY1uAcj1Bl0AA/LcZ8yIAAO8+AYywAQDgCwNQ4AkAgDcLkHUJBMDb7i6BDgDVGknfAwLwtQGYAJR7Auh5AwDAL13dAncAytWjXgQAwAAA8NsTwAz7HhCANwCewEdAAH6WOQAA/BiAq0ugDUD0AMwGQLVG2osAAPzWijwDAvCjyEsgAAwAAJ8YgBovAgDwSzvzEgiATw3ABKBYd+8CjwNAta4ugToA5Z4ARuoZEIBPDEADoFoj83tAAP5t5Z4BAYgfAAAuB2AfAIoVfAkEQLu8BX7OASB5AHqzANEDsAGo1gwfgHQA5+4MaAGiB2AcC1CtkX0GTAdw94fBnwOAAQCgUiv9DJgOoAe/CQTA7QCsBkDyAIwGQLUzwOMRMBqAS6BwAAYgG8C8OwNagGpPACP9e8BwANMZMBuAAcgGsDwCRgM4LoGyAVwOwAGgWN33gNEAtieAaADbGTAbwN3XQL0BUCwDkA3g7hZ4NACiB2ACUK27AdgAFPsFsDwCZi/A1QA8B4BiA7ANQPYCdGfAZACXAzAaAAYAgFIf2ABEA7i8BNoA1OruD4M/2wJED0BvABTLAGQDuLwFPgBED8BqACQPwDgAFKt7ESAawOUt8AYgegB6AyB5AJ4NQK2OS6BwAM6A0QAuB2A0AIp1OQAHgFpNl0DZAIYXAaIBLGfAbAAugbIBGIBwAJcDsA8Apbq8BV7NAmSfAQ8AxT6lFwGiAdwNQNZbcgmf9vI/A0wAsgcg6AgQAmC4BIoGcHkJtA4AtZ4AuhcBogEsZ8BsAAYgG8DlLfDcACQPwLMtQPQA9AZArabvAaMBXP5ngLhHwPIADEA4gOFl8GQAxyVQ+AIMLwJEA1jOgNkAXAJFAzgugcIXoHsRIBvA4xIoGsB0BkwGcLZLoOwFmB4BsxdgOANGA3AJFA5g+B4wGsByBowGcLoBiAZwOwD7AFCq7hIoGsDl10DPAaDWE4BLoHAAj0ugaAAGIBvA7S3wsgDRAzCOBajVcAaMBrCcAbMBuATKBrCcAbMBXA5APwCU6vYWeDUAkgdgNACKfSCPgNEAXAJlA9gugbIBzNtLIAtQ6+MM3wNGA3AJFA5gOANGA1gugbIBuATKBnB7CzyPf/9SALoXAeKPgQJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAgAAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAPrz/SPAALhU0wuPYuMdAAAAAElFTkSuQmCC" alt="image"></span>
+					<input name="cptch_result" value="BPM=" type="hidden"><input name="cptch_time" value="1516756550" type="hidden">
+					<input name="cptch_form" value="wp_comments" type="hidden">
+				</label><span class="cptch_reload_button_wrap hide-if-no-js">
+					<noscript>
+						<style type="text/css">
+							.hide-if-no-js {
+								display: none !important;
+							}
+						</style>
+					</noscript>
+					<span class="cptch_reload_button dashicons dashicons-update"></span>
+				</span></span></p><p class="form-submit"><input name="submit" id="submit" class="submit" value="Post Comment" type="submit"> <input name="comment_post_ID" value="19088" id="comment_post_ID" type="hidden">
+<input name="comment_parent" id="comment_parent" value="0" type="hidden">
+</p><p style="display: none;"><input id="akismet_comment_nonce" name="akismet_comment_nonce" value="53a1b3e39c" type="hidden"></p><p class="comment-subscription-form"><input name="subscribe_comments" id="subscribe_comments" value="subscribe" style="width: auto; -moz-appearance: checkbox; -webkit-appearance: checkbox;" type="checkbox"> <label class="subscribe-label" id="subscribe-label" for="subscribe_comments">Notify me of follow-up comments by email.</label></p><p class="comment-subscription-form"><input name="subscribe_blog" id="subscribe_blog" value="subscribe" style="width: auto; -moz-appearance: checkbox; -webkit-appearance: checkbox;" type="checkbox"> <label class="subscribe-label" id="subscribe-blog-label" for="subscribe_blog">Notify me of new posts by email.</label></p><p style="display: none;"></p>			<input id="ak_js" name="ak_js" value="1516756552276" type="hidden"></form>
+			</div><!-- #respond -->
+	
+</div><!-- #comments .comments-area -->
+		<p id="back-to-top" class="hidden-print"><a href="#top"><span class="glyphicon glyphicon-chevron-up"></span> Top</a></p>
+
+</div>
+
+					</div><!-- #content -->
+	</section><!-- #primary -->
+
+
+			<section id="secondary" class="widget-area col size-md-3-of-12" role="complementary">
+			<aside id="wysija-3" class="widget widget_wysija"><h3 class="widget-title"><span>Get updates</span></h3><div class="widget_wysija_cont"><div id="msg-form-wysija-3" class="wysija-msg ajax"></div><form id="form-wysija-3" method="post" action="#wysija" class="widget_wysija">
+<p class="wysija-paragraph">
+    
+    
+    	<input name="wysija[user][email]" class="wysija-input validate[required,custom[email]]" title="Email" placeholder="Email" value="Email" type="text">
+    
+    
+    
+    <span class="abs-req">
+        <input name="wysija[user][abs][email]" class="wysija-input validated[abs][email]" type="text">
+    </span>
+    
+</p>
+
+<span id="get-updates-options-control">Show options</span><input class="wysija-submit wysija-submit-field" value="Subscribe!" type="submit">
+
+<div id="get-updates-options" style="display: none;">
+<p class="wysija-checkbox-label">Select list(s):</p>
+
+    <p class="wysija-checkbox-paragraph"><label><input class="wysija-checkbox validate[required]" name="wysija[user_list][list_id][]" value="5" type="checkbox"> New Post Published</label></p>
+
+    <p class="wysija-checkbox-paragraph"><label><input class="wysija-checkbox validate[required]" name="wysija[user_list][list_id][]" value="3" checked="checked" type="checkbox"> Weekly Newsletter</label></p>
+
+
+</div><!-- #get-updates-options -->
+
+    <input name="form_id" value="1" type="hidden">
+    <input name="action" value="save" type="hidden">
+    <input name="controller" value="subscribers" type="hidden">
+    <input value="1" name="wysija-page" type="hidden">
+
+    
+ </form></div></aside><aside id="reallysimpletwitterwidget-3" class="widget widget_reallysimpletwitterwidget"><h3 class="widget-title"><span>Latest Tweets</span></h3>
+      <ul class="really_simple_twitter_widget unfocused"><li>Are you a proud owner of one of the 3 generations of <a href="http://twitter.com/#!/search?q=%23RIPEAtlas" class="twitter-link">#RIPEAtlas</a> probes? 
+Learn about their history and their future… <a href="https://t.co/gKQkMkEdQT" class="twitter-link">https://t.co/gKQkMkEdQT</a><span class="rstw_comma">,</span> <span class="twitter-timestamp" title="2018/01/24 00:15">1 hour ago</span></li><li>What you're seeing is the high-level architecture of <a href="http://twitter.com/#!/search?q=%23RIPEAtlas" class="twitter-link">#RIPEAtlas</a>
+Learn more about it and how it has changed over tim… <a href="https://t.co/opbifS7Oux" class="twitter-link">https://t.co/opbifS7Oux</a><span class="rstw_comma">,</span> <span class="twitter-timestamp" title="2018/01/23 08:15">17 hours ago</span></li><li>Hong Kong! 
+Register for APNIC Training's Software Defined Network <a href="http://twitter.com/#!/search?q=%23SDN" class="twitter-link">#SDN</a> workshop happening in March as part of… <a href="https://t.co/IMwKYFVHD5" class="twitter-link">https://t.co/IMwKYFVHD5</a><span class="rstw_comma">,</span> <span class="twitter-timestamp" title="2018/01/23 05:10">20 hours ago</span></li></ul></aside><aside id="authors-4" class="widget authors_widget"><h3 class="widget-title"><span>Authors</span></h3>
+			<ul>
+								<li class="author-pinned"><a href="https://blog.apnic.net/author/geoff-huston/">Geoff Huston</a></li>
+								<li class="author-pinned"><a href="https://blog.apnic.net/author/paul-wilson/">Paul Wilson</a></li>
+				                
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/a-khalil-aziz/">A Khalil Azizi</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/abhishek-jain/">Abhishek Jain</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/achie-atienza/">Achie Atienza</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/adam/">Adam Gosling</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/adeel-sadiq/">Adeel Sadiq</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/adiel-akplogan/">Adiel Akplogan</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/adli-w/">Adli Wahid</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/afifa-abbas/">Afifa Abbas</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/afsheen-saadat/">Afsheen Saadat</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/agustin-formoso/">Agustín Formoso</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/ajaikumar/">Ajai Kumar</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/ajay-kumar/">Ajay Kumar</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/akimichi-ogawa/">Akimichi Ogawa</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/alan-mauldin/">Alan Mauldin</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/amrita-choudhury/">Amrita Choudhury</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/anand-buddhdev/">Anand Buddhdev</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/anant-shah/">Anant Shah</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/andrew-cushen/">Andrew Cushen</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/andrew-toimoana/">Andrew Toimoana</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/andy-newton/">Andy Newton</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/anju-mangal/">Anju Mangal</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/annaliza-mulingbayan/">Annaliza Mulingbayan</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/anthony-lee/">Anthony Lee</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/anurag-bhatia/">Anurag Bhatia</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/apnic/">APNIC</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/arjuna-sathiaseelan/">Arjuna Sathiaseelan</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/arth-paulite/">Arth Paulite</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/asanka-sayakkara/">Asanka Sayakkara</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/ashwin-rangan/">Ashwin Rangan</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/azfar-adib/">Azfar Adib</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/azura-mat-salim/">Azura Mat Salim</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/barry-greene/">Barry Greene</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/ben-cox/">Ben Cox</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/bert-hubert/">Bert Hubert</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/bhadrika/">Bhadrika Magan</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/bhumika-sapkota/">Bhumika Sapkota</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/bill-woodcock/">Bill Woodcock</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/brenda-buwu/">Brenda Buwu</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/brian-nisbet/">Brian Nisbet</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/brian-trammell/">Brian Trammell</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/byron-ellacott/">Byron Ellacott</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/cengiz-alaettinoglu/">Cengiz Alaettinoglu</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/champika-wijayatunga/">Champika Wijayatunga</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/che-hoo-cheng/">Che-Hoo Cheng</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/cheeyong-tay/">Cheeyong Tay</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/chika-yoshimura/">Chika Yoshimura</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/chris-amin/">Chris Amin</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/christoph-dietzel/">Christoph Dietzel</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/ciprian-popoviciu/">Ciprian Popoviciu</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/constance-bommelaer/">Constance Bommelaer</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/constanze-dietrich/">Constanze Dietrich</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/craig-ng/">Craig Ng</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/david-huberman/">David Huberman</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/dean-pemberton/">Dean Pemberton</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/desiree-miloshevic/">Désirée Miloshevic</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/di-ma/">Di Ma</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/donatas-abraitis/">Donatas Abraitis</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/duncan/">Duncan Macintosh</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/elizabeth-krumbach-joseph/">Elizabeth Krumbach Joseph</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/elly-tawhai/">Elly Tawhai</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/emile-aben/">Emile Aben</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/enno-rey/">Enno Rey</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/enric-pujol/">Enric Pujol</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/eric-loos/">Eric Loos</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/eric-vyncke/">Eric Vyncke</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/eunju-pak/">Eunju Pak</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/fakrul-alam/">Fakrul Alam</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/foy-shiver/">Foy Shiver</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/fred-christopher/">Fred Christopher</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/ganga-r-dhungyel/">Ganga R Dhungyel</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/gaurab-raj-upadhaya/">Gaurab Raj Upadhaya</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/geoff-huston/">Geoff Huston</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/george/">George Kuo</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/ggm/">George Michaelson</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/george-odagi/">George Odagi</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/gregory-mounier/">Grégory Mounier</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/gazi-zehadul-kabir/">GZ Kabir</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/harish-chowdhary/">Harish Chowdhary</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/helen-hollins/">Helen Hollins</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/hideyuki-sasaki/">Hideyuki Sasaki</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/hinne-hettema/">Hinne Hettema</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/hiroko-kamata/">Hiroko Kamata</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/hisham-ibrahim/">Hisham Ibrahim</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/houlin-zhao/">Houlin Zhao</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/ilker-nadi-bozkurt/">Ilker Nadi Bozkurt</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/ioana-livadariu/">Ioana Livadariu</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/italo-cunha/">Italo Cunha</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/ivana-tomic/">Ivana Tomic</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/yip-ivy/">Ivy Yip</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/izumi-okutani/">Izumi Okutani</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/jahangir/">Jahangir Hossain</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/jamie-gillespie/">Jamie Gillespie</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/jan-harm-kuipers/">Jan Harm Kuipers</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/jan-ruth/">Jan Rüth</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/jan-zorz/">Jan Zorz</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/jari-arkko/">Jari Arkko</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/jason-smith/">Jason Smith</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/jen-linkova/">Jen Linkova</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/jessica-shen/">Jessica Shen</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/jessica-wei/">Jessica Wei</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/jethro-webston/">Jethro Webston</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/jia-rong-low/">Jia-Rong Low</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/joanna-kulesza/">Joanna Kulesza</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/joao-luis-silva-damas/">Joao Luis Silva Damas</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/job-snijders/">Job Snijders</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/joel-jaeggli/">Joel Jaeggli</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/johanna-amann/">Johanna Amann</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/jonathan-brewer/">Jonathan Brewer</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/jordan-carter/">Jordan Carter</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/jordi-palet-martinez/">Jordi Palet Martinez</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/josef-gustafsson/">Josef Gustafsson</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/julien-gamba/">Julien Gamba</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/kanagaraj-krishna/">Kanagaraj Krishna</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/kasek-galgal/">Kasek Galgal</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/kathleen-moriarty/">Kathleen Moriarty</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/katsuyasu-toyama/">Katsuyasu Toyama</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/keisuke-kamata/">Keisuke Kamata</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/kenny-huang/">Kenny Huang</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/kevin-meynell/">Kevin Meynell</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/kevon-swift/">Kevon Swift</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/khee-hong-loke/">Khee Hong Loke</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/klee-aiken/">Klée Aiken</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/kurt-lindqvist/">Kurt Lindqvist</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/kyle-drake/">Kyle Drake</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/leandro-navarro/">Leandro Navarro</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/leslie-daigle/">Leslie Daigle</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/lia-hestina/">Lia Hestina</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/davey-song/">Linjian Song</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/lisa-corness/">Lisa Corness</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/louise-tromp/">Louise Tromp</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/luca-sani/">Luca Sani</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/luuk-hendriks/">Luuk Hendriks</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/maemura-akinori/">Maemura Akinori</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/mai-thu-thuy/">Mai Thu Thuy</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/manaf-gharaibeh/">Manaf Gharaibeh</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/marc-bruyere/">Marc Bruyere</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/marco-hogewoning/">Marco Hogewoning</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/marcus-keane/">Marcus Keane</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/mariko-kobayashi/">Mariko Kobayashi</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/mark-nottingham/">Mark Nottingham</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/mark-prior/">Mark Prior</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/mark-smith/">Mark Smith</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/martin-hannigan/">Martin Hannigan</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/martin-thomson/">Martin Thomson</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/mary-rose-ofianga-rontal/">Mary Rose Ofianga-Rontal</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/masataka-mawatari/">Masataka Mawatari</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/massimo-candela/">Massimo Candela</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/matt-larson/">Matt Larson</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/matt-ringel/">Matt Ringel</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/megan-baker/">Megan Baker</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/merike-kaeo/">Merike Kaeo</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/min-sun-jung/">Min Sung Jung</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/miwa-fujii/">Miwa Fujii</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/mohamad-dikshie-fauzie/">Mohamad Dikshie Fauzie</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/mohamed-boucadair/">Mohamed Boucadair</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/molay-gosh/">Molay Ghosh</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/mubashir-sargana/">Mubashir Sargana</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/nadir-hassan/">Nadir Hassan</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/narelle-clark/">Narelle Clark</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/nikolai-hampton/">Nikolai Hampton</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/roman/">Nurul Islam Roman</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/oky-tria-saputra/">Oky Tria Saputra</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/ondrej-sury/">Ondřej Surý</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/pablo/">Pablo Hinojosa</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/parkpoom-tripatana/">Parkpoom Tripatana</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/paul-wilson/">Paul Wilson</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/pete-stevens/">Pete Stevens</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/philip-smith/">Philip Smith</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/philipp-richter/">Philipp Richter</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/pier-carlo-chiodi/">Pier Carlo Chiodi</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/pranav-kondala/">Pranav Kondala</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/praneet-kaur/">Praneet Kaur</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/pubudu-jayasinghe/">Pubudu Jayasinghe</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/rene-wilhelm/">René Wilhelm</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/richard-cziva/">Richard Cziva</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/richard-jimmerson/">Richard Jimmerson</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/richard-nelson/">Richard Nelson</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/robbie-mitchell/">Robbie Mitchell</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/robert-kisteleki/">Robert Kisteleki</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/rohana-palliyaguru/">Rohana Palliyaguru</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/ron-winward/">Ron Winward</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/ronald-van-kleunen/">Ronald van Kleunen</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/russ-white/">Russ White</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/said-zazai/">Said Zazai</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/samit-jana/">Samit Jana</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/sanjaya/">Sanjaya</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/sarah-escandor-tomas/">Sarah Escandor-Tomas</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/sarmad-hussain/">Sarmad Hussain</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/scott-hollenbeck/">Scott Hollenbeck</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/sebastian-castro/">Sebastian Castro</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/sebastian-zander/">Sebastian Zander</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/seiichi-kawamura/">Seiichi Kawamura</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/shah/">Shah Sahari</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/shamsullah-shams/">Shamsullah Shams</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/shane-kerr/">Shane Kerr</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/sheetal-kumar/">Sheetal Kumar</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/shane/">Sheryl Hermoso</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/shian-shyong-tseng/">Shian-Shyong Tseng</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/siena/">Siena Perry</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/simon/">Simon Baroi</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/sofia-silva-berenguer/">Sofia Silva Berenguer</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/sonam-keba/">Sonam Keba</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/song-bing/">Song Bing</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/srimal-andrahennadi/">Srimal Andrahennadi</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/stanley-osao/">Stanley Osao</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/stephane-bortzmeyer/">Stéphane Bortzmeyer</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/stephen-mcquistin/">Stephen McQuistin</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/steve-santorelli/">Steve Santorelli</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/suksit-sripitchayaphan/">Suksit Sripitchayaphan</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/sunny-chendi/">Sunny Chendi</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/sylvia/">Sylvia Cadena</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/taejoong-chung/">Taejoong Chung</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/tan-kean-siong/">Tan Kean Siong</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/teav-sovandara/">Teav Sovandara</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/tim-raphael/">Tim Raphael</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/tobias-fiebig/">Tobias Fiebig</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/tom-do/">Tom Do</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/tomh/">Tom Harrison</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/tom-hollingsworth/">Tom Hollingsworth</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/tony-scheid/">Tony Scheid</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/tony/">Tony Smith</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/tuan-nguyen/">Tuan Nguyen</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/ulrich-speidel/">Ulrich Speidel</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/uta-meier-hahn/">Uta Meier-Hahn</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/vashkar-bhattacharjee/">Vashkar Bhattacharjee</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/vivek-nigam/">Vivek Nigam</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/w-k-shiu/">W K Shiu</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/warren-kumari/">Warren Kumari</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/wassie-goushe/">Wassie Goushe</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/werachart-muttitanon/">Werachart Muttitanon</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/wes-hardaker/">Wes Hardaker</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/wilaiwan-phanarin/">Wilaiwan Phanarin</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/wilhelm-boeddinghaus/">Wilhelm Boeddinghaus</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/w/">William Lu</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/willy-sutrisno/">Willy Sutrisno</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/xing-li/">Xing Li</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/yali-liu/">Yali Liu</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/yeo-lee-chin/">Yeo Lee Chin</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/ying-chu-chen/">Ying-Chu Chen</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/younghwan-choi/">Younghwan Choi</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/yurie-ito/">Yurie Ito</a></li>
+
+								<li class="author-all" style="display: none;"><a href="https://blog.apnic.net/author/zaid-ali-kahn/">Zaid Ali Kahn</a></li>
+
+				                                <li id="author-all-li"><a href="#" id="author-all-a">More</a></li>
+
+			</ul>
+
+		</aside><script>
+try{
+var $authors_widget = window.$authors_widget = $('.authors_widget');
+if($authors_widget.length > 0){
+    $('.author-all',$authors_widget).hide();
+  
+    $('#author-all-a',$authors_widget).click(function(e){
+        e.preventDefault();
+        var $all = $('.author-all',$authors_widget);
+        var $pinned = $('.author-pinned',$authors_widget);
+
+      if($all.first().is(':visible')){
+          $all.hide();
+          $pinned.show();
+          $('#author-all-a').text('More').removeClass('less');
+
+      }
+      else{
+          $all.show();
+          $pinned.hide();
+          $('#author-all-a').text('Less').addClass('less');
+      }
+    });
+
+}
+}catch(e){console.log('Problem adding author widget toggle:');console.log(e.message);}
+</script>
+        <aside id="categories-3" class="widget widget_categories widget_categories_dynamic widget_categories_visible"><h3 class="widget-title"><span>Categories</span></h3>		<ul>
+	<li class="cat-item cat-item-5"><a href="https://blog.apnic.net/category/tech-matters/" title="Technology, Labs, Standards, LEA/Security, IPv4/IPv6, DNSSEC, Routing">Tech matters</a> (628)
+</li>
+	<li class="cat-item cat-item-6"><a href="https://blog.apnic.net/category/policy/">Policy</a> (83)
+</li>
+	<li class="cat-item cat-item-8"><a href="https://blog.apnic.net/category/community/">Community</a> (554)
+</li>
+	<li class="cat-item cat-item-9"><a href="https://blog.apnic.net/category/events/">Events</a> (411)
+</li>
+	<li class="cat-item cat-item-10"><a href="https://blog.apnic.net/category/development/">Development</a> (205)
+</li>
+		</ul>
+</aside><aside id="tag_cloud-2" class="widget widget_tag_cloud widget_tag_cloud_dynamic widget_tag_cloud_hidden"><h3 class="widget-title"><span>Tags</span></h3><div class="tagcloud" style="display: none;"><a href="https://blog.apnic.net/tag/apnic-38/" class="tag-cloud-link tag-link-69 tag-link-position-1" style="font-size: 8.2641509433962pt;" aria-label="APNIC 38 (26 items)">APNIC 38</a>
+<a href="https://blog.apnic.net/tag/apnic-40/" class="tag-cloud-link tag-link-300 tag-link-position-2" style="font-size: 8pt;" aria-label="APNIC 40 (25 items)">APNIC 40</a>
+<a href="https://blog.apnic.net/tag/apnic-42/" class="tag-cloud-link tag-link-451 tag-link-position-3" style="font-size: 8.5283018867925pt;" aria-label="APNIC 42 (27 items)">APNIC 42</a>
+<a href="https://blog.apnic.net/tag/training/" class="tag-cloud-link tag-link-25 tag-link-position-4" style="font-size: 16.849056603774pt;" aria-label="APNIC Training (119 items)">APNIC Training</a>
+<a href="https://blog.apnic.net/tag/arin/" class="tag-cloud-link tag-link-86 tag-link-position-5" style="font-size: 8pt;" aria-label="ARIN (25 items)">ARIN</a>
+<a href="https://blog.apnic.net/tag/bgp/" class="tag-cloud-link tag-link-58 tag-link-position-6" style="font-size: 12.88679245283pt;" aria-label="BGP (59 items)">BGP</a>
+<a href="https://blog.apnic.net/tag/capacity-development/" class="tag-cloud-link tag-link-42 tag-link-position-7" style="font-size: 14.867924528302pt;" aria-label="capacity development (84 items)">capacity development</a>
+<a href="https://blog.apnic.net/tag/cert/" class="tag-cloud-link tag-link-114 tag-link-position-8" style="font-size: 11.169811320755pt;" aria-label="CERTs (44 items)">CERTs</a>
+<a href="https://blog.apnic.net/tag/china/" class="tag-cloud-link tag-link-172 tag-link-position-9" style="font-size: 8.2641509433962pt;" aria-label="China (26 items)">China</a>
+<a href="https://blog.apnic.net/tag/cyber-security/" class="tag-cloud-link tag-link-51 tag-link-position-10" style="font-size: 11.698113207547pt;" aria-label="cybersecurity (48 items)">cybersecurity</a>
+<a href="https://blog.apnic.net/tag/dns/" class="tag-cloud-link tag-link-45 tag-link-position-11" style="font-size: 15.924528301887pt;" aria-label="DNS (102 items)">DNS</a>
+<a href="https://blog.apnic.net/tag/dnssec/" class="tag-cloud-link tag-link-56 tag-link-position-12" style="font-size: 14.075471698113pt;" aria-label="DNSSEC (73 items)">DNSSEC</a>
+<a href="https://blog.apnic.net/tag/event-wrap/" class="tag-cloud-link tag-link-14 tag-link-position-13" style="font-size: 21.339622641509pt;" aria-label="Event Wrap (260 items)">Event Wrap</a>
+<a href="https://blog.apnic.net/tag/guest-post/" class="tag-cloud-link tag-link-129 tag-link-position-14" style="font-size: 21.603773584906pt;" aria-label="Guest Post (272 items)">Guest Post</a>
+<a href="https://blog.apnic.net/tag/iana/" class="tag-cloud-link tag-link-30 tag-link-position-15" style="font-size: 13.943396226415pt;" aria-label="IANA (72 items)">IANA</a>
+<a href="https://blog.apnic.net/tag/iana-transition/" class="tag-cloud-link tag-link-240 tag-link-position-16" style="font-size: 11.301886792453pt;" aria-label="IANA transition (45 items)">IANA transition</a>
+<a href="https://blog.apnic.net/tag/icann/" class="tag-cloud-link tag-link-29 tag-link-position-17" style="font-size: 14.471698113208pt;" aria-label="ICANN (78 items)">ICANN</a>
+<a href="https://blog.apnic.net/tag/ietf/" class="tag-cloud-link tag-link-68 tag-link-position-18" style="font-size: 13.811320754717pt;" aria-label="IETF (70 items)">IETF</a>
+<a href="https://blog.apnic.net/tag/igf/" class="tag-cloud-link tag-link-72 tag-link-position-19" style="font-size: 10.641509433962pt;" aria-label="IGF (40 items)">IGF</a>
+<a href="https://blog.apnic.net/tag/indonesia/" class="tag-cloud-link tag-link-20 tag-link-position-20" style="font-size: 9.7169811320755pt;" aria-label="Indonesia (34 items)">Indonesia</a>
+<a href="https://blog.apnic.net/tag/internet-governance/" class="tag-cloud-link tag-link-254 tag-link-position-21" style="font-size: 15.132075471698pt;" aria-label="Internet Governance (89 items)">Internet Governance</a>
+<a href="https://blog.apnic.net/tag/internet-of-things/" class="tag-cloud-link tag-link-210 tag-link-position-22" style="font-size: 9.7169811320755pt;" aria-label="Internet of Things (34 items)">Internet of Things</a>
+<a href="https://blog.apnic.net/tag/ipv4/" class="tag-cloud-link tag-link-36 tag-link-position-23" style="font-size: 15.792452830189pt;" aria-label="IPv4 (100 items)">IPv4</a>
+<a href="https://blog.apnic.net/tag/ipv4-transfers/" class="tag-cloud-link tag-link-81 tag-link-position-24" style="font-size: 8.9245283018868pt;" aria-label="IPv4 transfers (29 items)">IPv4 transfers</a>
+<a href="https://blog.apnic.net/tag/ipv6/" class="tag-cloud-link tag-link-11 tag-link-position-25" style="font-size: 22pt;" aria-label="IPv6 (292 items)">IPv6</a>
+<a href="https://blog.apnic.net/tag/isif-asia/" class="tag-cloud-link tag-link-47 tag-link-position-26" style="font-size: 9.5849056603774pt;" aria-label="ISIF Asia (33 items)">ISIF Asia</a>
+<a href="https://blog.apnic.net/tag/itu/" class="tag-cloud-link tag-link-22 tag-link-position-27" style="font-size: 12.358490566038pt;" aria-label="ITU (54 items)">ITU</a>
+<a href="https://blog.apnic.net/tag/ixp/" class="tag-cloud-link tag-link-128 tag-link-position-28" style="font-size: 11.037735849057pt;" aria-label="IXPs (43 items)">IXPs</a>
+<a href="https://blog.apnic.net/tag/japan/" class="tag-cloud-link tag-link-23 tag-link-position-29" style="font-size: 8pt;" aria-label="Japan (25 items)">Japan</a>
+<a href="https://blog.apnic.net/tag/lacnic/" class="tag-cloud-link tag-link-85 tag-link-position-30" style="font-size: 8pt;" aria-label="LACNIC (25 items)">LACNIC</a>
+<a href="https://blog.apnic.net/tag/netgov/" class="tag-cloud-link tag-link-15 tag-link-position-31" style="font-size: 9.3207547169811pt;" aria-label="netgov (31 items)">netgov</a>
+<a href="https://blog.apnic.net/tag/networking/" class="tag-cloud-link tag-link-137 tag-link-position-32" style="font-size: 8pt;" aria-label="networking (25 items)">networking</a>
+<a href="https://blog.apnic.net/tag/nog/" class="tag-cloud-link tag-link-21 tag-link-position-33" style="font-size: 16.188679245283pt;" aria-label="NOGs (106 items)">NOGs</a>
+<a href="https://blog.apnic.net/tag/nro/" class="tag-cloud-link tag-link-62 tag-link-position-34" style="font-size: 11.169811320755pt;" aria-label="NRO (44 items)">NRO</a>
+<a href="https://blog.apnic.net/tag/pacific/" class="tag-cloud-link tag-link-346 tag-link-position-35" style="font-size: 12.094339622642pt;" aria-label="Pacific (52 items)">Pacific</a>
+<a href="https://blog.apnic.net/tag/peering/" class="tag-cloud-link tag-link-127 tag-link-position-36" style="font-size: 8pt;" aria-label="peering (25 items)">peering</a>
+<a href="https://blog.apnic.net/tag/policy-sig/" class="tag-cloud-link tag-link-132 tag-link-position-37" style="font-size: 8pt;" aria-label="Policy SIG (25 items)">Policy SIG</a>
+<a href="https://blog.apnic.net/tag/ripe-ncc/" class="tag-cloud-link tag-link-221 tag-link-position-38" style="font-size: 10.905660377358pt;" aria-label="RIPE NCC (42 items)">RIPE NCC</a>
+<a href="https://blog.apnic.net/tag/rirs/" class="tag-cloud-link tag-link-102 tag-link-position-39" style="font-size: 13.283018867925pt;" aria-label="RIRs (64 items)">RIRs</a>
+<a href="https://blog.apnic.net/tag/routing/" class="tag-cloud-link tag-link-31 tag-link-position-40" style="font-size: 12.622641509434pt;" aria-label="routing (56 items)">routing</a>
+<a href="https://blog.apnic.net/tag/rpki/" class="tag-cloud-link tag-link-59 tag-link-position-41" style="font-size: 10.11320754717pt;" aria-label="RPKI (36 items)">RPKI</a>
+<a href="https://blog.apnic.net/tag/security/" class="tag-cloud-link tag-link-26 tag-link-position-42" style="font-size: 19.490566037736pt;" aria-label="Security (188 items)">Security</a>
+<a href="https://blog.apnic.net/tag/taiwan/" class="tag-cloud-link tag-link-87 tag-link-position-43" style="font-size: 9.5849056603774pt;" aria-label="Taiwan (33 items)">Taiwan</a>
+<a href="https://blog.apnic.net/tag/three-of-the-best/" class="tag-cloud-link tag-link-298 tag-link-position-44" style="font-size: 8.6603773584906pt;" aria-label="Three of the best (28 items)">Three of the best</a>
+<a href="https://blog.apnic.net/tag/whois/" class="tag-cloud-link tag-link-104 tag-link-position-45" style="font-size: 9.9811320754717pt;" aria-label="Whois (35 items)">Whois</a></div>
+</aside><aside id="archives-3" class="widget widget_archive widget_archive_dynamic widget_archive_hidden"><h3 class="widget-title"><span>Archives</span></h3>		<ul style="display: none;">
+			<li><a href="https://blog.apnic.net/2018/01/">January 2018</a>&nbsp;(29)</li>
+	<li><a href="https://blog.apnic.net/2017/12/">December 2017</a>&nbsp;(21)</li>
+	<li><a href="https://blog.apnic.net/2017/11/">November 2017</a>&nbsp;(38)</li>
+	<li><a href="https://blog.apnic.net/2017/10/">October 2017</a>&nbsp;(24)</li>
+	<li><a href="https://blog.apnic.net/2017/09/">September 2017</a>&nbsp;(30)</li>
+	<li><a href="https://blog.apnic.net/2017/08/">August 2017</a>&nbsp;(32)</li>
+	<li><a href="https://blog.apnic.net/2017/07/">July 2017</a>&nbsp;(30)</li>
+	<li><a href="https://blog.apnic.net/2017/06/">June 2017</a>&nbsp;(40)</li>
+	<li><a href="https://blog.apnic.net/2017/05/">May 2017</a>&nbsp;(39)</li>
+	<li><a href="https://blog.apnic.net/2017/04/">April 2017</a>&nbsp;(26)</li>
+	<li><a href="https://blog.apnic.net/2017/03/">March 2017</a>&nbsp;(31)</li>
+	<li><a href="https://blog.apnic.net/2017/02/">February 2017</a>&nbsp;(31)</li>
+	<li><a href="https://blog.apnic.net/2017/01/">January 2017</a>&nbsp;(22)</li>
+	<li><a href="https://blog.apnic.net/2016/12/">December 2016</a>&nbsp;(33)</li>
+	<li><a href="https://blog.apnic.net/2016/11/">November 2016</a>&nbsp;(33)</li>
+	<li><a href="https://blog.apnic.net/2016/10/">October 2016</a>&nbsp;(38)</li>
+	<li><a href="https://blog.apnic.net/2016/09/">September 2016</a>&nbsp;(33)</li>
+	<li><a href="https://blog.apnic.net/2016/08/">August 2016</a>&nbsp;(32)</li>
+	<li><a href="https://blog.apnic.net/2016/07/">July 2016</a>&nbsp;(30)</li>
+	<li><a href="https://blog.apnic.net/2016/06/">June 2016</a>&nbsp;(29)</li>
+	<li><a href="https://blog.apnic.net/2016/05/">May 2016</a>&nbsp;(33)</li>
+	<li><a href="https://blog.apnic.net/2016/04/">April 2016</a>&nbsp;(22)</li>
+	<li><a href="https://blog.apnic.net/2016/03/">March 2016</a>&nbsp;(20)</li>
+	<li><a href="https://blog.apnic.net/2016/02/">February 2016</a>&nbsp;(37)</li>
+	<li><a href="https://blog.apnic.net/2016/01/">January 2016</a>&nbsp;(12)</li>
+	<li><a href="https://blog.apnic.net/2015/12/">December 2015</a>&nbsp;(37)</li>
+	<li><a href="https://blog.apnic.net/2015/11/">November 2015</a>&nbsp;(29)</li>
+	<li><a href="https://blog.apnic.net/2015/10/">October 2015</a>&nbsp;(37)</li>
+	<li><a href="https://blog.apnic.net/2015/09/">September 2015</a>&nbsp;(36)</li>
+	<li><a href="https://blog.apnic.net/2015/08/">August 2015</a>&nbsp;(32)</li>
+	<li><a href="https://blog.apnic.net/2015/07/">July 2015</a>&nbsp;(33)</li>
+	<li><a href="https://blog.apnic.net/2015/06/">June 2015</a>&nbsp;(33)</li>
+	<li><a href="https://blog.apnic.net/2015/05/">May 2015</a>&nbsp;(28)</li>
+	<li><a href="https://blog.apnic.net/2015/04/">April 2015</a>&nbsp;(27)</li>
+	<li><a href="https://blog.apnic.net/2015/03/">March 2015</a>&nbsp;(34)</li>
+	<li><a href="https://blog.apnic.net/2015/02/">February 2015</a>&nbsp;(25)</li>
+	<li><a href="https://blog.apnic.net/2015/01/">January 2015</a>&nbsp;(25)</li>
+	<li><a href="https://blog.apnic.net/2014/12/">December 2014</a>&nbsp;(32)</li>
+	<li><a href="https://blog.apnic.net/2014/11/">November 2014</a>&nbsp;(36)</li>
+	<li><a href="https://blog.apnic.net/2014/10/">October 2014</a>&nbsp;(30)</li>
+	<li><a href="https://blog.apnic.net/2014/09/">September 2014</a>&nbsp;(40)</li>
+	<li><a href="https://blog.apnic.net/2014/08/">August 2014</a>&nbsp;(32)</li>
+	<li><a href="https://blog.apnic.net/2014/07/">July 2014</a>&nbsp;(12)</li>
+	<li><a href="https://blog.apnic.net/2014/06/">June 2014</a>&nbsp;(2)</li>
+		<li><a href="https://www.apnic.net/publications/news/news-archives">News archives</a></li></ul>
+		</aside>		</section><!-- #secondary -->
+	        <script>
+            try{
+                $('#secondary > .widget > h3').wrapInner('<span></span>');
+                $('#secondary > .widget #social-media-icons').parents('.widget:first').addClass('social-media-icons-widget');
+            }catch(e){}
+
+            /* Toggle on options for mailing list */
+    (function(){
+        try{
+            var $options = $('#get-updates-options');
+            $options.hide();
+            var $button = $('.widget_wysija input.wysija-submit:first');
+            $('<span id="get-updates-options-control">Show options</span>').insertBefore($button);
+            var $control = window.$get_updates_control = $('#get-updates-options-control');
+            $control.click(function(e){
+                e.preventDefault();
+                var $options = $('#get-updates-options');
+                if($options.is(':visible')){
+                    $options.hide();
+                    window.$get_updates_control.text('Show options');
+                }
+                else{
+                    $options.show();
+                    window.$get_updates_control.text('Hide options');
+                }
+            });
+        }
+        catch(e){
+            console.log('Problem adding show/hide options to get updates widget:');
+            console.log(e.message);}
+    }).call(this);
+
+            /*
+                function makeWidgetToggle(handle,parentSelector){
+                    if( window[handle] === 'undefined' ){ return false; }
+                    var $el = window[handle] = $(parentSelector);
+                    if( $el.length === 0 ){ return false; }
+                    $el.addClass('widget_with_toggle widget_with_toggle_hidden');
+                    var $child = $('ul',$el);
+                    if( $child.length === 0){ $child = $('div', $el) }
+                    if( $child.length === 0){ return false; }
+
+
+                }
+            */
+
+            /* Toggle on widget for tag cloud */
+            try{
+            var $tag_cloud_widget = window.$tag_cloud_widget = $('.widget_tag_cloud');
+            if($tag_cloud_widget.length > 0){
+                $tag_cloud_widget.addClass('widget_tag_cloud_dynamic widget_tag_cloud_hidden');
+                $('div',$tag_cloud_widget).hide();
+
+                $('h3',$tag_cloud_widget).click(function(e){
+                    e.preventDefault();
+                    var $items = $('div',$tag_cloud_widget);
+
+                  if($items.first().is(':visible')){
+                      $items.hide();
+                      $tag_cloud_widget.addClass('widget_tag_cloud_hidden').removeClass('widget_tag_cloud_visible');
+                  }
+                  else{
+                      $items.show();
+                      $tag_cloud_widget.removeClass('widget_tag_cloud_hidden').addClass('widget_tag_cloud_visible');
+                  }
+                });
+            }}catch(e){console.log('Problem extending tag cloud widget toggle:');console.log(e.message);}
+            /* Toggle on widget for archives */
+            try{
+            var $archive_widget = window.$archive_widget = $('.widget_archive');
+            if($archive_widget.length > 0){
+                $archive_widget.addClass('widget_archive_dynamic widget_archive_hidden');
+                $('ul',$archive_widget).hide();
+
+                $('h3',$archive_widget).click(function(e){
+                    e.preventDefault();
+                    var $items = $('ul',$archive_widget);
+
+                  if($items.first().is(':visible')){
+                      $items.hide();
+                      $archive_widget.addClass('widget_archive_hidden').removeClass('widget_archive_visible');
+                  }
+                  else{
+                      $items.show();
+                      $archive_widget.removeClass('widget_archive_hidden').addClass('widget_archive_visible');
+                  }
+                });
+            }}catch(e){console.log('Problem extending archive widget toggle:');console.log(e.message);}
+
+            /* Toggle on widget for categories */
+            try{
+            var $categories_widget = window.$categories_widget = $('.widget_categories');
+            if($categories_widget.length > 0){
+                $categories_widget.addClass('widget_categories_dynamic widget_categories_visible');
+                //$('ul',$categories_widget).hide();
+
+                $('h3',$categories_widget).click(function(e){
+                    e.preventDefault();
+                    var $items = $('ul',$categories_widget);
+
+                  if($items.first().is(':visible')){
+                      $items.hide();
+                      $categories_widget.addClass('widget_categories_hidden').removeClass('widget_categories_visible');
+                  }
+                  else{
+                      $items.show();
+                      $categories_widget.addClass('widget_categories_visible').removeClass('widget_categories_hidden');
+                  }
+                });
+            }}catch(e){console.log('Problem extending categories widget toggle:');console.log(e.message);}
+
+
+        </script>
+<script>
+try{
+// Tag iframes for better proportional stying
+$('iframe').each(function(){
+    var $me = $(this);
+    if( $me.attr('src').indexOf('flickr') != -1){
+        $me.addClass('iframe-to-flickr');
+    }else if( $me.attr('src').indexOf('youtube') != -1){
+        $me.addClass('iframe-to-youtube');
+    }
+    else if( $me.attr('src').indexOf('twitter') != -1){
+        $me.addClass('iframe-to-twitter');
+    }
+    else if( $me.attr('src').indexOf('slideshare') != -1){
+        $me.addClass('iframe-to-slideshare');
+    }
+});
+$('iframe').wrap("<div class='iframe-wrapper'></div>");
+}catch(e){}
+// Create nicely captioned figures from images (on demand)
+try{
+    $('img.figure:not(figure img)').each(function(){
+        var $img = $(this);
+        var small = $img.attr('data-small');
+        var caption = "<figcaption class='photo'>"+$img.attr('alt')+"</figcaption>";
+        var html = "<figure></figure>";
+        if(typeof small !== "undefined"){
+            html = "<figure class='small'></figure>";
+        }
+	$img.wrap(html);
+        if ($img.attr('alt').length) {
+            $img.after(caption);
+        }
+        $img.attr('height','');
+        $img.attr('width','');
+    });
+}catch(e){console.log('Problem converting images to captioned figures');console.log(e.message);}
+</script>
+    	</div><!-- #main .wrapper -->
+    </div><!-- .content -->
+</div><!-- #page .container -->
+
+
+    <footer class="footer">
+
+        <div class="container">
+
+            <div class="grid grid-inline grid-middle">
+
+                <div class="col size-sm-1-of-4">
+
+                    <div class="footer-logo">
+                        <a href="https://www.apnic.net/"><img src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/apnic-reverse.svg" alt="APNIC"></a>
+                    </div>
+                    <!-- .footer-logo -->
+
+                </div>
+
+                <div class="col size-sm-3-of-4">
+
+                    <div class="footer-social">
+                        Connect with us
+                        <ul>
+                            <li><a href="https://www.facebook.com/APNIC" class="is-facebook"><span class="sr-only">Facebook</span></a></li>
+                            <li><a href="https://twitter.com/apnic" class="is-twitter"><span class="sr-only">Twitter</span></a></li>
+                            <li><a href="https://www.youtube.com/user/apnicmultimedia" class="is-youtube"><span class="sr-only">YouTube</span></a></li>
+                            <li><a href="https://www.flickr.com/photos/apnic/" class="is-flickr"><span class="sr-only">Flickr</span></a></li>
+                            <li><a href="http://weibo.com/APNICrir" class="is-weibo"><span class="sr-only">Weibo</span></a></li>
+                            <li><a href="http://www.slideshare.net/apnic" class="is-slideshare"><span class="sr-only">Slideshare</span></a></li>
+                            <li><a href="https://www.linkedin.com/company/apnic" class="is-linkedin"><span class="sr-only">LinkedIn</span></a></li>
+                            <li><a href="https://blog.apnic.net/feed/" class="is-rss"><span class="sr-only">RSS</span></a></li></ul>
+                    </div>
+                    <!-- .footer-social -->
+
+                </div>
+
+            </div>
+
+            <div class="footer-aside">
+
+                <small class="footer-aside-copyright">© 2017&nbsp;APNIC<span class="footer-aside-copyright-abn">ABN&nbsp;42&nbsp;081&nbsp;528&nbsp;010</span></small>
+                <!-- .footer-aside-copyright -->
+
+                <ul class="footer-aside-links">
+                    <li><a href="https://www.apnic.net/apnic-info/privacy">Privacy</a></li>
+                    <li><a href="https://www.apnic.net/about-APNIC/organization/contact-APNIC">Contact</a></li>
+                    <li><a href="https://www.apnic.net/get-ip/helpdesk">Helpdesk</a></li>
+                    <li><a href="https://www.nro.net/category/news">NRO News</a></li>
+                    <li><a href="https://www.apnic.net/about-APNIC/service-updates">Service Status</a></li>
+                </ul>
+                <!-- .footer-links -->
+
+            </div>
+            <!-- .footer-aside -->
+
+        </div>
+        <!-- .container -->
+
+    </footer>
+    <!-- .footer -->
+
+    <script>document.documentElement.className = document.documentElement.className.replace('no-js', 'js');</script>
+    <script src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/main.js"></script>
+
+    <script>
+        (function(){
+            var url = window.location;
+            var d = new Date();
+            var message = "<span class='visible-print'>Printed on " + 
+d.getDate() + "/" + (d.getMonth()+1) + "/" + d.getFullYear() + " from " +
+ url + "</span>";
+            var selector = "#copyright-stamp";
+            $(selector).append(message);
+        }).call(this);
+    </script>
+
+    					<!-- This site's ratings are powered by RatingWidget plugin v2.9.0.1 (Free version) - https://rating-widget.com/wordpress-plugin/ -->
+					<div class="rw-js-container"></div>
+					<!-- / RatingWidget plugin -->
+						<div style="display:none">
+	</div>
+<script type="text/javascript" src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/devicepx-jetpack.js"></script>
+<script type="text/javascript" src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/clipboard.js"></script>
+<script type="text/javascript" src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/comment-reply.js"></script>
+<script type="text/javascript" src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/navigation.js"></script>
+<script type="text/javascript" src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/wp-embed.js"></script>
+<script async="async" type="text/javascript" src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/form.js"></script>
+<script type="text/javascript" src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/jquery_003.js"></script>
+<script type="text/javascript" src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/jquery.js"></script>
+<script type="text/javascript">
+/* <![CDATA[ */
+var wysijaAJAX = 
+{"action":"wysija_ajax","controller":"subscribers","ajaxurl":"https:\/\/blog.apnic.net\/wp-admin\/admin-ajax.php","loadingTrans":"Loading...","is_rtl":""};
+/*
+ ]]> */
+</script>
+<script type="text/javascript" src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/front-subscribers.js"></script>
+<script type="text/javascript">
+/* <![CDATA[ */
+var cptch_vars = {"nonce":"44ea7721a6","ajaxurl":"https:\/\/blog.apnic.net\/wp-admin\/admin-ajax.php","enlarge":""};
+/* ]]> */
+</script>
+<script type="text/javascript" src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/front_end_script.js"></script>
+<script type="text/javascript" src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/e-201804.js" async="" defer="defer"></script>
+<script type="text/javascript">
+	_stq = window._stq || [];
+	_stq.push([ 'view', {v:'ext',j:'1:5.6.1',blog:'73396298',post:'19088',tz:'10',srv:'blog.apnic.net'} ]);
+	_stq.push([ 'clickTrackerInit', '73396298', '19088' ]);
+</script>
+
+</div><script id="pocket-btn-js" src="Internet%20protocols%20are%20changing%20|%20APNIC%20Blog_files/btn.js"></script> <!-- /.page -->
+
+
+
+<span style="display: none;" class="rw-ui-tooltip"></span><div style="display: none;" class="rw-ui-report"></div><div><i class="rw-action-loader" style="position: fixed; top: -1000px;"></i></div><div><i class="rw-action-loader" style="position: fixed; top: -1000px;"></i></div></body></html>

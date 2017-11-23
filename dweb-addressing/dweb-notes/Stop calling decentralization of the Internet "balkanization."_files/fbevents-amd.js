@@ -1,0 +1,1 @@
+define(function(a){if(!window.fbq){var b=window.fbq=function(){b.callMethod?b.callMethod.apply(b,arguments):b.queue.push(arguments)};return window._fbq||(window._fbq=b),b.push=b,b.loaded=!0,b.version="2.0",b.queue=[],requirejs(["https://connect.facebook.net/en_US/fbevents.js"]),b}});
