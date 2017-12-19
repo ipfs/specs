@@ -25,67 +25,54 @@ Bitswap is the data trading module for IPFS. Its purpose is to request blocks fr
 
 # Organization of this document
 
-TODO
+  - [Introduction](#introduction)
+  - [Subsystems](#subsystems)
+  - [Implementation Details](#implementation-details)
+  - [API Spec](#api-spec)
+  - [Implementations](#implementations)
 
 # Introduction
 
-Bitswap is IPFS's central block exchange protocol. It handles the requests made by an IPFS user, human, or application to fetch data blocks from the network. It interacts with other Bitswap agents present in other IPFS nodes, exchanging (fetching + serving) blocks as it needs.
+Bitswap is IPFS’s central block exchange protocol. It handles the requests made by an IPFS user, human, or application to fetch data blocks from the network. It interacts with other Bitswap agents present in other IPFS nodes, exchanging (fetching + serving) blocks as it needs.
 
-Bitswap is a message based protocol, as opposed to response-reply. All messages contain wantlists, or blocks. Upon receiving a wantlist, an IPFS node should consider sending out wanted blocks if it has them. Upon receiving blocks, the node should send out a notification called a 'Cancel' signifying that they no longer want the block. At the protocol level, Bitswap is very simple.
+Bitswap is a message based protocol, as opposed to response-reply. All messages contain wantlists, or blocks. Upon receiving a wantlist, an IPFS node should consider sending out wanted blocks if it has them. Upon receiving blocks, the node should send out a notification called a `Cancel` signifying that they no longer want the block. At the protocol level, Bitswap is very simple.
 
 While Bitswap is a relatively simple protocol, a time- and memory- performant implementation requires that many details be carefully thought out. We aim to document these details here so that future implementers may build upon the knowledge gathered over the several iterations of Bitswap.
 
-# Systems
+# Subsystems
+
+There are two primary flows that Bitswap manages: requesting blocks from and serving blocks to peers. Block requests are primarily mediated by the want-manager, which tells our peers whenever we want a new block. Serving blocks is primarily handled by the decision engine, which decides how resources should be allocated among our peers.
+
+The subsystems involved in these flows are detailed in the following subsections.
+
+**TODO**: Update graphic
 
 ![](https://cloud.githubusercontent.com/assets/1211152/21071077/4620387a-be4a-11e6-895c-aa8f2b06aa4e.png)
 
-## Wantlist Manager
+## Types
 
-TODO
+The following types are used in the descriptions of the Bitswap subsystems.
 
-## Decision Engine
+  - `CID`: A [content-addressed identifier](https://github.com/ipld/cid) that refers to a particular `Block`.
+  - `Peer`: Another Bitswap instance that we are connected to.
+  - `Block`: A binary blob.
+  - `Message`: A Bitswap message.
+  - `Entry`: A wantlist entry that may be included in a Message when adding/removing a particular `CID` from our wantlist. Contains:
+      - `CID` referring to a particular block.
+      - `Priority` relative priority with which the user wants `CID` (relevant only if `Cancel` is not true.
+      - `Cancel` is a boolean representing whether this `Entry` is meant to remove `CID` from our wantlist.
+  - `Ledger`: A record of the aggregate data exchanged between two peers. Each peer stores one `Ledger` for each of their peers.
 
-TODO
+### Bitswap Message
 
-### Strategies
+A single Bitswap message may contain any of the following content:
 
-TODO: Link to strategy impl docs
+1.  The sender’s wantlist. This wantlist may either be the sender’s complete wantlist or just the changes to the sender’s wantlist that the receiver needs to know.
+2.  Data blocks. These are meant to be blocks that the receiver has requested (i.e., blocks on that are on the receiver’s wantlist as far as the sender is aware at the time of sending).
 
-## Message Queue
+#### Wire Format
 
-TODO
-
-## Network
-
-TODO
-
-# Bitswap Flows
-
-There are two primary flows that Bitswap manages: requesting blocks from and serving blocks to peers.
-
-## Requesting Blocks
-
-**TODO**: continue editing from here
-
-Client requests for new blocks are handled by the wantlist manager. For every new block (or set of blocks) wanted, the `WantBlocks` method is invoked. The want manager then ensures that connected peers are notified of the new block that we want by sending the new entries to a message queue for each peer. The message queue will loop while there is work available and do the following:
-
-1.  Ensure it has a connection to its peer
-2.  Grab the message to be sent
-3.  Send it
-
-If new messages are added while the loop is in steps 1 or 3, the messages are combined into one to avoid having to keep an actual queue and send multiple messages. The same process occurs when the client receives a block and sends a cancel message for it.
-
-## Serving Blocks
-
-Internally, when a message with a wantlist is received, it is sent to the decision engine to be considered, and blocks that we have that are wanted are placed into the peer request queue. Any block we possess that is wanted by another peer has a task in the peer request queue created for it.
-
-The peer request queue is a priority queue that sorts available tasks by some metric, currently, that metric is very simple and aims to fairly address the tasks of each other peer. More advanced decision logic will be implemented in the future.
-
-Task workers pull tasks to be done off of the queue, retreive the block to be sent, and send it off. The number of task workers is limited by a constant factor.
-
-# Wire Format
-
-Streams of [Bitswap messages, according to this protobuf](https://github.com/ipfs/go-ipfs/blob/master/exchange/bitswap/message/pb/message.proto):
+The wire format for Bitswap is simply a stream of Bitswap messages. The following protobuf describes the form of these messages.
 
 ```
 message Message {
@@ -105,16 +92,51 @@ message Message {
 }
 ```
 
+## Want-Manager
+
+The want-manager handles requests for blocks. For a requested block, identified by `cid`, the `Bitswap.GetBlock(cid)` method is invoked. `Bitswap.GetBlock(cid)` requests `cid` from the network and, if the corresponding `Block` is received, returns it. More concretely, `Bitswap.GetBlock(cid)` adds `cid` to our wantlist. The want-manager then updates all peers with this addition by adding a new `Entry` to each peer’s message queue, who then may or may not respond with the desired block.
+
+## Decision Engine
+
+The decision engine decides how to allocate resources to peers. When a `Message` with a wantlist from a peer is received, the `Message` is sent to the decision engine. For every `CID` in the wantlist that we have the corresponding `Block` for, the block has a `Task` added to the peer’s `TaskQueue`. A `Task` is considered complete once the corresponding `Block` has been sent to the message queue for that peer.
+
+The primary data structure in the decision engine is the peer request queue (`PRQ`). The `PRQ` adds peers to a weighted round-robin queue, where the weights are based on one or more peer-specific metrics. This is where Bitswap *strategies* come in. Currently, a `Strategy` is a function whose input is a peer’s `Ledger` and output is a weight for that peer. The peers are then served the `Task`s in their respective `TaskQueue`s. The amount of data each peer is served in a given round-robin round is determined by their relative weight in the queue. The in-progress Bitswap strategy implementation can be found [here](https://github.com/ipfs/research-bitswap/tree/docs/strategy_impl/strategy-impl). Further Bitswap strategy metrics and configuration interfaces are planned for the near future.
+
+*Note: The Bitswap strategy implementations in the current releases of* `go-ipfs` *and* `js-ipfs` *do not conform to the description here as of the time of this writing.*
+
+## Message Queue
+
+Each active peer has an associated message queue. The message queue holds the next message to be sent to that peer. The message queues receive updates from two other subsystems:
+
+1.  Wantlist manager: When a `CID` is added or removed from our wantlist, we must update our peers – these wantlist updates are sent to all relevant peers’ message queues.
+2.  Decision engine: When we have a block that a peer wants and the decision engine decides to send the block, we propagate the block to that peer’s message queue.
+
+Task workers watch the message queues, dequeue a waiting message, and send it to the recipient.
+
+## Network
+
+The network is the abstraction representing all Bitswap peers that are connected to us by one or more hops. Bitswap messages flow in and out of the network. This is where a game-theoretical analysis of Bitswap becomes relevant – in an arbitrary network we must assume that all of our peers are rational and self-interested, and we act accordingly. Work along these lines can be found in the [research-bitswap respository](https://github.com/ipfs/research-bitswap), with a preliminary game-theoretical analysis currently in-progress [here](https://github.com/ipfs/research-bitswap/blob/docs/strategy_analysis/analysis/prelim_strategy_analysis.pdf).
+
 # Implementation Details
+
+## Coalescing Messages
+
+When a message queue that already contains a Bitswap message receives another, the new message should be coalesced with the original to reduce the overhead of sending separate packets.
+
+## Bitswap Sessions
+
+**TODO**
+
+**TODO**: Everything below must either be updated/integrated above, or removed
 
 Also, make sure to read - <https://github.com/ipfs/go-ipfs/tree/master/exchange/bitswap#go-ipfs-implementation>
 
 Implementation suggestions:
 
-  - maintain a peer set of "live partners"
+  - maintain a peer set of “live partners”
   - protocol listener accept streams for partners to receive messages
   - protocol sender opens streams to partners to send messages
-  - separate out a decision engine that selects which blocks to send to which partners, and at what time. (this is a bit tricky, but it's super easy to make as a whole if the engine is separated out)
+  - separate out a decision engine that selects which blocks to send to which partners, and at what time. (this is a bit tricky, but it’s super easy to make as a whole if the engine is separated out)
 
 Sender:
 
@@ -171,6 +193,8 @@ bs.getBlock(multihash, (err, block) => {
 ```
 
 # API Spec
+
+**TODO**: Fill this in, may need some input from @diasdavid, @whyrusleeping
 
 > **Will be written once it gets stable, by now, it still requires a ton of experimentation**
 
