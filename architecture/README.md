@@ -95,7 +95,7 @@ The **network** provides point-to-point transports (reliable and unreliable) bet
 - supports encryption, signing, or clear communications
 - multi-multiplexes -multiplexes connections, streams, protocols, peers, ...
 
-See more in the [network spec](https://github.com/ipfs/specs/tree/master/libp2p).
+See more in the [libp2p specs](https://github.com/libp2p/specs).
 
 ## [3.2 Routing -- finding peers and data](routing)
 
@@ -110,7 +110,7 @@ The Routing Sytem is an interface that is satisfied by various kinds of implemen
 - **snr:** supernode routing is a delegated routing system: it delegates to one of a set of supernodes. This is roughly like federated routing.
 - **dns:** ipfs routing could even happen over dns.
 
-See more in the [routing spec](https://github.com/ipfs/specs/tree/master/libp2p).
+See more in the [libp2p specs](https://github.com/libp2p/specs).
 
 ## [3.3 Block Exchange -- transfering content-addressed data](exchange)
 
