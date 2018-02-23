@@ -80,8 +80,9 @@ DESCRIPTION:
 OPTIONS:
 
 	-t, -type		string		- Specify the type and size of key to generate (i.e. rsa-4096)
-	-p, -passphrase string		- Passphrase for encrypting the private key on disk
+	-p, -passphrase 	string		- Passphrase for encrypting the private key on disk
 	-n, -name		string		- Specify a name for the key
+	-l, -list				- Lists out all supported types and sizes of keys
 
 DESCRIPTION:
 
