@@ -125,7 +125,7 @@ When a message queue that already contains a Bitswap message receives another, t
 
 ## Bitswap Sessions
 
-**TODO**
+Bitswap sessions are an attempt to optimize the block requests sent to other Bitswap clients. When requesting a graph of blocks from the network, we send a wantlist update containing the graph’s root block to all of our peers. Then, for each peer who sends the root block back, we add that peer to the graph’s *active set*. We then send all requests for other nodes in the graph only to the peers in the active set. The idea is that peers who have the root node of a graph are likely to have its children as well, while those who do not have the root are unlikely to have its children.
 
 **TODO**: Everything below must either be updated/integrated above, or removed
 
