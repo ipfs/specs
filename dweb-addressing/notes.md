@@ -44,6 +44,7 @@ but do keep in mind what jbenet said about absolute paths
 
 ---
 
+```
 22:42+0000 <@lgierth> the /wss scheme is far from ideal but it's what we have right now
 22:43+0000 <@lgierth> it should be come /tls/http/ws instead in the future, when /tls and /http are speced
 00:46+0000 <Magik6k> I'm not sure it /http should be speced for ws as websockets don't really run on top of http, they just use http for a handshake/protocol upgrade. Other than that they don't have anything to do with http
@@ -71,12 +72,12 @@ but do keep in mind what jbenet said about absolute paths
 02:01+0000 <@lgierth> mh! interesting! thanks!
 02:01+0000 <deltab> CCNx URIs: https://www.ietf.org/proceedings/95/slides/slides-95-icnrg-1.pdf
 02:39+0000 <deltab> also found this, about content-centric routing: https://www.christopher-wood.com/docs/conference/pitless17.pdf
-
+```
 ---
 
 quote juan, to be edited:
 
-The major reason has to do with unifying FSes, Databases, and the Web
+> The major reason has to do with unifying FSes, Databases, and the Web
 with a singular way of addressing all data. It's about undoing the harm
 that URLs brought unto computing systems by fragmenting the ecosystem.
 To this day the rift between both worlds prevents simple tooling from
@@ -97,10 +98,11 @@ decentralized web things). It would be nice if there's a nice compatible
 way to bridge with the web's expectations (dweb://...) but work towards
 fixing things more broadly.
 
-A minor reason is not having to force people to swallow N shemes
+> A minor reason is not having to force people to swallow N shemes
 (ipfs:// ipns:// ipld:// and counting), and instead use one that muxes.
 
-(important note) These goals are secondary in time to getting browser
+ (important note) 
+> These goals are secondary in time to getting browser
 adoption. Meaning that we CAN do things like recommend ipfs:// ipns://
 ipld:// IF browser vendors think that it's unlikely to get adoption this
 way now. We can work on unifying the fs-db-web rift later. We're not
@@ -228,14 +230,14 @@ From @gozala:
 @jbenet:
 
 > What if we resolve through to a CIDv1 encoded in the right base (16 or 32) non-transparently? meaning that we actually resolve through from
->
->  fs://ipfs/${CIDv0 or CIDv1 in any base}/path  ->   ipfs://${CIDv1 in base16 or base32}/path
+>   ```
+>   fs://ipfs/${CIDv0 or CIDv1 in any base}/path  ->   ipfs://${CIDv1 in base16 or base32}/path
 >   fs://ipns/${CIDv0 or CIDv1 in any base}/path  ->   ipns://${CIDv1 in base16 or base32}/path
 >   fs://ipld/${CIDv0 or CIDv1 in any base}/path  ->   ipld://${CIDv1 in base16 or base32}/path
 >   ipfs://${CIDv0 or CIDv1 in any base}/path  ->   ipfs://${CIDv1 in base16 or base32}/path
 >   ipns://${CIDv0 or CIDv1 in any base}/path  ->   ipns://${CIDv1 in base16 or base32}/path
 >   ipld://${CIDv0 or CIDv1 in any base}/path  ->   ipld://${CIDv1 in base16 or base32}/path
-
+>   ```
 >
 > so that the browser can treat ${CIDv1 in base16 or base32} as the origin hostname?
 
@@ -247,7 +249,7 @@ From @gozala:
 >
 > fs, ipfs and ipns protocol handlers are added added to firefox.
 > fs protocol handler essentially just redirects to either ipfs or ipns as follows
->
+> ``` 
 > fs://ipfs/${cid}/path/with-in/ -> ipfs://${cid_v1_base16}/path/with-in
 > fs:ipfs/${cid}/path/with-in/ -> ipfs://${cid_v1_base16}/path/with-in
 > fs:///ipfs/${cid}/path/with-in/ -> ipfs://${cid_v1_base16}/path/with-in
@@ -256,26 +258,27 @@ From @gozala:
 > fs:ipns/${cid}/path/with-in/ -> ipns://${cid_v1_base16}/path/with-in
 > fs:///ipns/${cid}/path/with-in/ -> ipns://${cid_v1_base16}/path/with-in
 > fs:/ipns/${cid}/path/with-in/ -> ipns://${cid_v1_base16}/path/with-in
->
+> ```
 > both ipfs and ipns protocol handlers redirect to corresponding base16 encoded CID path
->
+> ```
 > ipfs://${cid_v0_base58}/path/with-in -> ipfs://${cid_v1_base16}/path/with-in
 > ipfs:/${cid_v0_base58}/path/with-in -> ipfs://${cid_v1_base16}/path/with-in
 > ipfs:///${cid_v0_base58}/path/with-in -> ipfs://${cid_v1_base16}/path/with-in
 > ipfs:${cid_v0_base58}/path/with-in -> ipfs://${cid_v1_base16}/path/with-in
->
+> 
 > ipfs://${cid_v1}/path/with-in -> ipfs://${cid_v1_base16}/path/with-in
 > ipfs:/${cid_v1}/path/with-in -> ipfs://${cid_v1_base16}/path/with-in
 > ipfs:///${cid_v1}/path/with-in -> ipfs://${cid_v1_base16}/path/with-in
 > ipfs:${cid_v1}/path/with-in -> ipfs://${cid_v1_base16}/path/with-in
->
+> ```
 > same with ipns
 >
 > both ipfs and ipns protocol handlers serve content from local node (that is assumed to be running), meaning that firefox will show URLs on the left but will serve content from URLs on the right.
->
+> ```
 > ipfs://${cid_v1_base16}/path/with-in => localhost:8080/ipfs/${cid_v0_base58}/path/with-in
 > ipns://${cid_v1_base16}/path/with-in => localhost:8080/ipns/${cid_v0_base58}/path/with-in
->
-> In a consequence to all the redirects everything works under (what I assume to be) desired origin policy where it’s either ipfs://${cid_v1_base16}/ or ipfs://${cid_v1_base16}/ respectively.
+> ```
+> In a consequence to all the redirects everything works under (what I assume to be) 
+> desired origin policy where it’s either `ipfs://${cid_v1_base16}/` or `ipfs://${cid_v1_base16}/` respectively.
 
 ---
