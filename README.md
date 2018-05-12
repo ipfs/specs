@@ -16,25 +16,21 @@ Some day we will hopefully transform these specs into RFCs. For now, they assume
 - [Work In Progress](#work-in-progress)
 - [Specs](#specs)
   - [High level Architecture of IPFS](/architecture)
-  - [bitswap](/bitswap)
-  - [DEX - Importers and Exporters](/dex)
-  - [Files API and MFS](/files)
-    - [Unixfs](/unixfs)
-  - [IPRS](/iprs)
-  - [keychain](/keychain)
-  - [keystore](/keystore)
-  - [MerkleDAG (deprecated, see IPLD)](/merkledag)
-  - [Repo](/repo)
-  - [Public API (CLI, HTTP and Core)](/public-api)
-  - [Protocol Driven Development](https://github.com/ipfs/pdd)
   - [IPLD](https://github.com/ipld/specs)
   - [libp2p](https://github.com/libp2p/specs)
+    - [IPRS](/iprs)
+  - [bitswap](/bitswap)
+  - [Files API and MFS](/files)
+  - [Public API (CLI, HTTP and Core)](/public-api)
+  - [DEX - Importers and Exporters](/dex)
+  - [keychain](/keychain)
+  - [keystore](/keystore)
+  - [Repo](/repo)
+  - [Protocol Driven Development](https://github.com/ipfs/pdd)
 - [Contribute](#contribute)
 - [License](#license)
 
 ## Work In Progress
-
-Warning: this is a work in progress. IPFS is a young system and we want to get it right. We will continue to evaluate and re-think pieces. At this point, the IPFS protocol is solid enough to write this spec and produce interoperable implementations in different languages.
 
 **Specs are not finished yet. We use the following tag system to identify their state:**
 
@@ -57,7 +53,7 @@ The specs contained in this repository are:
 - [overviews](/overviews) - quick overviews of the various parts of IPFS
 
 **Networking layer:**
-- [libp2p](https://github.com/libp2p/spec) - libp2p is a modular and extensible network stack, built and use by IPFS, but that it can be reused as a standalone project. Covers:
+- [libp2p](https://github.com/libp2p/specs) - libp2p is a modular and extensible network stack, built and use by IPFS, but that it can be reused as a standalone project. Covers:
   - network - the network layer spec
   - routing - the routing layer spec
     - kademlia - Kademlia DHT
@@ -66,14 +62,19 @@ The specs contained in this repository are:
     - snr - supernode delegated routing
     - multirouter - combines multiple others
 
+**Records and Record Systems:**
+- [IPRS](https://github.com/libp2p/specs/blob/master/IPRS.md) - InterPlanetary Record System
+- IPNS - InterPlanetary Naming System
+
+
 **Data Structures and formats:**
-- [MerkleDAG](/merkledag) - The MerkleDAG layer (pre IPLD).
 - [IPLD](https://github.com/ipld/spec) - InterPlanetary Linked Data.
 - [unixfs](/unixfs)
-- [multihash](https://github.com/multiformats/multihash) - self-describing hash digest format.
-- [multiaddr](https://github.com/multiformats/multiaddr) - self-describing addressing format.
-- [multicodec](https://github.com/multiformats/multicodec) - self-describing protocol/encoding streams (note: a file is a stream).
-- [multistream](https://github.com/multiformats/multistream) - multistream is a format -- or simple protocol -- for disambiguating, and layering streams. It is extremely simple.
+- [multiformats](http://github.com/multiformats/multiformats)
+  - [multihash](https://github.com/multiformats/multihash) - self-describing hash digest format.
+  - [multiaddr](https://github.com/multiformats/multiaddr) - self-describing addressing format.
+  - [multicodec](https://github.com/multiformats/multicodec) - self-describing protocol/encoding streams (note: a file is a stream).
+  - [multistream](https://github.com/multiformats/multistream) - multistream is a format -- or simple protocol -- for disambiguating, and layering streams. It is extremely simple.
 
 **Block Exchanges:**
 - [bitswap](/bitswap) - BitTorrent-inspired exchange
@@ -90,13 +91,9 @@ The specs contained in this repository are:
 - [Files Impl and API](/files) - Virtual File System interface, unix like, on top of the MerkleDAG
 
 **Public APIs:**
-- [CLI](/public-api/cli) - Command Line Interface
-- [HTTP API](https://github.com/ipfs/http-api-spec) - IPFS HTTP API specification
 - [Core API](/public-api/core) - IPFS programatic interface
-
-**Records and Record Systems:**
-- [IPRS](/iprs) - InterPlanetary Record System
-- IPNS - InterPlanetary Naming System
+- [HTTP API](https://github.com/ipfs/http-api-spec) - IPFS HTTP API specification
+- [CLI](/public-api/cli) - Command Line Interface
 
 **Key Management:**
 - [KeyStore](/keystore) - Key management on IPFS

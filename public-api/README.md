@@ -29,7 +29,6 @@ This RFC is organized by chapters described on the *Table of contents* section. 
 
 - [%N% Introduction]()
 - [%N% APIs]()
-  - [%N.M% Internals]()
   - [%N.M% Core]()
   - [%N.M% HTTP]()
   - [%N.M% CLI]()
