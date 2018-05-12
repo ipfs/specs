@@ -1,18 +1,19 @@
-![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) unixfs and Files on IPFS
-==================================================================================================
+![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Files (Mutable File System)
+====================================================================================================
 
 Authors:
 
+- n/a
+
 Reviewers:
 
-> tl;dr;
+- n/a
 
 * * *
 
 # Abstract
 
-# Status of this spec
-
+`TODO`
 
 # Organization of this document
 
@@ -27,6 +28,4 @@ This spec is organized by chapters described on the *Table of contents* section.
 # Implementations
 
 - JavaScript
-  - Data Formats - [unixfs](https://github.com/ipfs/js-ipfs-unixfs)
-  - Importers and Exporters - [unixfs-engine](https://github.com/ipfs/js-ipfs-unixfs-engine)
   - Mutable File System - [mfs](https://github.com/ipfs/js-ipfs-mfs)

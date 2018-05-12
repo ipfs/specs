@@ -1,7 +1,13 @@
-# IPFS Repo Spec
-Author[s]: [Juan Benet](github.com/jbenet)
+![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) IPFS Repo Spec
+========================================================================================
 
-Reviewer[s]:
+Authors:
+
+- [Juan Benet](github.com/jbenet)
+
+Reviewer:
+
+- n/a
 
 * * *
 
@@ -26,7 +32,7 @@ Repo Implementations:
 - [s3-repo](s3-repo) - stored in amazon s3
 
 <center>
-<img src="ipfs-repo.png" width="256" />
+  <img src="ipfs-repo.png" width="256" />
 </center>
 
 ## Repo Contents
@@ -61,18 +67,14 @@ For example, the `fs-repo` simply includes a `version` file with the version num
 
 IPFS nodes store some IPLD objects locally. These are either (a) **state objects** required for local operation -- such as the `config` and `keys` -- or (b) **content objects** used to represent data locally available. **Content objects** are either _pinned_ (stored until they are unpinned) or _cached_ (stored until the next repo garbage collection).
 
-The name "datastore" comes from
-[go-datastore](https://github.com/jbenet/go-datastore), a library for
-swappable key-value stores. Like its name-sake, some repo implementations
-feature swappable datastores, for example:
+The name "datastore" comes from [go-datastore](https://github.com/jbenet/go-datastore), a library for swappable key-value stores. Like its name-sake, some repo implementations feature swappable datastores, for example:
 - an fs-repo with a leveldb datastore
 - an fs-repo with a boltdb datastore
 - an fs-repo with a union fs and leveldb datastore
 - an fs-repo with an s3 datastore
 - an s3-repo with a cached fs and s3 datastore
 
-This makes it easy to change properties or performance characteristics of
-a repo without an entirely new implementation.
+This makes it easy to change properties or performance characteristics of a repo without an entirely new implementation.
 
 
 ### keys (state)
@@ -109,28 +111,20 @@ Logs MAY be stored directly as IPLD objects along with everything else, but this
 
 ### locks
 
-IPFS implementations may use multiple processes, or may disallow multiple
-processes from using the same repo simultaneously. Others may disallow using
-the same repo but may allow sharing _datastores_ simultaneously. This
-synchronization is accomplished via _locks_.
+IPFS implementations may use multiple processes, or may disallow multiple processes from using the same repo simultaneously. Others may disallow using the same repo but may allow sharing _datastores_ simultaneously. This synchronization is accomplished via _locks_.
 
 All repos contain the following standard locks:
 - `repo.lock` - prevents concurrent access to the repo. Must be held to _read_ or _write_.
 
 ### hooks (TODO)
 
-Like git, IPFS nodes will allow `hooks`, a set of user configurable scripts
-to run at predefined moments in ipfs operations. This makes it easy
-to customize the behavior of ipfs nodes without changing the implementations
-themselves.
+Like git, IPFS nodes will allow `hooks`, a set of user configurable scripts to run at predefined moments in ipfs operations. This makes it easy to customize the behavior of ipfs nodes without changing the implementations themselves.
 
 ## Notes
 
 #### A Repo uniquely identifies an IPFS Node
 
-A repository uniquely identifies a node. Running two different ipfs programs
-with identical repositories -- and thus identical identities -- WILL cause
-problems.
+A repository uniquely identifies a node. Running two different ipfs programs with identical repositories -- and thus identical identities -- WILL cause problems.
 
 Datastores MAY be shared -- with proper synchronization -- though note that sharing datastore access MAY erode privacy.
 
@@ -138,11 +132,8 @@ Datastores MAY be shared -- with proper synchronization -- though note that shar
 
 **DO NOT BREAK USERS' DATA.** This is critical. Thus, any changes to a repo's implementation **MUST** be accompanied by a **SAFE** migration tool.
 
-See https://github.com/jbenet/go-ipfs/issues/537 and
-https://github.com/jbenet/random-ideas/issues/33
+See https://github.com/jbenet/go-ipfs/issues/537 and https://github.com/jbenet/random-ideas/issues/33
 
 #### Repo Versioning
 
-A repo version is a single incrementing integer. All versions are considered
-non-compatible. Repos of different versions MUST be run through the
-appropriate migration tools before use.
+A repo version is a single incrementing integer. All versions are considered non-compatible. Repos of different versions MUST be run through the appropriate migration tools before use.

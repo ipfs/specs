@@ -62,10 +62,9 @@ The specs contained in this repository are:
     - snr - supernode delegated routing
     - multirouter - combines multiple others
 
-**Records and Record Systems:**
+**Records, Naming and Record Systems:**
 - [IPRS](https://github.com/libp2p/specs/blob/master/IPRS.md) - InterPlanetary Record System
 - IPNS - InterPlanetary Naming System
-
 
 **Data Structures and formats:**
 - [IPLD](https://github.com/ipld/spec) - InterPlanetary Linked Data.
@@ -76,6 +75,9 @@ The specs contained in this repository are:
   - [multicodec](https://github.com/multiformats/multicodec) - self-describing protocol/encoding streams (note: a file is a stream).
   - [multistream](https://github.com/multiformats/multistream) - multistream is a format -- or simple protocol -- for disambiguating, and layering streams. It is extremely simple.
 
+**Files / Mutable File System:**
+- [Files Impl and API](/files) - Virtual File System interface, unix like, on top of the MerkleDAG
+
 **Block Exchanges:**
 - [bitswap](/bitswap) - BitTorrent-inspired exchange
 
@@ -84,11 +86,6 @@ The specs contained in this repository are:
 - DAG and DAG Service
 - Data Importing
 - [Repo](/repo) - IPFS node local repository spec
-  - config - IPFS node configuration
-  - fs-repo - the spec of the fs-repo implementation
-
-**Files / Mutable File System:**
-- [Files Impl and API](/files) - Virtual File System interface, unix like, on top of the MerkleDAG
 
 **Public APIs:**
 - [Core API](/public-api/core) - IPFS programatic interface
