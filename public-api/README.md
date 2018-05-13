@@ -1,5 +1,5 @@
-IPFS API Specifications (core + http + cli)
-===========================================
+![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Public APIs (core + http + cli)
+=========================================================================================================
 
 > This document presents the specifications for the IPFS APIs, namely: 'core', the programmatic interface, 'http', a networked API interface over HTTP and 'cli', the command line interface to interact with IPFS.
 
@@ -17,10 +17,6 @@ Reviewers:
 
 This describes the [IPFS](https://ipfs.io/) APIs, including 'core', 'http' and 'cli'.
 
-# Status of this spec
-
-![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
-
 # Organization of this document
 
 This RFC is organized by chapters described on the *Table of contents* section. Each of the chapters can be found in its own file.
@@ -29,7 +25,6 @@ This RFC is organized by chapters described on the *Table of contents* section. 
 
 - [%N% Introduction]()
 - [%N% APIs]()
-  - [%N.M% Internals]()
   - [%N.M% Core]()
   - [%N.M% HTTP]()
   - [%N.M% CLI]()

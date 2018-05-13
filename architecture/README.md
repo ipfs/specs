@@ -1,9 +1,7 @@
-IPFS Architecture Overview
-==========================
+![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) IPFS Architecture Overview
+====================================================================================================
 
-![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
-
-Authors: 
+Authors:
 
 - [Juan Benet](https://github.com/jbenet)
 - [David Dias](https://github.com/diasdavid)
