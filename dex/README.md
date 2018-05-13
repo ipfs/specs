@@ -1,5 +1,5 @@
-RFC - DEX (name still under consideration)
-=========================
+![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) DEX
+=============================================================================
 
 Authors:
 
@@ -8,8 +8,7 @@ Authors:
 
 Reviewers:
 
-
-> tl;dr; This document presents how data is chunked and represented inside the IPFS network.
+- n/a
 
 * * *
 
@@ -18,8 +17,6 @@ Reviewers:
 IPFS Data Importing spec describes the several importing mechanisms used by IPFS that can be also be reused by other systems. An importing mechanism is composed by one or more chunkers and data format layouts.
 
 # Status of this spec
-
-> **This spec is a Work In Progress (WIP).**
 
 Lots of discussions around this topic, some of them here:
 
