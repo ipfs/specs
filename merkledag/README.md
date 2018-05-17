@@ -1,6 +1,6 @@
 # The merkledag
 
-**This spec has been deprecated in favor of [IPLD](https://github.com/ipld/specs/tree/master/ipld)**
+**This spec has been deprecated in favor of [IPLD](https://github.com/ipld/specs/)**
 
 Authors: [Juan Benet](https://github.com/jbenet)
 
@@ -10,7 +10,7 @@ Reviewers:
 
 * * *
 
-This is the [Spec](../) for the IPFS Merkledag.
+This is the [Spec](https://github.com/ipfs/specs/) for the IPFS Merkledag.
 
 ## Definitions
 
