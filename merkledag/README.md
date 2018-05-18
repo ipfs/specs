@@ -1,6 +1,10 @@
 # The merkledag
 
-**This spec has been deprecated in favor of [IPLD](https://github.com/ipld/specs/tree/master/ipld)**
+**This spec has been deprecated in favor of [IPLD](https://github.com/ipld/specs/tree/master/ipld).**
+
+> The reason for this was mainly about improving interoperability with other content-addressed systems (e.g. making it straightforward to link an IPFS node to a Git commit). The IPLD format is also more flexible and is compatible with more serialization formats (e.g. JSON).
+>
+>IPLD is also more separate from IPFS than Merkle DAG because it’s as a pretty generalized idea; it could be used outside IPFS. It also involves a other related concepts (like [content-addressed identifiers for distributed systems [CID]](https://github.com/ipld/cid) and [CARs (Certified ARchives)](https://github.com/ipld/specs/blob/master/CAR.md)), and having a separate org makes it easy to group them together as a family of ideas. — [Rob Brackett](https://github.com/ipfs/specs/issues/179#issuecomment-389980396)
 
 Authors: [Juan Benet](https://github.com/jbenet)
 
