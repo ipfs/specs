@@ -1,9 +1,10 @@
 ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) unixfs
 ================================================================================
 
-Draft work and discussion on the upcoming UnixFS specification is happening in the [`ipfs/ipld-unixfs` repo](https://github.com/ipfs/unixfs-v2). Please see the issues there for discussion and PRs for drafts. When the specification is completed there, it will be copied back to this repo and replace this document.
+UnixFS is a [protocol-buffers](https://developers.google.com/protocol-buffers/) based format for describing files, directories, and symlinks in IPFS. The current implementation of UnixFS has grown organically and does not have a clear specification document. See [“implementations”](#implementations) below for reference implementations you can examine to understand the format.
 
-The current implementation of UnixFS has grown organically and does not currently have a clear specification. See [“implementations”](#implementations) below for reference implementations.
+Draft work and discussion on a specification for the upcoming version 2 of the UnixFS format is happening in the [`ipfs/unixfs-v2` repo](https://github.com/ipfs/unixfs-v2). Please see the issues there for discussion and PRs for drafts. When the specification is completed there, it will be copied back to this repo and replace this document.
+
 
 # Implementations
 
