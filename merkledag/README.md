@@ -1,6 +1,6 @@
 # The merkledag
 
-**This spec has been deprecated in favor of [IPLD](https://github.com/ipld/specs/tree/master/ipld)**
+**This spec has been deprecated in favor of [IPLD](https://github.com/ipld/specs/).** It offers a clearer description of how to link different kinds of hash-based structures (e.g. linking a file in IPFS to a commit in Git), has a more generalized and flexible format, and uses a JSON-compatible representation, among other improvements.
 
 Authors: [Juan Benet](https://github.com/jbenet)
 
@@ -10,7 +10,7 @@ Reviewers:
 
 * * *
 
-This is the [Spec](../) for the IPFS Merkledag.
+This is the [Spec](https://github.com/ipfs/specs/) for the IPFS Merkledag.
 
 ## Definitions
 
