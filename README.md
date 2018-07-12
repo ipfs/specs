@@ -18,7 +18,7 @@ Some day we will hopefully transform these specs into RFCs. For now, they assume
   - [High level Architecture of IPFS](/architecture)
   - [IPLD](https://github.com/ipld/specs)
   - [libp2p](https://github.com/libp2p/specs)
-    - [IPRS](/iprs)
+    - [IPRS](https://github.com/libp2p/specs/blob/master/IPRS.md)
   - [bitswap](/bitswap)
   - [Files API and MFS](/files)
   - [Public API (CLI, HTTP and Core)](/public-api)
