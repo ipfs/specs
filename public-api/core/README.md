@@ -68,7 +68,6 @@ Core API
   - rm
 - bitswap
   - stat
-  - unwant
   - wantlist
 - log
   - level
