@@ -6,7 +6,6 @@
 Authors:
 
 - David Dias
-- Richard Littauer
 
 Reviewers:
 
@@ -21,12 +20,8 @@ This describes the [IPFS](https://ipfs.io/) APIs, including 'core', 'http' and '
 
 This RFC is organized by chapters described on the *Table of contents* section. Each of the chapters can be found in its own file.
 
-# Table of contents
+## API
 
-- [%N% Introduction]()
-- [%N% APIs]()
-  - [%N.M% Core]()
-  - [%N.M% HTTP]()
-  - [%N.M% CLI]()
-- [%N% Implementations]()
-- [%N% Referecences]()
+- [CLI](./CLI)
+- [HTTP](./http)
+- [Core API (aka using IPFS as a package/module)](./core)
