@@ -69,7 +69,6 @@ The `dag put` call will store a single node at each time and return its respecti
 
 - `> ipfs bitswap`
 - `> ipfs bitswap stat`
-- `> ipfs bitswap unwant`
 - `> ipfs bitswap wantlist`
 
 ## Block
