@@ -12,7 +12,7 @@ Reviewers:
   
 # Abstract
 
-IPFS is powered by content-addressed data, which by nature is immutable: changing an object would change its hash, and consequently its address, making it a different object altogether. However, there are several use cases where we need mutable data. This is where IPNS gets into the equation.
+IPFS is powered by content-addressed data, which by nature is immutable: changing an object would change its hash, and consequently its address, making it a different object altogether. However, there are several use cases where we benefit from having mutable data. This is where IPNS gets into the equation.
 
 All things considered, the IPFS naming layer is responsible for the creation of:
 
@@ -28,11 +28,12 @@ All things considered, the IPFS naming layer is responsible for the creation of:
   - [Introduction](#introduction)
   - [Building Blocks](#building-blocks)
   - [Implementation Details](#implementation-details)
+  - [Overview](#overview)
   - [API Spec](#api-spec)
 
 # Introduction
 
-IPFS is mostly concerned with content-addressed data, which by nature is immutable. That is, when a file is added to a node, its reference in the system is an immutable content-addressed hash. This characteristic is a security mechanism, which guarantees that a peer has not modified the original content of a file. Accordingly, this characteristic is crucial in a network composed of anonymous peers.
+IPFS is mostly concerned with content-addressed data, which by nature is immutable. That is, when a file is added to the network, its reference in the system is an immutable content-addressed hash. This characteristic is a security mechanism, which guarantees that a peer has not modified the original content of a file. Accordingly, this characteristic is crucial in a network composed of anonymous peers.
 
 Nevertheless, there are some requirements that do not match with immutable data. Taking into account a use case, where a web application will have its static files stored in IPFS. Each time a static file needs to be modified, its directory hash will be automatically modified. As a consequence, the address previously used for getting that static file needs to be updated. As this is not pratical, IPNS was conceptualized to solve this.
 
@@ -82,7 +83,7 @@ message IpnsEntry {
 }
 ```
 
-This record will be stored locally, as well as spread across the network with different keys. This way, we are able to understand which is the most recent record in the network, since it will be stored locally by the peer using the keys used to generate it.
+The record is stored locally, in order to allow us to understand which is the most recent record in the network, since it will be stored locally by the peer using the keys used to generate it.
 
 **Note**: validity must be with nanoseconds precision.
 
@@ -98,9 +99,11 @@ Note: Base32 according to the [RFC4648](https://tools.ietf.org/html/rfc4648).
 
 The routing record is also stored in the datastore of the IPFS nodes, once they receive the data. As we intend to remove IPNS entries from the routing system when the record expires, we must have a different record identifier from the local record.
 
-**Key format:** `base32(/ipns/<HASH>)`
+**Key format:** `/ipns/BINARY_ID`
 
-Note: Base32 according to the [RFC4648](https://tools.ietf.org/html/rfc4648).
+The two routing systems available for IPNS are the `DHT` and `pubsub`. As the `pubsub` topics must be `utf-8` for interoperability among different implementations
+
+# Implementation Details
 
 ## IPNS Publisher
 
@@ -109,7 +112,7 @@ Flow for publishing an IPNS record:
 1. Get the private key to use
   - the default key is the node's private key
   - a generated key may also be provided
-2. Verify if the value provided exists before proceeding with publish (optional)
+2. Verify if the value provided exists before proceeding with publish (optional through parameters)
 3. Get the peer id (using the private key)
 4. Start publishing the record
   1. Verify if a local record already exists
@@ -117,10 +120,10 @@ Flow for publishing an IPNS record:
       - unmarshal the obtained record
       - increment the sequence number (if the new value is different from the already stored)
       - update the value
-    - If it does not exist and the check routing option is enabled:
+    - If it does not exist:
       - try to get the record from the routing system
-      - if it is found, unmarshal the obtained entry
-  2. Create a new record with the previous modifications, or create a new one if the record was not found.
+      - if it is found, unmarshal the obtained entry and do the steps above
+  2. Create a new record with the previous updates, or create a new one if the record was not found.
   3. Marshal the record using the protocol Buffer
   4. Put the local record into the repo's datastore using the local record key
   5. Put the routing record to the routing, according to the systems available (DHT / Pubsub)
@@ -134,7 +137,7 @@ Flow for resolving an IPNS record:
 2. Get the peer id from the hash
 3. Get public key from the network / from the record if embedded
   - Note: Name should be the hash of a public key retrievable from IPFS.
-4. Get value from the chosen routing (according to the chosen resolver)
+4. Get value from the routing (if offline only use the local datastore)
 5. Unmarshal data
 6. Validate record
   - Use the public key to verify the record signature
@@ -142,11 +145,11 @@ Flow for resolving an IPNS record:
 
 ## IPNS Republisher
 
-IPNS republisher gets in action each 4 hours. Accordingly, the republisher will get the old record from the local repo and publish it with an updated validity in each cycle.
+IPNS republisher gets in action each 4 hours (by default). Accordingly, the republisher will get the old record from the local repo and publish it with an updated validity in each cycle.
 
-# Implementation Details
+## Overview
 
-> TODO
+![](ipns-overview.png)
 
 # API Spec
 
