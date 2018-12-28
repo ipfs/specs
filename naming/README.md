@@ -40,7 +40,7 @@ IPNS is based on [SFS](http://en.wikipedia.org/wiki/Self-certifying_File_System)
 
 # IPNS Record
 
-An IPNS record is a data structure composed by:
+An IPNS record is a data structure containing the following fields:
 
 - 1. **Value** (bytes)
   - It can be a path to another IPNS record, a `dnslink` path (`/ipns/example.com`) or an IPFS path (`/ipfs/Qm...`)
@@ -48,8 +48,8 @@ An IPNS record is a data structure composed by:
   - Expiration date of the record using [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) with nanoseconds precision.
   - Note: Currently, the expiration date is the only available type of validity.
 - 3. **Validity Type** (uint64)
-  - Allows us to define if the record is valid under certain conditions
-  - Only supporting expiration date with `validityType = 0` for now
+   - Allows us to define the conditions under which the record is valid.
+   - Only supports expiration date with `validityType = 0` for now.
 - 4. **Signature** (bytes)
   - Concatenate value, validity field and validity type
   - Sign the concatenation result with the provided private key
