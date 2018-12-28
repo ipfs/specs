@@ -34,7 +34,7 @@ All things considered, the IPFS naming layer is responsible for the creation of:
 
 # Introduction
 
-Each time a file added to IPFS needs to be modified, its content addressable idendifier will be automatically modified. As a consequence, the address previously used for getting that file needs to be updated by who is using it. As this is not pratical, IPNS was conceptualized to solve the problem.
+Each time a file is modified, its content address changes. As a consequence, the address previously used for getting that file needs to be updated by who is using it. As this is not pratical, IPNS was created to solve the problem.
 
 IPNS is based on [SFS](http://en.wikipedia.org/wiki/Self-certifying_File_System). It consists of a PKI namespace, where a name is simply the hash of a public key. As a result, whoever controls the private key has full control over the name. Accordingly, records are signed by the private key and then distributed across the network (in IPFS, via the routing system). This is an egalitarian way to assign mutable names on the Internet at large, without any centralization whatsoever, or certificate authorities.
 
@@ -43,7 +43,7 @@ IPNS is based on [SFS](http://en.wikipedia.org/wiki/Self-certifying_File_System)
 An IPNS record is a data structure containing the following fields:
 
 - 1. **Value** (bytes)
-  - It can be a path to another IPNS record, a `dnslink` path (`/ipns/example.com`) or an IPFS path (`/ipfs/Qm...`)
+  - It can be any path, such as a path to another IPNS record, a `dnslink` path (eg. `/ipns/example.com`) or an IPFS path (eg. `/ipfs/Qm...`)
 - 2. **Validity** (bytes)
   - Expiration date of the record using [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) with nanoseconds precision.
   - Note: Currently, the expiration date is the only available type of validity.
