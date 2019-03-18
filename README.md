@@ -64,7 +64,7 @@ The specs contained in this repository are:
 
 **Records, Naming and Record Systems:**
 - [IPRS](https://github.com/libp2p/specs/blob/master/IPRS.md) - InterPlanetary Record System
-- IPNS - InterPlanetary Naming System
+- [IPNS](/naming) - InterPlanetary Naming System
 
 **Data Structures and formats:**
 - [IPLD](https://github.com/ipld/spec) - InterPlanetary Linked Data.
