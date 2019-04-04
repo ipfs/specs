@@ -22,6 +22,6 @@ This RFC is organized by chapters described on the *Table of contents* section. 
 
 ## API
 
-- [CLI](./CLI)
+- [CLI](./cli)
 - [HTTP](./http)
 - [Core API (aka using IPFS as a package/module)](./core)
