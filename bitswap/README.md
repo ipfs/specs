@@ -78,7 +78,7 @@ The wire format for Bitswap is simply a stream of Bitswap messages. The followin
 message Message {
   message Wantlist {
     message Entry {
-      optional string block = 1; // the block key
+      optional bytes block = 1; // the block key
       optional int32 priority = 2; // the priority (normalized). default to 1
       optional bool cancel = 3;  // whether this revokes an entry
     }
@@ -87,8 +87,14 @@ message Message {
     optional bool full = 2;     // whether this is the full wantlist. default to false
   }
 
-  optional Wantlist wantlist = 1;
-  repeated bytes blocks = 2;
+  message Block {
+    bytes prefix = 1;		// CID prefix (cid version, multicodec and multihash prefix (type + length)
+    bytes data = 2;
+  }
+  
+  Wantlist wantlist = 1;
+  optional repeated bytes blocks = 2; 	// used to send Blocks in bitswap 1.0.0
+  repeated Block payload = 3; // used to send Blocks in bitswap 1.1.0
 }
 ```
 
@@ -200,5 +206,5 @@ bs.getBlock(multihash, (err, block) => {
 
 # Implementations
 
-  - <https://github.com/ipfs/go-ipfs/tree/master/exchange/bitswap>
+  - <https://github.com/ipfs/go-bitswap>
   - <https://github.com/ipfs/js-ipfs-bitswap>
