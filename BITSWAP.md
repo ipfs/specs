@@ -87,8 +87,17 @@ message Message {
   Wantlist wantlist = 1;
   optional repeated bytes blocks = 2; 	// used to send Blocks in bitswap 1.0.0
   repeated Block payload = 3; // used to send Blocks in bitswap 1.1.0
+  bytes session_id = 3; // Bitswap 1.2 - id for this wantlist session
+  int32 frame_start = 4; // Bitswap 1.2 - start frame for deltas in a non-full message
+  int32 frame_end = 5; // Bitswap 1.2 - end frame for deltas in a non-full message
+  bytes ack_session_id = 6; // Bitswap 1.2 - acknowledge id for last received session_id
+  int32 ack_frame = 5; // Bitswap 1.2 - acknowledge last frame received
 }
 ```
+
+#### Error Correction
+
+Bitswap 1.2 introduces session ids and frames to make the protocol more reliable. When a new peer connects, the connection is assigned a local unique session id (likely a 16 byte uuid) and a starting frame (should be >0 which is the default value for protobuf ints). Each sent want list change or block send increments the frame counter. When sending a message, one or more frames are joined together, and sent with the local session id, and the starting and ending frame. When the remote peer sends its next message (or immediately), it sends last received local session id, and the last received and transmitted frame (along with its own session_id and frame range). Deltas are never applied unless the starting frame is lesser or equal to the last frame received and applied. Skillful buffering on both sides can use this mechanism to insure an accurate wantlist is maintained and blocks are resent when neccesary. Meanwhile, the fact that the rest of the protocol is identical means the presence of default (missing) values is used to detect and downgrade when communicating with older peers.
 
 ## Want-Manager
 
