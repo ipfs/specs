@@ -11,6 +11,8 @@
 
 Some day we will hopefully transform these specs into RFCs. For now, they assume a high level of familiarity with the concepts.
 
+*Read this in other languages: [Portuguese](translations/pt_BR/README.md).*
+
 ## Table of Contents
 
 - [Work In Progress](#work-in-progress)
