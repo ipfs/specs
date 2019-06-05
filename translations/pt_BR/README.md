@@ -104,9 +104,9 @@ As especificações contidas neste repositório são:
 
 Sugestões, contribuições e críticas são bem vindas. Embora, antes de fazê-la, por favor, certifique-se de se familiarizar profundamente com o IPFS, com os modelos que ele adota e os princípios que ele segue.
 
-Esteja ciente de que as especificações são realmente difíceis de projetar pelo comitê. Trate este espaço como se fosse a oficina de um artista. Por favor, sugira melhorias, mas por favor, não fique desapontado se dissermos não a alguma coisa. O que deixamos de fora costuma ser mais importante do que aquilo que acrescentamos.
+Esteja ciente de que as especificações são realmente difíceis de projetar pelo comitê. Trate este espaço como se fosse a oficina de um artista. Por favor, sugira melhorias, mas não fique desapontado se dissermos não a alguma coisa. O que deixamos de fora costuma ser mais importante do que aquilo que acrescentamos.
 
-Sinta-se livre para participar. Todos bem-vindos. Abra uma [issue](https://github.com/ipfs/specs/issues)!
+Sinta-se livre para participar. Todos são bem-vindos. Abra uma [issue](https://github.com/ipfs/specs/issues)!
 
 Este repositório está incluído no [Código de Conduta](https://github.com/ipfs/community/blob/master/code-of-conduct.md) do IPFS.
 
