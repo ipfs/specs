@@ -108,7 +108,7 @@ Esteja ciente de que as especificações são realmente difíceis de projetar pe
 
 Sinta-se livre para participar. Todos bem-vindos. Abra uma [issue](https://github.com/ipfs/specs/issues)!
 
-Este repositório está incluído no [Code of Conduct](https://github.com/ipfs/community/blob/master/code-of-conduct.md) do IPFS.
+Este repositório está incluído no [Código de Conduta](https://github.com/ipfs/community/blob/master/code-of-conduct.md) do IPFS.
 
 [![](https://cdn.rawgit.com/jbenet/contribute-ipfs-gif/master/img/contribute.gif)](https://github.com/ipfs/community/blob/master/contributing.md)
 
