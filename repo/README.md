@@ -20,11 +20,11 @@ swappable implementations.
 ## Definition
 
 A `repo` is the storage repository of an IPFS node. It is the subsystem that
-actually stores the data ipfs nodes use. All IPFS objects are stored in
+actually stores the data IPFS nodes use. All IPFS objects are stored
 in a repo (similar to git).
 
 There are many possible repo implementations, depending on the storage media
-used. Most commonly, ipfs nodes use an [fs-repo](fs-repo).
+used. Most commonly, IPFS nodes use an [fs-repo](fs-repo).
 
 Repo Implementations:
 - [fs-repo](fs-repo) - stored in the os filesystem
@@ -101,7 +101,7 @@ It is recommended that `config` files avoid identifying information, so that the
 
 ### logs
 
-A full IPFS node is complex. Many events can happen, and thus some ipfs
+A full IPFS node is complex. Many events can happen, and thus some IPFS
 implementations capture event logs and (optionally) store them for user review
 or debugging.
 
@@ -118,13 +118,13 @@ All repos contain the following standard locks:
 
 ### hooks (TODO)
 
-Like git, IPFS nodes will allow `hooks`, a set of user configurable scripts to run at predefined moments in ipfs operations. This makes it easy to customize the behavior of ipfs nodes without changing the implementations themselves.
+Like git, IPFS nodes will allow `hooks`, a set of user configurable scripts to run at predefined moments in IPFS operations. This makes it easy to customize the behavior of IPFS nodes without changing the implementations themselves.
 
 ## Notes
 
 #### A Repo uniquely identifies an IPFS Node
 
-A repository uniquely identifies a node. Running two different ipfs programs with identical repositories -- and thus identical identities -- WILL cause problems.
+A repository uniquely identifies a node. Running two different IPFS programs with identical repositories -- and thus identical identities -- WILL cause problems.
 
 Datastores MAY be shared -- with proper synchronization -- though note that sharing datastore access MAY erode privacy.
 
