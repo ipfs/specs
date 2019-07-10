@@ -4,7 +4,7 @@
 Authors:
 
 - [Juan Benet](https://github.com/jbenet)
-- [David Dias](https://github.com/diasdavid)
+- [David Dias](https://github.com/daviddias)
 
 Reviewers:
 
