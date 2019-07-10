@@ -1,7 +1,17 @@
-CLI - Command Line Interface
-============================
+# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) CLI API, the IPFS Daemon interface
 
-![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
+**Editors**:
+- N/A
+
+* * *
+
+**Abstract**
+
+TODO
+
+# Table of Contents
+
+TODO
 
 ## Commands
 

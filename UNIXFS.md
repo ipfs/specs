@@ -1,12 +1,21 @@
-![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) unixfs
-================================================================================
+# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) UnixFS
+
+**Editors**:
+- NA
+
+* * *
+
+**Abstract**
 
 UnixFS is a [protocol-buffers](https://developers.google.com/protocol-buffers/) based format for describing files, directories, and symlinks in IPFS. The current implementation of UnixFS has grown organically and does not have a clear specification document. See [“implementations”](#implementations) below for reference implementations you can examine to understand the format.
 
 Draft work and discussion on a specification for the upcoming version 2 of the UnixFS format is happening in the [`ipfs/unixfs-v2` repo](https://github.com/ipfs/unixfs-v2). Please see the issues there for discussion and PRs for drafts. When the specification is completed there, it will be copied back to this repo and replace this document.
 
+## Table of Contents
 
-# Implementations
+TODO
+
+## Implementations
 
 - JavaScript
   - Data Formats - [unixfs](https://github.com/ipfs/js-ipfs-unixfs)
@@ -56,17 +65,11 @@ Importing a file into unixfs is split up into two parts. The first is chunking, 
 
 ### Chunking
 
-Chunking has two main parameters, chunking strategy and leaf format. 
+Chunking has two main parameters, chunking strategy and leaf format.
 
-Leaf format should always be set to 'raw', this is mainly configurable for
-backwards compatibility with earlier formats that used a Unixfs Data object
-with type 'Raw'. Raw leaves means that the nodes output from chunking will be
-just raw data from the file with a CID type of 'raw'.
+Leaf format should always be set to 'raw', this is mainly configurable for backwards compatibility with earlier formats that used a Unixfs Data object with type 'Raw'. Raw leaves means that the nodes output from chunking will be just raw data from the file with a CID type of 'raw'.
 
-Chunking strategy currently has two different options, 'fixed size' and 'rabin'.
-Fixed size chunking will chunk the input data into pieces of a given size. Rabin
-chunking will chunk the input data using rabin fingerprinting to determine the
-boundaries between chunks.
+Chunking strategy currently has two different options, 'fixed size' and 'rabin'. Fixed size chunking will chunk the input data into pieces of a given size. Rabin chunking will chunk the input data using rabin fingerprinting to determine the boundaries between chunks.
 
 
 ### Layout
@@ -76,17 +79,10 @@ Layout defines the shape of the tree that gets built from the chunks of the inpu
 There are currently two options for layout, balanced, and trickle.
 Additionally, a 'max width' must be specified. The default max width is 174.
 
-The balanced layout creates a balanced tree of width 'max width'. The tree is
-formed by taking up to 'max width' chunks from the chunk stream, and creating a
-unixfs file node that links to all of them. This is repeated until 'max width'
-unixfs file nodes are created, at which point a unixfs file node is created to
-hold all of those nodes, recursively. The root node of the resultant tree is returned
-as the handle to the newly imported file.
+The balanced layout creates a balanced tree of width 'max width'. The tree is formed by taking up to 'max width' chunks from the chunk stream, and creating a unixfs file node that links to all of them. This is repeated until 'max width' unixfs file nodes are created, at which point a unixfs file node is created to hold all of those nodes, recursively. The root node of the resultant tree is returned as the handle to the newly imported file.
 
-If there is only a single chunk, no intermediate unixfs file nodes are created,
-and the single chunk is returned as the handle to the file.
+If there is only a single chunk, no intermediate unixfs file nodes are created, and the single chunk is returned as the handle to the file.
 
 ## Exporting
 
-To read the file data out of the unixfs graph, perform an in order traversal,
-emitting the data contained in each of the leaves.
+To read the file data out of the unixfs graph, perform an in order traversal, emitting the data contained in each of the leaves.

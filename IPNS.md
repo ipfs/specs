@@ -1,6 +1,6 @@
 # ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) IPNS - Inter-Planetary Naming System
 
-Editors:
+**Editors**:
 - Vasco Santos ([@vasco-santos](https://github.com/vasco-santos))
 - Steven Allen ([@Stebalien](https://github.com/Stebalien))
 
@@ -14,7 +14,7 @@ All things considered, the IPFS naming layer is responsible for the creation of:
 - mutable pointers to objects
 - human-readable names
 
-# Organization of this document
+# Table of Contents
 
 - [Introduction](#introduction)
 - [IPNS Record](#ipns-record)
@@ -23,13 +23,13 @@ All things considered, the IPFS naming layer is responsible for the creation of:
 - [API Spec](#api-spec)
 - [Integration with IPFS](#integration-with-ipfs)
 
-# Introduction
+## Introduction
 
 Each time a file is modified, its content address changes. As a consequence, the address previously used for getting that file needs to be updated by who is using it. As this is not pratical, IPNS was created to solve the problem.
 
 IPNS is based on [SFS](http://en.wikipedia.org/wiki/Self-certifying_File_System). It consists of a PKI namespace, where a name is simply the hash of a public key. As a result, whoever controls the private key has full control over the name. Accordingly, records are signed by the private key and then distributed across the network (in IPFS, via the routing system). This is an egalitarian way to assign mutable names on the Internet at large, without any centralization whatsoever, or certificate authorities.
 
-# IPNS Record
+## IPNS Record
 
 An IPNS record is a data structure containing the following fields:
 
@@ -75,7 +75,7 @@ message IpnsEntry {
 }
 ```
 
-# Protocol
+## Protocol
 
 Taking into consideration a p2p network, each peer should be able to publish IPNS records to the network, as well as to resolve the IPNS records published by other peers.
 
@@ -93,18 +93,18 @@ Finally, the network nodes may also republish their records, so that the records
 
 ## Overview
 
-![](ipns-overview.png)
+![](img/ipns-overview.png)
 
-# API Spec
+## API Spec
 
   - <https://github.com/ipfs/interface-ipfs-core/blob/master/SPEC/NAME.md>
 
-# Implementations
+## Implementations
 
   - <https://github.com/ipfs/js-ipfs/tree/master/src/core/ipns>
   - <https://github.com/ipfs/go-ipfs/tree/master/namesys>
 
-# Integration with IPFS
+## Integration with IPFS
 
 #### Local record
 
