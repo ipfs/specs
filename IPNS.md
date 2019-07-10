@@ -1,36 +1,27 @@
-# IPNS - Inter-Planetary Naming System
+# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) IPNS - Inter-Planetary Naming System
 
-Authors:
-
-  - Vasco Santos ([@vasco-santos](https://github.com/vasco-santos))
-  
-Reviewers:
-
-  - Steven Allen ([@Stebalien](https://github.com/Stebalien))
+Editors:
+- Vasco Santos ([@vasco-santos](https://github.com/vasco-santos))
+- Steven Allen ([@Stebalien](https://github.com/Stebalien))
 
 -----
-  
-# Abstract
+
+**Abstract**
 
 IPFS is powered by content-addressed data, which by nature is immutable: changing an object would change its hash, and consequently its address, making it a different object altogether. However, there are several use cases where we benefit from having mutable data. This is where IPNS gets into the equation.
 
 All things considered, the IPFS naming layer is responsible for the creation of:
-
-  - mutable pointers to objects
-  - human-readable names
-
-# Status of this spec
-
-![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
+- mutable pointers to objects
+- human-readable names
 
 # Organization of this document
 
-  - [Introduction](#introduction)
-  - [IPNS Record](#ipns-record)
-  - [Protocol](#protocol)
-  - [Overview](#overview)
-  - [API Spec](#api-spec)
-  - [Integration with IPFS](#integration-with-ipfs)
+- [Introduction](#introduction)
+- [IPNS Record](#ipns-record)
+- [Protocol](#protocol)
+- [Overview](#overview)
+- [API Spec](#api-spec)
+- [Integration with IPFS](#integration-with-ipfs)
 
 # Introduction
 
@@ -61,7 +52,7 @@ An IPNS record is a data structure containing the following fields:
   - Note: The public key **must** be included if it cannot be extracted from the peer ID (reference [libp2p/specs#100](https://github.com/libp2p/specs/pull/100/files)).
 - 7. **ttl** (uint64)
   - A hint for how long the record should be cached before going back to, for instance the DHT, in order to check if it has been updated.
-  
+
 These records are stored locally, as well as spread accross the network, in order to be accessible to everyone. For storing this structured data, we use [Protocol Buffers](https://github.com/google/protobuf), which is a language-neutral, platform neutral extensible mechanism for serializing structured data.
 
 ```
@@ -92,9 +83,9 @@ When a node intends to publish a record to the network, an IPNS record needs to 
 
 As an IPNS record may be updated during its lifetime, a versioning related logic is needed during the publish process. As a consequence, the record must be stored locally, in order to enable the publisher to understand which is the most recent record published. Accordingly, before creating the record, the node must verify if a previous version of the record exists, and update the sequence value for the new record being created.
 
-Once the record is created, it is ready to be spread through the network. This way, a peer can use whatever routing system it supports to make the record accessible to the remaining peers of the network. 
+Once the record is created, it is ready to be spread through the network. This way, a peer can use whatever routing system it supports to make the record accessible to the remaining peers of the network.
 
-On the other side, each peer must be able to get a record published by another node. It only needs to have the unique identifier used to publish the record to the network. Taking into account the routing system being used, we may obtain a set of occurences of the record from the network. In this case, records can be compared using the sequence number, in order to obtain the most recent one. 
+On the other side, each peer must be able to get a record published by another node. It only needs to have the unique identifier used to publish the record to the network. Taking into account the routing system being used, we may obtain a set of occurences of the record from the network. In this case, records can be compared using the sequence number, in order to obtain the most recent one.
 
 As soon as the node has the most recent record, the signature and the validity must be verified, in order to conclude that the record is still valid and not compromised.
 
