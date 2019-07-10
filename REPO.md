@@ -1,21 +1,17 @@
-![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) IPFS Repo Spec
-========================================================================================
+# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) IPFS Repo Spec
 
-Authors:
-
+Editors:
 - [Juan Benet](github.com/jbenet)
-
-Reviewer:
-
-- n/a
 
 * * *
 
-The [Spec](../) for IPFS node repositories.
+**Abstract**
 
-This spec defines an IPFS Repo, its contents, and its interface. It does
-not specify how the repo data is actually stored, as that is done via
-swappable implementations.
+This spec defines an IPFS Repo, its contents, and its interface. It does not specify how the repo data is actually stored, as that is done via swappable implementations.
+
+# Table of Contents
+
+TODO
 
 ## Definition
 

@@ -1,23 +1,21 @@
-# The Keychain
+# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) The Keychain
 
-Authors: [Juan Benet](github.com/jbenet)
-
-Reviewers:
+**Editors**:
+- [Juan Benet](github.com/jbenet)
 
 * * *
 
-This is the [Spec](../) for the IPFS Keychain.
-
-![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
-
-**THIS WIP IS JUST A NOTES PLACEHOLDER ATM**
-
-## Abstract
+**Abstract**
 
 This document presents _The Keychain_, a distributed merkle-linked data structure that links cryptographic keys, identities, signatures, certificates, ciphertexts, proofs, and other objects.
 
 The idea of _The Keychain_ is to provide a common construction for managing and distributing cryptographic keys and artifacts. It is similar to a Public Key Infrastructure, but goes further into binding objects together.
 
+# Table of Contents
+
+TODO
+
+## Types
 
 ```go
 // Identity represents an entity that can prove possession of keys.

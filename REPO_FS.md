@@ -1,13 +1,15 @@
-# IPFS fs-repo version 1 Spec
-Author[s]: [Juan Benet](github.com/jbenet)
+# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) fs-repo
 
-Reviewer[s]:
+**Editors**:
+- [Juan Benet](github.com/jbenet)
+
 * * *
 
-The [Spec](../../) for the fs-repo IPFS repository.
+**Abstract**
 
 This spec defines `fs-repo` version `1`, its formats, and semantics.
-The repo interface is defined [here](../).
+
+# Table of Contents
 
 ## Definition
 
@@ -26,16 +28,16 @@ The repo interface is defined [here](../).
 .ipfs/
 ├── api             <--- running daemon api addr
 ├── blocks/         <--- objects stored directly on disk
-│   └── aa          <--- prefix namespacing like git
-│       └── aa      <--- N tiers
+│   └── aa          <--- prefix namespacing like git
+│      └── aa      <--- N tiers
 ├── config          <--- config file (json or toml)
 ├── hooks/          <--- hook scripts
 ├── keys/           <--- cryptographic keys
-│   ├── id.pri      <--- identity private key
-│   └── id.pub      <--- identity public key
+│   ├── id.pri      <--- identity private key
+│   └── id.pub      <--- identity public key
 ├── datastore/      <--- datastore
 ├── logs/           <--- 1 or more files (log rotate)
-│   └── events.log  <--- can be tailed
+│   └── events.log  <--- can be tailed
 ├── repo.lock       <--- mutex for repo
 └── version         <--- version file
 ```
@@ -239,9 +241,9 @@ the go-ipfs fs-repo in version 2 uses a different `blocks/` dir layout:
 ```
 /Users/jbenet/.ipfs/blocks
 ├── 12200007
-│   └── 12200007d4e3a319cd8c7c9979280e150fc5dbaae1ce54e790f84ae5fd3c3c1a0475.data
+│  └── 12200007d4e3a319cd8c7c9979280e150fc5dbaae1ce54e790f84ae5fd3c3c1a0475.data
 ├── 1220000f
-│   └── 1220000fadd95a98f3a47c1ba54a26c77e15c1a175a975d88cf198cc505a06295b12.data
+│  └── 1220000fadd95a98f3a47c1ba54a26c77e15c1a175a975d88cf198cc505a06295b12.data
 ```
 
 We MUST address whether we should change the fs-repo spec to match go-ipfs in version 2, or we should change go-ipfs to match the fs-repo spec (more tiers). We MUST also address whether the levels are a repo version parameter or a config parameter. There are filesystems in which a different fanout will have wildly different performance. These are mostly networked and legacy filesystems.

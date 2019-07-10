@@ -1,15 +1,16 @@
-# Addressing on the Decentralized Web
+# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Addressing on the Decentralized Web
 
-Editors:
+**Editors**:
 - [Lars Gierth](mailto:lgierth@ipfs.io)
 
 * * *
 
 **Abstract**
-> Note: This document is work in progress and largely incomplete.
+
+This document is largely incomplete.
 
 
-Table of contents:
+# Table of contents:
 - Introduction
 - The precarious web
   - Link competition and link rot
@@ -31,7 +32,6 @@ Table of contents:
   - Implementations
   - Future Work
   - Related work
-
 
 ## Introduction
 

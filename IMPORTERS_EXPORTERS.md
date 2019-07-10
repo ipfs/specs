@@ -1,6 +1,6 @@
 # ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Data Importers & Exporters
 
-Editors:
+**Editors**:
 - David Dias
 - Juan Benet
 
@@ -26,7 +26,7 @@ Lots of discussions around this topic, some of them here:
 - [Implementations]()
 - [References]()
 
-# Introduction
+## Introduction
 
 Importing data into IPFS can be done in a variety of ways. These are use-case specific, produce different datastructures, produce different graph topologies, and so on. These are not strictly needed in an IPFS implementation, but definitely make it more useful.
 
@@ -50,7 +50,7 @@ Essentially, data importing is divided into two parts:
 
 - Have a set of primitives to digest, chunk and parse files, so that different chunkers can be replaced/added without any trouble.
 
-# Requirements
+## Requirements
 
 These are a set of requirements (or guidelines) of the expectations that need to be fullfilled for a layout or a splitter:
 
@@ -64,7 +64,7 @@ These are a set of requirements (or guidelines) of the expectations that need to
 - a splitter, once fed with data, should yield chunks to be added to layout or another layout of itself
 - an importer is a aggregate of layouts and splitters
 
-# Architecture
+## Architecture
 
 ```bash
               ┌───────────┐        ┌──────────┐
@@ -83,7 +83,7 @@ These are a set of requirements (or guidelines) of the expectations that need to
 - `layouts or topologies` graph topologies (eg balanced vs trickledag vs ext4, ... etc)
 - `importer` is a process that reads in some data (single file, set of files, archive, db, etc), and outputs a dag. may use many chunkers. may use many layouts.
 
-# Interfaces
+## Interfaces
 
 #### splitters
 
@@ -91,7 +91,7 @@ These are a set of requirements (or guidelines) of the expectations that need to
 
 #### importer
 
-# Implementations
+## Implementations
 
 #### chunker
 
@@ -101,4 +101,4 @@ These are a set of requirements (or guidelines) of the expectations that need to
 
 #### importer
 
-# References
+## References

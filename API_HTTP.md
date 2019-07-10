@@ -1,15 +1,18 @@
-HTTP API
-========
+# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) HTTP API
 
-# Status
+**Editors**:
+- N/A
 
-![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
+* * *
 
-# Interactive HTTP API documentation
+**Abstract**
 
-> note: Currently, the HTTP API is a mix between a RPC and RESTful API
+TODO
 
-You can find a live version of the HTTP API on Apiary:
+# Table of Contents
 
-- Apiary = http://docs.ipfs.apiary.io/#
-- Repo - https://github.com/ipfs/http-api-spec
+TODO
+
+## Description
+
+The current spec is auto generated documentation from the Golang implementation of IPFS. Find it at https://github.com/ipfs/http-api-docs
