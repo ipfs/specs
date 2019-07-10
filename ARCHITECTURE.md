@@ -1,14 +1,12 @@
-![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) IPFS Architecture Overview
-====================================================================================================
+# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) IPFS Architecture Overview
 
-Authors:
-
+Editors:
 - [Juan Benet](https://github.com/jbenet)
 - [David Dias](https://github.com/daviddias)
 
-Reviewers:
-
 * * *
+
+**Abstract**
 
 This spec document defines the IPFS protocol stack, the subsystems, the interfaces, and how it all fits together. It delegates non-interface details to other specs as much as possible. This is meant as a top-level view of the protocol and how the system fits together.
 
@@ -81,7 +79,7 @@ IPFS has five layers:
 - **routing** - locating peers and objects
 - **network** - establishing connections between peers
 
-![](stack.png)
+![](img/ipfs-stack.png)
 
 These are briefly described bottom-up.
 
@@ -171,8 +169,7 @@ The IPFS **naming** layer -- or IPNS -- handles the creation of:
 - mutable pointers to objects
 - human-readable names
 
-IPNS is based on [SFS](http://en.wikipedia.org/wiki/Self-certifying_File_System). It is a
-PKI namespace -- a name is simply the hash of a public key. Whoever controls the private key controls the name. Records are signed by the private key and distributed anywhere (in IPFS, via the routing system). This is an egalitarian way to assign mutable names in the internet at large, without any centralization whatsoever, or certificate authorities.
+IPNS is based on [SFS](http://en.wikipedia.org/wiki/Self-certifying_File_System). It is a PKI namespace -- a name is simply the hash of a public key. Whoever controls the private key controls the name. Records are signed by the private key and distributed anywhere (in IPFS, via the routing system). This is an egalitarian way to assign mutable names in the internet at large, without any centralization whatsoever, or certificate authorities.
 
 See more in the namin spec (TODO).
 

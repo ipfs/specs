@@ -1,9 +1,13 @@
 # Addressing on the Decentralized Web
 
+Editors:
+- [Lars Gierth](mailto:lgierth@ipfs.io)
+
+* * *
+
+**Abstract**
 > Note: This document is work in progress and largely incomplete.
 
-Authors:
-- Lars Gierth \<lgierth@ipfs.io>
 
 Table of contents:
 - Introduction
@@ -31,9 +35,6 @@ Table of contents:
 
 ## Introduction
 
-Location-based addressing is a centralizing vector on the web.
-It lets links rot and drives copies of content into mutual competition.
+Location-based addressing is a centralizing vector on the web. It lets links rot and drives copies of content into mutual competition.
 
-This document describes a content-based addressing model
-which provides permanent links that don't rot and are cryptographically verifiable.
-The result is a more cooperative, resilient, and performant web.
+This document describes a content-based addressing model which provides permanent links that don't rot and are cryptographically verifiable. The result is a more cooperative, resilient, and performant web.

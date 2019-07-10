@@ -1,22 +1,14 @@
-![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) DEX
-=============================================================================
+# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Data Importers & Exporters
 
-Authors:
-
+Editors:
 - David Dias
 - Juan Benet
 
-Reviewers:
-
-- n/a
-
 * * *
 
-# Abstract
+**Abstract**
 
 IPFS Data Importing spec describes the several importing mechanisms used by IPFS that can be also be reused by other systems. An importing mechanism is composed by one or more chunkers and data format layouts.
-
-# Status of this spec
 
 Lots of discussions around this topic, some of them here:
 
@@ -25,22 +17,18 @@ Lots of discussions around this topic, some of them here:
 - https://github.com/ipfs/notes/issues/205
 - https://github.com/ipfs/notes/issues/144
 
-# Organization of this document
-
-This RFC is organized by chapters described on the *Table of contents* section.
-
 # Table of contents
 
-- [%N%. Introduction]()
-- [%N%. Requirements]()
-- [%N%. Architecture]()
-- [%N%. Interfaces]()
-- [%N%. Implementations]()
-- [%N%. References]()
+- [Introduction]()
+- [Requirements]()
+- [Architecture]()
+- [Interfaces]()
+- [Implementations]()
+- [References]()
 
 # Introduction
 
-Importing data into IPFS can be done in a variety of ways. These are use-case specific, produce different datastructures, produce different graph topologies, and so on. These are not strictly needed in an IPFS implementation, but definitely make it more useful. 
+Importing data into IPFS can be done in a variety of ways. These are use-case specific, produce different datastructures, produce different graph topologies, and so on. These are not strictly needed in an IPFS implementation, but definitely make it more useful.
 
 These data importing primitivies  are really just tools on top of IPLD, meaning that these can be generic and separate from IPFS itself.
 
@@ -114,4 +102,3 @@ These are a set of requirements (or guidelines) of the expectations that need to
 #### importer
 
 # References
-

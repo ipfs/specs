@@ -1,35 +1,25 @@
-# Bitswap
+# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Bitswap
 
-Authors:
+Editors:
+- David Dias
+- Jeromy Johnson
+- Juan Benet
 
-  - David Dias
-  - Jeromy Johnson
-  - Juan Benet
+* * *
 
-Reviewers:
-
-> tl;dr;
-
------
-
-# Abstract
+**Abstract**
 
 Bitswap is the data trading module for IPFS. Its purpose is to request blocks from and send blocks to other peers in the network. Bitswap has two primary jobs:
-
-1.  Attempt to acquire blocks from the network that have been requested by the client.
-2.  Judiciously (though strategically) send blocks in its possession to other peers who want them.
-
-# Status of this spec
-
-![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
+1. Attempt to acquire blocks from the network that have been requested by the client.
+2. Judiciously (though strategically) send blocks in its possession to other peers who want them.
 
 # Organization of this document
 
-  - [Introduction](#introduction)
-  - [Subsystems](#subsystems)
-  - [Implementation Details](#implementation-details)
-  - [API Spec](#api-spec)
-  - [Implementations](#implementations)
+- [Introduction](#introduction)
+- [Subsystems](#subsystems)
+- [Implementation Details](#implementation-details)
+- [API Spec](#api-spec)
+- [Implementations](#implementations)
 
 # Introduction
 
@@ -91,7 +81,7 @@ message Message {
     bytes prefix = 1;		// CID prefix (cid version, multicodec and multihash prefix (type + length)
     bytes data = 2;
   }
-  
+
   Wantlist wantlist = 1;
   optional repeated bytes blocks = 2; 	// used to send Blocks in bitswap 1.0.0
   repeated Block payload = 3; // used to send Blocks in bitswap 1.1.0
@@ -194,7 +184,7 @@ bs.getBlock(multihash, (err, block) => {
   // 1) try to fetch from repo
   // 2) if not -> ask bitswap
     // 2.1) bitswap will cb() once the block is back, once.
-    //      bitswap will write to the repo as well. 
+    //      bitswap will write to the repo as well.
 })
 ```
 
