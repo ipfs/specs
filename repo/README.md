@@ -28,8 +28,8 @@ used. Most commonly, IPFS nodes use an [fs-repo](fs-repo).
 
 Repo Implementations:
 - [fs-repo](fs-repo) - stored in the os filesystem
-- [mem-repo](mem-repo) - stored in process memory
-- [s3-repo](s3-repo) - stored in amazon s3
+- mem-repo - stored in process memory
+- s3-repo - stored in amazon s3
 
 <center>
   <img src="ipfs-repo.png" width="256" />
@@ -39,11 +39,10 @@ Repo Implementations:
 
 The Repo stores a collection of [IPLD](../merkledag/ipld.md) objects that represent:
 
-- keys - cryptographic keys, including node's identity
-- config - node configuration and settings
-- datastore - content stored locally, and indexing data
-- logs - debugging and usage event logs
-- hooks - scripts to run at predefined times (not yet implemented)
+- **config** - node configuration and settings
+- **datastore** - content stored locally, and indexing data
+- **keys** - cryptographic keys, including node's identity
+- **hooks** - scripts to run at predefined times (not yet implemented)
 
 Note that the IPLD objects a repo stores are divided into:
 - **state** (system, control plane) used for the node's internal state
@@ -51,9 +50,11 @@ Note that the IPLD objects a repo stores are divided into:
 
 Additionally, the repo state must determine the following. These need not be IPLD objects, though it is of course encouraged:
 
-- version - the repo version, required for safe migrations
-- locks - process semaphores for correct concurrent access
+- **version** - the repo version, required for safe migrations
+- **locks** - process semaphores for correct concurrent access
+- **datastore_spec** - array of mounting points and their properties
 
+Finally, the repo also stores the blocks with blobs containing binary data.
 
 ![](ipfs-repo-contents.png?)
 
@@ -76,7 +77,6 @@ The name "datastore" comes from [go-datastore](https://github.com/jbenet/go-data
 
 This makes it easy to change properties or performance characteristics of a repo without an entirely new implementation.
 
-
 ### keys (state)
 
 A Repo typically holds the keys a node has access to, for signing and for encryption. This includes:
@@ -94,20 +94,13 @@ Keys are structured using the [multikey](https://github.com/jbenet/multikey) for
 The node's `config` (configuration) is a tree of variables, used to configure various aspects of operation. For example:
 - the set of bootstrap peers IPFS uses to connect to the network
 - the Swarm, API, and Gateway network listen addresses
+- the Datastore configuration regarding the contruction and operation of the on-disk storage system.
+
+There is a set of properties, which are mandatory for the repo usage. Those are `Addresses`, `Discovery`, `Bootstrap`, `Identity`, `Datastore` and `Keychain`.
 
 It is recommended that `config` files avoid identifying information, so that they may be re-shared across multiple nodes.
 
-**CHANGES**: today, implementations like go-ipfs store the peer-id and private key directly in the config. These will be removed and moved out.
-
-### logs
-
-A full IPFS node is complex. Many events can happen, and thus some IPFS
-implementations capture event logs and (optionally) store them for user review
-or debugging.
-
-Logs MAY be stored directly as IPLD objects along with everything else, but this may be a problem if the logs
-
-**NOTE**: go-ipfs no longer stores logs. it only emits them at a given route. This section is kept here in case other implementations may wish to store logs, though it may be removed in the future.
+**CHANGES**: today, implementations like js-ipfs and go-ipfs store the peer-id and private key directly in the config. These will be removed and moved out.
 
 ### locks
 
@@ -115,6 +108,12 @@ IPFS implementations may use multiple processes, or may disallow multiple proces
 
 All repos contain the following standard locks:
 - `repo.lock` - prevents concurrent access to the repo. Must be held to _read_ or _write_.
+
+### datastore_spec
+
+This file is created according to the Datastore configuration specified in the `config` file. It contains an array with all the mounting points that the repo is using, as well as its properties. This way, the `datastore_spec` file must have the same mounting points as defined in the Datastore configuration.
+
+It is important pointing out that the `Datastore` in config must have a `Spec` property, which defines the structure of the ipfs datastore. It is a composable structure, where each datastore is represented by a json object.
 
 ### hooks (TODO)
 
