@@ -1,6 +1,6 @@
 # ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) The Keychain
 
-**Editors**:
+**Maintainer(s)**:
 - [Juan Benet](github.com/jbenet)
 
 * * *

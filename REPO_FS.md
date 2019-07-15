@@ -1,6 +1,6 @@
 # ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) fs-repo
 
-**Editors**:
+**Maintainer(s)**:
 - [Juan Benet](github.com/jbenet)
 
 * * *
@@ -29,7 +29,7 @@ This spec defines `fs-repo` version `1`, its formats, and semantics.
 ├── api             <--- running daemon api addr
 ├── blocks/         <--- objects stored directly on disk
 │   └── aa          <--- prefix namespacing like git
-│      └── aa      <--- N tiers
+│       └── aa      <--- N tiers
 ├── config          <--- config file (json or toml)
 ├── hooks/          <--- hook scripts
 ├── keys/           <--- cryptographic keys
