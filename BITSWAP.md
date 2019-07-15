@@ -1,6 +1,6 @@
 # ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Bitswap
 
-**Editors**:
+**Maintainer(s)**:
 - David Dias
 - Jeromy Johnson
 - Juan Benet

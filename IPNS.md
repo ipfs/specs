@@ -1,6 +1,6 @@
 # ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) IPNS - Inter-Planetary Naming System
 
-**Editors**:
+**Maintainer(s)**:
 - Vasco Santos ([@vasco-santos](https://github.com/vasco-santos))
 - Steven Allen ([@Stebalien](https://github.com/Stebalien))
 

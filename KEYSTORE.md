@@ -1,6 +1,6 @@
 # ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Keystore
 
-**Editors:**
+**Maintainer(s):**
 - [whyrusleeping](github.com/whyrusleeping)
 
 * * *
