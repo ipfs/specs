@@ -6,7 +6,7 @@
 
 > This repository contains the specs for the IPFS Protocol and associated subsystems.
 
-## Understanding the meaning of the spec badges
+## Understanding the meaning of the spec badges and their lifecycle
 
 We use the following label system to identify the state of each spec:
 
