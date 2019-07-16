@@ -8,7 +8,7 @@ The protocol specifications should be treated as the ultimate source of truth fo
 
 Understanding this, we want to make sure to provide a platform in which the Core Developers and the whole IPFS community can collaborate and build specs and code that as much of a pair as possible. This compromises into two main chunks of work:
 
-- Writting the spec and iterating on it to the point that the spec and the code progress smoothly together.
+- Writing the spec and iterating on it to the point that the spec and the code progress smoothly together.
 - For mature and more stable specs, have tests (using [Protocol Driven Development](https://github.com/ipfs/pdd), [TLA+](https://lamport.azurewebsites.net/tla/tla.html) or another framework of verification) to ensure that all implementations stand correct.
 
 The very aspirational future is to have a spec language in which we can describe how the program should function and it will automatically create the tests to verify it. The aspiration future ++ is having such spec language that writes the code itself and verifies it 🚀.
