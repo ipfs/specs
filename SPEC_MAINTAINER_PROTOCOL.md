@@ -4,7 +4,7 @@
 
 ## Motivation
 
-The protocol specifications should be treated as the ultimate source of truth for how the protocol works, how to implemented and what users and builders can expect on how it behaves. However, writting specs for a protocol is not novelty and there has been multiple decades of research on how to do this well, from having a reference implementation, standards bodies and/or formal verification to ensure both code and specs behave the same. It is a hard problem and ultimately one that questions how programming is done as a whole.
+The protocol specifications should be treated as the ultimate source of truth for how the protocol works, how to be implemented and what users and builders can expect on how it behaves. However, writing specs for a protocol is not novelty and there has been multiple decades of research on how to do this well, from having a reference implementation, standards bodies and/or formal verification to ensure both code and specs behave the same. It is a hard problem and ultimately one that questions how programming is done as a whole.
 
 Understanding this, we want to make sure to provide a platform in which the Core Developers and the whole IPFS community can collaborate and build specs and code that as much of a pair as possible. This compromises into two main chunks of work:
 
