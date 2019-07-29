@@ -243,7 +243,7 @@ the go-ipfs fs-repo in version 2 uses a different `blocks/` dir layout:
 ├── 12200007
 │  └── 12200007d4e3a319cd8c7c9979280e150fc5dbaae1ce54e790f84ae5fd3c3c1a0475.data
 ├── 1220000f
-│  └── 1220000fadd95a98f3a47c1ba54a26c77e15c1a175a975d88cf198cc505a06295b12.data
+│   └── 1220000fadd95a98f3a47c1ba54a26c77e15c1a175a975d88cf198cc505a06295b12.data
 ```
 
 We MUST address whether we should change the fs-repo spec to match go-ipfs in version 2, or we should change go-ipfs to match the fs-repo spec (more tiers). We MUST also address whether the levels are a repo version parameter or a config parameter. There are filesystems in which a different fanout will have wildly different performance. These are mostly networked and legacy filesystems.
