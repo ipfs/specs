@@ -32,7 +32,7 @@ The specs contained in this repository are:
 - **User Interface (aka Public APIs):**
   - [Core API (aka using IPFS as a package/module)](./API_CORE.md)
     - [JavaScript Interface](https://github.com/ipfs/interface-js-ipfs-core)
-    - [Golang implementation details](https://github.com/ipfs/interface-go-ipfs-core)
+    - [Golang Interface](https://github.com/ipfs/interface-go-ipfs-core)
   - [CLI (the ipfs daemon API)](./API_CLI.md)
   - [HTTP API](./API_HTTP.md)
   - HTTP Gateway
