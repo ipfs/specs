@@ -31,7 +31,7 @@ The specs contained in this repository are:
   - [Other IPFS Overviews](/overviews) - quick overviews of the various parts of IPFS
 - **User Interface (aka Public APIs):**
   - [Core API (aka using IPFS as a package/module)](./API_CORE.md)
-    - [JavaScript implementation details](https://github.com/ipfs/interface-js-ipfs-core)
+    - [JavaScript Interface](https://github.com/ipfs/interface-js-ipfs-core)
     - [Golang implementation details](https://github.com/ipfs/interface-go-ipfs-core)
   - [CLI (the ipfs daemon API)](./API_CLI.md)
   - [HTTP API](./API_HTTP.md)
