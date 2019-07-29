@@ -60,7 +60,6 @@ The specs contained in this repository are:
   - [libp2p](https://github.com/libp2p/specs) - libp2p is a modular and extensible network stack, built and use by IPFS, but that it can be reused as a standalone project. Covers:
 - **Records, Naming and Record Systems:**
   - [IPNS](./IPNS.md) - InterPlanetary Naming System
-  - [IPRS](https://github.com/libp2p/specs/blob/master/IPRS.md) - InterPlanetary Record System. A generalization of IPNS for other types of mutable data
 - **Other/related/included:**
   - [PDD](https://github.com/ipfs/pdd) - Protocol Driven Development
 
