@@ -241,7 +241,7 @@ the go-ipfs fs-repo in version 2 uses a different `blocks/` dir layout:
 ```
 /Users/jbenet/.ipfs/blocks
 ├── 12200007
-│  └── 12200007d4e3a319cd8c7c9979280e150fc5dbaae1ce54e790f84ae5fd3c3c1a0475.data
+│   └── 12200007d4e3a319cd8c7c9979280e150fc5dbaae1ce54e790f84ae5fd3c3c1a0475.data
 ├── 1220000f
 │   └── 1220000fadd95a98f3a47c1ba54a26c77e15c1a175a975d88cf198cc505a06295b12.data
 ```
