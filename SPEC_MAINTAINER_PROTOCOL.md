@@ -17,7 +17,7 @@ The Spec Maintainer Protocol takes a large amount of inspiration from the repo [
 
 ## Maintaining a Specification
 
-A Specification Maintainer is a contributor that has shown that understand the subsystem of the spec that is maintaining and that is passionate about documenting it well. There is a benefit for this contributor to be actively involved with the development of the subsystem at least in one or more of the languages.
+A Specification Maintainer is a contributor that has shown that they understand the subsystem that is maintained by the spec and are passionate about documenting it well. There is a benefit for this contributor to be actively involved with the development of the subsystem at least in one or more of the languages.
 
 Each spec should be maintained at least by 1 person and up to 3 for efficiency purposes.
 
