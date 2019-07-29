@@ -31,7 +31,8 @@ As a Spec Maintainer, you are expected to:
 - Have a great understanding of the subsystem  purpose and how it is used by other parts of the project.
 - Review and merge PRs to the Spec
 - Respond in a timely manner to Github issues on ipfs/specs repo that are related to the spec being maintained.
-- Notify the developers of the subsystem in case there is a new proposal for a change or also request the developers to notify when there is a system change that needs to be reflected on the spec.
+- Notify implementer(s) of the subsystem in case there is a new proposal for a change or also request the implementer(s) to notify when there is a system change that needs to be reflected on the spec.
+- Seek review and consensus approval from subsystem implementer(s) to every non-trivial change.
 
 ### Specification Status
 
