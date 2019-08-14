@@ -14,7 +14,7 @@ Reviewers:
 IPNS consists of a public/private asymmetric cryptographic key pair, a record type and a protocol.
 Part of the protocol involves a routing layer that is used for the distribution and discovery of new or updated IPNS records.
 
-The IPNS PubSub router uses as a base [libp2p PubSub](https://github.com/libp2p/specs/tree/master/pubsub), but layers on it persistence so as to ensure IPNS updates are always available to a connected network.
+The IPNS PubSub router uses [libp2p PubSub](https://github.com/libp2p/specs/tree/master/pubsub) as a base, and adds persistence on top of it to ensure IPNS updates are always available to a connected network.
 An inherent property of the IPNS PubSub Router is that IPNS records are republishable by peers other than the peer that originated the record.
 This implies that as long as a peer on the network has an IPNS record it can be made available to other peers (although the records may be ignored if they are received after the IPNS record's End-of-Life/EOL).
 
