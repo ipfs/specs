@@ -60,7 +60,7 @@ The protocol has the following steps:
 4. `A` sends `B` a Fetch request for `k`
 5. If Fetch returns a record that supersedes `A`'s current record then `A` updates its record and Publishes it to the network
 
-Note: PubSub does not guarantee that the a message sent by a peer `A` will be received by a peer `B` and it's possible
+Note: PubSub does not guarantee that a message sent by a peer `A` will be received by a peer `B` and it's possible
 (e.g. in systems like [gossipsub](https://github.com/libp2p/specs/tree/master/pubsub/gossipsub))
 that this is true even if `A` and `B` are already connected. Therefore, whenever `A` notices **any** node that has
 connected to it and subscribed to `t` it should run the Fetch protocol as described above. However, developers may have routers
