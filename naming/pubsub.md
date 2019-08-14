@@ -11,7 +11,7 @@ Reviewers:
 # Abstract
 
 [Inter-Planetary Naming System (IPNS)](/README.md) is a naming system responsible for the creating, reading and updating of mutable pointers to data.
-IPNS consists of a pubic/private asymmetric cryptographic key pair, a record type and a protocol.
+IPNS consists of a public/private asymmetric cryptographic key pair, a record type and a protocol.
 Part of the protocol involves a routing layer that is used for the distribution and discovery of new or updated IPNS records.
 
 The IPNS PubSub router uses as a base [libp2p PubSub](https://github.com/libp2p/specs/tree/master/pubsub), but layers on it persistence so as to ensure IPNS updates are always available to a connected network.
