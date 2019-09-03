@@ -44,9 +44,7 @@ message Data {
 	optional uint32 ctime = 9;
 	
 	/* file permissions */
-	optional uint32 permissions = 10;
-	optional uint32 uid = 11;
-	optional uint32 gid = 12;
+	optional uint32 mode = 10;
 }
 
 message Metadata {
