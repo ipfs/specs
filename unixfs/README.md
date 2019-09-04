@@ -58,6 +58,8 @@ For files that are comprised of more than a single block, the 'Type' field will 
 
 This data is serialized and placed inside the 'Data' field of the outer merkledag protobuf, which also contains the actual links to the child nodes of this object.
 
+The `mode` is for optionally persisting the [file permissions in numeric notation](https://en.wikipedia.org/wiki/File_system_permissions#Numeric_notation).
+
 ## Importing
 
 Importing a file into unixfs is split up into two parts. The first is chunking, the second is layout.
