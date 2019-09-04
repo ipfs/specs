@@ -58,7 +58,7 @@ For files that are comprised of more than a single block, the 'Type' field will 
 
 This data is serialized and placed inside the 'Data' field of the outer merkledag protobuf, which also contains the actual links to the child nodes of this object.
 
-The `mode` is for optionally persisting the [file permissions in numeric notation](https://en.wikipedia.org/wiki/File_system_permissions#Numeric_notation).
+The `mode` is for optionally persisting the [file permissions in numeric notation](https://en.wikipedia.org/wiki/File_system_permissions#Numeric_notation) \[[spec](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_stat.h.html)\].
 
 ## Importing
 
@@ -77,7 +77,6 @@ Chunking strategy currently has two different options, 'fixed size' and 'rabin'.
 Fixed size chunking will chunk the input data into pieces of a given size. Rabin
 chunking will chunk the input data using rabin fingerprinting to determine the
 boundaries between chunks.
-
 
 ### Layout
 
