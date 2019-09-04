@@ -21,10 +21,9 @@ This implies that as long as a peer on the network has an IPNS record it can be 
 # Organization of this document
 
   - [Introduction](#introduction)
+  - [Protocol Overview](#pubsub-protocol-overview)
   - [Protocol](#protocol)
-  - [Overview](#overview)
-  - [API Spec](#api-spec)
-  - [Integration with IPFS](#integration-with-ipfs)
+  - [Implementations](#implementations)
 
 # Introduction
 
