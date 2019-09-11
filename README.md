@@ -17,10 +17,7 @@ We use the following label system to identify the state of each spec:
 - ![](https://img.shields.io/badge/status-permanent-blue.svg?style=flat-square) - This spec will not change.
 - ![](https://img.shields.io/badge/status-deprecated-red.svg?style=flat-square) - This spec is no longer in use.
 
-
 Nothing in this spec repository is `permanent` or even `stable` yet. Most of the subsystems are still a `draft` or in `reliable` state.
-
-IPFS Specifications are maintained following the [SPEC_MAINTAINER_PROTOCOL](SPEC_MAINTAINER_PROTOCOL.md)
 
 ## Index
 

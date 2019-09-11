@@ -1,5 +1,8 @@
 # ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Core API
 
+**Author(s)**:
+- N/A
+
 **Maintainer(s)**:
 - N/A
 

@@ -1,8 +1,12 @@
 # ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) IPFS Architecture Overview
 
-**Maintainer(s)**:
+
+**Authors(s)**:
 - [Juan Benet](https://github.com/jbenet)
 - [David Dias](https://github.com/daviddias)
+
+**Maintainer(s)**:
+- N/A
 
 * * *
 

@@ -2,7 +2,7 @@
 
 **This spec has been deprecated in favor of [IPLD](https://github.com/ipld/specs/).** It offers a clearer description of how to link different kinds of hash-based structures (e.g. linking a file in IPFS to a commit in Git), has a more generalized and flexible format, and uses a JSON-compatible representation, among other improvements.
 
-**Maintainer(s)**:
+**Authors(s)**:
 - [Juan Benet](https://github.com/jbenet)
 - [Jeromy Johnson](https://github.com/whyrusleeping)
 
