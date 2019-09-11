@@ -1,7 +1,10 @@
 # ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Addressing on the Decentralized Web
 
-**Maintainer(s)**:
+**Authors(s)**:
 - [Lars Gierth](mailto:lgierth@ipfs.io)
+
+**Maintainers(s)**:
+-
 
 * * *
 

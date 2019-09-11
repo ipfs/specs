@@ -1,6 +1,6 @@
 # ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Data Importers & Exporters
 
-**Maintainer(s)**:
+**Authors(s)**:
 - David Dias
 - Juan Benet
 

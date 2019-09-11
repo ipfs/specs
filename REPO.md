@@ -1,6 +1,6 @@
 # ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) IPFS Repo Spec
 
-**Maintainer(s)**:
+**Author(s)**:
 - [Juan Benet](github.com/jbenet)
 
 * * *

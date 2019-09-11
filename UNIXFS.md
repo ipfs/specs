@@ -1,6 +1,6 @@
 # ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) UnixFS
 
-**Maintainer(s)**:
+**Author(s)**:
 - NA
 
 * * *
