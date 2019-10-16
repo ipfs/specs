@@ -1,21 +1,27 @@
-# ipfs keystore proposal
-Author[s]: [whyrusleeping](github.com/whyrusleeping)
+# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Keystore
 
-Reviewer[s]:
+**Authors(s):**
+- [whyrusleeping](github.com/whyrusleeping)
 
 * * *
 
-![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
+**Abstract**
 
-Note: This spec is currently in the `wip` phase, things are likely to change very quickly.
+TODO
+
+# Table of Contents
+
+TODO
 
 ## Goals:
+
 To have a secure, simple and user-friendly way of storing and managing keypairs
 for use by ipfs. As well as the ability to share these keys, encrypt, decrypt,
 sign and verify data.
 
 ## Planned Implementation
 ### Storage
+
 Keys will be stored in a directory named `keys` under the `$IPFS_PATH`
 directory. Each named keypair will be stored across two files, the private key
 in `$NAME` and the public key in `$NAME.pub`. They will be encoded in PEM (or

@@ -1,16 +1,22 @@
-# The merkledag
+# ![](https://img.shields.io/badge/status-deprecated-red.svg?style=flat-square) The merkledag
 
 **This spec has been deprecated in favor of [IPLD](https://github.com/ipld/specs/).** It offers a clearer description of how to link different kinds of hash-based structures (e.g. linking a file in IPFS to a commit in Git), has a more generalized and flexible format, and uses a JSON-compatible representation, among other improvements.
 
-Authors: [Juan Benet](https://github.com/jbenet)
-
-Reviewers:
-
+**Authors(s)**:
+- [Juan Benet](https://github.com/jbenet)
 - [Jeromy Johnson](https://github.com/whyrusleeping)
 
 * * *
 
-This is the [Spec](https://github.com/ipfs/specs/) for the IPFS Merkledag.
+**Abstract**
+
+The _ipfs merkledag_ is a directed acyclic graph whose edges are merkle-links. This means that links to objects can authenticate the objects themselves, and that every object contains a secure representation of its children.
+
+This is a powerful primitive for distributed systems computations. The merkledag simplifies distributed protocols by providing an append-only authenticated datastructure. Parties can communicate and exchange secure references (merkle-links) to objects. The references are enough to verify the correctness of the object at a later time, which allows the objects themselves to be served over untrusted channels. Merkledags also allow the branching of a datastructure and subsequent merging, as in the version control system git. More generally, merkledags simplify the construction of Secure [CRDTs](http://en.wikipedia.org/wiki/Conflict-free_replicated_data_type), which enable distributed, convergent, commutative computation in an authenticated, secure way.
+
+## Table of Contents
+
+TODO
 
 ## Definitions
 
@@ -26,11 +32,6 @@ This is the [Spec](https://github.com/ipfs/specs/) for the IPFS Merkledag.
 - `protobuf` - [protocol buffers](https://developers.google.com/protocol-buffers/), a serialization encoding.
 - `multicodec` - a self-describing, generalized serialization format.
 
-## Abstract
-
-The _ipfs merkledag_ is a directed acyclic graph whose edges are merkle-links. This means that links to objects can authenticate the objects themselves, and that every object contains a secure representation of its children.
-
-This is a powerful primitive for distributed systems computations. The merkledag simplifies distributed protocols by providing an append-only authenticated datastructure. Parties can communicate and exchange secure references (merkle-links) to objects. The references are enough to verify the correctness of the object at a later time, which allows the objects themselves to be served over untrusted channels. Merkledags also allow the branching of a datastructure and subsequent merging, as in the version control system git. More generally, merkledags simplify the construction of Secure [CRDTs](http://en.wikipedia.org/wiki/Conflict-free_replicated_data_type), which enable distributed, convergent, commutative computation in an authenticated, secure way.
 
 ## The Format
 
