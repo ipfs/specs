@@ -48,6 +48,7 @@ message Data {
 	optional uint64 fanout = 6;
 
 	repeated Metadata metadata = 7;
+	optional Metadata defaultMetadata = 8;
 }
 
 message Metadata {
@@ -65,10 +66,18 @@ This data is serialized and placed inside the 'Data' field of the outer merkleda
 
 ## Metadata
 
-There are two ways to specify file metadata:
+There are three ways to specify file metadata:
 
 1. The repeated `metadata` field in a directory applies metadata to each file in the directory.
 2. An intermediary node with a `Type` of `Metadata` applies metadata to an individual file. While this feature should be supported, it has been deprecated.
+3. An optional `defaultMetadata` field to specify the _default_ metadata for files in the directory. If unspecified, the default mode is 0755 and the default modification time is the epoch.
+  * Files: The default metadata is applied as-is.
+  * Directories:
+    * The default mode for directories is `defaultMetadata.mode | 0111` (sets the execute bit).
+    * The default mime type for directories is `inode/directory`.
+  * Symlinks:
+    * The default mime type for symlinks is `inode/symlink`.
+    * The mode for symlinks is _always_ 0777.
 
 Fields:
 
