@@ -46,10 +46,14 @@ message Data {
 
 	optional uint64 hashType = 5;
 	optional uint64 fanout = 6;
+
+	repeated Metadata metadata = 7;
 }
 
 message Metadata {
-	optional string MimeType = 1;
+	optional string mimeType = 1;
+	optional uint32 mode = 2;
+	optional int64 mtime = 3;
 }
 ```
 
@@ -58,6 +62,19 @@ This `Data` object is used for all non-leaf nodes in Unixfs.
 For files that are comprised of more than a single block, the 'Type' field will be set to 'File', the 'filesize' field will be set to the total number of bytes in the file (not the graph structure) represented by this node, and 'blocksizes' will contain a list of the filesizes of each child node.
 
 This data is serialized and placed inside the 'Data' field of the outer merkledag protobuf, which also contains the actual links to the child nodes of this object.
+
+## Metadata
+
+There are two ways to specify file metadata:
+
+1. The repeated `metadata` field in a directory applies metadata to each file in the directory.
+2. An intermediary node with a `Type` of `Metadata` applies metadata to an individual file. While this feature should be supported, it has been deprecated.
+
+Fields:
+
+* `mimeType` -- The mime-type of the file. This generally shouldn't be used.
+* `mode` -- The `mode` is for optionally persisting the [file permissions in numeric notation](https://en.wikipedia.org/wiki/File_system_permissions#Numeric_notation) \[[spec](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_stat.h.html)\].
+* `mtime` -- The modification time in seconds since the epoch. This is a 64 bit uint for forwards compatibility.
 
 ## Importing
 
