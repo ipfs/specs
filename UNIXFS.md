@@ -66,24 +66,53 @@ This data is serialized and placed inside the 'Data' field of the outer merkleda
 
 ## Metadata
 
-There are three ways to specify file metadata:
-
-1. The repeated `metadata` field in a directory applies metadata to each file in the directory.
-2. An intermediary node with a `Type` of `Metadata` applies metadata to an individual file. While this feature should be supported, it has been deprecated.
-3. An optional `defaultMetadata` field to specify the _default_ metadata for files in the directory. If unspecified, the default mode is 0755 and the default modification time is the epoch.
-  * Files: The default metadata is applied as-is.
-  * Directories:
-    * The default mode for directories is `defaultMetadata.mode | 0111` (sets the execute bit).
-    * The default mime type for directories is `inode/directory`.
-  * Symlinks:
-    * The default mime type for symlinks is `inode/symlink`.
-    * The mode for symlinks is _always_ 0777.
-
-Fields:
+UnixFS currently supports three metadata fields:
 
 * `mimeType` -- The mime-type of the file. This generally shouldn't be used.
-* `mode` -- The `mode` is for optionally persisting the [file permissions in numeric notation](https://en.wikipedia.org/wiki/File_system_permissions#Numeric_notation) \[[spec](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_stat.h.html)\].
-* `mtime` -- The modification time in seconds since the epoch. This is a 64 bit uint for forwards compatibility.
+* `mode` -- The `mode` is for optionally persisting the [file permissions in numeric notation](https://en.wikipedia.org/wiki/File_system_permissions#Numeric_notation) \[[spec](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_stat.h.html)\]. It defaults to 0755 if unspecified.
+* `mtime` -- The modification time in seconds since the epoch. This defaults to the unix epoch if unspecified.
+
+There are three ways to specify file metadata:
+
+### Embedded in the directory
+
+Each entry in the repeated metadata field corresponds to the linked file/directory at the same offset in the Links section of the outer dag-pb. This field is appropriate in nodes with type `Directory` and `HAMTShard`. However, metadata should _not_ be specified for links that point to other HAMT shards.
+
+### Using an intermediate node
+
+DEPRECATED
+
+Metadata can be applied to a single file/directory with an intermediate "metadata node":
+
+1. A `Type` of `Metadata`.
+2. A `Data` containing an encoded `Metadata` message.
+3. A single `Link` (in the outer dag-pb node) pointing to the actual file/directory.
+
+However, this is inefficient as it requires an extra node and poorly supported. Files that contain metadata should be wrapped in directories.
+
+### Default metadata
+
+The `defaultMetadata` field can be used in conjunction with the repeated `metadata` field to specify metadata "defaults".
+
+1. The first `defaultMetadata` field encountered when traversing a sharded directory takes precedence.
+2. Default metadata and explicit per-file metadata are merged field-wise.
+
+Given the `defaultMetdata` field, the _actual_ default metadata is determined as follows:
+
+* For directories:
+  * The default mode is `defaultMetadata.mode | 0111` (sets the execute bit).
+  * The default mime type is ignored.
+  * The default mtime is as specified in `defaultMetadata`.
+* For symlinks, the defaults are ignored.
+* For regular files, the defaults are as specified in `defaultMetadata`.
+
+To determine the metadata for a file:
+
+1. The per-file metadata is looked up in the `metadata` list as usual.
+2. For each field in the file's metadata:
+  1. If the field is specified, use it.
+  2. If the field is unspecified but a default is specified, use it.
+  3. Otherwise, use the global default.
 
 ## Importing
 
