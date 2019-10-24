@@ -78,6 +78,11 @@ There are three ways to specify file metadata:
 
 Each entry in the repeated metadata field corresponds to the linked file/directory at the same offset in the Links section of the outer dag-pb. This field is appropriate in nodes with type `Directory` and `HAMTShard`. However, metadata should _not_ be specified for links that point to other HAMT shards.
 
+For some context, this solution was chosen over embedding the metadata in the file itself because:
+
+1. It allows accessing the metadata without downloading the target files.
+2. More importantly, it avoids changing the root hash of the target files to allow for better deduplication.
+
 ### Using an intermediate node
 
 DEPRECATED
