@@ -93,7 +93,7 @@ Metadata can be applied to a single file/directory with an intermediate "metadat
 2. A `Data` containing an encoded `Metadata` message.
 3. A single `Link` (in the outer dag-pb node) pointing to the actual file/directory.
 
-However, this is inefficient as it requires an extra node and poorly supported. Files that contain metadata should be wrapped in directories.
+This solution has been _deprecated_ because it requires an additional intermediate node just for the metadata. It is also poorly supported.
 
 ### Default metadata
 
