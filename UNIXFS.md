@@ -76,7 +76,46 @@ There are three ways to specify file metadata:
 
 ### Embedded in the directory
 
-Each entry in the repeated metadata field corresponds to the linked file/directory at the same offset in the Links section of the outer dag-pb. This field is appropriate in nodes with type `Directory` and `HAMTShard`. However, metadata should _not_ be specified for links that point to other HAMT shards.
+Each entry in the repeated metadata field corresponds to the linked file/directory at the same offset in the Links section of the outer dag-pb. This field is appropriate in nodes with type `Directory` and `HAMTShard`. However, metadata corresponding to linked HAMT shards should be left blank.
+
+For example, a directory might look like.
+
+```
+{
+  Type: Directory,
+  Data: {
+    Metadata: [
+      {},
+      {Mode: 0666},
+      {}
+  },
+  Links: [
+    {Name: "foo", ...}, // mode: 0644 (default)
+    {Name: "bar", ...}, // mode: 0666
+    {Name: "baz", ...}  // mode: 0644 (default)
+  ]
+}
+```
+
+A HAMT shard might look like:
+
+```
+{
+  Type: HAMTShard,
+  Data: {
+    Metadata: [
+      {Mode: 0666},
+      {}, // must be blank
+      {} // must be blank
+    ]
+  },
+  Links: [
+    {Name: "01foo", ...}, // A file with mode 0600.
+    {Name: "02", ...},    // A shard.
+    {Name: "03", ...},    // Annother shard.
+  ]
+}
+```
 
 For some context, this solution was chosen over embedding the metadata in the file itself because:
 
