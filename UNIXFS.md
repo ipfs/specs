@@ -48,7 +48,6 @@ message Data {
 	optional uint64 fanout = 6;
 
 	repeated Metadata metadata = 7;
-	optional Metadata defaultMetadata = 8;
 }
 
 message Metadata {
@@ -72,7 +71,7 @@ UnixFS currently supports three metadata fields:
 * `mode` -- The `mode` is for optionally persisting the [file permissions in numeric notation](https://en.wikipedia.org/wiki/File_system_permissions#Numeric_notation) \[[spec](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_stat.h.html)\]. It defaults to 0755 if unspecified.
 * `mtime` -- The modification time in seconds since the epoch. This defaults to the unix epoch if unspecified.
 
-There are three ways to specify file metadata:
+There are two ways to specify file metadata:
 
 ### Embedded in the directory
 
@@ -133,30 +132,6 @@ Metadata can be applied to a single file/directory with an intermediate "metadat
 3. A single `Link` (in the outer dag-pb node) pointing to the actual file/directory.
 
 This solution has been _deprecated_ because it requires an additional intermediate node just for the metadata. It is also poorly supported.
-
-### Default metadata
-
-The `defaultMetadata` field can be used in conjunction with the repeated `metadata` field to specify metadata "defaults".
-
-1. The first `defaultMetadata` field encountered when traversing a sharded directory takes precedence.
-2. Default metadata and explicit per-file metadata are merged field-wise.
-
-Given the `defaultMetdata` field, the _actual_ default metadata is determined as follows:
-
-* For directories:
-  * The default mode is `defaultMetadata.mode | 0111` (sets the execute bit).
-  * The default mime type is ignored.
-  * The default mtime is as specified in `defaultMetadata`.
-* For symlinks, the defaults are ignored.
-* For regular files, the defaults are as specified in `defaultMetadata`.
-
-To determine the metadata for a file:
-
-1. The per-file metadata is looked up in the `metadata` list as usual.
-2. For each field in the file's metadata:
-  1. If the field is specified, use it.
-  2. If the field is unspecified but a default is specified, use it.
-  3. Otherwise, use the global default.
 
 ## Importing
 
