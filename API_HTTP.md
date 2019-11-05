@@ -28,6 +28,7 @@ This specification describes the HTTP API - it's resources, arguments, behaviour
   - [Response codes](#response-codes)
 - [Resources](#resources)
   - [`/api/v1/files`](#apiv1files)
+    - [Paths](#paths)
     - [Data types](#data-types-1)
     - [POST `/api/v1/files[/{path}]`](#post-apiv1filespath)
       - [Query string](#query-string)
@@ -228,9 +229,13 @@ In some cases specific status codes will indicate certain request outcomes and m
 
 The `files` resource allows interactions with IPFS filesystems.
 
+#### Paths
+
 All `files` operations take a path which can be an IPFS path (e.g. `/ipfs/bafyFile` or `/ipfs/bafyDir/file.txt`) or an [MFS] path (e.g. `/path/to/file`).
 
 Where conflicts arise, the IPFS path takes priority.
+
+Path components are separate by a forward slash `/` character.  Individual components must be URI Encoded in accordance with [RFC3986].
 
 #### Data types
 
@@ -264,7 +269,9 @@ Where conflicts arise, the IPFS path takes priority.
 
 #### POST `/api/v1/files[/{path}]`
 
-Add a file or files to IPFS or [MFS]
+Import a file or directory structure to IPFS or [MFS].
+
+Requests may include a `content-disposition` header that specifies the full path to the file in the directory structure that is being imported.  Path components must be URI Encoded (see [#paths](#paths)).
 
 ##### Query string
 
@@ -611,3 +618,4 @@ content-type: application/ipfs-unixfs-v1-directory
 [CID]: https://docs.ipfs.io/guides/concepts/cid/
 [RFC1341]: https://www.w3.org/Protocols/rfc1341/4_Content-Type.html
 [RFC2616]: https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
+[RFC3986]: https://tools.ietf.org/html/rfc3986
