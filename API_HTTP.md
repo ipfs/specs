@@ -395,6 +395,21 @@ HTTP 1.1 406 NOT ACCEPTIBLE
 
 Example:
 
+> Downloading a directory as a single file
+
+```
+GET /api/vi/files/path/to/dir HTTP/1.1
+accept: application/gzip
+```
+```
+HTTP 1.1 200 OK
+content-type: application/gzip
+
+...binary data
+```
+
+Example:
+
 > Listing the contents of a directory
 
 ```
@@ -509,7 +524,7 @@ content-type: application/ipfs-unixfs-v1-directory
 
 Example:
 
-> You cannot patch directory
+> You cannot patch a directory
 
 ```
 PATCH /api/vi/files/path/to/dir HTTP/1.1
@@ -529,7 +544,7 @@ All available data will be read from the octet-stream and used to overwrite the 
 Example:
 
 ```
-PATCH /api/vi/files/path/to/file?offset=10 HTTP/1.1
+PUT /api/vi/files/path/to/file?offset=10 HTTP/1.1
 content-type: application/octect-stream
 accept: application/ipfs-unixfs-v1-file
 
@@ -555,7 +570,7 @@ Example:
 > Deleting a file
 
 ```
-PATCH /api/vi/files/ipfs/bafyFile?offset=10 HTTP/1.1
+DELETE /api/vi/files/ipfs/bafyFile?offset=10 HTTP/1.1
 content-type: application/octect-stream
 accept: application/ipfs-unixfs-v1-file; application/ipfs-unixfs-v1-directory
 
