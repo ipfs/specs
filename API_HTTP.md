@@ -355,7 +355,7 @@ Requests may include a `content-disposition` header that specifies the full path
   * If true, added files will be sent to IPFS managed preload nodes
 * cidVersion (int, default 1)
   * The version of CID to use
-* hashAlg (enum, See [`names`](https://github.com/multiformats/js-multihash/blob/master/src/constants.js) for values, default `sha2-256`)
+* hashAlg (enum, See [multiformats/multicodec] for values, default `sha2-256`)
   * The hashing algorithm to use when creating the CID
 * inlineBlocks (boolean default false)
   * If true and the specifed chunker generates exactly one chunk for the file, only one DAGNode will be created and it will contain both the file data and UnixFS metadata
@@ -717,7 +717,7 @@ By default [CID]s are returned as binary data.  The client may override this by 
 
 ##### Query string
 
-* hashAlg (enum, See [`names`](https://github.com/multiformats/js-multihash/blob/master/src/constants.js) for values, default `sha2-256`)
+* hashAlg (enum, See [multiformats/multicodec] for values, default `sha2-256`)
   * The hashing algorithm to use when creating the CID
 
 ##### Examples
@@ -826,3 +826,4 @@ bafyFoo
 [RFC1341]: https://www.w3.org/Protocols/rfc1341/4_Content-Type.html
 [RFC2616]: https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
 [RFC3986]: https://tools.ietf.org/html/rfc3986
+[multiformats/multicodec]: https://github.com/multiformats/multicodec
