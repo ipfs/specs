@@ -22,22 +22,59 @@ This specification describes the HTTP API - it's resources, arguments, behaviour
   - [Streams](#streams)
   - [Batches](#batches)
   - [Errors](#errors)
+      - [Examples](#examples)
+        - [An error during a non-streaming resource response](#an-error-during-a-non-streaming-resource-response)
+        - [An error during a stream](#an-error-during-a-stream)
     - [Data types](#data-types)
   - [HTTP Verbs](#http-verbs)
   - [Resource names](#resource-names)
   - [Response codes](#response-codes)
+  - [Network behaviour](#network-behaviour)
 - [Resources](#resources)
   - [`/api/v1/files`](#apiv1files)
     - [Paths](#paths)
     - [Data types](#data-types-1)
     - [POST `/api/v1/files[/{path}]`](#post-apiv1filespath)
       - [Query string](#query-string)
+      - [Examples](#examples-1)
+        - [Adding a file to IPFS](#adding-a-file-to-ipfs)
+        - [Adding a file to MFS](#adding-a-file-to-mfs)
+        - [Adding a directory of files to MFS](#adding-a-directory-of-files-to-mfs)
+        - [Adding an IPFS path to MFS](#adding-an-ipfs-path-to-mfs)
     - [GET `/api/v1/files/{path}`](#get-apiv1filespath)
       - [Query string](#query-string-1)
+      - [Examples](#examples-2)
+        - [Getting the contents of a file - specify `application/octect-stream` as the `accept` header](#getting-the-contents-of-a-file---specify-applicationoctect-stream-as-the-accept-header)
+        - [You cannot download a directory as an octet-stream](#you-cannot-download-a-directory-as-an-octet-stream)
+        - [Downloading a directory as a single file](#downloading-a-directory-as-a-single-file)
+        - [Listing the contents of a directory](#listing-the-contents-of-a-directory)
+        - [Listing the contents of a directory recursively](#listing-the-contents-of-a-directory-recursively)
     - [PATCH `/api/v1/files/{path}`](#patch-apiv1filespath)
       - [Query string](#query-string-2)
+      - [Examples](#examples-3)
+        - [Replacing part of a deeply nested file](#replacing-part-of-a-deeply-nested-file)
+        - [Patching a deeply nested file](#patching-a-deeply-nested-file)
+        - [You cannot patch a directory](#you-cannot-patch-a-directory)
     - [PUT `/api/v1/files/{path}`](#put-apiv1filespath)
+      - [Examples](#examples-4)
+        - [Replacing a deeply nested file](#replacing-a-deeply-nested-file)
     - [DELETE `/api/v1/files/ipfs/{path}`](#delete-apiv1filesipfspath)
+      - [Examples](#examples-5)
+        - [Deleting a file](#deleting-a-file)
+        - [Deleting a deeply nested file](#deleting-a-deeply-nested-file)
+  - [`/api/v1/dag`](#apiv1dag)
+    - [GET `/api/v1/dag/{path}`](#get-apiv1dagpath)
+      - [Examples](#examples-6)
+        - [Downloading a node](#downloading-a-node)
+        - [Downloading path from inside a node](#downloading-path-from-inside-a-node)
+    - [POST `/api/v1/dag`](#post-apiv1dag)
+      - [Query string](#query-string-3)
+      - [Examples](#examples-7)
+        - [Creating a dag-pb node](#creating-a-dag-pb-node)
+        - [Creating multiple dag-pb nodes](#creating-multiple-dag-pb-nodes)
+        - [Creating a dag-cbor node](#creating-a-dag-cbor-node)
+        - [Creating a raw node](#creating-a-raw-node)
+        - [Specifying a different representation](#specifying-a-different-representation)
 
 ## Description
 
@@ -98,6 +135,29 @@ content-type: application/ipfs-unixfs-v1-file; charset=UTF-8
 --boundary--
 ```
 
+Headers that affect returned entities may be specified in the header of the request or in each part of a multipart message.  Where they exist in both places, headers specified in a part of a multipart message will take priority.
+
+Example:
+
+> The first file will be returned as `json`, the second file will returned as `cbor`
+
+```
+POST /api/v1/files HTTP/1.1
+content-type: multipart/mixed; boundary=boundary
+accept: application/ipfs-unixfs-v1-file; application/ipfs-unixfs-v1-directory
+
+--boundary
+content-type: application/octet-stream
+
+...binary data
+--boundary
+content-type: application/octet-stream
+accept: application/ipfs-unixfs-v1-file; representation=cbor, application/ipfs-unixfs-v1-directory; representation=cbor
+
+...binary data
+--boundary--
+```
+
 ### Batches
 
 Any request or response type can be a batch, this means the request/response entity will be an array containing one or more entries.  It will be indicated by appending an `enclosure` parameter to the content type in accordance with [RFC1341].
@@ -137,11 +197,11 @@ Where processing a request to a resource has resulted in a failure, the error mu
 
 The only exception to this is streaming responses where errors may be added to the output stream.
 
-If an error is added to the output stream, a final multipart boundary will be added and then the response will end and no more data will be sent.
+If an error is added to the output stream, a final multipart boundary will be added and then the response will end, no more data will be sent and any inflight requests created as a result of the current resource operation must be aborted and torn down.
 
-Example:
+##### Examples
 
-> An error during a non-streaming resource response
+###### An error during a non-streaming resource response
 
 ```
 content-type: application/ipfs-error-v1; charset=UTF-8
@@ -149,9 +209,7 @@ content-type: application/ipfs-error-v1; charset=UTF-8
 { "message": "An unknown error occured", "code": "ERR_UNKNOWN_ERROR", "stack": [ "line1", "line2", "line3" ] }
 ```
 
-Example:
-
-> An error during a stream
+###### An error during a stream
 
 ```
 content-type: multipart/mixed; boundary=boundary
@@ -222,6 +280,12 @@ If the fault is on the part of the client (e.g. parameter validation failed or t
 If the fault is on the part of the API (e.g. a network failure or an error condition due to misconfiguration, etc) a `5xx` series status should be returned.
 
 In some cases specific status codes will indicate certain request outcomes and must be returned, these will be noted in the `Resources` section below.
+
+### Network behaviour
+
+Resource operations may involve making further network requests on behalf of the client - resolving [DAG]s, etc.
+
+If the remote connection is interruped, any inflight requests created as a result of the current operation must be aborted and torn down.
 
 ## Resources
 
@@ -297,10 +361,12 @@ Requests may include a `content-disposition` header that specifies the full path
   * If true and the specifed chunker generates exactly one chunk for the file, only one DAGNode will be created and it will contain both the file data and UnixFS metadata
 * shard (boolean default false)
   * If true any directories created will be HAMT shards
+* resolve (boolean default false)
+  * If true and the uploaded `content-type` is `application/ipfs-path`, the complete [DAG] beneath the passed path will be fetched from IPFS to ensure it's presence in the repo
 
-Example:
+##### Examples
 
-> Adding a file to IPFS
+###### Adding a file to IPFS
 
 ```
 POST /api/v1/files?progress=true&wrapWithDirectory=true HTTP/1.1
@@ -314,9 +380,7 @@ content-type: application/octet-stream
 --boundary--
 ```
 
-Example:
-
-> Adding a file to MFS
+###### Adding a file to MFS
 
 ```
 POST /api/v1/files/path/to/file.txt?progress=true&wrapWithDirectory=true HTTP/1.1
@@ -326,9 +390,9 @@ accept: application/ipfs-unixfs-v1-file; application/ipfs-unixfs-v1-directory
 ... binary data
 ```
 
-Example:
+###### Adding a directory of files to MFS
 
-> Adding a directory of files to MFS - file data is sent as `application/octet-stream`s and paths are specified via `content-disposition` headers.  Directory are indicated by `content-type: application/directory`
+File data is sent as `application/octet-stream`s and paths are specified via `content-disposition` headers.  Directory are indicated by `content-type: application/directory`
 
 ```
 POST /api/v1/files/path/to/dir?progress=true HTTP/1.1
@@ -348,9 +412,7 @@ content-disposition: filename="b"
 --boundary--
 ```
 
-Example:
-
-> Adding an IPFS path to MFS
+###### Adding an IPFS path to MFS
 
 ```
 POST /api/v1/files/path/to/file.txt HTTP/1.1
@@ -373,12 +435,12 @@ This resource allows you to retrieve data from IPFS and [MFS] paths.
 * recursive (boolean)
   * If true and the resolved path is a directory, list the contents of sub directories
 
-Example:
+##### Examples
 
-> Getting the contents of a file - specify `application/octect-stream` as the `accept` header
+###### Getting the contents of a file - specify `application/octect-stream` as the `accept` header
 
 ```
-GET /api/vi/files/path/to/file.txt HTTP/1.1
+GET /api/v1/files/path/to/file.txt HTTP/1.1
 accept: application/octet-stream
 ```
 ```
@@ -388,24 +450,20 @@ content-type: application/octet-stream
 ...binary data
 ```
 
-Example:
-
-> You cannot download a directory as an octet-stream
+###### You cannot download a directory as an octet-stream
 
 ```
-GET /api/vi/files/path/to/dir HTTP/1.1
+GET /api/v1/files/path/to/dir HTTP/1.1
 accept: application/octet-stream
 ```
 ```
 HTTP 1.1 406 NOT ACCEPTIBLE
 ```
 
-Example:
-
-> Downloading a directory as a single file
+###### Downloading a directory as a single file
 
 ```
-GET /api/vi/files/path/to/dir HTTP/1.1
+GET /api/v1/files/path/to/dir HTTP/1.1
 accept: application/gzip
 ```
 ```
@@ -415,12 +473,10 @@ content-type: application/gzip
 ...binary data
 ```
 
-Example:
-
-> Listing the contents of a directory
+###### Listing the contents of a directory
 
 ```
-GET /api/vi/files/path/to/dir HTTP/1.1
+GET /api/v1/files/path/to/dir HTTP/1.1
 accept: application/ipfs-unixfs-v1-file; application/ipfs-unixfs-v1-directory
 ```
 ```
@@ -434,12 +490,10 @@ content-type: application/ipfs-unixfs-v1-file
 --boundary--
 ```
 
-Example:
-
-> Listing the contents of a directory recursively
+###### Listing the contents of a directory recursively
 
 ```
-GET /api/vi/files/path/to/dir?recursive=true HTTP/1.1
+GET /api/v1/files/path/to/dir?recursive=true HTTP/1.1
 accept: application/ipfs-unixfs-v1-file; application/ipfs-unixfs-v1-directory
 ```
 ```
@@ -476,10 +530,12 @@ Original block data will not be altered.  [CID]s of newly created file root node
 * truncate (boolean, default false)
   * If true, the file will be truncated at the point that the input stream ends
 
-Example:
+##### Examples
+
+###### Replacing part of a deeply nested file
 
 ```
-PATCH /api/vi/files/path/to/file?offset=10 HTTP/1.1
+PATCH /api/v1/file/ipfs/bafyFile?offset=10 HTTP/1.1
 content-type: application/octect-stream
 accept: application/ipfs-unixfs-v1-file
 
@@ -492,12 +548,10 @@ content-type: application/ipfs-unixfs-v1-file
 { path: '/foo', cid: 'bafyfoo' }
 ```
 
-Example:
-
-> Patching a deeply nested file
+###### Patching a deeply nested file
 
 ```
-PATCH /api/vi/files/path/to/file.txt?offset=10 HTTP/1.1
+PATCH /api/v1/files/path/to/file.txt?offset=10 HTTP/1.1
 content-type: application/octect-stream
 accept: application/ipfs-unixfs-v1-file
 
@@ -529,12 +583,10 @@ content-type: application/ipfs-unixfs-v1-directory
 --boundary--
 ```
 
-Example:
-
-> You cannot patch a directory
+###### You cannot patch a directory
 
 ```
-PATCH /api/vi/files/path/to/dir HTTP/1.1
+PATCH /api/v1/files/path/to/dir HTTP/1.1
 accept: application/ipfs-unixfs-v1-directory
 content-type: application/octet-stream
 ```
@@ -548,10 +600,14 @@ This resource entirely replaces files at the passed path.
 
 All available data will be read from the octet-stream and used to overwrite the file.  This may cause the final file to be smaller than the original.
 
-Example:
+##### Examples
+
+###### Replacing a deeply nested file
+
+This is similar to invoking `PATCH /api/v1/files/path` with the `offset=0` and `truncate=true` (if the uploaded data is shorter than the original file) query parameters.
 
 ```
-PUT /api/vi/files/path/to/file?offset=10 HTTP/1.1
+PUT /api/v1/files/path/to/file HTTP/1.1
 content-type: application/octect-stream
 accept: application/ipfs-unixfs-v1-file
 
@@ -572,12 +628,12 @@ The [CID]s of newly created DAGNodes are returned in the response.
 
 If the path starts with `/ipfs/`, it's an operation on an IPFS node, otherwise it's an operation on an [MFS] path.
 
-Example:
+##### Examples
 
-> Deleting a file
+###### Deleting a file
 
 ```
-DELETE /api/vi/files/ipfs/bafyFile?offset=10 HTTP/1.1
+DELETE /api/v1/files/ipfs/bafyFile?offset=10 HTTP/1.1
 content-type: application/octect-stream
 accept: application/ipfs-unixfs-v1-file; application/ipfs-unixfs-v1-directory
 
@@ -590,18 +646,16 @@ content-type: application/ipfs-unixfs-v1-file
 { path: '/foo', cid: 'bafyfoo' }
 ```
 
-Example:
-
-> Deleting a deeply nested file
+###### Deleting a deeply nested file
 
 ```
-DELETE /api/vi/files/ipfs/bafyDir/file.txt HTTP/1.1
+DELETE /api/v1/files/ipfs/bafyDir/file.txt HTTP/1.1
 accept: application/ipfs-unixfs-v1-file; application/ipfs-unixfs-v1-directory
 
 .. binary data
 ```
 
-> Response includes all parent paths
+Response includes all parent paths
 
 ```
 HTTP 1.1 200 OK
@@ -614,8 +668,161 @@ content-type: application/ipfs-unixfs-v1-directory
 --boundary--
 ```
 
+### `/api/v1/dag`
+
+The `dag` resource allows interactions with the [IPLD] [Merkle-DAG]s that underpin IPFS.
+
+#### GET `/api/v1/dag/{path}`
+
+Path can be a [CID] or a CID plus a path segment.
+
+CIDs contain the codec of a given node (assumed to be `dag-pb` in v0 CIDs) so no further mime types are required.
+
+Where path segments are specified, this may result in multiple nodes being loaded.
+
+##### Examples
+
+###### Downloading a node
+
+```
+GET /api/v1/dag/bafyFoo HTTP/1.1
+accept: application/octet-stream
+```
+```
+HTTP 1.1 200 OK
+content-type: application/octet-stream
+
+...binary data
+```
+
+###### Downloading path from inside a node
+
+```
+GET /api/v1/dag/bafyFoo/Links/bar.txt HTTP/1.1
+accept: application/octet-stream
+```
+```
+HTTP 1.1 200 OK
+content-type: application/octet-stream
+
+...binary data
+```
+
+#### POST `/api/v1/dag`
+
+Creates a [DAG] from the passed data.
+
+By default [CID]s are returned as binary data.  The client may override this by specifying alternative representations such as `base64`, `base32` or `base58btc`.
+
+
+##### Query string
+
+* hashAlg (enum, See [`names`](https://github.com/multiformats/js-multihash/blob/master/src/constants.js) for values, default `sha2-256`)
+  * The hashing algorithm to use when creating the CID
+
+##### Examples
+
+###### Creating a dag-pb node
+
+```
+POST /api/v1/dag HTTP/1.1
+accept: application/multiformats-cid
+content-type: application/ipld-dag-pb
+
+...binary data
+```
+```
+HTTP 1.1 200 OK
+content-type: application/multiformats-cid
+
+...binary data
+```
+
+###### Creating multiple dag-pb nodes
+
+```
+POST /api/v1/dag HTTP/1.1
+accept: application/multiformats-cid
+content-type: multipart/mixed; boundary=boundary
+
+--boundary
+content-type: application/ipld-dag-pb
+
+...binary data
+--boundary
+content-type: application/ipld-raw
+
+...binary data
+--boundary--
+```
+```
+HTTP 1.1 200 OK
+content-type: multipart/mixed; boundary=boundary
+
+--boundary
+content-type: application/multiformats-cid
+
+...binary data
+--boundary
+content-type: application/multiformats-cid
+
+...binary data
+--boundary--
+```
+
+###### Creating a dag-cbor node
+
+```
+POST /api/v1/dag HTTP/1.1
+accept: application/multiformats-cid
+content-type: application/ipld-dag-cbor
+
+...binary data
+```
+```
+HTTP 1.1 200 OK
+content-type: application/multiformats-cid
+
+...binary data
+```
+
+###### Creating a raw node
+
+```
+POST /api/v1/dag HTTP/1.1
+accept: application/multiformats-cid
+content-type: application/ipld-raw
+
+...binary data
+```
+```
+HTTP 1.1 200 OK
+content-type: application/multiformats-cid
+
+...binary data
+```
+
+###### Specifying a different representation
+
+```
+POST /api/v1/dag HTTP/1.1
+accept: application/multiformats-cid; representation=base32
+content-type: application/ipld-raw
+
+...binary data
+```
+```
+HTTP 1.1 200 OK
+content-type: application/multiformats-cid; representation=base32
+
+bafyFoo
+```
+
 [MFS]: https://docs.ipfs.io/guides/concepts/mfs/
 [CID]: https://docs.ipfs.io/guides/concepts/cid/
+[Merkle-DAG]: https://docs.ipfs.io/guides/concepts/merkle-dag/
+[DAG]: https://docs.ipfs.io/guides/concepts/merkle-dag/
+[IPLD]: https://ipld.io/
 [RFC1341]: https://www.w3.org/Protocols/rfc1341/4_Content-Type.html
 [RFC2616]: https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
 [RFC3986]: https://tools.ietf.org/html/rfc3986
