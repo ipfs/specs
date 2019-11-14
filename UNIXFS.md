@@ -43,9 +43,10 @@ message Data {
 	optional bytes Data = 2;
 	optional uint64 filesize = 3;
 	repeated uint64 blocksizes = 4;
-
 	optional uint64 hashType = 5;
 	optional uint64 fanout = 6;
+	optional uint32 mode = 7;
+	optional int64 mtime = 8;
 }
 
 message Metadata {
@@ -58,6 +59,32 @@ This `Data` object is used for all non-leaf nodes in Unixfs.
 For files that are comprised of more than a single block, the 'Type' field will be set to 'File', the 'filesize' field will be set to the total number of bytes in the file (not the graph structure) represented by this node, and 'blocksizes' will contain a list of the filesizes of each child node.
 
 This data is serialized and placed inside the 'Data' field of the outer merkledag protobuf, which also contains the actual links to the child nodes of this object.
+
+For files comprised of a single block, the 'Type' field will be set to 'File', 'filesize' will be set to the total number of bytes in the file and the file data will be stored in the 'Data' field.
+
+The serialized size of a UnixFS node must not exceed 256KiB in order to work will with the [Bitswap] protocol.
+
+## Metadata
+
+UnixFS currently supports three optional metadata fields:
+
+* `mode` -- The `mode` is for persisting the [file permissions in numeric notation](https://en.wikipedia.org/wiki/File_system_permissions#Numeric_notation) \[[spec](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_stat.h.html)\]. If unspecified this defaults to `0755` for directories/HAMT shards and `0644` for all other types where applicable.
+* `mtime` -- The modification time in seconds since the epoch. This defaults to the unix epoch if unspecified.
+* `MimeType` -- The mime type of the file. This field is deprecated, as is the `Metadata` message and neither will be present in `UnixFSv2` because mime types are not typically properties of a file system.
+
+### Inheritance
+
+When traversing down through a UnixFSv1.5 directory, child entries without metadata fields will inherit those of their direct ascendants.
+
+### Deduplication and inlining
+
+Where the file data is small it would normally be stored in the `Data` field of the UnixFS `File` node.
+
+To aid in deduplication of data even for small files, file data can be stored in a separate node linked to from the `File` node in order for the data to have a constant [CID] regardless of the metadata associated with it.
+
+As a further optimization, if the `File` node's serialized size is small, it may be inlined into it's v1 [CID] by using the [`identity`](https://github.com/multiformats/multicodec/blob/master/table.csv) [multihash].
+
+Such [CID]s must consist of 23 bytes or fewer in order for them to fit inside the 63 character limit for a DNS label when encoded in base32 (see [RFC1035 Section 2.3.1](https://tools.ietf.org/html/rfc1035#section-2.3.1)).
 
 ## Importing
 
@@ -86,3 +113,7 @@ If there is only a single chunk, no intermediate unixfs file nodes are created, 
 ## Exporting
 
 To read the file data out of the unixfs graph, perform an in order traversal, emitting the data contained in each of the leaves.
+
+[multihash]: https://tools.ietf.org/html/draft-multiformats-multihash-00
+[CID]: https://docs.ipfs.io/guides/concepts/cid/
+[Bitswap]: https://github.com/ipfs/specs/blob/master/BITSWAP.md
