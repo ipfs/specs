@@ -1,4 +1,4 @@
-# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) UnixFS
+# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) UnixFS  <!-- omit in toc -->
 
 **Author(s)**:
 - NA
@@ -11,15 +11,31 @@ UnixFS is a [protocol-buffers](https://developers.google.com/protocol-buffers/) 
 
 Draft work and discussion on a specification for the upcoming version 2 of the UnixFS format is happening in the [`ipfs/unixfs-v2` repo](https://github.com/ipfs/unixfs-v2). Please see the issues there for discussion and PRs for drafts. When the specification is completed there, it will be copied back to this repo and replace this document.
 
-## Table of Contents
+## Table of Contents <!-- omit in toc -->
 
-TODO
+- [Implementations](#implementations)
+- [Data Format](#data-format)
+- [Metadata](#metadata)
+	- [Inheritance](#inheritance)
+	- [Deduplication and inlining](#deduplication-and-inlining)
+- [Importing](#importing)
+	- [Chunking](#chunking)
+	- [Layout](#layout)
+- [Exporting](#exporting)
+- [Design decision rationale](#design-decision-rationale)
+	- [Metadata](#metadata-1)
+		- [Separate Metadata node](#separate-metadata-node)
+		- [Metadata in the directory](#metadata-in-the-directory)
+		- [Metadata in the file](#metadata-in-the-file)
+		- [Side trees](#side-trees)
+		- [Side database](#side-database)
 
 ## Implementations
 
 - JavaScript
   - Data Formats - [unixfs](https://github.com/ipfs/js-ipfs-unixfs)
-  - Importers and Exporters - [unixfs-engine](https://github.com/ipfs/js-ipfs-unixfs-engine)
+  - Importer - [unixfs-importer](https://github.com/ipfs/js-ipfs-unixfs-importer)
+  - Exporter - [unixfs-exporter](https://github.com/ipfs/js-ipfs-unixfs-exporter)
 - Go
   - [`ipfs/go-ipfs/unixfs`](https://github.com/ipfs/go-ipfs/tree/b3faaad1310bcc32dc3dd24e1919e9edf51edba8/unixfs)
   - Protocol Buffer Definitions - [`ipfs/go-ipfs/unixfs/pb`](https://github.com/ipfs/go-ipfs/blob/b3faaad1310bcc32dc3dd24e1919e9edf51edba8/unixfs/pb/unixfs.proto)
@@ -66,11 +82,10 @@ The serialized size of a UnixFS node must not exceed 256KiB in order to work wil
 
 ## Metadata
 
-UnixFS currently supports three optional metadata fields:
+UnixFS currently supports two optional metadata fields:
 
 * `mode` -- The `mode` is for persisting the [file permissions in numeric notation](https://en.wikipedia.org/wiki/File_system_permissions#Numeric_notation) \[[spec](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_stat.h.html)\]. If unspecified this defaults to `0755` for directories/HAMT shards and `0644` for all other types where applicable.
 * `mtime` -- The modification time in seconds since the epoch. This defaults to the unix epoch if unspecified.
-* `MimeType` -- The mime type of the file. This field is deprecated, as is the `Metadata` message and neither will be present in `UnixFSv2` because mime types are not typically properties of a file system.
 
 ### Inheritance
 
@@ -82,7 +97,7 @@ Where the file data is small it would normally be stored in the `Data` field of 
 
 To aid in deduplication of data even for small files, file data can be stored in a separate node linked to from the `File` node in order for the data to have a constant [CID] regardless of the metadata associated with it.
 
-As a further optimization, if the `File` node's serialized size is small, it may be inlined into it's v1 [CID] by using the [`identity`](https://github.com/multiformats/multicodec/blob/master/table.csv) [multihash].
+As a further optimization, if the `File` node's serialized size is small, it may be inlined into its v1 [CID] by using the [`identity`](https://github.com/multiformats/multicodec/blob/master/table.csv) [multihash].
 
 Such [CID]s must consist of 23 bytes or fewer in order for them to fit inside the 63 character limit for a DNS label when encoded in base32 (see [RFC1035 Section 2.3.1](https://tools.ietf.org/html/rfc1035#section-2.3.1)).
 
@@ -114,6 +129,71 @@ If there is only a single chunk, no intermediate unixfs file nodes are created, 
 
 To read the file data out of the unixfs graph, perform an in order traversal, emitting the data contained in each of the leaves.
 
+## Design decision rationale
+
+### Metadata
+
+Metadata support in UnixFSv1.5 has been expanded to increase the number of possible use cases.  These include rsync and filesystem based package managers.
+
+Several metadata systems were evaluated:
+
+#### Separate Metadata node
+
+In this scheme, the existing `Metadata` message is expanded to include additional metadata types (`mtime`, `mode`, etc).  It then contains links to the actual file data but never the file data itself.
+
+This was ultimately rejected for a number of reasons:
+
+1. You would always need to retrieve an additional node to access file data which limits the kind of optimizations that are possible.
+
+	For example many files are under the 256KiB block size limit, so we tend to inline them into the describing UnixFS `File` node.  This would not be possible with an intermediate `Metadata` node.
+
+1. The `File` node already contains some metadata (e.g. the file size) so you'd end up with metadata stored in multiple places
+
+#### Metadata in the directory
+
+Repeated `Metadata ` messages are added to UnixFS `Directory` and `HAMTShard` nodes, the index of which indicates which entry they are to be applied to.
+
+Where entries are `HAMTShard`s, an empty message is added.
+
+One advantage of this method is that if we expand stored metadata to include entry types and sizes we can perform directory listings without needing to fetch further entry nodes (excepting `HAMTShard` nodes), though without removing the storage of these datums elsewhere in the spec we run the risk of having non-canonical data locations and perhaps conflicting data as we traverse through trees containing both UnixFS v1 and v1.5 nodes.
+
+This was rejected for the following reasons:
+
+1. When creating a UnixFS node there's no way to record metadata without wrapping it in a directory.
+
+2. If you access any UnixFS node directly by its [CID], there is no way of recreating the metadata which limits flexibility.
+
+3. In order to list the contents of a directory including entry types and sizes, you have to fetch the root node of each entry anyway so the performance benefit of including some metadata in the containing directory is negligible in this use case.
+
+#### Metadata in the file
+
+This adds new fields to the UnixFS `Data` message to represent the various metadata fields.
+
+It has the advantage of being simple to implement, metadata is maintained whether the file is accessed directly via its [CID] or via an IPFS path that includes a containing directory, and by keeping the metadata small enough we can inline root UnixFS nodes into their CIDs so we can end up fetching the same number of nodes if we decide to keep file data in a leaf node for deduplication reasons.
+
+Downsides to this approach are:
+
+1. Two users adding the same file to IPFS at different times will have different [CID]s due to the `mtime`s being different.
+
+	If the content is stored in another node, its [CID] will be constant between the two users but you can't navigate to it unless you have the parent node which will be less available due to the proliferation of [CID]s.
+
+2. Metadata is also impossible to remove without changing the [CID], so metadata becomes part of the content.
+
+3. Performance may be impacted as well as if we don't inline UnixFS root nodes into [CID]s, additional fetches will be required to load a given UnixFS entry.
+
+#### Side trees
+
+With this approach we would maintain a separate data structure outside of the UnixFS tree to hold metadata.
+
+This was rejected due to concerns about added complexity, recovery after system crashes while writing, and having to make extra requests to fetch metadata nodes when resolving [CID]s from peers.
+
+#### Side database
+
+This scheme would see metadata stored in an external database.
+
+The downsides to this are that metadata would not be transferred from one node to another when syncing as [Bitswap] is not aware of the database, and in-tree metadata
+
 [multihash]: https://tools.ietf.org/html/draft-multiformats-multihash-00
 [CID]: https://docs.ipfs.io/guides/concepts/cid/
 [Bitswap]: https://github.com/ipfs/specs/blob/master/BITSWAP.md
+[MFS]: https://docs.ipfs.io/guides/concepts/mfs/
