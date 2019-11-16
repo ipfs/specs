@@ -84,8 +84,12 @@ The serialized size of a UnixFS node must not exceed 256KiB in order to work wil
 
 UnixFS currently supports two optional metadata fields:
 
-* `mode` -- The `mode` is for persisting the [file permissions in numeric notation](https://en.wikipedia.org/wiki/File_system_permissions#Numeric_notation) \[[spec](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_stat.h.html)\]. If unspecified this defaults to `0755` for directories/HAMT shards and `0644` for all other types where applicable.
-* `mtime` -- The modification time in seconds since the epoch. This defaults to the unix epoch if unspecified.
+* `mode` -- The `mode` is for persisting the file permissions in [numeric notation](https://en.wikipedia.org/wiki/File_system_permissions#Numeric_notation) \[[spec](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_stat.h.html)\].
+  If unspecified this defaults to `0755` for directories/HAMT shards and `0644` for all other types where applicable
+  The nine least significant bits represent  `ugo-rwx`
+  The next three least significant bits represent `setuid`, `setgid` and the `sticky bit`
+  All others are reserved for future use
+* `mtime` -- The modification time in seconds since the epoch. This defaults to the unix epoch if unspecified
 
 ### Inheritance
 
@@ -147,7 +151,7 @@ This was ultimately rejected for a number of reasons:
 
 	For example many files are under the 256KiB block size limit, so we tend to inline them into the describing UnixFS `File` node.  This would not be possible with an intermediate `Metadata` node.
 
-1. The `File` node already contains some metadata (e.g. the file size) so you'd end up with metadata stored in multiple places
+2. The `File` node already contains some metadata (e.g. the file size) so metadata would be stored in multiple places which complicates forwards compatibility with UnixFSv2 as to map between metadata formats potentially requires multiple fetch operations
 
 #### Metadata in the directory
 
