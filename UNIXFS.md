@@ -16,7 +16,6 @@ Draft work and discussion on a specification for the upcoming version 2 of the U
 - [Implementations](#implementations)
 - [Data Format](#data-format)
 - [Metadata](#metadata)
-	- [Inheritance](#inheritance)
 	- [Deduplication and inlining](#deduplication-and-inlining)
 - [Importing](#importing)
 	- [Chunking](#chunking)
@@ -90,10 +89,6 @@ UnixFS currently supports two optional metadata fields:
   The next three least significant bits represent `setuid`, `setgid` and the `sticky bit`
   All others are reserved for future use
 * `mtime` -- The modification time in seconds since the epoch. This defaults to the unix epoch if unspecified
-
-### Inheritance
-
-When traversing down through a UnixFSv1.5 directory, child entries without metadata fields will inherit those of their direct ascendants.
 
 ### Deduplication and inlining
 
