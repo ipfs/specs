@@ -77,8 +77,6 @@ This data is serialized and placed inside the 'Data' field of the outer merkleda
 
 For files comprised of a single block, the 'Type' field will be set to 'File', 'filesize' will be set to the total number of bytes in the file and the file data will be stored in the 'Data' field.
 
-The serialized size of a UnixFS node must not exceed 256KiB in order to work will with the [Bitswap] protocol.
-
 ## Metadata
 
 UnixFS currently supports two optional metadata fields:
@@ -97,8 +95,6 @@ Where the file data is small it would normally be stored in the `Data` field of 
 To aid in deduplication of data even for small files, file data can be stored in a separate node linked to from the `File` node in order for the data to have a constant [CID] regardless of the metadata associated with it.
 
 As a further optimization, if the `File` node's serialized size is small, it may be inlined into its v1 [CID] by using the [`identity`](https://github.com/multiformats/multicodec/blob/master/table.csv) [multihash].
-
-Such [CID]s must consist of 23 bytes or fewer in order for them to fit inside the 63 character limit for a DNS label when encoded in base32 (see [RFC1035 Section 2.3.1](https://tools.ietf.org/html/rfc1035#section-2.3.1)).
 
 ## Importing
 
