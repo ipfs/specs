@@ -60,8 +60,8 @@ message Data {
 	repeated uint64 blocksizes = 4;
 	optional uint64 hashType = 5;
 	optional uint64 fanout = 6;
-	optional uint32 mode = 7;
-	optional int64 mtime = 8;
+	optional string mode = 7;
+	optional string mtime = 8;
 }
 
 message Metadata {
@@ -82,11 +82,12 @@ For files comprised of a single block, the 'Type' field will be set to 'File', '
 UnixFS currently supports two optional metadata fields:
 
 * `mode` -- The `mode` is for persisting the file permissions in [numeric notation](https://en.wikipedia.org/wiki/File_system_permissions#Numeric_notation) \[[spec](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_stat.h.html)\].
-  If unspecified this defaults to `0755` for directories/HAMT shards and `0644` for all other types where applicable
+  It is stored as a string that is intended to be interpreted as a `uint32` number in base 8, e.g. `'0544'`
   The nine least significant bits represent  `ugo-rwx`
   The next three least significant bits represent `setuid`, `setgid` and the `sticky bit`
   All others are reserved for future use
 * `mtime` -- The modification time in seconds since the epoch. This defaults to the unix epoch if unspecified
+  It is stored as a string that is intended to be interpreted as a `int64` number in base 10
 
 ### Deduplication and inlining
 
@@ -188,7 +189,18 @@ This scheme would see metadata stored in an external database.
 
 The downsides to this are that metadata would not be transferred from one node to another when syncing as [Bitswap] is not aware of the database, and in-tree metadata
 
+#### Why are `mode` and `mtime` stored as strings?
+
+UnixFS uses [protocol buffers] as its internal storage format, which do not have the concept of null, instead [defaulting all fields to certain values](https://developers.google.com/protocol-buffers/docs/proto3#default) - numbers as `0`, strings as `''`, etc.
+
+The problem is `0` is a valid mode for a file, so we need a way of representing a file where no mode has been set, as well as when the user has set the mode to what would have been the default value for the field, if the field was a number.
+
+So we use `''` for when no mode has been set, `'0'` for when the mode was set to `0`, `'0644'` for when the mode was set to `0644`, etc.
+
+Similarly `''` represents the absence of an `mtime`, `'0'` is the start of the Unix Epoch, `'1'` is one second after the start of the Unix Epoch.
+
 [multihash]: https://tools.ietf.org/html/draft-multiformats-multihash-00
 [CID]: https://docs.ipfs.io/guides/concepts/cid/
 [Bitswap]: https://github.com/ipfs/specs/blob/master/BITSWAP.md
 [MFS]: https://docs.ipfs.io/guides/concepts/mfs/
+[protocol buffers]: https://developers.google.com/protocol-buffers
