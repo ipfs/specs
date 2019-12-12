@@ -60,12 +60,20 @@ message Data {
 	repeated uint64 blocksizes = 4;
 	optional uint64 hashType = 5;
 	optional uint64 fanout = 6;
-	optional uint32 mode = 7;
-	optional int64 mtime = 8;
+	optional Mode mode = 7;
+	optional Mtime mtime = 8;
 }
 
 message Metadata {
 	optional string MimeType = 1;
+}
+
+message Mode {
+	required uint32 value = 1;
+}
+
+message Mtime {
+	required int64 seconds = 1;
 }
 ```
 
@@ -82,7 +90,6 @@ For files comprised of a single block, the 'Type' field will be set to 'File', '
 UnixFS currently supports two optional metadata fields:
 
 * `mode` -- The `mode` is for persisting the file permissions in [numeric notation](https://en.wikipedia.org/wiki/File_system_permissions#Numeric_notation) \[[spec](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_stat.h.html)\].
-  If unspecified this defaults to `0755` for directories/HAMT shards and `0644` for all other types where applicable
   The nine least significant bits represent  `ugo-rwx`
   The next three least significant bits represent `setuid`, `setgid` and the `sticky bit`
   All others are reserved for future use
