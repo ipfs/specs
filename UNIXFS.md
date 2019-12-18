@@ -88,8 +88,8 @@ UnixFS currently supports two optional metadata fields:
   - The nine least significant bits represent  `ugo-rwx`
   - The next three least significant bits represent `setuid`, `setgid` and the `sticky bit`
   - The remaining 20 bits are reserved for future use, and are subject to change. Spec implementations **MUST** handle bits they do not expect as follows:
-    - For future-proofing the (de)serialization layer must preserve the entre uint32 value during clone/copy operations, modifying only bit values that have a well defined meaning: `clonedValue = ( modifiedBits & 07777 ) | ( originalValue & 0xFFFFF000 )`
-    - Any higher level operations interpreting the value must proactively mask-off bits without a defined meaning in the current version of the spec: `interpretedValue = originalValue & 07777`
+    - For future-proofing the (de)serialization layer must preserve the entire uint32 value during clone/copy operations, modifying only bit values that have a well defined meaning: `clonedValue = ( modifiedBits & 07777 ) | ( originalValue & 0xFFFFF000 )`
+    - Implementations of this spec must proactively mask off bits without a defined meaning in the implemented version of the spec: `interpretedValue = originalValue & 07777`
 * `mtime` -- The modification time in seconds since the epoch. This defaults to the unix epoch if unspecified
 
 ### Deduplication and inlining
