@@ -85,7 +85,9 @@ UnixFS currently supports two optional metadata fields:
   If unspecified this defaults to `0755` for directories/HAMT shards and `0644` for all other types where applicable
   The nine least significant bits represent  `ugo-rwx`
   The next three least significant bits represent `setuid`, `setgid` and the `sticky bit`
-  All others are reserved for future use, and are subject to change - consumers **MUST** mask bits they do not expect, currently `& 07777`
+  The remaining 20 bits are reserved for future use, and are subject to change. Spec implementations **MUST** handle bits they do not expect as follows:
+    For future-proofing the (de)serialization layer must preserve the entre uint32 value during clone/copy operations, modifying only bit values that have a well defined meaning: `clonedValue = ( modifiedBits & 07777 ) | ( originalValue & 0xFFFFF000 )`
+    Any higher level operations interpreting the value must proactively mask-off bits without a defined meaning in the current version of the spec: `interpretedValue = originalValue & 07777`
 * `mtime` -- The modification time in seconds since the epoch. This defaults to the unix epoch if unspecified
 
 ### Deduplication and inlining
