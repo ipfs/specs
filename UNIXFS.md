@@ -94,7 +94,7 @@ UnixFS currently supports two optional metadata fields:
   - If no mtime value is available, an `undefined` mtime is assumed. Implementations are free to default to the epoch itself, or if appropriate render a variant of `N/A` to signify lack of a value
   - If one mtime value is available, it represents the amount of seconds after or *before* the epoch. Implementations must be able to gracefully handle negative mtime, even if such a value is not applicable within their domain ( e.g. a POSIX filesystem )
   - If two mtime values are available, the first one is interpreted as described above, and the second value represents the fractional part of the mtime as the amount of nanoseconds. The valid range for this value is the intger range `[1, 999999999]`.
-    If a fractional part outside of this range is encountered, implementations should consider the entire metadata block invalid and abort processing it. Note that **a fractional value of `0` is NOT invalid**.
+    If a fractional part outside of this range is encountered, implementations should consider the entire metadata block invalid and abort processing it. Note that **a fractional value of `0` is NOT valid**.
   - If more than two repeated mtime values are available, implementations should consider the entire metadata block invalid and abort processing it.
 
 ### Deduplication and inlining
