@@ -28,7 +28,7 @@ Repo Implementations:
 - s3-repo - stored in amazon s3
 
 <center>
-  <img src="ipfs-repo.png" width="256" />
+  <img src="img/ipfs-repo.png" width="256" />
 </center>
 
 ## Repo Contents
