@@ -61,7 +61,7 @@ message Data {
 	optional uint64 hashType = 5;
 	optional uint64 fanout = 6;
 	optional uint32 mode = 7;
-	optional TimSpec mtime = 8;
+	optional TimeSpec mtime = 8;
 }
 
 message Metadata {
@@ -69,15 +69,8 @@ message Metadata {
 }
 
 message TimeSpec {
-	// Use of int64 is deliberate - negative epoch is super unlikely
-	// Using sint64 would introduce zig-zag encoding ( harder to eyeball )
-	// The varint representing the time of writing this is 5 bytes long
-	// It will remain so until October 26, 3058 ( 34,359,738,367 )
 	required int64 EpochSeconds = 1;
 
-	// fixed32 ( always 4 bytes, no varint ), as nanosecs are often > 2^28
-	// https://developers.google.com/protocol-buffers/docs/proto#scalar
-	// NOTE: on the wire this value will be *little* endian
 	optional fixed32 EpochNanoseconds = 2;
 }
 ```
@@ -206,6 +199,21 @@ This was rejected due to concerns about added complexity, recovery after system 
 This scheme would see metadata stored in an external database.
 
 The downsides to this are that metadata would not be transferred from one node to another when syncing as [Bitswap] is not aware of the database, and in-tree metadata
+
+### TimeSpec protobuf datatype rationale
+
+#### EpochSeconds
+
+The integer portion of the epoch is represented on the wire using a varint encoding. While this is inefficient for
+negative values, it avoids introducing zig-zag encoding. Negative epoch values will be exceedingly rare, and there
+could very well be value in having such cases stand out, while at the same keeping the "usual" positive values easy
+to eyeball. The varint representing the time of writing this text is 5 bytes long. It will remain so until
+October 26, 3058 ( 34,359,738,367 )
+
+#### EpichNanoseconds
+Since fractional values will very often be > 2^28 nanoseconds, that part is represented as a 4-byte `fixed32`,
+[as per google's recommendation](https://developers.google.com/protocol-buffers/docs/proto#scalar).
+
 
 [multihash]: https://tools.ietf.org/html/draft-multiformats-multihash-00
 [CID]: https://docs.ipfs.io/guides/concepts/cid/
