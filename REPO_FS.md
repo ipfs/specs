@@ -22,7 +22,7 @@ This spec defines `fs-repo` version `1`, its formats, and semantics.
 
 ## Contents
 
-![](img//ipfs-repo-contents.png?)
+![](img/ipfs-repo-contents.png?)
 
 ```
 .ipfs/
