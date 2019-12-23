@@ -23,7 +23,7 @@ There are many possible repo implementations, depending on the storage media
 used. Most commonly, IPFS nodes use an [fs-repo](REPO_FS.md).
 
 Repo Implementations:
-- [fs-repo](REPO_FS.d) - stored in the os filesystem
+- [fs-repo](REPO_FS.md) - stored in the os filesystem
 - mem-repo - stored in process memory
 - s3-repo - stored in amazon s3
 
