@@ -20,20 +20,20 @@ actually stores the data IPFS nodes use. All IPFS objects are stored
 in a repo (similar to git).
 
 There are many possible repo implementations, depending on the storage media
-used. Most commonly, IPFS nodes use an [fs-repo](fs-repo).
+used. Most commonly, IPFS nodes use an [fs-repo](REPO_FS.md).
 
 Repo Implementations:
-- [fs-repo](fs-repo) - stored in the os filesystem
+- [fs-repo](REPO_FS.md) - stored in the os filesystem
 - mem-repo - stored in process memory
 - s3-repo - stored in amazon s3
 
 <center>
-  <img src="ipfs-repo.png" width="256" />
+  <img src="img/ipfs-repo.png" width="256" />
 </center>
 
 ## Repo Contents
 
-The Repo stores a collection of [IPLD](../merkledag/ipld.md) objects that represent:
+The Repo stores a collection of [IPLD](https://github.com/ipld/specs#readme) objects that represent:
 
 - **config** - node configuration and settings
 - **datastore** - content stored locally, and indexing data
