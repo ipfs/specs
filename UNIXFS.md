@@ -61,11 +61,24 @@ message Data {
 	optional uint64 hashType = 5;
 	optional uint64 fanout = 6;
 	optional uint32 mode = 7;
-	optional int64 mtime = 8;
+	optional TimSpec mtime = 8;
 }
 
 message Metadata {
 	optional string MimeType = 1;
+}
+
+message TimeSpec {
+	// Use of int64 is deliberate - negative epoch is super unlikely
+	// Using sint64 would introduce zig-zag encoding ( harder to eyeball )
+	// The varint representing the time of writing this is 5 bytes long
+	// It will remain so until October 26, 3058 ( 34,359,738,367 )
+	required int64 EpochSeconds = 1;
+
+	// fixed32 ( always 4 bytes, no varint ), as nanosecs are often > 2^28
+	// https://developers.google.com/protocol-buffers/docs/proto#scalar
+	// NOTE: on the wire this value will be *little* endian
+	optional fixed32 EpochNanoseconds = 2;
 }
 ```
 
@@ -90,7 +103,9 @@ UnixFS currently supports two optional metadata fields:
   - The remaining 20 bits are reserved for future use, and are subject to change. Spec implementations **MUST** handle bits they do not expect as follows:
     - For future-proofing the (de)serialization layer must preserve the entire uint32 value during clone/copy operations, modifying only bit values that have a well defined meaning: `clonedValue = ( modifiedBits & 07777 ) | ( originalValue & 0xFFFFF000 )`
     - Implementations of this spec must proactively mask off bits without a defined meaning in the implemented version of the spec: `interpretedValue = originalValue & 07777`
-* `mtime` -- The modification time in seconds since the epoch. This defaults to the unix epoch if unspecified
+* `mtime` -- A two-element structure ( `EpochSeconds`, `EpochNanoseconds` ) representing the modification time in seconds relative to the unix epoch `1970-01-01T00:00:00Z`. In contexts where an mtime is mandatory ( e.g. FUSE interfaces ) implementations must treat an unspecified mtime as `0`.
+  - `EpochSeconds` represents the amount of seconds after **or before** the epoch. Implementations must be able to gracefully handle negative mtime, even if such a value is not applicable within their domain ( e.g. a POSIX filesystem )
+  - `EpochNanoseconds` represents the fractional part of the mtime as the amount of nanoseconds. The valid range for this value is the integer range `[1, 999999999]`. If a fractional part outside of this range is encountered, implementations should consider the entire metadata block invalid and abort processing it. Note that **a fractional value of `0` is NOT valid** - omit the nanosecond value altogether to represent whole seconds.
 
 ### Deduplication and inlining
 
