@@ -13,16 +13,16 @@ This spec defines `fs-repo` version `1`, its formats, and semantics.
 
 ## Definition
 
-`fs-repo` is a filesystem implementation of the IPFS [repo](../).
+`fs-repo` is a filesystem implementation of the IPFS [repo](REPO.md).
 
 <center>
-<img src="fs-repo.png?" width="256" />
+<img src="img/fs-repo.png?" width="256" />
 </center>
 
 
 ## Contents
 
-![](../ipfs-repo-contents.png?)
+![](img/ipfs-repo-contents.png?)
 
 ```
 .ipfs/
