@@ -33,7 +33,7 @@ Repo Implementations:
 
 ## Repo Contents
 
-The Repo stores a collection of [IPLD](https://github.com/ipld/specs/) objects that represent:
+The Repo stores a collection of [IPLD](https://github.com/ipld/specs#readme) objects that represent:
 
 - **config** - node configuration and settings
 - **datastore** - content stored locally, and indexing data
