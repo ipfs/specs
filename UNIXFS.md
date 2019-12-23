@@ -61,7 +61,12 @@ message Data {
 	optional uint64 hashType = 5;
 	optional uint64 fanout = 6;
 	optional uint32 mode = 7;
-	optional int64 mtime = 8;
+	optional TimeSpec mtime = 8;
+}
+
+message TimeSpec {
+	required int64 EpochSeconds = 1;
+	optional uint32 EpochNanoseconds = 2;
 }
 
 message Metadata {
@@ -90,7 +95,7 @@ UnixFS currently supports two optional metadata fields:
   - The remaining 20 bits are reserved for future use, and are subject to change. Spec implementations **MUST** handle bits they do not expect as follows:
     - For future-proofing the (de)serialization layer must preserve the entire uint32 value during clone/copy operations, modifying only bit values that have a well defined meaning: `clonedValue = ( modifiedBits & 07777 ) | ( originalValue & 0xFFFFF000 )`
     - Implementations of this spec must proactively mask off bits without a defined meaning in the implemented version of the spec: `interpretedValue = originalValue & 07777`
-* `mtime` -- The modification time in seconds since the epoch. This defaults to the unix epoch if unspecified
+* `mtime` -- The modification time since the epoch stored as a `TimeSpec` message consisting of seconds and nanoseconds.  `EpochSeconds` represents the fractional part of the mtime as the amount of nanoseconds. The valid range for this value is the integer range `[1, 999999999]`. If `EpochSeconds` is negative, the time is before the epoch. This defaults to the unix epoch if unspecified.
 
 ### Deduplication and inlining
 
