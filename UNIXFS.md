@@ -61,17 +61,16 @@ message Data {
 	optional uint64 hashType = 5;
 	optional uint64 fanout = 6;
 	optional uint32 mode = 7;
-	optional TimeSpec mtime = 8;
+	optional UnixTime mtime = 8;
 }
 
 message Metadata {
 	optional string MimeType = 1;
 }
 
-message TimeSpec {
-	required int64 EpochSeconds = 1;
-
-	optional fixed32 EpochNanoseconds = 2;
+message UnixTime {
+	required int64 Seconds = 1;
+	optional fixed32 FractionalNanoseconds = 2;
 }
 ```
 
@@ -96,9 +95,9 @@ UnixFS currently supports two optional metadata fields:
   - The remaining 20 bits are reserved for future use, and are subject to change. Spec implementations **MUST** handle bits they do not expect as follows:
     - For future-proofing the (de)serialization layer must preserve the entire uint32 value during clone/copy operations, modifying only bit values that have a well defined meaning: `clonedValue = ( modifiedBits & 07777 ) | ( originalValue & 0xFFFFF000 )`
     - Implementations of this spec must proactively mask off bits without a defined meaning in the implemented version of the spec: `interpretedValue = originalValue & 07777`
-* `mtime` -- A two-element structure ( `EpochSeconds`, `EpochNanoseconds` ) representing the modification time in seconds relative to the unix epoch `1970-01-01T00:00:00Z`. In contexts where an mtime is mandatory ( e.g. FUSE interfaces ) implementations must treat an unspecified mtime as `0`.
-  - `EpochSeconds` represents the amount of seconds after **or before** the epoch. Implementations must be able to gracefully handle negative mtime, even if such a value is not applicable within their domain ( e.g. a POSIX filesystem )
-  - `EpochNanoseconds` represents the fractional part of the mtime as the amount of nanoseconds. The valid range for this value is the integer range `[1, 999999999]`. If a fractional part outside of this range is encountered, implementations should consider the entire metadata block invalid and abort processing it. Note that **a fractional value of `0` is NOT valid** - omit the nanosecond value altogether to represent whole seconds.
+* `mtime` -- A two-element structure ( `Seconds`, `FractionalNanoseconds` ) representing the modification time in seconds relative to the unix epoch `1970-01-01T00:00:00Z`. In contexts where an mtime is mandatory ( e.g. FUSE interfaces ) implementations must treat an unspecified mtime as `0`.
+  - `Seconds` represents the amount of seconds after **or before** the epoch. Implementations must be able to gracefully handle negative mtime, even if such a value is not applicable within their domain ( e.g. a POSIX filesystem )
+  - `FractionalNanoseconds` represents the fractional part of the mtime as the amount of nanoseconds. The valid range for this value is the integer range `[1, 999999999]`. If a fractional part outside of this range is encountered, implementations should consider the entire metadata block invalid and abort processing it. Note that **a fractional value of `0` is NOT valid** - omit the nanosecond value altogether to represent whole seconds.
 
 ### Deduplication and inlining
 
@@ -200,20 +199,20 @@ This scheme would see metadata stored in an external database.
 
 The downsides to this are that metadata would not be transferred from one node to another when syncing as [Bitswap] is not aware of the database, and in-tree metadata
 
-### TimeSpec protobuf datatype rationale
+### UnixTime protobuf datatype rationale
 
-#### EpochSeconds
+#### Seconds
 
-The integer portion of the epoch is represented on the wire using a varint encoding. While this is inefficient for
-negative values, it avoids introducing zig-zag encoding. Negative epoch values will be exceedingly rare, and there
-could very well be value in having such cases stand out, while at the same keeping the "usual" positive values easy
-to eyeball. The varint representing the time of writing this text is 5 bytes long. It will remain so until
-October 26, 3058 ( 34,359,738,367 )
+The integer portion of UnixTime is represented on the wire using a varint encoding. While this is
+inefficient for negative values, it avoids introducing zig-zag encoding. Values before the year 1970
+will be exceedingly rare, and it would be handy having such cases stand out, while at the same keeping
+the "usual" positive values easy to eyeball. The varint representing the time of writing this text is
+5 bytes long. It will remain so until October 26, 3058 ( 34,359,738,367 )
 
-#### EpichNanoseconds
-Since fractional values will very often be > 2^28 nanoseconds, that part is represented as a 4-byte `fixed32`,
-[as per google's recommendation](https://developers.google.com/protocol-buffers/docs/proto#scalar).
-
+#### FractionalNanoseconds
+Fractional values are effectively a random number in the range 0 ~ 999,999,999. Such values will exceed
+2^28 nanoseconds ( 268,435,456 ) in most cases. Therefore, the fractional part is represented as a 4-byte
+`fixed32`, [as per google's recommendation](https://developers.google.com/protocol-buffers/docs/proto#scalar).
 
 [multihash]: https://tools.ietf.org/html/draft-multiformats-multihash-00
 [CID]: https://docs.ipfs.io/guides/concepts/cid/
