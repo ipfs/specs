@@ -95,9 +95,22 @@ UnixFS currently supports two optional metadata fields:
   - The remaining 20 bits are reserved for future use, and are subject to change. Spec implementations **MUST** handle bits they do not expect as follows:
     - For future-proofing the (de)serialization layer must preserve the entire uint32 value during clone/copy operations, modifying only bit values that have a well defined meaning: `clonedValue = ( modifiedBits & 07777 ) | ( originalValue & 0xFFFFF000 )`
     - Implementations of this spec must proactively mask off bits without a defined meaning in the implemented version of the spec: `interpretedValue = originalValue & 07777`
-* `mtime` -- A two-element structure ( `Seconds`, `FractionalNanoseconds` ) representing the modification time in seconds relative to the unix epoch `1970-01-01T00:00:00Z`. In contexts where an mtime is mandatory ( e.g. FUSE interfaces ) implementations must treat an unspecified mtime as `0`.
-  - `Seconds` represents the amount of seconds after **or before** the epoch. Implementations must be able to gracefully handle negative mtime, even if such a value is not applicable within their domain ( e.g. a POSIX filesystem )
-  - `FractionalNanoseconds` represents the fractional part of the mtime as the amount of nanoseconds. The valid range for this value is the integer range `[1, 999999999]`. If a fractional part outside of this range is encountered, implementations should consider the entire metadata block invalid and abort processing it. Note that **a fractional value of `0` is NOT valid** - omit the nanosecond value altogether to represent whole seconds.
+
+* `mtime` -- A two-element structure ( `Seconds`, `FractionalNanoseconds` ) representing the modification time in seconds relative to the unix epoch `1970-01-01T00:00:00Z`.
+  - The two fields are:
+    1. `Seconds` ( always present, signed 64bit integer ): represents the amount of seconds after **or before** the epoch.
+    2. `FractionalNanoseconds` ( optional, 32bit unsigned integer ): when specified represents the fractional part of the mtime as the amount of nanoseconds. The valid range for this value are the integers `[1, 999999999]`.
+
+  - Implementations encoding or decoding wire-representations must observe the following:
+    - An `mtime` structure with `FractionalNanoseconds` outside of the on-wire range `[1, 999999999]` is **not** valid. This includes a fractional value of `0`. Implementations encountering such values should consider the entire enclosing metadata block malformed and abort processing the corresponding DAG.
+    - The `mtime` structure is optional - its absence implies `unspecified`, rather than `0`
+    - For ergonomic reasons a surface API of an encoder must allow fractional 0 as input, while at the same time must ensure it is stripped from the final structure before encoding, satisfying the above constraints.
+
+  - Implementations interpreting the mtime metadata in order to apply it within a non-IPFS target must observe the following:
+    - If the target supports a distinction between `unspecified` and `0`/`1970-01-01T00:00:00Z`, the distinction must be preserverd within the target. E.g. if no `mtime` structure is available, a web gateway must **not** render a `Last-Modified:` header.
+    - If the target requires an mtime ( e.g. a FUSE interface ) and no `mtime` is supplied OR the supplied `mtime` falls outside of the targets accepted range:
+      - When no `mtime` is specified or the resulting `UnixTime` is negative: implementations must assume `0`/`1970-01-01T00:00:00Z` ( note that such values are not merely academic: e.g. the OpenVMS epoch is `1858-11-17T00:00:00Z` )
+      - When the resulting `UnixTime` is larger than the targets range ( e.g. 32bit vs 64bit mismatch ) implementations must assume the highest possible value in the targets range ( in most cases that would be `2038-01-19T03:14:07Z` )
 
 ### Deduplication and inlining
 
@@ -210,7 +223,7 @@ the "usual" positive values easy to eyeball. The varint representing the time of
 5 bytes long. It will remain so until October 26, 3058 ( 34,359,738,367 )
 
 #### FractionalNanoseconds
-Fractional values are effectively a random number in the range 0 ~ 999,999,999. Such values will exceed
+Fractional values are effectively a random number in the range 1 ~ 999,999,999. Such values will exceed
 2^28 nanoseconds ( 268,435,456 ) in most cases. Therefore, the fractional part is represented as a 4-byte
 `fixed32`, [as per google's recommendation](https://developers.google.com/protocol-buffers/docs/proto#scalar).
 
