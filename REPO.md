@@ -52,7 +52,7 @@ Additionally, the repo state must determine the following. These need not be IPL
 
 Finally, the repo also stores the blocks with blobs containing binary data.
 
-![](ipfs-repo-contents.png?)
+![](/img/ipfs-repo-contents.png)
 
 ### version
 
