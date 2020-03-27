@@ -2,12 +2,13 @@
 
 **Authors(s):**
 - [whyrusleeping](github.com/whyrusleeping)
+- [Hector Sanjuan](github.com/hsanjuan)
 
 * * *
 
 **Abstract**
 
-TODO
+This spec provides definitions and operations for the keystore feature in IPFS.
 
 # Table of Contents
 
@@ -15,26 +16,19 @@ TODO
 
 ## Goals:
 
-To have a secure, simple and user-friendly way of storing and managing keypairs
+To have a secure, simple and user-friendly way of storing and managing keys
 for use by ipfs. As well as the ability to share these keys, encrypt, decrypt,
 sign and verify data.
 
 ## Planned Implementation
-### Storage
 
-Keys will be stored in a directory named `keys` under the `$IPFS_PATH`
-directory. Each named keypair will be stored across two files, the private key
-in `$NAME` and the public key in `$NAME.pub`. They will be encoded in PEM (or
-similar) format, and optionally password encrypted. Upon starting the ipfs daemon,
-keys will be lazily loaded as needed. If a given key is password protected, the user
-should be prompted for the password at the time of loading the key. The `$IPFS_PATH/keys`
-directory should be readable only be the owner, with unix permissions of `700`. Keys
-in the directory should be readonly, by the owner `400`.
+### Key storage
+
+Storage layout and format is defined in the [`REPO_FS`](REPO_FS.md) part of the spec.
 
 ### Interface
-Several additions and modifications will need to be made to the ipfs toolchain to
-accomodate the changes. First, the creation of two subcommands `ipfs key` and
-`ipfs crypt`:
+
+#### ipfs key
 
 ```
 
@@ -45,11 +39,11 @@ SUBCOMMANDS:
     ipfs key gen                  - Generates a new named ipfs keypair
     ipfs key list                 - Lists out all local keypairs
     ipfs key info <key>           - Get information about a given key
-	ipfs key rm	<key>             - Delete a given key from your keystore
-	ipfs key rename <key> <name>  - Renames a given key
-	ipfs key show <key>			  - Print out a given key
+    ipfs key rm     <key>             - Delete a given key from your keystore
+    ipfs key rename <key> <name>  - Renames a given key
+    ipfs key show <key>               - Print out a given key
 
-	ipfs key send <key> <peer>    - Shares a specified private key with the given peer
+    ipfs key send <key> <peer>    - Shares a specified private key with the given peer
 
     Use 'ipfs key <subcmd> --help' for more information about each command.
 
@@ -59,9 +53,10 @@ DESCRIPTION:
 
 ```
 
-```
+#### ipfs crypt
 
-	ipfs crypt - Perform cryptographic operations using ipfs keypairs
+```
+    ipfs crypt - Perform cryptographic operations using ipfs keypairs
 
 SUBCOMMANDS:
 
@@ -72,33 +67,27 @@ SUBCOMMANDS:
 
 DESCRIPTION:
 
-	`ipfs crypt` is a command used to perform various cryptographic operations
-	using ipfs keypairs, including: signing, verifying, encrypting and decrypting.
+    `ipfs crypt` is a command used to perform various cryptographic operations
+    using ipfs keypairs, including: signing, verifying, encrypting and decrypting.
 ```
 
 #### Some subcommands:
 
-##### Key Gen
-```
+##### ipfs key Gen
 
-    ipfs key gen - Generate a new ipfs keypair
+
+```
+    ipfs key gen <name> - Generate a new ipfs keypair
 
 OPTIONS:
-
-	-t, -type		string		- Specify the type and size of key to generate (i.e. rsa-4096)
-	-p, -passphrase string		- Passphrase for encrypting the private key on disk
-	-n, -name		string		- Specify a name for the key
+    -t, -type       string         - Specify the type and size of key to generate (i.e. rsa)
+    -s. -size       int            - Size of the key to generate
+    -p, -passphrase string         - Passphrase for encrypting the private key on disk
 
 DESCRIPTION:
 
     'ipfs key gen' is a command used to generate new keypairs.
-	If any options are not given, the command will go into interactive mode and prompt
-	the user for the missing fields.
-
 ```
-##### Comments:
-
-Similar to ssh's `ssh-keygen` with the `-t` option and interactive prompts.
 
 * * *
 
@@ -109,18 +98,18 @@ Similar to ssh's `ssh-keygen` with the `-t` option and interactive prompts.
 
 OPTIONS:
 
-	-y, -yes		bool		- Yes to the prompt
+    -y, -yes        bool        - Yes to the prompt
 
 DESCRIPTION:
 
     'ipfs key send' is a command used to share keypairs with other trusted users.
 
-	It will first look up the peer specified and print out their information and
-	prompt the user "are you sure? [y/n]" before sending the keypair. The target
-	peer must be online and dialable in order for the key to be sent.
+    It will first look up the peer specified and print out their information and
+    prompt the user "are you sure? [y/n]" before sending the keypair. The target
+    peer must be online and dialable in order for the key to be sent.
 
-	Note: while it is still managed through the keystore, ipfs will prevent you from
-			sharing your nodes private key with anyone else.
+    Note: while it is still managed through the keystore, ipfs will prevent you from
+            sharing your nodes private key with anyone else.
 
 ```
 
@@ -137,19 +126,19 @@ Ensure that the user knows the implications of sending a key.
 
 ARGUMENTS:
 
-	data						- The filename of the data to be encrypted ("-" for stdin)
+    data                        - The filename of the data to be encrypted ("-" for stdin)
 
 OPTIONS:
 
-	-k, -key		string		- The name of the key to use for encryption (default: localkey)
-	-o, -output		string		- The name of the output file (default: stdout)
-	-c, -cipher     string		- The cipher to use for the operation
-	-m, -mode		string		- The block cipher mode to use for the operation
+    -k, -key        string        - The name of the key to use for encryption (default: localkey)
+    -o, -output     string        - The name of the output file (default: stdout)
+    -c, -cipher     string        - The cipher to use for the operation
+    -m, -mode       string        - The block cipher mode to use for the operation
 
 DESCRIPTION:
 
     'ipfs crypt encrypt' is a command used to encypt data so that only holders of a certain
-	key can read it.
+    key can read it.
 
 ```
 
@@ -165,8 +154,8 @@ We will also need to make additions to support keys in other commands, these cha
 
 - `ipfs add`
     - Support for a `-encrypt-key` option, for block encrypting the file being added with the key
-		- also adds an 'encrypted' node above the root unixfs node
-	- Support for a `-sign-key` option to attach a signature node above the root unixfs node
+        - also adds an 'encrypted' node above the root unixfs node
+    - Support for a `-sign-key` option to attach a signature node above the root unixfs node
 
 - `ipfs block put`
     - Support for a `-encrypt-key` option, for encrypting the block before hashing and storing
@@ -175,28 +164,30 @@ We will also need to make additions to support keys in other commands, these cha
     - Support for a `-encrypt-key` option, for encrypting the object before hashing and storing
 
 - `ipfs name publish`
-	- Support for a `-key` option to select which keyspace to publish to
+    - Support for a `-key` option to select which keyspace to publish to
 
-### Code Changes/Additions
-An outline of which packages or submodules will be affected.
+### Code changes and additions
 
-#### Repo
+This sections outlines code organization around this feature.
 
-- add `keystore` concept to repo, load/store keys securely
-- needs to understand PEM (or $CHOSEN_FORMAT) encoding
+#### Keystore package
 
-Expected Interface: (very wip)
+The fsrepo carries a `keystore` that can be used to load/store keys. The keystore is implemented following this interface:
 
-```
-type KeyStore interface {
-	// Get a key from the cache
-	GetKey(name string) (ci.PrivKey, error)
-
-	// Save a new key into the cache, and write to disk
-	StoreKey(name string, key ci.PrivKey) error
-
-	// LoadKey reads the key from its file on disk, and stores it in the cache
-	LoadKey(name string, password []byte) error
+```go
+// Keystore provides a key management interface
+type Keystore interface {
+	// Has returns whether or not a key exist in the Keystore
+	Has(string) (bool, error)
+	// Put stores a key in the Keystore, if a key with the same name already exists, returns ErrKeyExists
+	Put(string, ci.PrivKey) error
+	// Get retrieves a key from the Keystore if it exists, and returns ErrNoSuchKey
+	// otherwise.
+	Get(string) (ci.PrivKey, error)
+	// Delete removes a key from the Keystore
+	Delete(string) error
+	// List returns a list of key identifier
+	List() ([]string, error)
 }
 ```
 
@@ -210,13 +201,13 @@ does not linger in memory.
 - if new node types are not unixfs nodes, special consideration must be given to the interop
 
 - DagReader needs to be able to access keystore to seamlessly stream encrypted data we have keys for
-	- also needs to be able to verify signatures
+    - also needs to be able to verify signatures
 
 #### Importer
 
 - DagBuilderHelper needs to be able to encrypt blocks
-	- Dag Nodes should be generated like normal, then encrypted, and their parents should
-		link to the hash of the encrypted node
+    - Dag Nodes should be generated like normal, then encrypted, and their parents should
+        link to the hash of the encrypted node
 - DagBuilderParams should have extra parameters to acommodate creating a DBH that encrypts the blocks
 
 #### New 'Encrypt' package
@@ -235,33 +226,33 @@ Some tenative mockups (in json) of the new DAG structures for signing and encryp
 Signed DAG:
 ```
 {
-	"Links" : [
-		{
-			"Name":"@content",
-			"Hash":"QmTheContent",
-		}
-	],
-	"Data": protobuf{
-		"Type":"Signed DAG",
-		"Signature": "thesignature",
-		"PubKeyID": "QmPubKeyHash",
-	}
+    "Links" : [
+        {
+            "Name":"@content",
+            "Hash":"QmTheContent",
+        }
+    ],
+    "Data": protobuf{
+        "Type":"Signed DAG",
+        "Signature": "thesignature",
+        "PubKeyID": "QmPubKeyHash",
+    }
 }
 ```
 
 Encrypted DAG:
 ```
 {
-	"Links" : [
-		{
-			"Name":"@content",
-			"Hash":"QmRawEncryptedDag",
-		}
-	],
-	"Data": protobuf{
-		"Type":"Encrypted DAG",
-		"PubKeyID": "QmPubKeyHash",
-		"Key": "ephemeral symmetric key, encrypted with public key",
-	}
+    "Links" : [
+        {
+            "Name":"@content",
+            "Hash":"QmRawEncryptedDag",
+        }
+    ],
+    "Data": protobuf{
+        "Type":"Encrypted DAG",
+        "PubKeyID": "QmPubKeyHash",
+        "Key": "ephemeral symmetric key, encrypted with public key",
+    }
 }
 ```
