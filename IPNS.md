@@ -97,12 +97,12 @@ Finally, the network nodes may also republish their records, so that the records
 
 ## API Spec
 
-  - <https://github.com/ipfs/interface-ipfs-core/blob/master/SPEC/NAME.md>
+  - [interface-ipfs-core/SPEC/NAME.md](https://github.com/ipfs/js-ipfs/blob/master/packages/interface-ipfs-core/SPEC/NAME.md)
 
 ## Implementations
 
-  - <https://github.com/ipfs/js-ipfs/tree/master/src/core/ipns>
-  - <https://github.com/ipfs/go-ipfs/tree/master/namesys>
+  - [js-ipfs](https://github.com/ipfs/js-ipfs/tree/master/packages/ipfs/src/core/ipns)
+  - [go-ipfs](https://github.com/ipfs/go-ipfs/tree/master/namesys)
 
 ## Integration with IPFS
 
