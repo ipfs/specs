@@ -33,7 +33,7 @@ in the directory should be readonly, by the owner `400`.
 
 ### Interface
 Several additions and modifications will need to be made to the ipfs toolchain to
-accomodate the changes. First, the creation of two subcommands `ipfs key` and
+accommodate the changes. First, the creation of two subcommands `ipfs key` and
 `ipfs crypt`:
 
 ```
@@ -148,7 +148,7 @@ OPTIONS:
 
 DESCRIPTION:
 
-    'ipfs crypt encrypt' is a command used to encypt data so that only holders of a certain
+    'ipfs crypt encrypt' is a command used to encrypt data so that only holders of a certain
 	key can read it.
 
 ```
@@ -206,7 +206,7 @@ does not linger in memory.
 
 #### Unixfs
 
-- new node types, 'encrypted' and 'signed', probably shouldnt be in unixfs, just understood by it
+- new node types, 'encrypted' and 'signed', probably shouldn't be in unixfs, just understood by it
 - if new node types are not unixfs nodes, special consideration must be given to the interop
 
 - DagReader needs to be able to access keystore to seamlessly stream encrypted data we have keys for
@@ -217,7 +217,7 @@ does not linger in memory.
 - DagBuilderHelper needs to be able to encrypt blocks
 	- Dag Nodes should be generated like normal, then encrypted, and their parents should
 		link to the hash of the encrypted node
-- DagBuilderParams should have extra parameters to acommodate creating a DBH that encrypts the blocks
+- DagBuilderParams should have extra parameters to accommodate creating a DBH that encrypts the blocks
 
 #### New 'Encrypt' package
 
@@ -230,7 +230,7 @@ public key chosen and stored in the Encrypted DAG structure.
 Note: One option is to simply add it to the key interface.
 
 ### Structures
-Some tenative mockups (in json) of the new DAG structures for signing and encrypting
+Some tentative mockups (in json) of the new DAG structures for signing and encrypting
 
 Signed DAG:
 ```

@@ -113,7 +113,7 @@ Task workers watch the message queues, dequeue a waiting message, and send it to
 
 ## Network
 
-The network is the abstraction representing all Bitswap peers that are connected to us by one or more hops. Bitswap messages flow in and out of the network. This is where a game-theoretical analysis of Bitswap becomes relevant – in an arbitrary network we must assume that all of our peers are rational and self-interested, and we act accordingly. Work along these lines can be found in the [research-bitswap respository](https://github.com/ipfs/research-bitswap), with a preliminary game-theoretical analysis currently in-progress [here](https://github.com/ipfs/research-bitswap/blob/docs/strategy_analysis/analysis/prelim_strategy_analysis.pdf).
+The network is the abstraction representing all Bitswap peers that are connected to us by one or more hops. Bitswap messages flow in and out of the network. This is where a game-theoretical analysis of Bitswap becomes relevant – in an arbitrary network we must assume that all of our peers are rational and self-interested, and we act accordingly. Work along these lines can be found in the [research-bitswap repository](https://github.com/ipfs/research-bitswap), with a preliminary game-theoretical analysis currently in-progress [here](https://github.com/ipfs/research-bitswap/blob/docs/strategy_analysis/analysis/prelim_strategy_analysis.pdf).
 
 # Implementation Details
 

@@ -112,7 +112,7 @@ The Routing Sytem is an interface that is satisfied by various kinds of implemen
 
 See more in the [libp2p specs](https://github.com/libp2p/specs).
 
-## 3.3 Block Exchange -- transfering content-addressed data
+## 3.3 Block Exchange -- transferring content-addressed data
 
 The IPFS **Block Exchange** takes care of negotiating bulk data transfers. Once nodes know each other -- and are connected -- the exchange protocols govern how the transfer of content-addressed blocks occurs.
 
@@ -175,7 +175,7 @@ The IPFS **naming** layer -- or IPNS -- handles the creation of:
 
 IPNS is based on [SFS](http://en.wikipedia.org/wiki/Self-certifying_File_System). It is a PKI namespace -- a name is simply the hash of a public key. Whoever controls the private key controls the name. Records are signed by the private key and distributed anywhere (in IPFS, via the routing system). This is an egalitarian way to assign mutable names in the internet at large, without any centralization whatsoever, or certificate authorities.
 
-See more in the namin spec (TODO).
+See more in the naming spec (TODO).
 
 # 4. Applications and Datastructures -- on top of IPFS
 

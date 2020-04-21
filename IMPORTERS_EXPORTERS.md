@@ -30,7 +30,7 @@ Lots of discussions around this topic, some of them here:
 
 Importing data into IPFS can be done in a variety of ways. These are use-case specific, produce different datastructures, produce different graph topologies, and so on. These are not strictly needed in an IPFS implementation, but definitely make it more useful.
 
-These data importing primitivies  are really just tools on top of IPLD, meaning that these can be generic and separate from IPFS itself.
+These data importing primitives are really just tools on top of IPLD, meaning that these can be generic and separate from IPFS itself.
 
 Essentially, data importing is divided into two parts:
 
@@ -52,10 +52,10 @@ Essentially, data importing is divided into two parts:
 
 ## Requirements
 
-These are a set of requirements (or guidelines) of the expectations that need to be fullfilled for a layout or a splitter:
+These are a set of requirements (or guidelines) of the expectations that need to be fulfilled for a layout or a splitter:
 
 - a layout should expose an API encoder/decoder like, that is, able to convert data to its format and convert it back to the original format
-- a layout should contain a clear umnambiguous representation of the data that gets converted to its format
+- a layout should contain a clear unambiguous representation of the data that gets converted to its format
 - a layout can leverage one or more splitting strategies, applying the best strategy depending on the data format (dedicated format chunking)
 - a splitter can be:
   - agnostic - chunks any data format in the same way
@@ -77,7 +77,7 @@ These are a set of requirements (or guidelines) of the expectations that need to
                           Importer
 ```
 
-- `chunkers or splitters`  algorithms that read a stream and produce a series of chunks. for our purposes should be deterministic on the stream. divided into:
+- `chunkers or splitters` algorithms that read a stream and produce a series of chunks. for our purposes should be deterministic on the stream. divided into:
   - `universal chunkers` which work on any streams given to them. (eg size, rabin, etc). should work roughly equally well across inputs.
   - `specific chunkers` which work on specific types of files (tar splitter, mp4 splitter, etc). special purpose but super useful for big files and special types of data.
 - `layouts or topologies` graph topologies (eg balanced vs trickledag vs ext4, ... etc)
