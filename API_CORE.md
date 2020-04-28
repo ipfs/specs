@@ -12,7 +12,7 @@ The `core` API is the programmatic interface for IPFS, it defines the method sig
 
 # Table of Contents
 
-TODo
+TODO
 
 ## Required for compliant IPFS implementation
 
@@ -83,7 +83,7 @@ TODo
   - tail
 
 
-## Tooling on top of the Core + Extentions
+## Tooling on top of the Core + Extensions
 
 > Everything defined here is optional, and might be specific to the implementation details (like running on the command line).
 

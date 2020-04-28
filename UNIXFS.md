@@ -107,7 +107,7 @@ UnixFS currently supports two optional metadata fields:
     - For ergonomic reasons a surface API of an encoder must allow fractional 0 as input, while at the same time must ensure it is stripped from the final structure before encoding, satisfying the above constraints.
 
   - Implementations interpreting the mtime metadata in order to apply it within a non-IPFS target must observe the following:
-    - If the target supports a distinction between `unspecified` and `0`/`1970-01-01T00:00:00Z`, the distinction must be preserverd within the target. E.g. if no `mtime` structure is available, a web gateway must **not** render a `Last-Modified:` header.
+    - If the target supports a distinction between `unspecified` and `0`/`1970-01-01T00:00:00Z`, the distinction must be preserved within the target. E.g. if no `mtime` structure is available, a web gateway must **not** render a `Last-Modified:` header.
     - If the target requires an mtime ( e.g. a FUSE interface ) and no `mtime` is supplied OR the supplied `mtime` falls outside of the targets accepted range:
       - When no `mtime` is specified or the resulting `UnixTime` is negative: implementations must assume `0`/`1970-01-01T00:00:00Z` ( note that such values are not merely academic: e.g. the OpenVMS epoch is `1858-11-17T00:00:00Z` )
       - When the resulting `UnixTime` is larger than the targets range ( e.g. 32bit vs 64bit mismatch ) implementations must assume the highest possible value in the targets range ( in most cases that would be `2038-01-19T03:14:07Z` )
@@ -225,7 +225,7 @@ the "usual" positive values easy to eyeball. The varint representing the time of
 #### FractionalNanoseconds
 Fractional values are effectively a random number in the range 1 ~ 999,999,999. Such values will exceed
 2^28 nanoseconds ( 268,435,456 ) in most cases. Therefore, the fractional part is represented as a 4-byte
-`fixed32`, [as per google's recommendation](https://developers.google.com/protocol-buffers/docs/proto#scalar).
+`fixed32`, [as per Google's recommendation](https://developers.google.com/protocol-buffers/docs/proto#scalar).
 
 [multihash]: https://tools.ietf.org/html/draft-multiformats-multihash-00
 [CID]: https://docs.ipfs.io/guides/concepts/cid/
