@@ -75,8 +75,10 @@ To set the stage, we begin by defining the abstract interface that content routi
      provide(tree):
           provide advertises to the network that this peer is serving the content of the given IPLD tree,
           e.g. specified by its root cid.
+
      resolve(cid, path) -> cid:
           resolve returns all peers in the network that can provide the content for cid/path.
+
      fetch(cid) -> block:
           fetch downloads the contents of cid from available providers.
 
@@ -91,6 +93,7 @@ routines, which are internal to the content routing implementation:
 
      find_parent(cid) -> list of cids:
           find_parent returns known parent cids for the given cid
+
      backtracking_fetch(look_at_cid, look_for_cid) -> content block:
           backtracking_fetch fetches the content of look_for_cid, by attempting to find it
           first at providers for look_at_cid and then at providers for the parents of look_at_cid, and so on.
