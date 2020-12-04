@@ -41,7 +41,7 @@ The format has two parts, the logical format, and the serialized format.
 
 ### Logical Format
 
-The merkledag format defines two parts, `Nodes` and `Links` between nodes. `Nodes` embed `Links` in their `Link Segement` (or link table).
+The merkledag format defines two parts, `Nodes` and `Links` between nodes. `Nodes` embed `Links` in their `Link Segment` (or link table).
 
 A node is divided in two parts:
 - a `Link Segment` which contains all the links.
@@ -112,7 +112,7 @@ In a sense, IPFS is a "web of data-structures", with the merkledag as the common
 
 The merkledag is a type of Linked-Data. The links do not follow the standard URI format, and instead opt for a more general and flexible UNIX filesystem path format, but the power is all there. One can trivially map formats like JSON-LD directly onto IPFS (IPFS-LD), making IPFS applications capable of using the full-power of the semantic web.
 
-A powerful result of content (and identity) addressing is that linked data definitions can be distributed directly with the content itself, and do not need to be served from the original location. This enables the creation of Linked Data defintions, specs, and applications which can operate faster (no need to fetch it over the network), disconnected, or even completely offline.
+A powerful result of content (and identity) addressing is that linked data definitions can be distributed directly with the content itself, and do not need to be served from the original location. This enables the creation of Linked Data definitions, specs, and applications which can operate faster (no need to fetch it over the network), disconnected, or even completely offline.
 
 ## Merkledag Notation
 

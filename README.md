@@ -12,7 +12,7 @@
 
 We use the following label system to identify the state of each spec:
 
-- ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) - A work-in-progress, possibly to describe an idea before actually commiting to a full draft of the spec.
+- ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) - A work-in-progress, possibly to describe an idea before actually committing to a full draft of the spec.
 - ![](https://img.shields.io/badge/status-draft-yellow.svg?style=flat-square) - A draft that is ready to review. It should be implementable.
 - ![](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square) - A spec that has been adopted (implemented) and can be used as a reference point to learn how the system works.
 - ![](https://img.shields.io/badge/status-stable-brightgreen.svg?style=flat-square) - We consider this spec to close to final, it might be improved but the system it specifies should not change fundamentally.
@@ -54,7 +54,7 @@ The specs contained in this repository are:
   - [Bitswap](./BITSWAP.md) - BitTorrent-inspired exchange
 - **Key Management:**
   - [KeyStore](./KEYSTORE.md) - Key management on IPFS
-  - [KeyChain](./KEYCHAIN.md) - Distribution of cryptographic Artificats
+  - [KeyChain](./KEYCHAIN.md) - Distribution of cryptographic Artifacts
 - **Networking layer:**
   - [libp2p](https://github.com/libp2p/specs) - libp2p is a modular and extensible network stack, built and use by IPFS, but that it can be reused as a standalone project. Covers:
 - **Records, Naming and Record Systems:**
@@ -64,7 +64,7 @@ The specs contained in this repository are:
 
 ## Contribute
 
-[![](https://cdn.rawgit.com/jbenet/contribute-ipfs-gif/master/img/contribute.gif)](https://github.com/ipfs/community/blob/master/contributing.md)
+[![](https://cdn.rawgit.com/jbenet/contribute-ipfs-gif/master/img/contribute.gif)](https://github.com/ipfs/community/blob/master/CONTRIBUTING.md)
 
 Suggestions, contributions, criticisms are welcome. Though please make sure to familiarize yourself deeply with IPFS, the models it adopts, and the principles it follows.
 This repository falls under the IPFS [Code of Conduct](https://github.com/ipfs/community/blob/master/code-of-conduct.md).

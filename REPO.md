@@ -84,7 +84,7 @@ Details on operation and storage of the keystore can be found in [`REPO_FS.md`](
 The node's `config` (configuration) is a tree of variables, used to configure various aspects of operation. For example:
 - the set of bootstrap peers IPFS uses to connect to the network
 - the Swarm, API, and Gateway network listen addresses
-- the Datastore configuration regarding the contruction and operation of the on-disk storage system.
+- the Datastore configuration regarding the construction and operation of the on-disk storage system.
 
 There is a set of properties, which are mandatory for the repo usage. Those are `Addresses`, `Discovery`, `Bootstrap`, `Identity`, `Datastore` and `Keychain`.
 

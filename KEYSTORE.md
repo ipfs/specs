@@ -197,7 +197,7 @@ does not linger in memory.
 
 #### Unixfs
 
-- new node types, 'encrypted' and 'signed', probably shouldnt be in unixfs, just understood by it
+- new node types, 'encrypted' and 'signed', probably shouldn't be in unixfs, just understood by it
 - if new node types are not unixfs nodes, special consideration must be given to the interop
 
 - DagReader needs to be able to access keystore to seamlessly stream encrypted data we have keys for
@@ -221,7 +221,7 @@ public key chosen and stored in the Encrypted DAG structure.
 Note: One option is to simply add it to the key interface.
 
 ### Structures
-Some tenative mockups (in json) of the new DAG structures for signing and encrypting
+Some tentative mockups (in json) of the new DAG structures for signing and encrypting
 
 Signed DAG:
 ```
