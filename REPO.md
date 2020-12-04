@@ -37,7 +37,7 @@ The Repo stores a collection of [IPLD](https://github.com/ipld/specs#readme) obj
 
 - **config** - node configuration and settings
 - **datastore** - content stored locally, and indexing data
-- **keys** - cryptographic keys, including node's identity
+- **keystore** - cryptographic keys, including node's identity
 - **hooks** - scripts to run at predefined times (not yet implemented)
 
 Note that the IPLD objects a repo stores are divided into:
@@ -73,17 +73,11 @@ The name "datastore" comes from [go-datastore](https://github.com/jbenet/go-data
 
 This makes it easy to change properties or performance characteristics of a repo without an entirely new implementation.
 
-### keys (state)
+### keystore
 
-A Repo typically holds the keys a node has access to, for signing and for encryption. This includes:
+A Repo typically holds the keys a node has access to, for signing and for encryption.
 
-- a special (private, public) key pair that defines the node's identity
-- (private, public) key pairs
-- symmetric keys
-
-Some repos MAY support key-agent delegation, instead of storing the keys directly.
-
-Keys are structured using the [multikey](https://github.com/jbenet/multikey) format, and are part of the [keychain](../keychain) datastructure. This means all keys are IPLD objects, and that they link to all the data needed to make sense of them, including parent keys, identities, and certificates.
+Details on operation and storage of the keystore can be found in [`REPO_FS.md`](REPO_FS.md) and [`KEYSTORE.md`](KEYSTORE.md).
 
 ### config (state)
 
