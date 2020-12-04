@@ -56,7 +56,7 @@ privateKey, publicKey := keygen()
 nodeID := multihash(publicKey)
 ```
 
-TODO: constraints on keygen.
+See more in the [IPFS keystore spec](https://github.com/ipfs/specs/blob/master/KEYSTORE.md).
 
 ## 2.1 multihash and upgradeable hashing
 
@@ -124,7 +124,7 @@ The Block Exchange is an interface that is satisfied by various kinds of impleme
 
 ## 3.4. Merkledag -- making sense of data
 
-[As discussed above](#IPFS-and-the-Merkle-DAG), the IPFS **merkledag** is the datastructure at the heart of IPFS. It is an [acyclic directed graph](http://en.wikipedia.org/wiki/Directed_acyclic_graph) whose edges are hashes. Another name for it is the merkleweb.
+[As discussed above](#IPFS-and-the-Merkle-DAG), the IPFS **merkledag** (also known as IPLD - InterPlanetary Linked Data) is the datastructure at the heart of IPFS. It is an [acyclic directed graph](http://en.wikipedia.org/wiki/Directed_acyclic_graph) whose edges are hashes. Another name for it is the merkleweb.
 
 The merkledag data structure is:
 
@@ -147,7 +147,7 @@ The merkledag is the "thin waist" of authenticated datastructures. It is a minim
 - **bitcoin** and other blockchains
 - **unixfs**, a content-addressed unix filesystem
 
-See more in the merkledag spec (TODO).
+See more in the [IPLD spec](https://github.com/ipld/specs/).
 
 ## 3.4.1 Merkledag Paths
 
@@ -161,7 +161,7 @@ The merkledag is enough to resolve paths:
 - (b) Then look into the links of (a), find the hash for `test`, and resolve it
 - (c) Then look into the links of (b), find the hash for `foo`, and resolve it
 
-See more in the path resolution spec (TODO).
+See more in the [path resolution spec](https://github.com/ipld/specs/blob/master/data-model-layer/paths.md).
 
 ![](img/ipfs-resolve/ipfs-resolve.gif)
 
@@ -175,7 +175,7 @@ The IPFS **naming** layer -- or IPNS -- handles the creation of:
 
 IPNS is based on [SFS](http://en.wikipedia.org/wiki/Self-certifying_File_System). It is a PKI namespace -- a name is simply the hash of a public key. Whoever controls the private key controls the name. Records are signed by the private key and distributed anywhere (in IPFS, via the routing system). This is an egalitarian way to assign mutable names in the internet at large, without any centralization whatsoever, or certificate authorities.
 
-See more in the naming spec (TODO).
+See more in the [IPNS spec](https://github.com/ipfs/specs/blob/master/IPNS.md).
 
 # 4. Applications and Datastructures -- on top of IPFS
 
@@ -183,7 +183,7 @@ The stack described so far is enough to represent arbitrary datastructures and r
 
 Applications and datastructures on top of IPFS are represented as merkledags. Users can create arbitrary datastructures that extend the merkledag and deploy them to the rest of the world using any of the tools that understand IPFS.
 
-See more in the datastructures and applications specs (TODO).
+See more in the [IPLD datastructures specs](https://github.com/ipld/specs/tree/master/data-structures).
 
 ## 4.1 unixfs -- representing traditional files
 
@@ -192,7 +192,7 @@ The unix filesystem abstractions -- files and directories -- are the main way pe
 - whether the object represents a file or directory.
 - total sizes, minus indexing overhead
 
-See more in the unixfs spec (TODO).
+See more in the [unixfs spec](https://github.com/ipfs/specs/blob/master/UNIXFS.md).
 
 ## 5. Lifetime of fetching an object.
 
