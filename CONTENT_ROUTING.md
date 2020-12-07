@@ -248,6 +248,24 @@ which have higher value for content-routing.
 
 ## Applications
 
+### Web links over IPFS
+
+Consider a typical website like Wikipedia, Archive, a newspaper or a blogging platform which desires to provide its content on IPFS.
+
+Websites contain cyclical internal links. E.g. Wikipedia articles can link to each other, a blog post can link to the next and the next can link back to the former, etc.
+
+Yet content addressing does not support cyclical references within a content tree. Thus HTML links pointing to other pages (i.e. nodes) on the same website (i.e. content tree) cannot be absolute (i.e. they cannot contain a CID) — they must be relative, as in `/foo/bar/article3.html`.
+
+Relative links are converted and interpreted as absolute ones by the browser. For a typical IPFS-enabled website, the example link above would be converted to `CID.ipfs.io/foo/bar/article3.html`, where `CID` is the root CID of the website's content tree.
+As pointed above, this is the only way in which a _web_ link can point to another page on the same IPFS-enabled site.
+
+When a user clicks on a link of this type, IPFS receives a request to resolve `CID/foo/bar/article3.html`. Note that this request requires finding a provider for the root CID, not for the article itself. (Once the root CID provider is discovered, it will be used to resolve the rest of the relative path, 
+as a result of the backtracking algorithm.)
+
+In particular and notably, provider records for the article were not used in this process. This is a key reason why eagerly providing non-root content nodes is often extremely wasteful.
+
+XXX
+
 ### Content delivery: bitswap and graphsync integration
 
 bitswap and graphsync are the main current users of content routing. Integration with the new content routing API should be straightforward, as the new API has the same corresponding methods as the currently utilized low-level API for publishing to the DHT and finding records.
