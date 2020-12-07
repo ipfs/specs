@@ -262,9 +262,11 @@ As pointed above, this is the only way in which a _web_ link can point to anothe
 When a user clicks on a link of this type, IPFS receives a request to resolve `CID/foo/bar/article3.html`. Note that this request requires finding a provider for the root CID, not for the article itself. (Once the root CID provider is discovered, it will be used to resolve the rest of the relative path, 
 as a result of the backtracking algorithm.)
 
-In particular and notably, provider records for the article were not used in this process. This is a key reason why eagerly providing non-root content nodes is often extremely wasteful.
+In particular and notably, provider records for the article were not used in this process.
+And, in general, internal (aka relative) _web_ links which form a majority of links on sites like Wikipedia do not benefit from being able to find providers for the CIDs of the content they point to.
+This is a key reason why eagerly providing non-root content nodes is often extremely wasteful.
 
-XXX
+After a user has resolved a link like `CID/foo/bar/article3.html` and fetched its content, they come in possession of the CID corresponding to it, e.g. `ARTICLE_CID`, and they may post links on other websites that now directly point to the article, e.g. `https://ARTICLE_CID.ipfs.io`. If a user clicks on this link, they will find a provider record for `ARTICLE_CID`, because one was created in the backtracking stage of resolving `CID/foo/bar/article3.html` earlier.
 
 ### Content delivery: bitswap and graphsync integration
 
