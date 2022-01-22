@@ -170,7 +170,7 @@ This was ultimately rejected for a number of reasons:
 
 #### Metadata in the directory
 
-Repeated `Metadata ` messages are added to UnixFS `Directory` and `HAMTShard` nodes, the index of which indicates which entry they are to be applied to.
+Repeated `Metadata` messages are added to UnixFS `Directory` and `HAMTShard` nodes, the index of which indicates which entry they are to be applied to.
 
 Where entries are `HAMTShard`s, an empty message is added.
 
