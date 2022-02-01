@@ -92,7 +92,7 @@ export interface FileShard extends PBNode {
    * Note: That this is heterogeneous list as e.g. in trickle DAG layout
    * shards may link to both leaves and other shards.
    */
-  Links: FileLink<FileLeaf|FileShard>[]
+  Links: AnonymousLink<FileLeaf|FileShard>[]
 }
 
 /**
@@ -157,7 +157,7 @@ export interface AdvancedFileLayout extends PBNode {
    * Note: That this is heterogeneous list as e.g. in trickle DAG layout
    * shards may link to both leaves and other shards.
    */
-  Links: FileLink<RawNode|FileShard>[]
+  Links: AnonymousLink<RawNode|FileShard>[]
 }
 
 /**
@@ -195,7 +195,7 @@ export interface FlatDirectoryLayout extends PBNode {
   /**
    * Links are directory entries.
    */
-  Links: DirectoryLink<FileLayout|DirectoryLayout>[]
+  Links: NamedLink<FileLayout|DirectoryLayout>[]
 }
 
 
@@ -228,15 +228,7 @@ export interface AdvancedDirectoryLayout {
     mode?: Mode
     mtime?: UnixTime
   }>
-  Links: ShardLink[]
-}
-
-export interface ShardLink extends PBLink<FileLayout|DirectoryLayout|DirectoryShard> {
-  /**
-   * 
-   */
-  Name: string
-  Tsize: number
+  Links: NamedLink<FileLayout|DirectoryLayout|DirectoryShard>[]
 }
 
 /**
@@ -260,7 +252,7 @@ export interface DirectoryShard extends PBNode {
   /**
    * Either links to other shards or actual directory entries
    */
-  Links: ShardLink[]|DirectoryLink<FileLayout|DirectoryLayout>[]
+  Links: NamedLink<FileLayout|DirectoryLayout|DirectoryShard>[]
 }
 
 /**
@@ -369,9 +361,10 @@ export type Mode = uint32;
 
 
 /**
- * Less loosely defined PB Link used by files.
+ * Less loosely defined PB Link which requires TSize and does not
+ * require `Name`.
  */
-export interface FileLink<Data> extends PBLink<Data> {
+export interface AnonymousLink<Data> extends PBLink<Data> {
   Hash: CID<Data>
   /**
    * File links MUST specify `TSize` for the linked slice.
@@ -386,9 +379,9 @@ export interface FileLink<Data> extends PBLink<Data> {
 }
 
 /**
- * Less loosely dhefined PB Link used by directories.
+ * Less loosely defined PB Link that requires `Name` field.
  */
-export interface DirectoryLink<Data> extends PBLink<Data> {
+export interface NamedLink<Data> extends PBLink<Data> {
   Hash: CID<Data>
   /**
    * Directory link SHOULD specify size of the entry.
