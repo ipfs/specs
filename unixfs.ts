@@ -262,19 +262,6 @@ export type DirectoryLayout =
   | FlatDirectoryLayout
   | AdvancedDirectoryLayout
 
-/**
- * All nodes that have `file` type.
- */
-export type FileNode =
-  | FileChunk
-  | FileLayout
-
-/**
- * All nodes that have `directory` type.
- */
-export type DirectoryNode =
-  | FlatDirectoryLayout
-  | AdvancedDirectoryLayout
 
 /**
  * @TODO
@@ -284,17 +271,38 @@ export type MetadataNode = never
 /**
  * @TODO
  */
-export type SymlinkNode = never
+export interface Symlink extends PBNode {
+  Data: ByteView<{
+    Type: DataType.Symlink,
+    /**
+     * UTF-8 encoded path to the symlink target.
+     */
+    Data: ByteView<string>
+    /**
+     * Number of bytes in Data field
+     */
+    filesize: uint64
+  }>
+  /**
+   * Symlink nodes MUST not have any links, yet empty `Links` list is expected.
+   * At the type level it is expressed as `never[]` which guarantees that
+   * no instatiation other than empty will satisfy this constraint.
+   *
+   * Decoder implementation SHOULD ignore links even if present.
+   */
+  Links: never[]
+}
 
 /**
  * Type representing any UnixFS node.
  */
 export type UnixFS =
   | RawChunk
-  | DirectoryNode
-  | FileNode
+  | DirectoryLayout
+  | FileChunk
+  | FileLayout
   | MetadataNode
-  | SymlinkNode
+  | Symlink
   | DirectoryShard
 
 export enum DataType {
@@ -306,11 +314,6 @@ export enum DataType {
    * or entype it's represenation deprecated
    */
   Metadata = 3,
-  /**
-   * TODO: Have not came across this one either, I'm not sure how it supposed
-   * to be represented. If not used in practice maybe it sholud be marked
-   * deprecated.
-   */
   Symlink = 4,
   HAMTShard = 5,
 }
