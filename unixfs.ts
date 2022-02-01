@@ -269,7 +269,11 @@ export type DirectoryLayout =
 export type MetadataNode = never
 
 /**
- * @TODO
+/**
+ * Logical representation of a [symbolic link][] .
+ *
+ * [symbolic link]:https://en.wikipedia.org/wiki/Symbolic_link
+ */
  */
 export interface Symlink extends PBNode {
   Data: ByteView<{
