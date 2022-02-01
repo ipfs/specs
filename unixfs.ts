@@ -412,7 +412,7 @@ export interface PBNode {
 
 export interface PBLink<Data> {
   Hash: CID<Data>
-  Tsize?: number
+  Tsize?: uint64
   Name?: string
 }
 
@@ -469,7 +469,7 @@ export type uint32 = number
 
 /**
  * This is an utility type to retain unused type parameter `T`. It can be used
- * as nominal type e.g. to capture semantics not represented in actual type strucutre.
+ * as nominal type e.g. to capture semantics not represented in actual type structure.
  */
 export interface Phantom<T> {
   // This field can not be represented because field name is non-existings
