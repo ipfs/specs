@@ -208,8 +208,7 @@ export interface FlatDirectoryLayout extends PBNode {
  */
 export interface AdvancedDirectoryLayout {
   Data: ByteView<{
-    // TODO: Is root still a directory type or is it going to be HAMT instead ?
-    Type: DataType.Directory,
+    Type: DataType.HAMTShard,
     Data: ByteView<Bitfield>
     /*
      * HAMT table width (In IPFS it's usually 256)
