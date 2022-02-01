@@ -1,9 +1,25 @@
 /**
- * Logical representation of a file chunk.
+ * Logical representation of a file chunk (a leaf node of the file DAG layout).
+ * This representation had been subsumed by `FileChunk` representation and
+ * therefor is marked as deprecated.
+ *
+ * UnixFS consumers are very likely to encounter nodes of this type, as of this
+ * writing JS & Go implementations can be configured to produce these nodes, in
+ * trickle DAG use this configuration.
  * 
- * TODO: Clarify when this represenation is used as opposed to `FileChunk`.
+ * UnixFS producers are RECOMMENDED to either use `FileChunk` representation or
+ * better yet raw binary nodes (That is 0x55 multicodec) which will likely
+ * relpace them in the future.
+ * 
+ * @see https://github.com/multiformats/multicodec/blob/master/table.csv#L39
+ * 
+ * @deprecated
  */
 export interface RawChunk extends PBNode {
+  /**
+   * While actual protobuf may include other fields consumers are recommended
+   * to ignore them.
+   */
   Data: ByteView<{
     Type: DataType.Raw,
     /**
@@ -14,19 +30,39 @@ export interface RawChunk extends PBNode {
   /**
    * Raw nodes MUST not have any links, yet empty `Links` list is expected.
    * At the type level it is expressed as `never[]` which guarantees that
-   * no instatiation other than empty will satisfy this constraint
+   * no instatiation other than empty will satisfy this constraint.
+   * 
+   * Consumer of `Raw` nodes SHOULD ignore all links even they are present
+   * in the block.
+   * 
+   * @TODO Verify this is accurate maybe they are treated just as files with
+   * `ComplexFileLayout`.
    */
   Links: never[]
 }
 
 /**
- * Logical representation of a file chunk. When large file is added to IPFS
- * it gets chunked into smaller pieces (according to specified `--chunker`)
- * and each chunk is encoded into this representation (and linked from file
- * DAG).
+ * Logical representation of a file chunk (a leaf node of the file DAG layout).
  * 
- * Note: While technically it is possible to add `mode` and `mtime` to
- * `FileChunk` node it is logical nonsense and therefor to be ignore.
+ * When large file is added to IPFS it gets chunked into smaller pieces
+ * (according to the `--chunker` specified) and each chunk is encoded into this
+ * representation (and linked from file DAG). Please note that in practice there
+ * are many other representations fro file chunks (leaf nodes) like `RawChunk`s
+ * (deprecated in favor of this representation) and raw binary nodes (That is
+ * 0x55 multicodec) which are on a way to surpass this representation.
+ *
+ * Please note that in reality there is only one `file` node with many optional
+ * fields, however different combination of fields corresponds to a different
+ * semntaics and we represent each by a different type.
+ * 
+ * Also note that some file nodes may also have `mode` and `mtime` fields,
+ * which we represent via `SimpleFileLayout` type however that is not completely
+ * accurate, e.g because one could take two `SimpleFileLayout`s and represent
+ * their concatination via `AdvancedDirectoryLayout` by linking to them. In such
+ * a scenario consumer should treat leaves as `FileChunk`s and SHOULD ignore
+ * `mode` and `mtime` fileds on them. However if those leves are accessed as
+ * files consumer SHOULD treat them as `SimpleFileLayout` and SHOULD NOT ignore
+ * `mode` and `mtime` fields.
  */
 export interface FileChunk extends PBNode {
   Data: ByteView<{
@@ -41,9 +77,7 @@ export interface FileChunk extends PBNode {
     filesize: uint64
   }>
   /**
-   * Raw nodes MUST not have any links, yet empty `Links` list is expected.
-   * At the type level it is expressed as `never[]` which guarantees that
-   * no instatiation other than empty will satisfy this constraint
+   * File chunks are leaf nodes and therefor are not supposed to have any links.
    */
   Links: never[]
 }
@@ -65,15 +99,21 @@ export type FileLeaf =
 
 /**
  * Logical representation of a file shard. When large files are chunked
- * slices that span multiple chunks may be represented via file shards.
+ * slices that span multiple blocks may be represented via file shards in
+ * certain DAG layouts (e.g. balanced & trickle DAGs).
  * 
- * Please note that some file layouts may create shallow DAGs where file root
- * node links to `FileChunk|Raw` nodes and in other layouts DAGs may be
- * several levels deep, in those cases file root link to `FileShard` nodes
- * that link to either other shards or leaf `FileChunk|Raw` nodes.
+ * Please note in practice there is only one `file` node type with many optional
+ * fields. Different combination of fields corresponds to a different semntaics
+ * and combination of fields in this type represent a branch nodes in the file
+ * DAGs where nodes beside leaves and root exist.
  * 
- * Note: While technically it is possible to add `mode` and `mtime` to
- * `FileShard` nodes it is logical nonsense and therefor to be ignore.
+ * Also note that you may encounter `FileShard`s with `mode` and `mtime` fields
+ * which according to our categorization would fall under `AdvancedFileLayout`
+ * category, however just as with `FileChunk` / `SimpleFileLayout` here as well
+ * you should treat node as `AdvancedFileLayout` if you encounter it in the
+ * root position (that is to say regard `mode`, `mtime` field) and treat it as
+ * `FileShard` node if encountered further down the DAG (that is ignore `mode`,
+ * `mtime` fileds).
  */
 export interface FileShard extends PBNode {
   Data: ByteView<{
@@ -88,17 +128,17 @@ export interface FileShard extends PBNode {
     blocksizes: uint64[]
   }>
   /**
-   * Links to the file slices this shard is comprised of.
-   * Note: That this is heterogeneous list as e.g. in trickle DAG layout
-   * shards may link to both leaves and other shards.
+   * Links to the file slices this shard is comprised of. Please note that in
+   * some layouts e.g. trickle DAG shards may link to both leaf nodes and other
+   * shards, which is why this list heterogeneous.
    */
   Links: AnonymousLink<FileLeaf|FileShard>[]
 }
 
 /**
- * Logical representation of a file that fits a single block. Note is
- * semantically different from a `FileChunk`, even though structurally it is
- * compatible. Unlike `FileChunk` it may contain `mode`, `mtime` file metadata.
+ * Logical representation of a file that fits a single block. Note this is only
+ * semantically different from a `FileChunk` and your interpretation SHOULD vary
+ * depending on where you encounter the node (In root of the DAG or not).
  */
 export interface SimpleFileLayout extends PBNode {
   Data: ByteView<{
@@ -121,9 +161,8 @@ export interface SimpleFileLayout extends PBNode {
   }>
 
   /**
-   * MUST not have any links, yet empty `Links` list is expected.
-   * At the type level it is expressed as `never[]` which guarantees that
-   * no instatiation other than empty will satisfy this constraint
+   * Simple files SHOULD NOT have any links as they are represented by single
+   * chunk.
    */
   Links: never[]
 }
@@ -161,6 +200,52 @@ export interface AdvancedFileLayout extends PBNode {
 }
 
 /**
+ * These type of nodes are not produces by referenece IPFS implementations, yet
+ * such file nodes could be represented and therefor defined with this type.
+ * 
+ * In this file representation first chunk of the file is represented by a
+ * `data` field while rest of the file is represented by links.
+ * 
+ * It is NOT RECOMMENDED to use this representation (which is why it's marked
+ * deprecated), however it is still valid representation and UnixFS consumers
+ * SHOULD recognize it and interpret as described.
+ *
+ * @deprecated
+ */
+export interface ComplexFileLayout extends PBNode {
+  Data: ByteView<{
+    Type: DataType.File,
+    /**
+     * Total number of bytes in the file (not the graph structure). Which is 
+     * `data` size + sum of `blocksizes`.
+     */
+    filesize: uint64,
+
+    /**
+     * Represents content of the first chunk of the file.
+     */
+    data: Bytes
+
+    /**
+     * List of `filesize`s for each linked node (in exact same order).
+     */
+    blocksizes: uint64[]
+
+    /**
+     * If omitted to be interprented as default `0644`. It is RECOMMENDED
+     * to omit if mode matches default.
+     */
+    mode?: Mode
+    mtime?: UnixTime
+  }>
+  /**
+   * Links to the rest of the file slices, besides one in `data` field, this
+   * file is comprised of.
+   */
+  Links: AnonymousLink<RawNode|FileShard>[]
+}
+
+/**
  * In IPFS large files are chucked into several blocks for a more effective
  * replication. Such files in UnixFS are represented via `AdvancedFileLayout`.
  * And files that fit into a single block are represented via `SimpleFileLayout`.
@@ -173,6 +258,7 @@ export interface AdvancedFileLayout extends PBNode {
 export type FileLayout =
   | SimpleFileLayout
   | AdvancedFileLayout
+  | ComplexFileLayout
 
 
 /**
@@ -232,7 +318,12 @@ export interface AdvancedDirectoryLayout {
 }
 
 /**
- * 
+ * Logical represenatation of the shard of the sharded directory. Please note
+ * that it only semantically different from `AdvancedDirectoryLayout`, in
+ * practice they are the same and interpretation should vary based on view. If
+ * viewed form root position it is `AdvancedDirectoryLayout` and it's `mtime`
+ * `mode` field to be respected, otherwise it is `DirectoryShard` and it's
+ * `mtime` and `mode` field to be ignored.
  */
 export interface DirectoryShard extends PBNode {
   Data: ByteView<{
@@ -264,16 +355,64 @@ export type DirectoryLayout =
 
 
 /**
- * @TODO
+ * Metadata as a separate node type has been considered in varios forms but
+ * ultimately had been decided against in favor of optional `mode`, `mtime`
+ * fields on the file & directory nodes.
+ *
+ * Consumers are RECOMMENDED to treat `Metadata` nodes same as `file` nodes,
+ * that is:
+ * 
+ * - If node has both `Links` and `Data` treat it as `ComplexFileLayout`
+ * - In node has `Data` but no `Links` treat it as `SimpleFileLayout` if
+ *   encountered in root position and as `FileChunk` in any other position.
+ * - If node has `Links` and no `Data` treat it as `AdvancedFileLayout` if
+ *   encountered in root position and as `FileShard` in any other position.
+ * - If node has neither `Data` nor `Links` treat it as `EmptyFile` in root
+ *   position and as empty `FileShard` otherwise.
+ * 
+ * 
+ * Producers SHOULD NOT produce `Metadata` nodes and use appropriate `file`
+ * node instead.
+ *
+ * @deprecated
  */
-export type MetadataNode = never
+export interface Metadata extends PBNode {
+  Data: ByteView<{
+    Type: DataType.Metadata
+    /**
+     * Raw bytes of the file content
+     */
+    Data?: Bytes
+    /**
+     * Number of bytes in above `Data` field
+     */
+    filesize?: uint64,
+
+    /**
+     * List of `filesize`s for each linked node (in exact same order).
+     */
+    blocksizes: uint64[]
+
+    /**
+     * If omitted to be interprented as default `0644`. It is RECOMMENDED
+     * to omit if mode matches default.
+     */
+    mode?: Mode
+    mtime?: UnixTime
+  }>
+  /**
+   * Links to the file slices this shard is comprised of. Please note that in
+   * some layouts e.g. trickle DAG shards may link to both leaf nodes and other
+   * shards, which is why this list heterogeneous.
+   */
+  Links: AnonymousLink<FileLeaf|FileShard>[]
+}
+
 
 /**
-/**
- * Logical representation of a [symbolic link][] .
+ * Logical representation of a [symbolic link][].
  *
  * [symbolic link]:https://en.wikipedia.org/wiki/Symbolic_link
- */
  */
 export interface Symlink extends PBNode {
   Data: ByteView<{
@@ -283,16 +422,23 @@ export interface Symlink extends PBNode {
      */
     Data: ByteView<string>
     /**
-     * Number of bytes in Data field
+     * In practice it may be present, in those cases it SHOULD be ignored.
+     * Producers should leave this field out.
+     * @deprecated
      */
-    filesize: uint64
+    filesize?: uint64
+
+    /**
+     * If omitted to be interprented as default `0644`. It is RECOMMENDED
+     * to omit if mode matches default.
+     */
+    mode?: Mode
+    mtime?: UnixTime
   }>
   /**
-   * Symlink nodes MUST not have any links, yet empty `Links` list is expected.
-   * At the type level it is expressed as `never[]` which guarantees that
-   * no instatiation other than empty will satisfy this constraint.
+   * Symlink nodes MUST not have any links.
    *
-   * Decoder implementation SHOULD ignore links even if present.
+   * Consumers SHOULD ignore links if they are present.
    */
   Links: never[]
 }
@@ -302,21 +448,17 @@ export interface Symlink extends PBNode {
  */
 export type UnixFS =
   | RawChunk
-  | DirectoryLayout
   | FileChunk
   | FileLayout
-  | MetadataNode
-  | Symlink
   | DirectoryShard
+  | DirectoryLayout
+  | Metadata
+  | Symlink
 
 export enum DataType {
   Raw = 0,
   Directory = 1,
   File = 2,
-  /**
-   * TODO: Have not came across this one would be nice to either mark
-   * or entype it's represenation deprecated
-   */
   Metadata = 3,
   Symlink = 4,
   HAMTShard = 5,
@@ -374,31 +516,34 @@ export type Mode = uint32;
 export interface AnonymousLink<Data> extends PBLink<Data> {
   Hash: CID<Data>
   /**
-   * File links MUST specify `TSize` for the linked slice.
+   * UnixFS links MUST specify size of the linked block.
    */
 
   Tsize: uint64
   /**
-   * File links SHOULD NOT specify `Name` for the links.
-   * TODO: JS actually uses `''` so maybe that is what type should say.
+   * Anonymoust links (e.g. links from files) SHOULD NOT specify `Name` on
+   * links.
+   *
+   * Consumers SHOULD ignore `Name` even if present.
    */
   Name?: never
 }
 
 /**
- * Less loosely defined PB Link that requires `Name` field.
+ * Less loosely defined PB Link that requires `Name` and `TSize` fields.
  */
 export interface NamedLink<Data> extends PBLink<Data> {
   Hash: CID<Data>
   /**
-   * Directory link SHOULD specify size of the entry.
-   */
-  Tsize: uint64
-  /**
-   * Directory link MUST specify link name which is a name for the directory
-   * entry.
+   * Named links (e.g. directory links) MUST specify link name. In case of
+   * directories those are interpreted as entry names.
    */
   Name: string
+
+  /**
+   * UnixFS links MUST specify size of the linked block.
+   */
+  Tsize: uint64
 }
 
 
@@ -408,7 +553,7 @@ export interface NamedLink<Data> extends PBLink<Data> {
  */
 
 export interface PBNode {
-  Data: ByteView<unknown>
+  Data?: ByteView<unknown>
   Links: PBLink<unknown>[]
 }
 
@@ -418,9 +563,19 @@ export interface PBNode {
  */
 
 export interface PBLink<Data> {
+  /**
+   * Binary CID of the target node.
+   */
   Hash: CID<Data>
-  Tsize?: uint64
+  /**
+   * UTF-8 string name
+   */
   Name?: string
+
+  /**
+   * Cumulative size of target node.
+   */
+  Tsize?: uint64
 }
 
 
