@@ -58,7 +58,7 @@ export interface RawChunk extends PBNode {
  * Also note that some file nodes may also have `mode` and `mtime` fields,
  * which we represent via `SimpleFileLayout` type however that is not completely
  * accurate, e.g because one could take two `SimpleFileLayout`s and represent
- * their concatination via `AdvancedDirectoryLayout` by linking to them. In such
+ * their concatination via `AdvancedFileLayout` by linking to them. In such
  * a scenario consumer should treat leaves as `FileChunk`s and SHOULD ignore
  * `mode` and `mtime` fileds on them. However if those leves are accessed as
  * files consumer SHOULD treat them as `SimpleFileLayout` and SHOULD NOT ignore
@@ -516,7 +516,8 @@ export type Mode = uint32;
 export interface AnonymousLink<Data> extends PBLink<Data> {
   Hash: CID<Data>
   /**
-   * UnixFS links MUST specify size of the linked block.
+   * UnixFS links SHOULD specify size of the linked subgraph
+   * (cumulative size of linked block and the blocks under it)
    */
 
   Tsize: uint64
@@ -541,7 +542,8 @@ export interface NamedLink<Data> extends PBLink<Data> {
   Name: string
 
   /**
-   * UnixFS links MUST specify size of the linked block.
+   * UnixFS links SHOULD specify size of the linked subgraph
+   * (cumulative size of linked block and the blocks under it)
    */
   Tsize: uint64
 }
