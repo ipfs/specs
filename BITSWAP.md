@@ -60,23 +60,23 @@ A single Bitswap message may contain any of the following content:
 
 #### Wire Format
 
-The wire format for Bitswap is simply a stream of Bitswap messages. The following protobuf describes the form of these messages.
+The wire format for Bitswap is simply a stream of Bitswap messages. The following protobuf describes the form of these messages. Note: all protobufs are described using proto3 syntax.
 
 ```
 message Message {
   message Wantlist {
     message Entry {
-      optional bytes block = 1; // the block key, i.e. a CIDv0
-      optional int32 priority = 2; // the priority (normalized). default to 1
-      optional bool cancel = 3;  // whether this revokes an entry
+      bytes block = 1; // the block key, i.e. a CIDv0
+      int32 priority = 2; // the priority (normalized). default to 1
+      bool cancel = 3;  // whether this revokes an entry
     }
 
     repeated Entry entries = 1; // a list of wantlist entries
-    optional bool full = 2;     // whether this is the full wantlist. default to false
+    bool full = 2;     // whether this is the full wantlist. default to false
   }
 
   Wantlist wantlist = 1;
-  optional repeated bytes blocks = 2;
+  repeated bytes blocks = 2;
 ```
 
 ### Protocol Format
