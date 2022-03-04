@@ -40,6 +40,7 @@ There are multiple Bitswap versions and more may evolve over time. We give brief
 - `/ipfs/bitswap/1.0.0` - Initial version
 - `/ipfs/bitswap/1.1.0` - Support CIDv1
 - `/ipfs/bitswap/1.2.0` - Support Wantlist Have's and Have/DontHave responses
+- `/ipfs/bitswap/1.3.0` - Support adding tokens in Bitswap requests/responses and BlockTooBig error message
 
 ## Block Sizes
 
@@ -192,7 +193,95 @@ message Message {
 }
 ```
 
-## Implementations
+## Bitswap 1.3.0
+
+Bitswap 1.3.0 extends the Bitswap 1.2.0 protocol with the following changes:
+1. Having a list of tokens that may be sent with the message and referenced within the message
+2. Allowing each entry in the wantlist to contain a set of tokens
+3. Allowing responses (both BlockPresences and Blocks) to contain a set of tokens
+4. Adding an `AuthRequired` BlockPresence
+5. Adding a `BlockTooBig` BlockPresence
+
+### Interaction Pattern
+
+Given that a client C wants to fetch data from some server S:
+
+1. C opens a stream `s_want` to S and sends a message for the blocks it wants
+    1. C may either send a complete wantlist, or an update to an outstanding wantlist
+    2. C may reuse this stream to send new wants
+    3. For each of the items in the wantlist C may ask if S has the block (i.e. a Have request) or for S to send the block (i.e. a block request). C may also ask S to send back a DontHave message in the event it doesn't have the block
+    4. For each of the items in the wantlist C may append any `tokens` they want. Recommended tokens include those that would convince S to give C the blocks they want.
+2. S responds back on a stream `s_receive`. S may reuse this stream to send back subsequent responses
+    1. If C sends S a Have request for data S has (and is willing to give to C) it should respond with a Have, although it may instead respond with the block itself (e.g. if the block is very small)
+        1. For each of the items that S sends back Blocks or BlockPresences for they may append any `tokens` they want
+    2. If C sends S a Have request for data S has but is not currently willing to give to C, S may respond with an `AuthRequired` BlockPresence
+      1. For each of the items that S sends back Blocks or BlockPresences for they may append any `tokens` they want. Recommended tokens include those that would inform C how they could convince S to give them access to the blocks they want.
+    2. If C sends S a Have request for data S does not have (or has but is not willing to tell C it has) and C has requested for DontHave responses then S should respond with DontHave
+    3. S may choose to include the number of bytes that are pending to be sent to C in the response message
+    4. If C asked for a block that S has but it is bigger than the maximum block size it should return `BlockTooBig`
+3. When C no longer needs a block it previously asked for it should send a Cancel message for that request to any peers that have not already responded about that particular block. It should particularly send Cancel messages for Block requests (as opposed to Have requests) that have not yet been answered.
+
+### Tokens
+
+The major change in this protocol version is the introduction of the ability to pass tokens along with requests and responses. A token is defined as `<multicode><data>` where the multicode is an identifier in the multicodec table, and the data is token-specific data associated with that code.
+
+Users who require additional codes for their new token formats should do one of:
+- Register their code in the table
+- For non-deployed testing purposes only - use a code in the application reserved range of the code table
+   - Note: if codes in the application reserved range will not be reservable in the code table which means that the code may conflict with another one used in the ecosystem which could cause application problems on collision. It is high recommended to not use these codes outside of testing or early development.
+
+To save space within the message the list of tokens used within the message are declared within the top level message and all other references to tokens are instead to the indices within the token list in the top level message.
+
+### Wire Format
+
+```
+message Message {
+
+  message Wantlist {
+    enum WantType {
+      Block = 0;
+      Have = 1;
+    }
+
+    message Entry {
+      bytes block = 1; // CID of the block
+      int32 priority = 2;	// the priority (normalized). default to 1
+      bool cancel = 3; // whether this revokes an entry
+      WantType wantType = 4; // Note: defaults to enum 0, ie Block
+      bool sendDontHave = 5; // Note: defaults to false
+      repeated tokens int32 = 6; // the indices of the tokens in the token list
+		}
+
+    repeated Entry entries = 1;	// a list of wantlist entries
+    bool full = 2; // whether this is the full wantlist. default to false
+  }
+  message Block {
+    bytes prefix = 1; // CID prefix (all of the CID components except for the digest of the multihash)
+    bytes data = 2;
+    repeated tokens int32 = 3; // the indices of the tokens in the token list
+  }
+
+  enum BlockPresenceType {
+    Have = 0;
+    DontHave = 1;
+    AuthRequired = 2;
+    BlockTooBig = 3;
+  }
+  message BlockPresence {
+    bytes cid = 1;
+    BlockPresenceType type = 2;
+    repeated tokens int32 = 3; // the indices of the tokens in the token list
+  }
+
+  Wantlist wantlist = 1;
+  repeated Block payload = 3;
+  repeated BlockPresence blockPresences = 4;
+  int32 pendingBytes = 5;
+  repeated bytes tokens = 6; // Each token is of the form <multicode><token-data> where the multicode identifies what the data is for
+}
+```
+
+# Implementations
 
 - <https://github.com/ipfs/go-bitswap>
 - <https://github.com/ipfs/js-ipfs-bitswap>
