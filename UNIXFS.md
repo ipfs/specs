@@ -78,7 +78,8 @@ This `Data` object is used for all non-leaf nodes in Unixfs.
 
 For files that are comprised of more than a single block, the 'Type' field will be set to 'File', the 'filesize' field will be set to the total number of bytes in the file (not the graph structure) represented by this node, and 'blocksizes' will contain a list of the filesizes of each child node.
 
-This data is serialized and placed inside the 'Data' field of the outer merkledag protobuf, which also contains the actual links to the child nodes of this object.
+This data is serialized and placed inside the 'Data' field of the outer structure, which also contains the actual links to the child nodes of this object.
+The final structure is most commonly serialized as a merkledag protobuf, but serialized data from other codecs may also be interpreted by the Unixfs ADL.
 
 For files comprised of a single block, the 'Type' field will be set to 'File', 'filesize' will be set to the total number of bytes in the file and the file data will be stored in the 'Data' field.
 
