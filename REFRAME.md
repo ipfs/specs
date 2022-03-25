@@ -178,7 +178,9 @@ Note: While the Key is a CID it is highly recommended that server implementation
     
     type GraphSync-FILv1 struct {
         ID SingletonInt(0x0910) # https://github.com/multiformats/multicodec/blob/f5dd49f35b26b447aa380e9a491f195fd49d912c/table.csv#L134
-        DealID Bytes # TODO: Is there a spec for what goes here?
+        PieceCID Link  # Taken from: https://github.com/filecoin-project/index-provider/blob/305bfab501d8850a5b6761df7af6c38ba2359a85/metadata/graphsync_filecoinv1.ipldsch
+        VerifiedDeal Bool
+        FastRetrieval Bool
     }
 ```
 
@@ -204,7 +206,9 @@ Response:
             "Multiaddresses":[{"/":{"bytes":"EncodedAddr1"}}, {"/":{"bytes":"EncodedAddr2"}}]}}},
                 "Proto" : [{
                     "ID": 2320, # the integer of the graphsync-filv1 code
-                    "DealID" : {"/":{"bytes":"SomeDataIdentifier"}}
+                    "PieceCID" : {"/": "bsome-base32-CidV1"},
+                    "VerifiedDeal" : true,
+                    "FastRetrieval" : false,
                 },
                 "Proto" : {
                     "ID": 2304 # integer bitswap code
