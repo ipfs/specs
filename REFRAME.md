@@ -154,10 +154,13 @@ Note: While the Key is a CID it is highly recommended that server implementation
      Proto optional [TransferProtocol]
      }
 
+    # Note: This is not quite valid IPLD Schema because having fallbacks within unions is not yet implemented and codified https://github.com/ipld/ipld/issues/194. We will use this syntax within this spec though.
+
     # Node describes a node (identity, network address, authentication, whatever else applies)
     # We expect different types of nodes, e.g. peer, miner, public IP, etc.
     type Node union {
      | Peer "peer"
+     | Any default
     } representation keyed
 
     type Peer struct {
@@ -167,19 +170,15 @@ Note: While the Key is a CID it is highly recommended that server implementation
                                         # https://github.com/libp2p/specs/blob/98e0ca0e54fd83f7b8c86d7e9677e1e430da5810/addressing/README.md#multiaddr-in-libp2p
     }
 
-    # Note: This is not quite valid IPLD Schema because the "structured" represenation does not exist yet, nor does the SingletonInt mechanism
-    # However, we can use this to describe that we have a union keyed by numbers rather than strings.
     type TransferProtocol union {
-        | Bitswap
-        | GraphSync-FILv1
-    } representation structured 
+        | Bitswap "2304" # Table entry interpretted as decimal string https://github.com/multiformats/multicodec/blob/f5dd49f35b26b447aa380e9a491f195fd49d912c/table.csv#L133
+        | GraphSync-FILv1 "2320" # Table entry interpretted as decimal string https://github.com/multiformats/multicodec/blob/f5dd49f35b26b447aa380e9a491f195fd49d912c/table.csv#L134
+        | Any default
+    } representation keyed 
     
-    type Bitswap struct {
-        ID SingletonInt(0x0900) # https://github.com/multiformats/multicodec/blob/f5dd49f35b26b447aa380e9a491f195fd49d912c/table.csv#L133
-    }
+    type Bitswap struct {}
     
     type GraphSync-FILv1 struct {
-        ID SingletonInt(0x0910) # https://github.com/multiformats/multicodec/blob/f5dd49f35b26b447aa380e9a491f195fd49d912c/table.csv#L134
         PieceCID Link  # Taken from: https://github.com/filecoin-project/index-provider/blob/305bfab501d8850a5b6761df7af6c38ba2359a85/metadata/graphsync_filecoinv1.ipldsch
         VerifiedDeal Bool
         FastRetrieval Bool
