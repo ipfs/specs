@@ -40,15 +40,17 @@ Given that a client C wants to request information from some server S:
 
 ### HTTP + DAG-JSON
 
-All messages MUST be encoded as DAG-JSON.
+All messages MUST be encoded as DAG-JSON and use explicit content type `application/vnd.ipfs.reframe+dag-json; version=1`
 
-Requests MUST be sent as HTTP POST requests to the endpoint where the message data is sent in the body with chunked encoding.
+
+Requests MUST be sent as HTTP POST requests. If a server supports HTTP/1.1, then it MAY send chunked-encoded messages. Clients supporting HTTP/1.1 MUST accept chunked-encoded responses.
 
 Requests and Responses MUST occur over a single HTTP call instead of the server being allowed to dial back the client with a response at a later time.
 
-If a server chooses to respond to a single request message with a group of messages in the response it should do so as a set of concatenated DAG-JSON messages (i.e. `{Response1}{Response2}...`).
+If a server chooses to respond to a single request message with a group of messages in the response it should do so as a set of `\n` delimited DAG-JSON messages (i.e. `{Response1}\n{Response2}...`).
 
-Requests and responses SHOULD come with `version=1` as a field in the Content-Type header.
+Requests and responses MUST come with `version=1` as a _Required Parameter_  in the `Accept` and `Content-Type` HTTP headers.
+
 
 Note: This version header is what allows the transport to more easily evolve over time (e.g. if it was desired to change the transport to support other encodings than DAG-JSON, utilize headers differently, move the request data from the body, etc.). Not including the version number is may lead to incompatibility with future versions of the transport.
 
