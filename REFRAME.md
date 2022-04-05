@@ -205,15 +205,15 @@ Response:
         {"Node":{"Peer":{"ID":{
             "/":{"bytes":"EncodedPeerID2"}},
             "Multiaddresses":[{"/":{"bytes":"EncodedAddr1"}}, {"/":{"bytes":"EncodedAddr2"}}]}}},
-                "Proto" : [{
-                    "ID": 2320, # the integer of the graphsync-filv1 code
-                    "PieceCID" : {"/": "bsome-base32-CidV1"},
-                    "VerifiedDeal" : true,
-                    "FastRetrieval" : false,
-                },
-                "Proto" : {
-                    "ID": 2304 # integer bitswap code
-                }]
+                "Proto" : [
+                    { "2320" : { # the integer of the graphsync-filv1 code
+                            "PieceCID" : {"/": "bsome-base32-CidV1"},
+                            "VerifiedDeal" : true,
+                            "FastRetrieval" : false
+                        }
+                    },
+                    { "2304" : {} }
+                ]
     ]
 }}
 ```
