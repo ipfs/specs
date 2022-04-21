@@ -117,7 +117,7 @@ TODO
   - filters add
   - filters rm
   - peers
-- records (iprs)
+- records (ipns)
   - put
   - get
 
