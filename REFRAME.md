@@ -173,8 +173,8 @@ Note: While the Key is a CID it is highly recommended that server implementation
     }
 
     type TransferProtocol union {
-        | Bitswap "2304" # Table entry interpretted as decimal string https://github.com/multiformats/multicodec/blob/f5dd49f35b26b447aa380e9a491f195fd49d912c/table.csv#L133
-        | GraphSync-FILv1 "2320" # Table entry interpretted as decimal string https://github.com/multiformats/multicodec/blob/f5dd49f35b26b447aa380e9a491f195fd49d912c/table.csv#L134
+        | Bitswap "2304" # Table entry interpreted as decimal string https://github.com/multiformats/multicodec/blob/f5dd49f35b26b447aa380e9a491f195fd49d912c/table.csv#L133
+        | GraphSync-FILv1 "2320" # Table entry interpreted as decimal string https://github.com/multiformats/multicodec/blob/f5dd49f35b26b447aa380e9a491f195fd49d912c/table.csv#L134
         | Any default
     } representation keyed 
     
