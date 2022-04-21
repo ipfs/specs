@@ -76,6 +76,7 @@ type Request union {
     | "FindProvidersRequest" FindProvidersRequest
     | "GetIPNSRequest" GetIPNSRequest
     | "PutIPNSRequest" PutIPNSRequest
+    | "GetPeerAddressesRequest" GetPeerAddressesRequest
 }
 ```
 
@@ -87,6 +88,7 @@ type Response union {
     | "FindProvidersResponse" FindProvidersResponse
     | "GetIPNSResponse" GetIPNSResponse
     | "PutIPNSResponse" PutIPNSResponse
+    | "GetPeerAddressesResponse" GetPeerAddressesResponse
     | "Error" Error
 }
 ```
@@ -278,6 +280,45 @@ Request:
 Response:
 ```
 {"PutIPNSResponse : {}"}
+```
+
+#### GetPeerAddresses
+
+A message for getting the addresses of a libp2p peer
+
+```ipldsch
+    type GetPeerAddressesRequest struct {
+        ID Bytes # libp2p PeerID
+        RecordTypes [String]
+    }
+
+    type Multiaddresses [Bytes] # Each element in the list is the binary representation of a complete multiaddr without a peerID suffix
+    type Libp2pSignedPeerRecord Bytes # https://github.com/libp2p/specs/blob/8c967a22bfbaff1ae41072b358fdba7c5883b6a4/RFC/0003-routing-records.md
+
+    type PeerRecordType union {
+     | Multiaddresses "multiaddrs"
+     | Libp2pSignedPeerRecord "769" // the libp2p signed peer record entry interpreted as decimal https://github.com/multiformats/multicodec/blob/f5dd49f35b26b447aa380e9a491f195fd49d912c/table.csv#L129
+     | Any default
+    } representation keyed
+    
+    type GetPeerAddressesResponse struct {
+        Records [PeerRecordType]
+    }
+```
+
+##### DAG-JSON Examples
+
+Request: // TODO
+```
+{"GetPeerAddressesRequest" : {
+    "ID" : {"/":{"bytes":"AXIUBPnagss"}},
+    "Record" : {"/":{"bytes":"AXIUBPnagss"}}
+}}
+```
+
+Response: // TODO
+```
+{"GetPeerAddressesResponse : {}"}
 ```
 
 # Method Upgrade Paths
