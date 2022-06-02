@@ -1,0 +1,131 @@
+# Subdomain Gateway Specification
+
+![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
+
+**Authors**:
+
+- Marcin Rataj ([@lidel](https://github.com/lidel))
+
+----
+
+**Abstract**
+
+Subdomain Gateway is an extension of  [PATH_GATEWAY.md](./PATH_GATEWAY.md) that
+enables website hosting compatible with web browsers relative pathing and
+security model of the web. Below should be read as a delta on top of that spec.
+
+Summary:
+
+- data is requested by CID placed in `Host` header
+    - URL paths are not prefixed with `/ipfs/{cid}` or `/ipns/{foo}`
+- retrieve data from IPFS in a way that is compatible with URL-based addressing
+    - URL’s path `/` points at the content root identified by the CID
+- each CID is granted a unique [Origin sandbox](https://en.wikipedia.org/wiki/Same-origin_policy)
+
+# Table of Contents
+
+- [Subdomain Gateway Specification](#subdomain-gateway-specification)
+- [Table of Contents](#table-of-contents)
+- [HTTP API](#http-api)
+  - [`GET /[{path}][?{params}]`](#get-pathparams)
+  - [`HEAD /[{path}][?{params}]`](#head-pathparams)
+- [HTTP Request](#http-request)
+  - [Request Headers](#request-headers)
+    - [`Host` (request header)](#host-request-header)
+- [HTTP Response](#http-response)
+  - [Response Headers](#response-headers)
+    - [`Location` (response header)](#location-response-header)
+- [Appendix: notes for implementers](#appendix-notes-for-implementers)
+  - [Security considerations](#security-considerations)
+
+# HTTP API
+
+The API is a superset of [PATH_GATEWAY.md](./PATH_GATEWAY.md), the differences
+are documented below.
+
+The main one is that Subdomain Gateway expects CID to be present in the `Host` header.
+
+## `GET /[{path}][?{params}]`
+
+Downloads data at specified content path.
+
+- `path` – optional path to a file or a directory under the content root sent in `Host` HTTP header
+
+## `HEAD /[{path}][?{params}]`
+
+Same as GET, but does not return any payload.
+
+# HTTP Request
+
+## Request Headers
+
+### `Host` (request header)
+
+Defines the root that should be prepended to the `path` before IPFS content
+path resolution is performed.
+
+The value in `Host` header must be a valid FQDN with at least three DNS labels:
+a case-insensitive content root identifier followed by `ipfs` or `ipns`
+namespace, and finally the domain name used by the gateway.
+
+Converting `Host` into a content path depends on the nature of requested resource:
+
+- For content at  `/ipfs/{cid}`
+    - `Host: {cid-mbase32}.ipfs.example.net`
+        - Example: `Host: bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi.ipfs.dweb.link`
+- For content at `/ipns/{libp2p-key}`
+    - `Host: {libp2p-key-mbase36}.ipns.example.net`
+        - Example: `Host: k2k4r8jl0yz8qjgqbmc2cdu5hkqek5rj6flgnlkyywynci20j0iuyfuj.ipns.dweb.link`
+        - Note: Base36 must be used to ensure CIDv1 with ED25519 fits in a single DNS label (63 characters).
+- For content at `/ipns/{dnslink-name}`
+    - `Host: {inlined-dnslink-name}.ipns.example.net`
+        - DNSLink names include `.` which means they  MUST be inlined into a single DNS label to provide unique origin and work with wildcard TLS certificates.
+            - DNSLink label encoding:
+                - Every `-` is replaced with `--`
+                - Every `.` is replaced with `-`
+            - DNSLink label decoding
+                - Every standalone `-` is replaced with `.`
+                - Every remaining `--` is replaced with `-`
+        - Example:
+            - `/ipns/en.wikipedia-on-ipfs.org` → `Host: en-wikipedia--on--ipfs-org.ipns.dweb.link`
+- For everything else (missing `Host`, or not following the above convention)
+
+# HTTP Response
+
+## Response Headers
+
+### `Location` (response header)
+
+Returned (with HTTP Status Code 301) when `Host` header does not follow the
+subdomain naming convention, but the requested URL path happens to be a valid
+`/ipfs/{cid}` or `/ipfs/{name}` content path.
+
+This additional normalization allows subdomain gateway to be used as a drop-in
+replacement compatible with regular path gateways.
+
+NOTE: the content root identifier must be converted to case-insensitive/inlined
+form if necessary. For example:
+- `https://dweb.link/ipfs/QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR`
+  returns HTTP 301 redirect to the same CID but in case-insensitive base32:
+  - `Location: https://bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi.ipfs.dweb.link/`
+- `https://dweb.link/ipns/en.wikipedia-on-ipfs.org` returns HTTP 301 redirect
+  to subdomain with DNSLink name correctly inlined:
+  - `Location: https://en-wikipedia--on--ipfs-org.ipns.dweb.link/`
+
+# Appendix: notes for implementers
+
+## Security considerations
+
+- Wildcard TLS certificates should be set for `*.ipfs.example.net` and
+  `*.ipns.example.net` if a subdomain gateway is to be exposed on the public
+  internet.
+
+- Subdomain gateways provide unique origin per content root, however the
+  origins still share the parent domain name used by the gateway. To fully
+  isolate websites from each other:
+    - The gateway operator should add a wildcard entry to
+      [https://publicsuffix.org](https://publicsuffix.org/)  (PSL).
+        - Example: `dweb.link` gateway [is listed on PSL](https://publicsuffix.org/list/public_suffix_list.dat) as `*.dweb.link`
+    - Web browsers with IPFS support should detect subdomain gateway (URL
+      pattern `https://{content-root-id}.ip[f|n]s.example.net`) and dynamically
+      add it to PSL.
