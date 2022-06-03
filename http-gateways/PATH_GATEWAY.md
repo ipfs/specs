@@ -60,6 +60,7 @@ where client prefers to perform all validation locally.
     - [`Content-Type` (response header)](#content-type-response-header)
     - [`Content-Disposition` (response header)](#content-disposition-response-header)
     - [`Content-Length` (response header)](#content-length-response-header)
+    - [`Content-Range` (response header)](#content-range-response-header)
     - [`Accept-Ranges` (response header)](#accept-ranges-response-header)
     - [`Location` (response header)](#location-response-header)
     - [`X-Ipfs-Path` (response header)](#x-ipfs-path-response-header)
@@ -411,10 +412,20 @@ Represents the length of returned HTTP payload.
 NOTE: the value may differ from the real size of requested data if compression or chunked `Transfer-Encoding` are used.
 <!-- TODO (https://github.com/ipfs/in-web-browsers/issues/194) IPFS clients looking for UnixFS file size should use value from `X-Ipfs-DataSize` instead. -->
 
+### `Content-Range` (response header)
+
+Returned only when request was a [`Range`](#range-request-header) request.
+
+See [RFC7233#header.content-range](https://httpwg.org/specs/rfc7233.html#header.content-range).
+
 ### `Accept-Ranges` (response header)
 
-`Accept-Ranges: none` should be returned with `application/vnd.ipld.car`
-responses if the block order in CAR stream is not deterministic.
+Optional, returned to explicitly indicate if gateway supports partial HTTP
+[`Range`](#range-request-header) requests for a specific resource.
+
+For example, `Accept-Ranges: none` should be returned with
+`application/vnd.ipld.car` responses if the block order in CAR stream is not
+deterministic.
 
 ### `Location` (response header)
 
