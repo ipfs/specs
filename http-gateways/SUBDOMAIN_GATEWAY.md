@@ -30,6 +30,8 @@ Summary:
   - [`GET /[{path}][?{params}]`](#get-pathparams)
   - [`HEAD /[{path}][?{params}]`](#head-pathparams)
 - [HTTP Request](#http-request)
+  - [Request Query Parameters](#request-query-parameters)
+    - [`uri` (request query parameter)](#uri-request-query-parameter)
   - [Request Headers](#request-headers)
     - [`Host` (request header)](#host-request-header)
 - [HTTP Response](#http-response)
@@ -56,6 +58,37 @@ Downloads data at specified content path.
 Same as GET, but does not return any payload.
 
 # HTTP Request
+
+## Request Query Parameters
+
+### `uri` (request query parameter)
+
+Optional. When present, passed address should override regular path routing.
+
+Provides URI router for `ipfs://` and `ipns://` protocol schemes,
+allowing external apps to resolve these native addresses on a gateway.
+
+The main intent is to provide `/ipfs/?uri=%s` endpoint compatible with
+[`registerProtocolHandler`](https://html.spec.whatwg.org/multipage/system-state.html#custom-handlers),
+present in web browsers, which means that value passed in `%s` should be
+[percent-encoded](https://url.spec.whatwg.org/#string-utf-8-percent-encode).
+
+**Example**
+
+Given registration:
+
+```
+navigator.registerProtocolHandler('ipfs', 'https://dweb.link/ipfs/?uri=%s', 'IPFS resolver')
+navigator.registerProtocolHandler('ipns', 'https://dweb.link/ipns/?uri=%s', 'IPNS resolver')
+```
+
+Opening `ipfs://bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi`
+should produce an HTTP GET request for
+`https://dweb.link/ipfs/?uri=ipfs%3A%2F%2Fbafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi`
+which in turn should redirect to
+`https://dweb.link/ipfs/bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi`.
+
+From there, regular subdomain gateway logic applies.
 
 ## Request Headers
 
