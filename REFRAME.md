@@ -40,7 +40,7 @@ Given that a client C wants to request information from some server S:
 
 ### HTTP + DAG-JSON
 
-All messages MUST be encoded as DAG-JSON and use explicit content type `application/vnd.ipfs.reframe+dag-json; version=1`
+All messages MUST be encoded as DAG-JSON and use explicit content type `application/vnd.ipfs.rpc+dag-json; version=1`
 
 
 Requests MUST be sent as HTTP POST requests. If a server supports HTTP/1.1, then it MAY send chunked-encoded messages. Clients supporting HTTP/1.1 MUST accept chunked-encoded responses.
