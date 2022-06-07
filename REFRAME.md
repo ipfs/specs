@@ -40,7 +40,7 @@ Given that a client C wants to request information from some server S:
 
 ### HTTP + DAG-JSON
 
-All messages sent in HTTP body MUST be encoded as DAG-JSON and use explicit content type `application/vnd.ipfs.reframe+dag-json; version=1`
+All messages sent in HTTP body MUST be encoded as DAG-JSON and use explicit content type `application/vnd.ipfs.rpc+dag-json; version=1`
 
 Requests MUST be sent as either:
 - `GET /reframe/{mbase64url-dag-cbor}`
