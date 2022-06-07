@@ -40,10 +40,17 @@ Given that a client C wants to request information from some server S:
 
 ### HTTP + DAG-JSON
 
-All messages MUST be encoded as DAG-JSON and use explicit content type `application/vnd.ipfs.reframe+dag-json; version=1`
+All messages sent in HTTP body MUST be encoded as DAG-JSON and use explicit content type `application/vnd.ipfs.reframe+dag-json; version=1`
 
+Requests MUST be sent as either:
+- `GET /reframe/{mbase64url-dag-cbor}`
+  - Cacheable HTTP `GET` requests with message passed as DAG-CBOR in HTTP path segment, encoded as URL-safe [`base64url` multibase](https://docs.ipfs.io/concepts/glossary/#base64url) string
+  - Suitable for sharing links, sending smaller messages, and when a query result MUST benefit from HTTP caching (see _HTTP Caching Considerations_ below).
+- `POST /reframe`
+  - Ephemeral HTTP `POST` request with message passed as DAG-JSON in HTTP request body
+  - Suitable for bigger messages, and when HTTP caching should be skipped for the most fresh results
 
-Requests MUST be sent as HTTP POST requests. If a server supports HTTP/1.1, then it MAY send chunked-encoded messages. Clients supporting HTTP/1.1 MUST accept chunked-encoded responses.
+If a server supports HTTP/1.1, then it MAY send chunked-encoded messages. Clients supporting HTTP/1.1 MUST accept chunked-encoded responses.
 
 Requests and Responses MUST occur over a single HTTP call instead of the server being allowed to dial back the client with a response at a later time.
 
@@ -51,8 +58,38 @@ If a server chooses to respond to a single request message with a group of messa
 
 Requests and responses MUST come with `version=1` as a _Required Parameter_  in the `Accept` and `Content-Type` HTTP headers.
 
-
 Note: This version header is what allows the transport to more easily evolve over time (e.g. if it was desired to change the transport to support other encodings than DAG-JSON, utilize headers differently, move the request data from the body, etc.). Not including the version number is may lead to incompatibility with future versions of the transport.
+
+#### HTTP Caching Considerations
+
+**POST vs GET**
+
+HTTP `POST` requests do not benefit from any preexisting HTTP caching because
+every `POST` response will overwrite the cached resource.
+
+While it is possible to write custom middleware to cache `POST` responses based on
+request body, this is not a standard behavior and is discouraged.
+
+Use of `GET` endpoint is not mandatory, but suggested if a Reframe deployment
+expects to handle the same message query multiple times, and want to leverage
+existing HTTP tooling to maximize HTTP cache hits.
+
+**Avoiding sending the same response messages twice**
+
+Implementations MUST always return strong
+[`Etag`](https://httpwg.org/specs/rfc7232.html#header.etag) HTTP header based
+on digest of DAG-JSON response messages. This allows clients to send
+inexpensive conditional requests with
+[`If-None-Match`](https://httpwg.org/specs/rfc7232.html#header.if-none-match)
+header, which will skip when the response message did not change.
+
+**Client controls for time-based caching**
+
+Implementations MUST always return
+[`Last-Modified`](https://httpwg.org/specs/rfc7232.html#header.last-modified)
+HTTP header, allowing clients to send conditional requests with
+[`If-Modified-Since`](https://httpwg.org/specs/rfc7232.html#header.if-modified-since)
+header to specify their acceptance for stale (cached) responses.
 
 ## Protocol Message Overview
 
