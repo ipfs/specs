@@ -17,7 +17,8 @@ security model of the web. Below should be read as a delta on top of that spec.
 Summary:
 
 - Requests carry the CID as a sub-domain in the `Host` header rather than as a URL path prefix
-  - e.g. `{cid}.ipfs.example.org` instead of `example.org/ipfs/{cid}`
+  - Case-insensitive [CIDv1](https://docs.ipfs.io/concepts/glossary/#cid-v1) encoding is used in sub-domain (see [DNS label limits](#dns-label-limits))
+  - e.g. `{cidv1}.ipfs.example.org` instead of `example.org/ipfs/{cid}`
 - The root CID is used to define the [Resource Origin](https://en.wikipedia.org/wiki/Same-origin_policy), aligning it with the web's security model.
   - Files in a DAG may request other files within the same DAG as part of the same Origin Sandbox.
 - Data is retrieved from IPFS in a way that is compatible with URL-based addressing
@@ -40,6 +41,7 @@ Summary:
   - [Response Headers](#response-headers)
     - [`Location` (response header)](#location-response-header)
 - [Appendix: notes for implementers](#appendix-notes-for-implementers)
+  - [DNS label limits](#dns-label-limits)
   - [Security considerations](#security-considerations)
 
 # HTTP API
