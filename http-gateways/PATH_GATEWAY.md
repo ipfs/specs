@@ -71,6 +71,7 @@ where client prefers to perform all validation locally.
     - [Finding the content root](#finding-the-content-root)
     - [Traversing remaining path](#traversing-remaining-path)
   - [Best practices for HTTP caching](#best-practices-for-http-caching)
+  - [Denylists](#denylists)
 
 # HTTP API
 
@@ -260,8 +261,10 @@ requested content path was not possible due to a invalid or missing DAG node.
 Error to indicate that request was formally correct, but this specific Gateway
 refuses to return requested data.
 
-Particularly useful for implementing deny lists, in order to not serve malicious content.
+Particularly useful for implementing [deny lists](#denylists), in order to not serve malicious content.
 The name of deny list and unique identifier of blocked entries can be provided in the response body.
+
+See: [Denylists](#denylists)
 
 ### `429` Too Many Requests
 
@@ -276,6 +279,8 @@ Error to indicate that request was formally correct, but this specific Gateway
 is unable to return requested data due to legal reasons. Response SHOULD
 include an explanation, as noted in
 [RFC7725.html#n-451-unavailable-for-legal-reasons](https://httpwg.org/specs/rfc7725.html#n-451-unavailable-for-legal-reasons).
+
+See: [Denylists](#denylists)
 
 ### `500` Internal Server Error
 
@@ -562,3 +567,23 @@ low level logical pathing from IPLD:
 - Advanced caching strategies can be built using additional information in
   `X-Ipfs-Path` and `X-Ipfs-Roots` headers.
 
+## Denylists
+
+Optional, but encouraged.
+
+Implementations are encouraged to support pluggable denylists to allow IPFS
+node operators to opt into not hosting previously flagged content.
+
+Gateway MUST respond with HTTP error when requested CID is on any of active denylists:
+- [410 Gone](#410-gone) returned when CID is denied for non-legal reasons, or when the exact reason is unknown
+- [451 Unavailable For Legal Reasons](#451-unavailable-for-legal-reasons) returned when denylist indicates that content was blocked on legal basis
+
+Implementation is free to apply some denylists by default as long the gateway
+operator is able to inspect and modify the list of denylists that are applied.
+
+**Examples of public deny lists**
+
+- [The Bad Bits Denylist](https://badbits.dwebops.pub/) – a list of hashed CIDs
+  that have been flagged for various reasons (copyright violation, malware,
+  etc). Each entry is `sha256()` hashed so that it can easily be checked given
+  a plaintext CID, but inconvenient to determine otherwise.
