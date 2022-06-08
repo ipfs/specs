@@ -55,15 +55,33 @@ Same as GET, but does not return any payload.
 
 ### `Host` (request header)
 
+Defines the [DNSLink](https://docs.ipfs.io/concepts/glossary/#dnslink) name
+to RECURSIVELY resolve into an immutable `/ipfs/{cid}/` prefix that should
+be prepended to the `path` before the final IPFS content path resolution
+is performed.
 
-Defines the DNSLink name to resolve into `/ipfs/{cid}/` prefix that should be
-prepended to the `path` before the final IPFS content path resolution is
-performed.
+Implementations MUST ensure DNSLink resolution is safe and correct:
+- each DNSLink may include an additional path segment, which MUST be preserved
+- each DNSLink may point at other DNSLink, which means there MUST be a hard
+  recursion limit (e.g. 32) and HTTP 400 Bad Request error MUST be returned
+  when the limit is reached.
 
-Example: if client sent HTTP GET request for `/sub-path` path and  `Host:
-example.com` header, and DNS at `_dnslink.example.com` has TXT record with
-value  `dnslink=/ipfs/cid1`, then the final content path is
-`/ipfs/cid1/sub-path`
+**Example: resolving an advanced DNSLink chain**
+
+To illustrate, given DNSLink records:
+
+- `_dnslink.a.example.com` TXT record: `dnslink=/ipns/b.example.net/path-b`
+- `_dnslink.b.example.net` TXT record: `dnslink=/ipfs/bafy…qy3k/path-c`
+
+HTTP client sends `GET /path-a` request with  `Host: a.example.com` header
+which recursively resolves all DNSLinks and produces the final immutable
+content path:
+
+1. `Host` header + `/path-a` → `/ipns/a.example.net/path-a`
+2. Resolving DNSlink at `a.example.net` replaces `/ipns/a.example.net` with `/ipns/b.example.net/path-b`
+3. Resolving DNSlink at `b.example.net` replaces `/ipns/b.example.net` with `/ipfs/bafy…qy3k/path-c`
+4. The immutable content path is `/ipfs/bafy…qy3k/path-c/path-b/path-a`
+
 
 # Appendix: notes for implementers
 
