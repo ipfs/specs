@@ -89,6 +89,25 @@ Downloads data at specified content path.
 
 Same as GET, but does not return any payload.
 
+Implementations are free to limit the scope of IPFS data transfer triggered by
+`HEAD` requests to a minimal DAG subset required for producing response headers
+such as
+[`X-Ipfs-Roots`](#x-ipfs-roots-response-header),
+[`Content-Length`](#content-length-response-header)
+and [`Content-Type`](#content-type-response-header).
+<!-- TODO add [`X-Ipfs-DataSize`](#x-ipfs-datasize-response-header) -->
+
+**only-if-cached HEAD behavior**
+
+HTTP client can send `HEAD` request with
+[`Cache-Control: only-if-cached`](#cache-control-request-header)
+to disable IPFS data transfer and inexpensively probe if the gateway has the data cached.
+
+Implementation MUST ensure that handling `only-if-cached` `HEAD` response is
+fast and does not generate any additional I/O such as IPFS data transfer. This
+allows light clients to probe and prioritize gateways which already
+have the data.
+
 # HTTP Request
 
 ## Request Headers
