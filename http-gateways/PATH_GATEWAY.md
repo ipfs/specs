@@ -246,7 +246,6 @@ Indicates permanent redirection.
 
 The new, canonical URL is returned in the [`Location`](#location-response-header) header.
 
-
 ### `400` Bad Request
 
 A generic client error returned when it is not possible to return a better one
@@ -259,7 +258,10 @@ requested content path was not possible due to a invalid or missing DAG node.
 ### `410` Gone
 
 Error to indicate that request was formally correct, but this specific Gateway
-refuses to return requested data and is unable to provide reason why.
+refuses to return requested data.
+
+Particularly useful for implementing deny lists, in order to not serve malicious content.
+The name of deny list and unique identifier of blocked entries can be provided in the response body.
 
 ### `429` Too Many Requests
 
@@ -364,8 +366,8 @@ Returning this header depends on the information available:
   uses different heuristic, making this an inferior, non-deterministic caching
   strategy.
 
-- New implementations should not return this header if  TTL is not known;
-  providing a static expiration window in  `Cache-Control` is easier to reason
+- New implementations should not return this header if TTL is not known;
+  providing a static expiration window in `Cache-Control` is easier to reason
   about than cache expiration based on the fuzzy “heuristic freshness”.
 
 ### `Content-Type` (response header)
@@ -538,7 +540,9 @@ The *CID* provides the starting point, often called *content root*. The
 IPLD data, starting from that data which the CID identified.
 
 **Note:** Other types of gateway may allow for passing CID by other means, such
-as `Host` header, removing the need for path splitting. (See [
+as `Host` header, changing the rules behind path splitting.
+(See [SUBDOMAIN_GATEWAY.md](./SUBDOMAIN_GATEWAY.md)
+and [DNSLINK_GATEWAY.md](./DNSLINK_GATEWAY.md)). 
 
 ### Traversing remaining path
 

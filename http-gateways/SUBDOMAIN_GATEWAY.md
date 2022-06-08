@@ -16,11 +16,13 @@ security model of the web. Below should be read as a delta on top of that spec.
 
 Summary:
 
-- data is requested by CID placed in `Host` header
-    - URL paths are not prefixed with `/ipfs/{cid}` or `/ipns/{foo}`
-- retrieve data from IPFS in a way that is compatible with URL-based addressing
+- Requests carry the CID as a sub-domain in the `Host` header rather than as a URL path prefix
+  - e.g. `{cid}.ipfs.example.org` instead of `example.org/ipfs/{cid}`
+- The root CID is used to define the [Resource Origin](https://en.wikipedia.org/wiki/Same-origin_policy), aligning it with the web's security model.
+  - Files in a DAG may request other files within the same DAG as part of the same Origin Sandbox.
+- Data is retrieved from IPFS in a way that is compatible with URL-based addressing
     - URL’s path `/` points at the content root identified by the CID
-- each CID is granted a unique [Origin sandbox](https://en.wikipedia.org/wiki/Same-origin_policy)
+
 
 # Table of Contents
 
@@ -146,7 +148,24 @@ form if necessary. For example:
   - `Location: https://en-wikipedia--on--ipfs-org.ipns.dweb.link/`
 
 # Appendix: notes for implementers
+## DNS label limits
 
+DNS labels, must be case-insensitive, and up to a maximum of 63 characters
+[per label](https://datatracker.ietf.org/doc/html/rfc2181#section-11).
+Representing CIDs within these limits requires some care.
+
+Base32 multibase encoding is used for CIDs to ensure case-insensitve,
+URL safe characters are used.
+
+Base36 multibase is used for ED25519 libp2p keys to get the string
+representation to safely fit with the 63 character limit.
+
+How to represent CIDs with a string representation greater than 63
+characters, such as those for `sha2-512` hashes, remains an
+[open question](https://github.com/ipfs/go-ipfs/issues/7318). 
+
+Until a solution is found, subdomain gateway implementations
+should return HTTP 400 Bad Request for CIDs longer than 63.
 ## Security considerations
 
 - Wildcard TLS certificates should be set for `*.ipfs.example.net` and
