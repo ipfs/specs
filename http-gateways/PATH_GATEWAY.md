@@ -136,9 +136,13 @@ gateway already has the data (e.g. in local datastore) and can return it
 immediately.
 
 If data is not cached locally, and the response requires an expensive remote
-fetch, a 504 (Gateway Timeout) status code should be returned.
+fetch, a 412 Precondition Failed HTTP status code should be returned by the
+gateway without any payload or specific HTTP headers.
 
-See [RFC7234#only-if-cached](https://datatracker.ietf.org/doc/html/rfc7234#section-5.2.1.7)
+The code 412 is used instead of 504 because only-if-cached is handled by the
+gateway itself, moving the error to client error range and avoiding confusing
+server errors in places like the browser console.
+
 <!-- TODO: https://github.com/ipfs/go-ipfs/issues/8783 -->
 
 ### `Accept` (request header)
