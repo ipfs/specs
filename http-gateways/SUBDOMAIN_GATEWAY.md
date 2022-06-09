@@ -20,7 +20,7 @@ Summary:
   - Case-insensitive [CIDv1](https://docs.ipfs.io/concepts/glossary/#cid-v1) encoding is used in sub-domain (see [DNS label limits](#dns-label-limits))
   - e.g. `{cidv1}.ipfs.example.org` instead of `example.org/ipfs/{cid}`
 - The root CID is used to define the [Resource Origin](https://en.wikipedia.org/wiki/Same-origin_policy), aligning it with the web's security model.
-  - Files in a DAG may request other files within the same DAG as part of the same Origin Sandbox.
+  - Files in a DAG defined by the root CID may request other files within the same DAG as part of the same Origin Sandbox.
 - Data is retrieved from IPFS in a way that is compatible with URL-based addressing
     - URL’s path `/` points at the content root identified by the CID
 
@@ -94,7 +94,7 @@ Converting `Host` into a content path depends on the nature of requested resourc
                 - Every standalone `-` is replaced with `.`
                 - Every remaining `--` is replaced with `-`
         - Example:
-            - `/ipns/en.wikipedia-on-ipfs.org` → `Host: en-wikipedia--on--ipfs-org.ipns.dweb.link`
+            - `example.net/ipns/en.wikipedia-on-ipfs.org` → `Host: en-wikipedia--on--ipfs-org.ipns.example.net`
 - For everything else (missing `Host`, or not following the above convention)
 
 ## Request Query Parameters
