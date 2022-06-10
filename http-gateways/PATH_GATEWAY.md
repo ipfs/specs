@@ -181,6 +181,7 @@ For example:
 
 - [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw) – disables [IPLD codec deserialization](https://ipld.io/docs/codecs/), requests a verifiable raw [block](https://docs.ipfs.io/concepts/glossary/#block) to be returned
 - [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car) – disables [IPLD codec deserialization](https://ipld.io/docs/codecs/), requests a verifiable [CAR](https://docs.ipfs.io/concepts/glossary/#car) stream to be returned
+- [application/x-tar](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types) – disables [IPLD codec deserialization](https://ipld.io/docs/codecs/), requests a [TAR](https://en.wikipedia.org/wiki/Tar_(computing)) archive to be returned
 <!-- TODO: https://github.com/ipfs/go-ipfs/issues/8823
 - application/vnd.ipld.dag-json OR application/json – requests IPLD Data Model representation serialized into [DAG-JSON format](https://ipld.io/docs/codecs/known/dag-json/)
 - application/vnd.ipld.dag-cbor OR application/cbor - requests IPLD Data Model representation serialized into [DAG-CBOR format](https://ipld.io/docs/codecs/known/dag-cbor/)
@@ -248,7 +249,9 @@ Optional, `format=<format>` can be used to request specific response format.
 
 This is a URL-friendly alternative to sending
 `Accept: application/vnd.ipld.<format>` header, see [`Accept`](#accept-request-header)
-for more details.
+for more details. 
+
+In case of `Accept: application/x-tar`, the `?format=` equivalent is `tar`.
 
 <!-- TODO Planned: https://github.com/ipfs/go-ipfs/issues/8769
 - `selector=<cid>`  can be used for passing a CID with [IPLD selector](https://ipld.io/specs/selectors)
@@ -354,7 +357,7 @@ and CDNs, implementations should base it on both CID and response type:
 
 - By default, etag should be based on requested CID. Example: `Etag: "bafy…foo"`
 
-- If a custom `format` was requested (such as a raw block or a CAR), the
+- If a custom `format` was requested (such as a raw block, CAR or TAR), the
   returned etag should be modified to include it. It could be a suffix.
   - Example: `Etag: "bafy…foo.raw"`
 
@@ -365,8 +368,9 @@ and CDNs, implementations should base it on both CID and response type:
   - Example: `Etag: "DirIndex-2B423AF_CID-bafy…foo"`
 
 - When a gateway can’t guarantee byte-for-byte identical responses, a “weak”
-  etag should be used. For example, if CAR is streamed, and blocks arrive in
-  non-deterministic order, the response should have `Etag: W/"bafy…foo.car"`
+  etag should be used. For example, if CAR or TAR is streamed, and blocks arrive in
+  non-deterministic order, the response should have `Etag: W/"bafy…foo.bar"`, where `bar`
+  is `car` or `tar`, respectively.
 
 - When responding to [`Range`](#range-request-header) request, a strong `Etag`
   should be based on requested range in addition to CID and response format:
@@ -394,6 +398,10 @@ Returned directive depends on requested content path and format:
     noted in [RFC 2131 Section 8](https://datatracker.ietf.org/doc/html/rfc2181#section-8).
   - If TTL value is unknown, implementations are free to set it to a static
     value, but it should not be lower than 60 seconds.
+
+- `Cache-Control: no-cache, no-transform`  should be returned with
+  `application/x-tar` responses if the TAR response, is not guaranteed
+  to be deterministic.
 
 ### `Last-Modified` (response header)
 
