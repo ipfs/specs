@@ -6,24 +6,24 @@
 
 # Summary
 
-This Request for Change (RFC) introduces lightweight RFC process
-for IPFS specifications [repository][1].
+This Request for Change (RFC) introduces a lightweight RFC process
+for the IPFS specifications [repository][1].
 
 [1]: https://github.com/ipfs/specs/
 
 # Motivation
 
-Protocol design discussions often take place in a repository of an IPFS
-implementation. Often lacking useful input from IPFS Stewards, other
+Today, protocol design discussions often take place in a repository of an IPFS
+implementation. These conversations are unintentionally obscured from the useful input of IPFS Stewards, other
 implementations, service operators and the wider IPFS Community.
 
-IPFS Project needs a mechanism for proposing and evaluating specification
+The IPFS Project needs a mechanism for proposing and evaluating specification
 improvements that are not tied to a specific programming language
 or implementation of IPFS.
 
 # Detailed design
 
-Adopt an informal RFC process for [ipfs/specs][1] repository, providing
+Adopt an informal RFC process for the [ipfs/specs][1] repository, providing a
 minimal structure for opening, reviewing, and merging specification changes.
 
 ## Opening
@@ -56,7 +56,7 @@ IPFS Stewards will adjust the process based on usage patterns.
 
 ## Design rationale
 
-We want to empower IPFS community and implementers with the ability to propose
+We want to empower IPFS community members and implementers with the ability to propose
 changes in a well-known way, without introducing much overhead.
 
 Guiding principles:
@@ -65,10 +65,10 @@ Guiding principles:
 - Convention over Byzantine process
   - Proposing a new RFC should have low cognitive overhead, allowing us to
     focus on specs
-  - Reuse existing Git developer accounts and reputation attached to them
+  - Reuse existing Github developer accounts and reputation attached to them
   - One should be able to create a valid RFC without reading a long explainer
     like this one. Looking at past RFCs, and then copying a template and
-    opening a PR with their proposal should be more than enough.
+    opening a PR with the proposal should be more than enough.
 
 ### User benefit
 
@@ -80,14 +80,14 @@ End users will indirectly benefit from a healthy RFC process being in place:
   existing implementations will be able to propose improvements for others to
   adopt. This removes the soft vendor lock-in present when the oldest
   implementation is considered as the reference standard and source of truth.
-- IPFS Implementers will have a better understanding why certain design
+- IPFS implementers will have a better understanding of why certain design
   decisions were made, and have both historical context and language-agnostic
   specifications with test fixtures ready for use in their project, ensuring
   a high level of interoperability.
 - More eyes looking at specifications will improve overall quality over time.
 
 As a result, IPFS will become easier to implement, useful in more contexts,
-benefiting more people.
+and benefit more people.
 
 ### Compatibility
 

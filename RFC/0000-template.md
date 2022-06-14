@@ -1,7 +1,7 @@
 # RFC 0000: Request for Change Template
 
 <!-- RFC number will be assigned by an editor. When opening a pull request to
-submit your RFC, please use an abbreviated title in the filename,
+submit your RFC, please use number 0000 and an abbreviated title in the filename,
 `0000-draft-title-abbrev.md`. -->
 
 - Start Date: (format: YYYY-MM-DD)
@@ -39,7 +39,7 @@ specification compliance.
 The rationale fleshes out the specification by describing what motivated
 the design and why particular design decisions were made.
 
-Provide evidence of consensus within the community,
+Provide evidence of rough consensus and working code within the community,
 and discuss important objections or concerns raised during discussion.
 
 ### User benefit
