@@ -11,14 +11,15 @@
 **Abstract**
 
 Subdomain Gateway is an extension of  [PATH_GATEWAY.md](./PATH_GATEWAY.md) that
-enables website hosting compatible with web browsers relative pathing and
-security model of the web. Below should be read as a delta on top of that spec.
+enables website hosting isolated per CID/name, while remaining compatible with
+web browsers relative pathing and security model of the web.
+Below should be read as a delta on top of that spec.
 
 Summary:
 
 - Requests carry the CID as a sub-domain in the `Host` header rather than as a URL path prefix
   - Case-insensitive [CIDv1](https://docs.ipfs.io/concepts/glossary/#cid-v1) encoding is used in sub-domain (see [DNS label limits](#dns-label-limits))
-  - e.g. `{cidv1}.ipfs.example.org` instead of `example.org/ipfs/{cid}`
+  - e.g. `{cidv1}.ipfs.example.net` instead of `example.net/ipfs/{cid}`
 - The root CID is used to define the [Resource Origin](https://en.wikipedia.org/wiki/Same-origin_policy), aligning it with the web's security model.
   - Files in a DAG defined by the root CID may request other files within the same DAG as part of the same Origin Sandbox.
 - Data is retrieved from IPFS in a way that is compatible with URL-based addressing
@@ -41,6 +42,7 @@ Summary:
   - [Response Headers](#response-headers)
     - [`Location` (response header)](#location-response-header)
 - [Appendix: notes for implementers](#appendix-notes-for-implementers)
+      - [Migrating from Path to Subdomain Gateway](#migrating-from-path-to-subdomain-gateway)
   - [DNS label limits](#dns-label-limits)
   - [Security considerations](#security-considerations)
   - [URI router](#uri-router)
@@ -111,11 +113,11 @@ See [URI router](#uri-router) section for usage and implementation details.
 
 ### `Location` (response header)
 
-Returned (with HTTP Status Code 301) when `Host` header does not follow the
-subdomain naming convention, but the requested URL path happens to be a valid
-`/ipfs/{cid}` or `/ipfs/{name}` content path.
+Returned with HTTP Status Code 301 (Moved Permanently) when `Host` header does
+not follow the subdomain naming convention, but the requested URL path happens
+to be a valid `/ipfs/{cid}` or `/ipfs/{name}` content path.
 
-This additional normalization allows subdomain gateway to be used as a drop-in
+This redirect allows subdomain gateway to be used as a drop-in
 replacement compatible with regular path gateways.
 
 NOTE: the content root identifier must be converted to case-insensitive/inlined
@@ -128,6 +130,16 @@ form if necessary. For example:
   - `Location: https://en-wikipedia--on--ipfs-org.ipns.dweb.link/`
 
 # Appendix: notes for implementers
+
+#### Migrating from Path to Subdomain Gateway
+
+During the migration from a path gateway to a subdomain gateway, even though
+the [`Location`](#location-response-header) header is present, some clients may
+check for HTTP 200, and consider other responses as invalid.
+
+It is up to the gateway operator to clearly communicate when such a transition
+is to happen, or use a different domain name for subdomain gateway to avoid
+breaking legacy clients that are unable to follow HTTP 301 redirects.
 
 ## DNS label limits
 

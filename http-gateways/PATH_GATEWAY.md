@@ -30,6 +30,8 @@ where client prefers to perform all validation locally.
 - [HTTP API](#http-api)
   - [`GET /ipfs/{cid}[/{path}][?{params}]`](#get-ipfscidpathparams)
   - [`HEAD /ipfs/{cid}[/{path}][?{params}]`](#head-ipfscidpathparams)
+  - [`GET /ipns/{name}[/{path}][?{params}]`](#get-ipnsnamepathparams)
+  - [`HEAD /ipns/{name}[/{path}][?{params}]`](#head-ipnsnamepathparams)
 - [HTTP Request](#http-request)
   - [Request Headers](#request-headers)
     - [`If-None-Match` (request header)](#if-none-match-request-header)
@@ -80,7 +82,7 @@ specified content path.
 
 ## `GET /ipfs/{cid}[/{path}][?{params}]`
 
-Downloads data at specified content path.
+Downloads data at specified **immutable** content path.
 
 - `cid` – a valid content identifier  ([CID](https://docs.ipfs.io/concepts/glossary#cid))
 - `path` – optional path remainer pointing at a file or a directory under the `cid` content root
@@ -108,6 +110,21 @@ Implementation MUST ensure that handling `only-if-cached` `HEAD` response is
 fast and does not generate any additional I/O such as IPFS data transfer. This
 allows light clients to probe and prioritize gateways which already
 have the data.
+
+## `GET /ipns/{name}[/{path}][?{params}]`
+
+Downloads data at specified **mutable** content path.
+
+Implementation must resolve the `name` to a CID, then serve response behind a
+`/ipfs/{resolved-cid}[/{path}][?{params}]` content path.
+
+- `name` may refer to:
+  - cryptographic [IPNS key hash](https://docs.ipfs.io/concepts/glossary/#ipns)
+  - human-readable DNS name with [DNSLink](https://docs.ipfs.io/concepts/glossary/#dnslink) set-up
+
+## `HEAD /ipns/{name}[/{path}][?{params}]`
+
+Same as GET, but does not return any payload.
 
 # HTTP Request
 
