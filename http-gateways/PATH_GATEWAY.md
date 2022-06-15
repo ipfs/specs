@@ -67,6 +67,7 @@ where client prefers to perform all validation locally.
     - [`Location` (response header)](#location-response-header)
     - [`X-Ipfs-Path` (response header)](#x-ipfs-path-response-header)
     - [`X-Ipfs-Roots` (response header)](#x-ipfs-roots-response-header)
+    - [`X-Content-Type-Options` (response header)](#x-content-type-options-response-header)
   - [Response Payload](#response-payload)
 - [Appendix: notes for implementers](#appendix-notes-for-implementers)
   - [Content resolution](#content-resolution)
@@ -528,6 +529,17 @@ change at all, allowing for smarter caching beyond what standard Etag offers.
     - Indicates the original byte size of the raw data (not impacted by HTTP transfer encoding or compression), without IPFS/IPLD metadata.
         - For UnixFS this is equivalent to `Size` from `ipfs files stat` or `ipfs dag stat`
 -->
+
+### `X-Content-Type-Options` (response header)
+
+Optional, present in certain response types:
+
+- `X-Content-Type-Options: nosniff`  should be returned with
+  `application/vnd.ipld.car` and `application/vnd.ipld.raw` responses to
+  indicate that the [`Content-Type`](#content-type-response-header) should be
+  followed and not be changed. This is a security feature, ensures that
+  non-executable binary response types are not used in `<script>` and `<style>`
+  HTML tags.
 
 ## Response Payload
 
