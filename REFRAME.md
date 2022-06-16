@@ -36,6 +36,10 @@ Given that a client C wants to request information from some server S:
 1. C opens sends a request to S that is a single message
 2. S will respond to C with either a single message or a group of messages
 
+## Cachability
+
+Some methods are prone to being cachable while others are not. Methods are tagged within the spec as cachable/not cachable. Transports may leverage that information to decide if cachable/not cachable methods should be treated differently.
+
 ## Transports
 
 ### HTTP + DAG-JSON
@@ -49,6 +53,8 @@ Requests MUST be sent as either:
 - `POST /reframe`
   - Ephemeral HTTP `POST` request with message passed as DAG-JSON in HTTP request body
   - Suitable for bigger messages, and when HTTP caching should be skipped for the most fresh results
+
+Severs MUST support `GET` for methods marked as cacheable and MUST support `POST` for methods marked as non-cacheable.
 
 If a server supports HTTP/1.1, then it MAY send chunked-encoded messages. Clients supporting HTTP/1.1 MUST accept chunked-encoded responses.
 
@@ -130,6 +136,26 @@ type Response union {
 
 Note: Each Request type has a corresponding Response type.
 Every message except the Error type should end in Request/Response.
+
+#### Cachable/Non-Cachable Methods
+
+The following methods are cachable:
+
+```ipldsch
+type Request union {
+    | "IdentifyRequest" IdentifyRequest
+    | "FindProvidersRequest" FindProvidersRequest
+    | "GetIPNSRequest" GetIPNSRequest
+}
+```
+
+The following methods are non-cachable:
+
+```ipldsch
+type Request union {
+    | "PutIPNSRequest" PutIPNSRequest
+}
+```
 
 #### Error
 
