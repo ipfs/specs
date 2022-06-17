@@ -43,6 +43,8 @@ The Redirects File MUST be a text file containing one or more lines with the fol
 from to [status]
 ```
 
+Any line beginning with `#` will be treated as a comment and ignored.
+
 ## From
 
 The path to redirect from.
@@ -86,6 +88,8 @@ For example:
 
 This rule will redirect a URL like `/posts/2022/06/15/hello-world` to `/articles/2022/06/15/hello-world`.
 
+Splat logic MUST only apply to a single trailing asterisk, as this is a greedy match, consuming the remainder of the path.
+
 # Evaluation
 
 ## Subdomain Gateways
@@ -98,7 +102,7 @@ Rules MUST be evaluated in order, redirecting or rewriting using the first match
 
 ## No Forced Redirects
 
-Rules MUST only be evaluated if the requested URL or path does not resolve.  This ensures that any performance impact of evaluating redirect rules only occurs for non-existent paths.
+All redirect logic MUST only be evaluated if the requested path does not resolve.  This means that any performance impact associated with checking for the existence of a Redirects File or evaluating redirect rules will only be incurred for non-existent paths.
 
 # Error Handling
 
