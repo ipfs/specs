@@ -10,7 +10,7 @@
 
 **Abstract**
 
-The Redirect File specification is an extension of the Subdomain Gateway specification.
+The Redirect File specification is an extension of the Subdomain Gateway and DNSLink Gateway specifications.
 
 Developers can enable URL redirects or rewrites by adding redirect rules to a file named `_redirects` stored underneath the root CID of their web site.
 
@@ -26,7 +26,7 @@ This can be used, for example, to enable URL rewriting for hosting a single-page
   - [Placeholders](#placeholders)
   - [Splat](#splat)
 - [Evaluation](#evaluation)
-  - [Subdomain Gateways](#subdomain-gateways)
+  - [Subdomain or DNSLink Gateways](#subdomain-or-dnslink-gateways)
   - [Order](#order)
   - [No Forced Redirects](#no-forced-redirects)
 - [Error Handling](#error-handling)
@@ -92,9 +92,9 @@ Splat logic MUST only apply to a single trailing asterisk, as this is a greedy m
 
 # Evaluation
 
-## Subdomain Gateways
+## Subdomain or DNSLink Gateways
 
-Rules MUST only be evaluated when hosted from a Subdomain Gateway, so that we have Same-Origin isolation.
+Rules MUST only be evaluated when hosted on a Subdomain or DNSLink Gateway, so that we have [Same-Origin](https://en.wikipedia.org/wiki/Same-origin_policy) isolation.
 
 ## Order
 

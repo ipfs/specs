@@ -7,7 +7,7 @@
 
 # Summary
 
-Provide support for URL redirects and rewrites for web sites hosted on Subdomain Gateways, thus enabling support for single-page applications (SPAs).
+Provide support for URL redirects and rewrites for web sites hosted on Subdomain or DNSLink Gateways, thus enabling support for single-page applications (SPAs).
 
 # Motivation
 
@@ -15,7 +15,7 @@ Web sites often need to redirect from one URL to another, for example, to change
 
 Currently the only way to handle URL redirects or rewrites is with additional software such as NGINX sitting in front of the Gateway. This software introduces operational complexity and decreases the uniformity of experience when navigating to content hosted on a Gateway, thus decreasing the value proposition of hosting web sites in IPFS.
 
-This RFC proposes the introduction of redirect support for content hosted on Subdomain Gateways, configured via a `_redirects` file residing underneath the root CID of the web site.
+This RFC proposes the introduction of redirect support for content hosted on Subdomain or DNSLink Gateways, configured via a `_redirects` file residing underneath the root CID of the web site.
 
 # Detailed design
 
@@ -31,7 +31,7 @@ Rules in the file are evaluated top to bottom.
 
 For performance reasons this proposal does not include forced redirect support (i.e. redirect rules that are evaluated even if the `from` path exists). In other word, redirect logic will be evaluated if and only if the requested path does not exist.  If the requested path exists, we won't even check for the existence of the `_redirects` file.
 
-If a `_redirects` file exists but is unable to be processed, perhaps not even parsing correctly, errors will be returned to the user viewing the site via the Subdomain Gateway.
+If a `_redirects` file exists but is unable to be processed, perhaps not even parsing correctly, errors will be returned to the user viewing the site via the Gateway.
 
 ## Test fixtures
 
@@ -88,7 +88,7 @@ If by some chance developers are already hosting sites that contain a `_redirect
 
 ### Security
 
-This functionality will only be evaluated for Subdomain Gateways, to ensure that redirect paths are relative to the root CID hosted at a specific subdomain.
+This functionality will only be evaluated for Subdomain or DNSLink Gateways, to ensure that redirect paths are relative to the root CID hosted at the specified domain name.
 
 Parsing of the `_redirects` file should be done safely to prevent any sort of injection vector or daemon crash.
 
