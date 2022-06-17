@@ -102,6 +102,4 @@ Rules MUST only be evaluated if the requested URL or path does not resolve.  Thi
 
 # Error Handling
 
-If there is an error reading or parsing the Redirects File, the errors should be swallowed and not returned to the user.  This simplifies some edge cases in the code base.
-
-TODO: ensure this is really what we want and clarify
+If the Redirects File exists but there is an error reading or parsing it, the errors MUST be returned to the user with a 500 HTTP status code.

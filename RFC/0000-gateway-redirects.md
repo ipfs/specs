@@ -23,15 +23,15 @@ Allow developers to configure redirect support by adding redirect rules to a fil
 
 The format for the file is `from to [status]`.
 
-- `from` - specifies the URL to intercept (can include globs and placeholders)
-- `to` - specifies the URL to redirect to (can include placeholders)
-- `status` - optional status code (301 if not specified)
+- `from` - specifies the path to intercept (can include globs and placeholders)
+- `to` - specifies the path or URL to redirect to (can include placeholders)
+- `status` - optional HTTP status code (301 if not specified)
 
 Rules in the file are evaluated top to bottom.
 
 For performance reasons this proposal does not include forced redirect support (i.e. redirect rules that are evaluated even if the `from` path exists).  This means that no redirect logic will be executed unless the requested path doesn't exist.
 
-If a `_redirects` file has invalid logic, perhaps not even parsing correctly, we may want to show the errors to the user viewing the site via the Subdomain Gateway.
+If a `_redirects` file has invalid logic, perhaps not even parsing correctly, return the errors to the user viewing the site via the Subdomain Gateway.
 
 ## Test fixtures
 
@@ -75,7 +75,7 @@ using a `_redirects` file hosted at the top level of the web site.  While we do 
 
 ### User benefit
 
-Provides general URL redirect and redirect support.
+Provides general URL redirect and rewrite support.
 The primary benefit is that developers will be able to host single-page applications in IPFS.
 Pretty 404 pages will likely be the next most common use of this feature.
 
