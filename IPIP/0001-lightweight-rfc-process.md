@@ -27,13 +27,29 @@ or implementation of IPFS.
 Adopt an informal IPIP process for the [ipfs/specs][1] repository, providing a
 minimal structure for opening, reviewing, and merging specification changes.
 
-## Opening
+## Opening an improvement proposal (IPIP)
 
-Changes to IPFS specifications can be proposed by opening a PR against the
-repository, and including a short "request for change" document based on the
-template in `IPIP/0000-template.md`.
+Changes to IPFS specifications can be proposed by opening a Git pull-request
+(PR) against the repository. In addition to specification changes, such PR must
+include a short IPIP document based on the template in `IPIP/0000-template.md`.
 
-## Reviewing
+The purpose of IPIP documents is to **document motivation** behind the change
+applied to the spec. **IPIP is not to be the spec itself**.
+
+To illustrate:
+ - In order to understand how (hypothetical) WebDAV Gateway works, one would
+   read contents of specs in `ipfs/specs/WEBDAV_GATEWAY.md`.
+ - IPIP in `ipfs/specs/IPIP/000N-webdav-gateway.md` would only include
+   **Motivation** and explainer why certain design decisions were made at a
+   certain point in time. Initial `IPIP/000N-webdav-gateway.md` would explain
+   why we added WebDAV spec in the first place.
+ - If we realize the spec has a bug, we will evaluate the impact: adding more
+   details, test vectors, and editorials/cosmetics can be fixed without IPIP.
+ - Things that could cause an interop issues require a PR with fix and IPIP in
+   `ipfs/specs/IPIP/000M-webdav-fix-for-foo.md` explaining why we make the
+   breaking spec change, compatibility/migration considerations etc.
+
+## Reviewing IPIPs
 
 [Specs Stewards] will review new IPIP PRs during weekly triage.
 
@@ -41,11 +57,12 @@ IPFS Community is encouraged to participate in the review process.
 
 Final decision belongs to [Specs Stewards].
 
-## Merging
+## Merging IPIPs
 
-IPIP can be merged only after two [Specs Stewards] approve it.
+PR with a IPIP can be merged only after two [Specs Stewards] approve it and
+there are no objections from other Stewards.
 
-IPIP number is assigned before the merge.
+IPIP number is assigned before the PR merge.
 
 IPIP author and two approving [Specs Stewards] are added to `CODEOWNERS` file
 to be automatically asked to review any future changes to files added or

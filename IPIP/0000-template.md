@@ -1,4 +1,4 @@
-# IPIP 0000: Request for Change Template
+# IPIP 0000: InterPlanetary Improvement Proposal Template
 
 <!-- IPIP number will be assigned by an editor. When opening a pull request to
 submit your IPIP, please use number 0000 and an abbreviated title in the filename,
@@ -32,7 +32,8 @@ interoperable implementations.
 ## Test fixtures
 
 List relevant CIDs. Describe how implementations can use them to determine
-specification compliance.
+specification compliance. This section can be skipped if IPIP does not deal
+with the way IPFS handles content-addressed data.
 
 ## Design rationale
 
