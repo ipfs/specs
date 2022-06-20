@@ -55,7 +55,12 @@ To illustrate:
 
 IPFS Community is encouraged to participate in the review process.
 
-Final decision belongs to [Specs Stewards].
+IPIP can be either:
+- merged,
+- rejected (PR close without merging),
+- deferred (converting PR back to a draft).
+
+The final decision belongs to [Specs Stewards].
 
 ## Merging IPIPs
 
