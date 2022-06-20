@@ -14,7 +14,7 @@ for the IPFS specifications [repository][1].
 # Motivation
 
 Today, protocol design discussions often take place in a repository of an IPFS
-implementation. These conversations are unintentionally obscured from the useful input of IPFS Stewards, other
+implementation. These conversations are unintentionally obscured from the useful input of [Specs Stewards], other
 implementations, service operators and the wider IPFS Community.
 
 The IPFS Project needs a mechanism for proposing and evaluating specification
@@ -34,25 +34,25 @@ template in `RFC/0000-template.md`.
 
 ## Reviewing
 
-IPFS Stewards will review new RFC PRs during weekly triage.
+[Specs Stewards] will review new RFC PRs during weekly triage.
 
 IPFS Community is encouraged to participate in the review process.
 
-Final decision belongs to IPFS Stewards.
+Final decision belongs to [Specs Stewards].
 
 ## Merging
 
-RFC can be merged only after two Stewards approve it.
+RFC can be merged only after two [Specs Stewards] approve it.
 
 RFC number is assigned before the merge.
 
-RFC author and two approving Stewards are added to CODEOWNERS file to be
+RFC author and two approving [Specs Stewards] are added to CODEOWNERS file to be
 automatically asked to review any future changes to files added or modified
 by the RFC.
 
 ## Long-term plan
 
-IPFS Stewards will adjust the process based on usage patterns.
+[Specs Stewards] will adjust the process based on usage patterns.
 
 ## Design rationale
 
@@ -99,7 +99,7 @@ against which RFC PRs can be opened.
 Existing Git-based review infrastructure, user accounts and reputation
 system will be reused.
 
-Merging RFC will require approval from two IPFS Stewards.
+Merging RFC will require approval from two [Specs Stewards].
 
 ### Alternatives
 
@@ -115,3 +115,5 @@ Merging RFC will require approval from two IPFS Stewards.
 ### Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
+[Specs Stewards]: https://github.com/orgs/ipfs/teams/specs-stewards/members
