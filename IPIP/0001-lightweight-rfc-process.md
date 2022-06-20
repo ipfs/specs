@@ -1,4 +1,4 @@
-# RFC 0001: Lightweight RFC Process for IPFS Specifications
+# IPIP 0001: Lightweight "RFC" Process for IPFS Specifications
 
 - Start Date: 2022-06-10
 - Related Issues:
@@ -6,8 +6,9 @@
 
 # Summary
 
-This Request for Change (RFC) introduces a lightweight RFC process
-for the IPFS specifications [repository][1].
+This _InterPlanetary Improvement Proposal_ (IPIP) introduces a lightweight
+"request for comments/change" process for the IPFS specifications
+[repository][1].
 
 [1]: https://github.com/ipfs/specs/
 
@@ -23,18 +24,18 @@ or implementation of IPFS.
 
 # Detailed design
 
-Adopt an informal RFC process for the [ipfs/specs][1] repository, providing a
+Adopt an informal IPIP process for the [ipfs/specs][1] repository, providing a
 minimal structure for opening, reviewing, and merging specification changes.
 
 ## Opening
 
 Changes to IPFS specifications can be proposed by opening a PR against the
 repository, and including a short "request for change" document based on the
-template in `RFC/0000-template.md`.
+template in `IPIP/0000-template.md`.
 
 ## Reviewing
 
-[Specs Stewards] will review new RFC PRs during weekly triage.
+[Specs Stewards] will review new IPIP PRs during weekly triage.
 
 IPFS Community is encouraged to participate in the review process.
 
@@ -42,13 +43,13 @@ Final decision belongs to [Specs Stewards].
 
 ## Merging
 
-RFC can be merged only after two [Specs Stewards] approve it.
+IPIP can be merged only after two [Specs Stewards] approve it.
 
-RFC number is assigned before the merge.
+IPIP number is assigned before the merge.
 
-RFC author and two approving [Specs Stewards] are added to CODEOWNERS file to be
-automatically asked to review any future changes to files added or modified
-by the RFC.
+IPIP author and two approving [Specs Stewards] are added to `CODEOWNERS` file
+to be automatically asked to review any future changes to files added or
+modified by the IPIP.
 
 ## Long-term plan
 
@@ -63,18 +64,18 @@ Guiding principles:
 - No new tooling
   - Reuse Markdown, Git, and existing PR review process
 - Convention over Byzantine process
-  - Proposing a new RFC should have low cognitive overhead, allowing us to
+  - Proposing a new IPIP should have low cognitive overhead, allowing us to
     focus on specs
   - Reuse existing Github developer accounts and reputation attached to them
-  - One should be able to create a valid RFC without reading a long explainer
-    like this one. Looking at past RFCs, and then copying a template and
+  - One should be able to create a valid IPIP without reading a long explainer
+    like this one. Looking at past IPIPs, and then copying a template and
     opening a PR with the proposal should be more than enough.
 
 ### User benefit
 
-End users will indirectly benefit from a healthy RFC process being in place:
+End users will indirectly benefit from a healthy IPIP process being in place:
 
-- IPFS community members will be able to use RFC drafts for evaluating ideas
+- IPFS community members will be able to use IPIP drafts for evaluating ideas
   before investing time into building new things.
 - The bar for creating a brand new IPFS implementation will be lowered, and
   existing implementations will be able to propose improvements for others to
@@ -92,22 +93,22 @@ and benefit more people.
 ### Compatibility
 
 Existing contents of [ipfs/specs][1] repository act as the initial state
-against which RFC PRs can be opened.
+against which IPIP PRs can be opened.
 
 ### Security
 
 Existing Git-based review infrastructure, user accounts and reputation
 system will be reused.
 
-Merging RFC will require approval from two [Specs Stewards].
+Merging IPIP will require approval from two [Specs Stewards].
 
 ### Alternatives
 
-- Maintaining the status quo (no RFC process) is not acceptable, as we want to
+- Maintaining the status quo (no IPIP process) is not acceptable, as we want to
   move specification discussions away from repositories of specific
   implementations. We need a mechanism for discussing improvements that is not
   tied to specific implementation or language.
-- Creating more elaborate RFC process. This comes with increased overhead and
+- Creating more elaborate IPIP process. This comes with increased overhead and
   risk. Introducing a complex process requires deeper understanding of
   community needs and pitfalls of preexisting processes, and since we don't
   have any process in place, starting light, limits the risk.

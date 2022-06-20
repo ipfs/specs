@@ -1,24 +1,24 @@
-# RFC 0000: Request for Change Template
+# IPIP 0000: Request for Change Template
 
-<!-- RFC number will be assigned by an editor. When opening a pull request to
-submit your RFC, please use number 0000 and an abbreviated title in the filename,
+<!-- IPIP number will be assigned by an editor. When opening a pull request to
+submit your IPIP, please use number 0000 and an abbreviated title in the filename,
 `0000-draft-title-abbrev.md`. -->
 
-- Start Date: (format: YYYY-MM-DD)
+- Start Date: YYYY-MM-DD
 - Related Issues:
   - (add links here)
 
 # Summary
 
-<!--One paragraph explanation of the RFC.-->
-This is the suggested template for new RFCs.
+<!--One paragraph explanation of the IPIP.-->
+This is the suggested template for new IPIPs.
 
 # Motivation
 
 AKA Problem Statement
 
 Clearly explain why the existing protocol specification is inadequate
-to address the problem that the RFC solves.
+to address the problem that the IPIP solves.
 
 # Detailed design
 
