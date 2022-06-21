@@ -54,7 +54,7 @@ Requests MUST be sent as either:
   - Ephemeral HTTP `POST` request with message passed as DAG-JSON in HTTP request body
   - Suitable for bigger messages, and when HTTP caching should be skipped for the most fresh results
 
-Severs MUST support `GET` for methods marked as cacheable and MUST support `POST` for methods marked as non-cacheable.
+Severs MUST support `GET` for methods marked as cacheable and MUST support `POST` for all methods (both cacheable and not-cacheable). This allows clients to use `POST` as a fallback in case there is a technical problem with bigger Reframe messages not fitting in a `GET` URL.
 
 If a server supports HTTP/1.1, then it MAY send chunked-encoded messages. Clients supporting HTTP/1.1 MUST accept chunked-encoded responses.
 
@@ -156,24 +156,19 @@ Every message except the Error type should end in Request/Response.
 
 #### Cachable/Non-Cachable Methods
 
-The following methods are cachable:
+The following method responses are _cachable_:
 
 ```ipldsch
-type Request union {
+type CachableRequest union {
     | "IdentifyRequest" IdentifyRequest
     | "FindProvidersRequest" FindProvidersRequest
     | "GetIPNSRequest" GetIPNSRequest
 }
 ```
 
-The following methods are non-cachable:
+Methods that are not listed above are considered _non-cachable_.
 
-```ipldsch
-type Request union {
-    | "PutIPNSRequest" PutIPNSRequest
-}
-```
-
+Implementations are encouraged to improve performance of  `CachableRequest` methods by applying transport and method-specific caching strategies.
 #### Error
 
 The Error message type should be used in Responses to indicate that an error has occurred.
