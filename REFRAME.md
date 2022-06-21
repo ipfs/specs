@@ -97,6 +97,23 @@ HTTP header, allowing clients to send conditional requests with
 [`If-Modified-Since`](https://httpwg.org/specs/rfc7232.html#header.if-modified-since)
 header to specify their acceptance for stale (cached) responses.
 
+**Rate-limiting non-cachable POST requests**
+
+HTTP endpoint can return status code
+[429 Too Many Requests](https://www.rfc-editor.org/rfc/rfc6585#section-4)
+with `Retry-After` header to throttle the number of `POST` requests a client can send.
+
+The body returned with `429` response should suggest use of HTTP `GET` endpoint
+for cacheable Reframe methods:
+
+```
+HTTP/1.1 429 Too Many Requests
+Content-Type: text/plain
+Retry-After: 3600
+
+too many POST requests: consider switching to cachable GET or try again later (see Retry-After header)
+```
+
 ## Protocol Message Overview
 
 We can represent each message as an IPLD Schema to denote its abstract representation independent of the serialization scheme. 
