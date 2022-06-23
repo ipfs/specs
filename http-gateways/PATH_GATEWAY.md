@@ -76,6 +76,7 @@ where client prefers to perform all validation locally.
   - [Content resolution](#content-resolution)
     - [Finding the content root](#finding-the-content-root)
     - [Traversing remaining path](#traversing-remaining-path)
+    - [Handling traversal errors](#handling-traversal-errors)
   - [Best practices for HTTP caching](#best-practices-for-http-caching)
   - [Denylists](#denylists)
 
@@ -185,8 +186,8 @@ necessary for handling the range request.
 
 
 NOTE: for more advanced use cases such as partial DAG/CAR streaming, or
-non-UnixFS data structures,  see the  `selector` query parameter described
-below.
+non-UnixFS data structures, see the `selector` query parameter
+[proposal](https://github.com/ipfs/go-ipfs/issues/8769).
 
 ### `Service-Worker` (request header)
 
@@ -420,8 +421,10 @@ Example: `Content-Type: application/vnd.ipld.car; version=1`
 
 When no explicit response format is provided with the request, and the
 requested data itself has no built-in content type metadata, implementations
-are free to perform content type sniffing based on filename and magic bytes to
-improve the utility of produced responses.
+are free to perform content type sniffing based on file name
+(from [URL path](https://datatracker.ietf.org/doc/html/rfc3986#section-3.3),
+or optional [`filename`](#filename-request-query-parameter) parameter)
+and magic bytes to improve the utility of produced responses.
 
 For example:
 - detect plain text file
@@ -605,6 +608,14 @@ traversal based on link names,  which provides a better user experience than
 low level logical pathing from IPLD:
 
 - Example of UnixFS pathing: `/ipfs/cid/dir-name/file-name.txt`
+
+### Handling traversal errors
+
+Gateway MUST respond with HTTP error when it is not possible to traverse the requested content path:
+- [`404 Not Found`](#404-not-found) should be returned when the root CID is valid and traversable, but
+the DAG it represents does not include content path remainder.
+  - Error response body should indicate which part of immutable content path (`/ipfs/{cid}/path/to/file`) is missing
+- [`400 Bad Request`](#400-bad-request) can be used for remaining traversal errors caused by invalid or unsupported DAG types.
 
 ## Best practices for HTTP caching
 
