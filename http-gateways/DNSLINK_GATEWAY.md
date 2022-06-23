@@ -19,9 +19,9 @@ This document describes the delta between [PATH_GATEWAY.md](./PATH_GATEWAY.md) a
 In short:
 
 - HTTP request includes a valid [DNSLink](https://dnslink.dev/) name in `Host` header
+- gateway decides if DNSlink name is allowed
 - gateway resolves DNSLink to an immutable content root identified by a CID
 - HTTP response includes the data for the CID
-- No third-party CIDs can be loaded
 
 # Table of Contents
 
