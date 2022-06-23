@@ -68,6 +68,7 @@ where client prefers to perform all validation locally.
     - [`Content-Range` (response header)](#content-range-response-header)
     - [`Accept-Ranges` (response header)](#accept-ranges-response-header)
     - [`Location` (response header)](#location-response-header)
+      - [Use in directory URL normalization](#use-in-directory-url-normalization)
     - [`X-Ipfs-Path` (response header)](#x-ipfs-path-response-header)
     - [`X-Ipfs-Roots` (response header)](#x-ipfs-roots-response-header)
     - [`X-Content-Type-Options` (response header)](#x-content-type-options-response-header)
@@ -495,15 +496,18 @@ deterministic.
 
 ### `Location` (response header)
 
-Returned only when response status code is HTTP 301 redirect.
+Returned only when response status code is [`301` Moved Permanently](#301-moved-permanently).
+The value informs the HTTP client about new URL for requested resource.
+
+This header is more widely used in [SUBDOMAIN_GATEWAY.md](./SUBDOMAIN_GATEWAY.md#location-response-header).
+
+#### Use in directory URL normalization
 
 Gateway MUST return a redirect when a valid UnixFS directory was requested
 without the trailing `/`, for example:
 - response for `https://ipfs.io/ipns/en.wikipedia-on-ipfs.org/wiki`
 	(no trailing slash) will be HTTP 301 redirect with
   `Location: /ipns/en.wikipedia-on-ipfs.org/wiki/`
-
-This header is more widely used in [SUBDOMAIN_GATEWAY.md](./SUBDOMAIN_GATEWAY.md).
 
 ### `X-Ipfs-Path` (response header)
 

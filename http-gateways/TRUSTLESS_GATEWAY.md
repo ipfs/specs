@@ -30,11 +30,13 @@ The minimal implementation means:
 - [HTTP Request](#http-request)
   - [HTTP Request Headers](#http-request-headers)
     - [`Accept` (request header)](#accept-request-header)
-- [Response](#response)
+- [HTTP Response](#http-response)
   - [HTTP Response Headers](#http-response-headers)
     - [`Content-Disposition` (response header)](#content-disposition-response-header)
 
 # HTTP API
+
+A subset of [HTTP API from `PATH_GATEWAY.md`](./PATH_GATEWAY.md#http-api).
 
 ## `GET /ipfs/{cid}[?{params}]`
 
@@ -46,8 +48,7 @@ Same as GET, but does not return any payload.
 
 # HTTP Request
 
-Same as [PATH_GATEWAY.md](./PATH_GATEWAY.md), but with limited number of
-supported response types.
+Same as in [PATH_GATEWAY.md](./PATH_GATEWAY.md#http-request), but with limited number of supported response types.
 
 ## HTTP Request Headers
 
@@ -62,7 +63,9 @@ Below response types MUST to be supported:
 - [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw) – requests a single, verifiable raw block to be returned
 - [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car) – disables IPLD/IPFS deserialization, requests a verifiable CAR stream to be returned
 
-# Response
+# HTTP Response
+
+Below MUST be implemented **in addition** to the [HTTP Response section from `PATH_GATEWAY.md`](./PATH_GATEWAY.md#http-response).
 
 ## HTTP Response Headers
 

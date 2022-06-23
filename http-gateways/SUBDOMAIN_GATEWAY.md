@@ -41,6 +41,7 @@ Summary:
 - [HTTP Response](#http-response)
   - [Response Headers](#response-headers)
     - [`Location` (response header)](#location-response-header)
+      - [Use in interop with Path Gateway](#use-in-interop-with-path-gateway)
 - [Appendix: notes for implementers](#appendix-notes-for-implementers)
   - [Migrating from Path to Subdomain Gateway](#migrating-from-path-to-subdomain-gateway)
   - [DNS label limits](#dns-label-limits)
@@ -65,6 +66,8 @@ Downloads data at specified content path.
 Same as GET, but does not return any payload.
 
 # HTTP Request
+
+Below MUST be implemented **in addition** to the [HTTP Request section from `PATH_GATEWAY.md`](./PATH_GATEWAY.md#http-request).
 
 ## Request Headers
 
@@ -113,11 +116,18 @@ See [URI router](#uri-router) section for usage and implementation details.
 
 # HTTP Response
 
+Below MUST be implemented **in addition** to the [HTTP Response section from `PATH_GATEWAY.md`](./PATH_GATEWAY.md#http-response).
+
 ## Response Headers
 
 ### `Location` (response header)
 
-Returned with HTTP Status Code 301 (Moved Permanently) when `Host` header does
+Below MUST be implemented **in addition** to
+[`Location` reqirements defined in `PATH_GATEWAY.md`](./PATH_GATEWAY.md#location-response-header).
+
+#### Use in interop with Path Gateway
+
+Returned with [`301` Moved Permanently](./PATH_GATEWAY.md#301-moved-permanently) when `Host` header does
 not follow the subdomain naming convention, but the requested URL path happens
 to be a valid `/ipfs/{cid}` or `/ipfs/{name}` content path.
 

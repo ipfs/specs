@@ -33,6 +33,7 @@ In short:
 - [HTTP Request](#http-request)
   - [Request headers](#request-headers)
     - [`Host` (request header)](#host-request-header)
+- [HTTP Response](#http-response)
 - [Appendix: notes for implementers](#appendix-notes-for-implementers)
   - [Leveraging DNS for content routing](#leveraging-dns-for-content-routing)
 
@@ -50,6 +51,8 @@ Downloads data at specified path under the content path for DNSLink name provide
 Same as GET, but does not return any payload.
 
 # HTTP Request
+
+Below MUST be implemented **in addition** to the [HTTP Request section from `PATH_GATEWAY.md`](./PATH_GATEWAY.md#http-request).
 
 ## Request headers
 
@@ -82,6 +85,9 @@ content path:
 3. Resolving DNSlink at `b.example.net` replaces `/ipns/b.example.net` with `/ipfs/bafy…qy3k/path-c`
 4. The immutable content path is `/ipfs/bafy…qy3k/path-c/path-b/path-a`
 
+# HTTP Response
+
+Same as [HTTP Response section in `PATH_GATEWAY.md`](./PATH_GATEWAY.md#http-response).
 
 # Appendix: notes for implementers
 
