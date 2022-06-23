@@ -626,6 +626,11 @@ the DAG it represents does not include content path remainder.
 - Advanced caching strategies can be built using additional information in
   `X-Ipfs-Path` and `X-Ipfs-Roots` headers.
 
+- Implement support for requests sent with
+  [`Cache-Control: only-if-cached`](#cache-control-request-header).
+  It allows IPFS-aware HTTP clients to probe and prioritize gateways that
+  already have the data cached, significantly improving retrieval speeds.
+
 ## Denylists
 
 Optional, but encouraged.
