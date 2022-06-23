@@ -42,7 +42,7 @@ Summary:
   - [Response Headers](#response-headers)
     - [`Location` (response header)](#location-response-header)
 - [Appendix: notes for implementers](#appendix-notes-for-implementers)
-      - [Migrating from Path to Subdomain Gateway](#migrating-from-path-to-subdomain-gateway)
+  - [Migrating from Path to Subdomain Gateway](#migrating-from-path-to-subdomain-gateway)
   - [DNS label limits](#dns-label-limits)
   - [Security considerations](#security-considerations)
   - [URI router](#uri-router)
@@ -79,7 +79,7 @@ namespace, and finally the domain name used by the gateway.
 
 Converting `Host` into a content path depends on the nature of requested resource:
 
-- For content at  `/ipfs/{cid}`:
+- For content at `/ipfs/{cid}`:
     - `Host: {cid-mbase32}.ipfs.example.net`
         - Example: `Host: bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi.ipfs.dweb.link`
 - For content at `/ipns/{libp2p-key}`:
@@ -97,7 +97,11 @@ Converting `Host` into a content path depends on the nature of requested resourc
                 - Every remaining `--` is replaced with `-`
         - Example:
             - `example.net/ipns/en.wikipedia-on-ipfs.org` → `Host: en-wikipedia--on--ipfs-org.ipns.example.net`
-- For everything else (missing `Host`, or not following the above convention)
+- If `Host` header does not include any subdomain, but the requested path is a
+  valid content path, gateway MUST attempt to
+  [migrate from Path to Subdomain Gateway](#migrating-from-path-to-subdomain-gateway).
+- Finally, if it is impossible to construct a content path from `Host`,
+  return HTTP Error [`400` Bad Request](./PATH_GATEWAY.md#400-bad-request).
 
 ## Request Query Parameters
 
@@ -129,9 +133,13 @@ form if necessary. For example:
   to subdomain with DNSLink name correctly inlined:
   - `Location: https://en-wikipedia--on--ipfs-org.ipns.dweb.link/`
 
+See also: [Migrate from Path to Subdomain Gateway](#migrating-from-path-to-subdomain-gateway).
+
 # Appendix: notes for implementers
 
-#### Migrating from Path to Subdomain Gateway
+## Migrating from Path to Subdomain Gateway
+
+Subdomain Gateway MUST implement a redirect on paths defined in [`PATH_GATEWAY.md`](./PATH_GATEWAY.md).
 
 During the migration from a path gateway to a subdomain gateway, even though
 the [`Location`](#location-response-header) header is present, some clients may
