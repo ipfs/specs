@@ -79,14 +79,14 @@ namespace, and finally the domain name used by the gateway.
 
 Converting `Host` into a content path depends on the nature of requested resource:
 
-- For content at  `/ipfs/{cid}`
+- For content at  `/ipfs/{cid}`:
     - `Host: {cid-mbase32}.ipfs.example.net`
         - Example: `Host: bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi.ipfs.dweb.link`
-- For content at `/ipns/{libp2p-key}`
+- For content at `/ipns/{libp2p-key}`:
     - `Host: {libp2p-key-mbase36}.ipns.example.net`
         - Example: `Host: k2k4r8jl0yz8qjgqbmc2cdu5hkqek5rj6flgnlkyywynci20j0iuyfuj.ipns.dweb.link`
         - Note: Base36 must be used to ensure CIDv1 with ED25519 fits in a single DNS label (63 characters).
-- For content at `/ipns/{dnslink-name}`
+- For content at `/ipns/{dnslink-name}`:
     - `Host: {inlined-dnslink-name}.ipns.example.net`
         - DNSLink names include `.` which means they  MUST be inlined into a single DNS label to provide unique origin and work with wildcard TLS certificates.
             - DNSLink label encoding:

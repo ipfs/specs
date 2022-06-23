@@ -59,7 +59,7 @@ Gateway is free to return HTTP 400 Bad Request when running in strict trustless
 mode and  `Accept` header is missing
 
 Below response types MUST to be supported:
-- [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw) – requests a singe, verifiable raw block to be returned
+- [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw) – requests a single, verifiable raw block to be returned
 - [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car) – disables IPLD/IPFS deserialization, requests a verifiable CAR stream to be returned
 
 # Response
