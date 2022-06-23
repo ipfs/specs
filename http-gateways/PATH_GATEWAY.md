@@ -30,6 +30,7 @@ where client prefers to perform all validation locally.
 - [HTTP API](#http-api)
   - [`GET /ipfs/{cid}[/{path}][?{params}]`](#get-ipfscidpathparams)
   - [`HEAD /ipfs/{cid}[/{path}][?{params}]`](#head-ipfscidpathparams)
+    - [only-if-cached HEAD behavior](#only-if-cached-head-behavior)
   - [`GET /ipns/{name}[/{path}][?{params}]`](#get-ipnsnamepathparams)
   - [`HEAD /ipns/{name}[/{path}][?{params}]`](#head-ipnsnamepathparams)
 - [HTTP Request](#http-request)
@@ -51,6 +52,8 @@ where client prefers to perform all validation locally.
     - [`400` Bad Request](#400-bad-request)
     - [`404` Not Found](#404-not-found)
     - [`410` Gone](#410-gone)
+    - [`412` Precondition Failed](#412-precondition-failed)
+      - [Use with only-if-cached](#use-with-only-if-cached)
     - [`429` Too Many Requests](#429-too-many-requests)
     - [`451` Unavailable For Legal Reasons](#451-unavailable-for-legal-reasons)
     - [`500` Internal Server Error](#500-internal-server-error)
@@ -101,7 +104,7 @@ such as
 and [`Content-Type`](#content-type-response-header).
 <!-- TODO add [`X-Ipfs-DataSize`](#x-ipfs-datasize-response-header) -->
 
-**only-if-cached HEAD behavior**
+### only-if-cached HEAD behavior
 
 HTTP client can send `HEAD` request with
 [`Cache-Control: only-if-cached`](#cache-control-request-header)
@@ -154,12 +157,8 @@ gateway already has the data (e.g. in local datastore) and can return it
 immediately.
 
 If data is not cached locally, and the response requires an expensive remote
-fetch, a 412 Precondition Failed HTTP status code should be returned by the
-gateway without any payload or specific HTTP headers.
-
-The code 412 is used instead of 504 because only-if-cached is handled by the
-gateway itself, moving the error to client error range and avoiding confusing
-server errors in places like the browser console.
+fetch, a [`412 Precondition Failed`](#412-precondition-failed) HTTP status code
+should be returned by the gateway without any payload or specific HTTP headers.
 
 <!-- TODO: https://github.com/ipfs/go-ipfs/issues/8783 -->
 
@@ -287,6 +286,22 @@ Particularly useful for implementing [deny lists](#denylists), in order to not s
 The name of deny list and unique identifier of blocked entries can be provided in the response body.
 
 See: [Denylists](#denylists)
+
+### `412` Precondition Failed
+
+Error to indicate that request was formally correct, but Gateway is unable to
+return requested data under the additional (usually cache-related) conditions
+sent by the client.
+
+#### Use with only-if-cached
+
+- Client sends a request with [`Cache-Control: only-if-cached`](#cache-control-request-header)
+- Gateway does not have requested CIDs in local datastore, and is unable to
+  fetch them from other peers due to `only-if-cached` condition
+- Gateway returns status code `412` to the client
+  - The code 412 is used instead of 504 because `only-if-cached` is handled by
+    the gateway itself, moving the error to client error range and avoiding
+    confusing server errors in places like the browser console.
 
 ### `429` Too Many Requests
 
