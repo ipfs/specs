@@ -72,6 +72,7 @@ where client prefers to perform all validation locally.
     - [`X-Ipfs-Path` (response header)](#x-ipfs-path-response-header)
     - [`X-Ipfs-Roots` (response header)](#x-ipfs-roots-response-header)
     - [`X-Content-Type-Options` (response header)](#x-content-type-options-response-header)
+    - [`X-Trace-Id` (response header)](#x-trace-id-response-header)
   - [Response Payload](#response-payload)
 - [Appendix: notes for implementers](#appendix-notes-for-implementers)
   - [Content resolution](#content-resolution)
@@ -562,6 +563,13 @@ Optional, present in certain response types:
   followed and not be changed. This is a security feature, ensures that
   non-executable binary response types are not used in `<script>` and `<style>`
   HTML tags.
+
+### `X-Trace-Id` (response header)
+
+Optional. Implementations are free to use this header to return a globally
+unique identifier to help in debugging errors and performance issues.
+
+A good practice is to always return it with HTTP error [status codes](#response-status-codes) >=`400`.
 
 ## Response Payload
 
