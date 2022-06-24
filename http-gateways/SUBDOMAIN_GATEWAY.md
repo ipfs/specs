@@ -44,6 +44,7 @@ Summary:
   - [Response Headers](#response-headers)
     - [`Location` (response header)](#location-response-header)
       - [Use in interop with Path Gateway](#use-in-interop-with-path-gateway)
+      - [Use in URI router](#use-in-uri-router)
 - [Appendix: notes for implementers](#appendix-notes-for-implementers)
   - [Migrating from Path to Subdomain Gateway](#migrating-from-path-to-subdomain-gateway)
   - [DNS label limits](#dns-label-limits)
@@ -176,6 +177,10 @@ form if necessary. For example:
 
 See also: [Migrate from Path to Subdomain Gateway](#migrating-from-path-to-subdomain-gateway).
 
+#### Use in URI router
+
+See: [URI router](#uri-router)
+
 # Appendix: notes for implementers
 
 ## Migrating from Path to Subdomain Gateway
@@ -226,8 +231,9 @@ should return HTTP 400 Bad Request for CIDs longer than 63.
 - Subdomain gateways provide unique origin per content root, however the
   origins still share the parent domain name used by the gateway. To fully
   isolate websites from each other:
-    - The gateway operator should add a wildcard entry to
-      [https://publicsuffix.org](https://publicsuffix.org/)  (PSL).
+
+    - The gateway operator should add a wildcard entry
+      to the [Public Suffix List](https://publicsuffix.org/) (PSL).
         - Example: `dweb.link` gateway [is listed on PSL](https://publicsuffix.org/list/public_suffix_list.dat) as `*.dweb.link`
     - Web browsers with IPFS support should detect subdomain gateway (URL
       pattern `https://{content-root-id}.ip[f|n]s.example.net`) and dynamically
