@@ -36,6 +36,8 @@ Summary:
 - [HTTP Request](#http-request)
   - [Request Headers](#request-headers)
     - [`Host` (request header)](#host-request-header)
+    - [`X-Forwarded-Proto` (request header)](#x-forwarded-proto-request-header)
+    - [`X-Forwarded-Host` (request header)](#x-forwarded-host-request-header)
   - [Request Query Parameters](#request-query-parameters)
     - [`uri` (request query parameter)](#uri-request-query-parameter)
 - [HTTP Response](#http-response)
@@ -106,6 +108,35 @@ Converting `Host` into a content path depends on the nature of requested resourc
 - Finally, if it is impossible to construct a content path from `Host`,
   return HTTP Error [`400` Bad Request](./PATH_GATEWAY.md#400-bad-request).
 
+
+### `X-Forwarded-Proto` (request header)
+
+Optional. Allows `http://` gateway implementation to be deployed behind
+reverse proxies that provide TLS (`https://`) termination.
+
+Setting `X-Forwarded-Proto: https` on reverse proxy informs gateway
+implementation that it MUST:
+
+1. set all absolute redirect URLs to `https://` (not `http://`)
+2. inline DNSLink names to fit in a single DNS label, making it compatible with
+   a single wildcard TLS certificate:
+
+Example (GET with `X-Forwarded-Proto: https`):
+
+- `GET http://dweb.link/ipfs/{cid}` → HTTP 301 with `Location: https://{cid}.ipfs.dweb.link`
+- `GET http://dweb.link/ipns/your-dnslink.site.example.com` → HTTP 301 with `Location: https://your--dnslink-site-example-com.ipfs.dweb.link`
+
+### `X-Forwarded-Host` (request header)
+
+Optional. Enables Path Gateway requests to be redirected to a Subdomain Gateway
+on a different domain name.
+
+See also: [migrating from Path to Subdomain Gateway](#migrating-from-path-to-subdomain-gateway).
+
+Example (GET with `X-Forwarded-Host: example.com`):
+
+- `GET https://dweb.link/ipfs/{cid}` → HTTP 301 with `Location: https://{cid}.ipfs.example.com`
+
 ## Request Query Parameters
 
 ### `uri` (request query parameter)
@@ -151,6 +182,11 @@ See also: [Migrate from Path to Subdomain Gateway](#migrating-from-path-to-subdo
 
 Subdomain Gateway MUST implement a redirect on paths defined in [`PATH_GATEWAY.md`](./PATH_GATEWAY.md).
 
+HTTP redirect will route path requests to correct subdomains on the same domain
+name, unless [`X-Forwarded-Host`](#x-forwarded-host-request-header) is present.
+
+**NOTE:**
+
 During the migration from a path gateway to a subdomain gateway, even though
 the [`Location`](#location-response-header) header is present, some clients may
 check for HTTP 200, and consider other responses as invalid.
@@ -183,6 +219,9 @@ should return HTTP 400 Bad Request for CIDs longer than 63.
 - Wildcard TLS certificates should be set for `*.ipfs.example.net` and
   `*.ipns.example.net` if a subdomain gateway is to be exposed on the public
   internet.
+  - If TLS termination takes place outside of gateway implementation, then
+    setting [`X-Forwarded-Proto`](#x-forwarded-proto-request-header) at a
+    reverse HTTP proxy can be used for preserving `https` protocol.
 
 - Subdomain gateways provide unique origin per content root, however the
   origins still share the parent domain name used by the gateway. To fully
