@@ -10,7 +10,7 @@
 
 **Abstract**
 
-The Redirect File specification is an extension of the Subdomain Gateway and DNSLink Gateway specifications.
+The Redirects File specification is an extension of the Subdomain Gateway and DNSLink Gateway specifications.
 
 Developers can enable URL redirects or rewrites by adding redirect rules to a file named `_redirects` stored underneath the root CID of their web site.
 
