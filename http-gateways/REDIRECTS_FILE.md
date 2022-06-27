@@ -61,6 +61,8 @@ An optional integer specifying the HTTP status code to return from the request. 
 - `302` - Temporary Redirect
 - `404` - Not Found
   - Useful for redirecting invalid URLs to a pretty 404 page.
+- `410` - Gone
+- `451` - Unavailable For Legal Reasons  
 - `200` - OK
   - Redirect will be treated as a rewrite, returning OK without changing the URL in the browser.
 
