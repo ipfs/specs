@@ -33,6 +33,8 @@ For performance reasons this proposal does not include forced redirect support (
 
 If a `_redirects` file exists but is unable to be processed, perhaps not even parsing correctly, errors will be returned to the user viewing the site via the Gateway.
 
+The detailed specification is added in `http-gateways/REDIRECTS_FILE.md`.
+
 ## Test fixtures
 
 A sample site can be found in QmaiAcL7pFedPJXxNJNDVDTUR78We7yBhdLzg151ZMzLCv.  This CID is associated with a CAR file used for test cases in the initial implementation of this feature in go-ipfs.
