@@ -81,6 +81,7 @@ where client prefers to perform all validation locally.
     - [Handling traversal errors](#handling-traversal-errors)
   - [Best practices for HTTP caching](#best-practices-for-http-caching)
   - [Denylists](#denylists)
+  - [Generated HTML with directory index](#generated-html-with-directory-index)
 
 # HTTP API
 
@@ -579,7 +580,7 @@ Data sent with HTTP response depends on the type of requested IPFS resource:
   - File
     - Bytes representing file contents
   - Directory
-    - Generated HTML with directory index, and/or link to CAR with directory DAG
+    - Generated HTML with directory index (see [additional notes here](#generated-html-with-directory-index))
     - When `index.html` is present, gateway can skip generating directory index and return it instead
 - Raw block
   - Opaque bytes, see [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw)
@@ -663,3 +664,30 @@ operator is able to inspect and modify the list of denylists that are applied.
   that have been flagged for various reasons (copyright violation, malware,
   etc). Each entry is `sha256()` hashed so that it can easily be checked given
   a plaintext CID, but inconvenient to determine otherwise.
+
+## Generated HTML with directory index
+
+While implementations are free to decide on the way HTML directory listing is
+generated and presented to the user, following below suggestions is advised.
+
+Linking to alternative response types such as CAR and dag-json allows clients
+to consume directory listings programmatically without the need for parsing HTML.
+
+Directory index response time should not grow with the number of items in a directory.
+It should be always fast, even when a directory has 10k of items.
+
+The usual optimizations involve:
+
+- Skipping size and type resolution for child UnixFS items, and using `Tsize`
+  from [logical format](https://ipld.io/specs/codecs/dag-pb/spec/#logical-format)
+  instead, allows gateway to respond much faster, as it no longer need to fetch
+  root nodes of child items.
+  - Additional information about child nodes can be fetched lazily
+    with JS, but only for items in the browser's viewport.
+
+- Alternative approach is resolving child items, but providing pagination UI.
+  - Opening a big directory can return HTTP 302 to the current URL with
+    additional query parameters (`?page=0&limit=100`),
+    limiting the cost of a single page load.
+  - The downside of this approach is that it will always be slower than
+    skipping child block resolution.
