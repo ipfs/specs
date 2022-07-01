@@ -1,0 +1,4 @@
+# Spec Stewards defined below are automatically requested for review when
+# someone opens a pull request that modifies area of their interest.
+
+http-gateways/  @lidel

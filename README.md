@@ -29,14 +29,12 @@ The specs contained in this repository are:
   - [Protocol Architecture Overview](./ARCHITECTURE.md) - the top-level spec and the stack
   - [Other IPFS Overviews](/overviews) - quick overviews of the various parts of IPFS
 - **User Interface (aka Public APIs):**
-  - [Core API (aka using IPFS as a package/module)](./API_CORE.md)
-    - [JavaScript Interface](https://github.com/ipfs/interface-js-ipfs-core)
-    - [Golang Interface](https://github.com/ipfs/interface-go-ipfs-core)
-  - [CLI (the ipfs daemon API)](./API_CLI.md)
-  - [HTTP API](./API_HTTP.md)
-  - HTTP Gateway
+  - [HTTP Gateways](./http-gateways/README.md) - implementation agnostic interfaces for accessing content-addressed data over HTTP
+  - IPFS implementations may provide additional interfaces, for example:
+    - [HTTP RPC API exposed by go-ipfs](https://docs.ipfs.io/reference/http/api/)
+    - [Programmatic Core API for JavaScript](https://github.com/ipfs/js-ipfs/tree/master/docs/core-api#readme)
 - **Data Formats:**
-  - [IPLD](https://github.com/ipld/spec) - InterPlanetary Linked Data.
+  - [IPLD](https://ipld.io/specs/) - InterPlanetary Linked Data.
   - [Merkle DAG (Deprecated)](./MERKLE_DAG.md)
   - Self Describing Formats ([multiformats](http://github.com/multiformats/multiformats)):
     - [multihash](https://github.com/multiformats/multihash) - self-describing hash digest format.
