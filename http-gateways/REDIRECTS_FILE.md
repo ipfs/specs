@@ -30,6 +30,8 @@ This can be used, for example, to enable URL rewriting for hosting a single-page
   - [Order](#order)
   - [No Forced Redirects](#no-forced-redirects)
 - [Error Handling](#error-handling)
+- [Appendix: notes for implementors](#appendix-notes-for-implementors)
+  - [Test fixtures](#test-fixtures)
 
 # File Name and Location
 
@@ -109,3 +111,38 @@ All redirect logic MUST only be evaluated if the requested path does not resolve
 # Error Handling
 
 If the Redirects File exists but there is an error reading or parsing it, the errors MUST be returned to the user with a 500 HTTP status code.
+
+# Appendix: notes for implementors
+
+## Test fixtures
+
+A sample site can be found in QmaiAcL7pFedPJXxNJNDVDTUR78We7yBhdLzg151ZMzLCv.  This CID is associated with a CAR file used for test cases in the initial implementation of this feature in go-ipfs.
+
+```
+$ ipfs ls /ipfs/QmaiAcL7pFedPJXxNJNDVDTUR78We7yBhdLzg151ZMzLCv/
+Qmd9GD7Bauh6N2ZLfNnYS3b7QVAijbud83b8GE8LPMNBBP 7   404.html
+QmdhCvSuBvrgXuWqAvierrtLs4dez1AJmrfRRQm41od1Rb 275 _redirects
+QmaWDLb4gnJcJbT1Df5X3j91ysiwkkyxw6329NLiC1KMDR -   articles/
+QmS6ZNKE9s8fsHoEnArsZXnzMWijKddhXXDsAev8LdTT5z 9   index.html
+QmNwEgMrExwSsE8DCjZjahYfHUfkSWRhtqSkQUh4Fk3udD 7   one.html
+QmVe2GcTbEPZkMbjVoQ9YieVGKCHmuHMcJ2kbSCzuBKh2s -   redirected-splat/
+QmUGVnZaofnd5nEDvT2bxcFck7rHyJRbpXkh9znjrJNV92 7   two.html
+```
+
+The `_redirects` file is as follows.
+
+```
+$ ipfs cat /ipfs/QmaiAcL7pFedPJXxNJNDVDTUR78We7yBhdLzg151ZMzLCv/_redirects
+/redirect-one /one.html
+/301-redirect-one /one.html 301
+/302-redirect-two /two.html 302
+/200-index /index.html 200
+/posts/:year/:month/:day/:title /articles/:year/:month/:day/:title 301
+/splat/:splat /redirected-splat/:splat 301
+/not-found/* /404.html 404
+/* /index.html 200
+```
+
+The non-existent paths that are being requested should be intercepted and redirected to the destination path and the specified HTTP status code returned. The rules are evaluated in the order they appear in the file.
+
+Any request for an existing file should be returned as is, and not intercepted by the last catch all rule.
