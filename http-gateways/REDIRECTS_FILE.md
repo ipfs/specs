@@ -30,6 +30,7 @@ This can be used, for example, to enable URL rewriting for hosting a single-page
   - [Order](#order)
   - [No Forced Redirects](#no-forced-redirects)
 - [Error Handling](#error-handling)
+- [Security](#security)
 - [Appendix: notes for implementors](#appendix-notes-for-implementors)
   - [Test fixtures](#test-fixtures)
 
@@ -111,6 +112,12 @@ All redirect logic MUST only be evaluated if the requested path does not resolve
 # Error Handling
 
 If the Redirects File exists but there is an error reading or parsing it, the errors MUST be returned to the user with a 500 HTTP status code.
+
+# Security
+
+This functionality will only be evaluated for Subdomain or DNSLink Gateways, to ensure that redirect paths are relative to the root CID hosted at the specified domain name.
+
+Parsing of the `_redirects` file should be done safely to prevent any sort of injection vector or daemon crash.
 
 # Appendix: notes for implementors
 

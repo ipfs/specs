@@ -60,12 +60,6 @@ Pretty 404 pages will likely be the next most common use of this feature.
 
 If by some chance developers are already hosting sites that contain a `_redirects` file that does something else, they may need to update the contents of the file to match the new functionality. Errors returned to the user due to parsing errors will guide them regarding the required updates.
 
-### Security
-
-This functionality will only be evaluated for Subdomain or DNSLink Gateways, to ensure that redirect paths are relative to the root CID hosted at the specified domain name.
-
-Parsing of the `_redirects` file should be done safely to prevent any sort of injection vector or daemon crash.
-
 ### Alternatives
 
 - There was some discussion early on about a [manifest file](https://github.com/ipfs/specs/issues/257) that could be used to configure redirect support in addition to many other things. While the idea of a manifest file has merit, manifest files are much larger in scope and it became challenging to reach agreement on functionality to include. There is already a large need for redirect support for SPAs, and this proposal allows us to provide that critical functionality without being hampered by further design discussion around manifest files. In addition, similar to how Netlify allows redirect support to be configured in either a `_redirects` file or a more general [configuration file](https://docs.netlify.com/configure-builds/file-based-configuration/#redirects), there is nothing precluding IPFS from allowing developers to configure redirect support in an app manifest later on.
