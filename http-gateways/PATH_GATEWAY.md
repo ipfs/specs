@@ -388,10 +388,6 @@ Returned directive depends on requested content path and format:
   - If TTL value is unknown, implementations are free to set it to a static
     value, but it should not be lower than 60 seconds.
 
-- `Cache-Control: no-cache, no-transform`  should be returned with
-  `application/vnd.ipld.car` responses if the block order in CAR stream is not
-  guaranteed to be deterministic.
-
 ### `Last-Modified` (response header)
 
 Optional, used as additional hint for HTTP caching.
