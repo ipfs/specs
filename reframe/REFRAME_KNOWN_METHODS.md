@@ -295,7 +295,7 @@ There are a a few semantics relevant to the construction of a ProvideRequest:
   1. Create the ProviderRequest struct, with empty bytes for Signature
   2. Serialize the ProviderRequest as DagJSON
   3. Hash the serialization with Sha256
-  4. Sign the Hash using the keypair associated wit hthe Provider.ID
+  4. Sign the Hash using the keypair associated with the Provider.ID
 
 
 ##### DAG-JSON Examples
