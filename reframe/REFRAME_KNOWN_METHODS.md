@@ -270,13 +270,33 @@ A message for indicating that the client is able to act as a provider for a give
 ```ipldsch
     type ProvideRequest struct 
         Key &Any
-        Providers [Provider]
+        Provider Provider
+        Timestamp Integer
+        AdvisoryTTL Integer
+        Signature Bytes
     }
 
-    type ProvideResponse struct {}
+    type ProvideResponse struct {
+        AdvisoryTTL Integer
+    }
 ```
 
-Note: While the Key is a CID it is highly recommended that server implementations treat these Requests as if they were for the multihash.
+Note: While the Key is a CID, it is highly recommended that server implementations treat these Requests as if they were for the multihash.
+
+There are a a few semantics relevant to the construction of a ProvideRequest:
+
+* The timestamp should be the current unix timestamp, encoded in an int64
+* AdvistoryTTL may list the time for which the provider desires the content will remain available. If the provider cannot not anticipate how long the content will remain available, it may use a 0 value for this field.
+* The AdvisoryTTL response may provide an expectation from the reframe endpoint of how long the content will remain available.
+  * If it is less than the requested TTL from the request, it indicates that the client should re-issue a ProvideRequest for the content by that point.
+  * If it is greater than the clients request, it indicates that the client may be perceived as responsible for the content for up to that amount of time.
+  * If it is 0, the endpoint is indicating it cannot make any claims about the lifetime of the request.
+* Construction of the Signature is performed as follows:
+  1. Create the ProviderRequest struct, with empty bytes for Signature
+  2. Serialize the ProviderRequest as DagJSON
+  3. Hash the serialization with Sha256
+  4. Sign the Hash using the keypair associated wit hthe Provider.ID
+
 
 ##### DAG-JSON Examples
 
