@@ -32,6 +32,7 @@ All messages sent in HTTP body MUST be encoded as DAG-JSON and use explicit cont
 Requests MUST be sent as either:
 - `GET /reframe/{mbase64url-dag-cbor}`
   - Cachable HTTP `GET` requests with message passed as DAG-CBOR in HTTP path segment, encoded as URL-safe [`base64url` multibase](https://docs.ipfs.io/concepts/glossary/#base64url) string
+    - DAG-CBOR in multibase `base64url` is used instead of DAG-JSON because JSON may include characters that are not safe to be used in URLs, and re-encoding JSON in base would take too much space
   - Suitable for sharing links, sending smaller messages, and when a query result MUST benefit from HTTP caching (see _HTTP Caching Considerations_ below).
 - `POST /reframe`
   - Ephemeral HTTP `POST` request with message passed as DAG-JSON in HTTP request body
