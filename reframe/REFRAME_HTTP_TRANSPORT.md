@@ -76,7 +76,7 @@ header, which will skip when the response message did not change.
 
 ### Client controls for time-based caching
 
-Implementations MUST always return
+Implementations can also return (optional) 
 [`Last-Modified`](https://httpwg.org/specs/rfc7232.html#header.last-modified)
 HTTP header, allowing clients to send conditional requests with
 [`If-Modified-Since`](https://httpwg.org/specs/rfc7232.html#header.if-modified-since)
