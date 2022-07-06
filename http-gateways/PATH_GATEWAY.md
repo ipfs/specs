@@ -37,6 +37,7 @@ where client prefers to perform all validation locally.
   - [Request Headers](#request-headers)
     - [`If-None-Match` (request header)](#if-none-match-request-header)
     - [`Cache-Control` (request header)](#cache-control-request-header)
+      - [`only-if-cached`](#only-if-cached)
     - [`Accept` (request header)](#accept-request-header)
     - [`Range` (request header)](#range-request-header)
     - [`Service-Worker` (request header)](#service-worker-request-header)
@@ -156,6 +157,8 @@ would be sent with response. Positive match MUST return HTTP status code 304
 
 Used for HTTP caching.
 
+#### `only-if-cached`
+
 Client can send `Cache-Control: only-if-cached` to request data only if the
 gateway already has the data (e.g. in local datastore) and can return it
 immediately.
@@ -164,7 +167,11 @@ If data is not cached locally, and the response requires an expensive remote
 fetch, a [`412 Precondition Failed`](#412-precondition-failed) HTTP status code
 should be returned by the gateway without any payload or specific HTTP headers.
 
-<!-- TODO: https://github.com/ipfs/go-ipfs/issues/8783 -->
+NOTE: when processing a request for a DAG, traversing it and checking every CID
+might be too expensive. Implementations are free to implement own heuristics to
+maximize cache hits while minimizing performance cost of checking if the entire
+DAG is locally cached. A good rule of thumb is to at the minimum test if the root
+block is in the local cache.
 
 ### `Accept` (request header)
 
