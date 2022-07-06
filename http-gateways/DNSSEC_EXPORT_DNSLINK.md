@@ -1,4 +1,9 @@
-# ![](https://img.shields.io/badge/status-draft-yellow.svg?style=flat-square) Gateway: DNSSEC proofs for DNSLink responses
+# IPIP 0000: Gateway-provided DNSSEC proofs for DNSLink responses
+- Start Date: 2022-07-06
+- Related Issues:
+  - https://github.com/ipfs/kubo/issues/8799
+  - https://github.com/ipfs/kubo/issues/6129
+
 ## Summary
 IPFS is connected to DNS through a standard called DNSLink. DNSLink allows a DNS TXT record for a domain to point to an IPNS address or IPFS content ID (CID). This specification describes a method for providing proof to the requesting client that the DNS mapping is provided by honest/trusted name servers and that the IPFS address pointed to by the TXT record corresponds to the content received by the client.
 
@@ -42,7 +47,7 @@ This proposal reduces the trust needed by a client, and allows honest gateways t
 - Cryptographic primitives are assumed to be secure.
 - A gateway can attempt provide either a false DNSSEC proof or incorrect IPFS content and is therefore untrusted.
 
-## System Design
+## Detailed Design
 ### Components
 1. HTTPS-capable client (likely in a browser)
 2. IPFS gateway
@@ -294,7 +299,7 @@ struct Ds {
 }
 ```
 
-### Security Risk
+### Security 
 DDoS Amplification: For each request to the gateway, a request must be made to the resolver and to IPFS, leading to several server-side computations. However, This information is cacheable, which should reduce the risk.
 
 
@@ -302,3 +307,7 @@ DDoS Amplification: For each request to the gateway, a request must be made to t
 The DNS query (via DNSLink) will often not resolve to a CID. It may resolve to either a CID with a subresource (e.g. /ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme) or it may resolve to an IPNS name (e.g. /ipns/QmSrPmbaUKA3ZodhzPWZnpFgcPMFWF4QsxXbkWfEptTBJd). Regarding subresources: our choice is either to have the client do the recursive resolution, or do the resolution on the server side. As the point of this spec is to avoid client side DNSSEC resolutions, it would probably make more sense to go with the second approach. However, this second approach may involve adding new headers to the CAR.
 
 Regarding IPNS names: we can most likely serialize the IPNS proof using similar techniques as described above.
+
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
