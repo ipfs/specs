@@ -97,7 +97,7 @@ Finally, the network nodes may also republish their records, so that the records
 
 ## API Spec
 
-  - [API_CORE](https://github.com/ipfs/specs/blob/master/API_CORE.md
+  - [API_CORE](https://github.com/ipfs/specs/blob/master/API_CORE.md)
 
 ## Implementations
 
