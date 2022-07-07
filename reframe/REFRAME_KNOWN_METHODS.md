@@ -10,7 +10,7 @@
 
 **Abstract**
 
-This document is defining known method types and semantics.
+This document is defining known methods (request-response message types) and semantics.
 
 # Organization of this document
 
@@ -59,7 +59,7 @@ Every message except the Error type should end in Request/Response.
 
 ## Cachable/Non-Cachable Methods
 
-The following method responses are _cachable_:
+The following methods (request-response pairs) are _cachable_:
 
 ```ipldsch
 type CachableRequest union {
