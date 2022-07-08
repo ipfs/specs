@@ -49,9 +49,10 @@ Changes to IPFS specifications can be proposed by opening a Git pull-request
 (PR) against the `ipfs/specs` repository.
 
 In addition to specification changes, such PR must include a short **IPIP
-document** based on the template in `ipfs/specs/IPIP/0000-template.md`.
+document** based on the template in [`ipfs/specs/IPIP/0000-template.md`](./0000-template.md).
 
-When a new specification is added, `ipfs/specs/template.md` can be used.
+When a new specification file is added to the repo, it should be based on
+the template at [`ipfs/specs/template.md`](../template.md).
 
 ### Reviewing IPIPs
 
