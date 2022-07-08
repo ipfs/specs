@@ -8,19 +8,19 @@ submit your IPIP, please use number 0000 and an abbreviated title in the filenam
 - Related Issues:
   - (add links here)
 
-# Summary
+## Summary
 
 <!--One paragraph explanation of the IPIP.-->
 This is the suggested template for new IPIPs.
 
-# Motivation
+## Motivation
 
 AKA Problem Statement
 
 Clearly explain why the existing protocol specification is inadequate
 to address the problem that the IPIP solves.
 
-# Detailed design
+## Detailed design
 
 AKA Solution Proposal
 

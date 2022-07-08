@@ -4,7 +4,7 @@
 - Related Issues:
   - [ipfs/specs/issues/286](https://github.com/ipfs/specs/issues/286)
 
-# Summary
+## Summary
 
 This _InterPlanetary Improvement Proposal_ (IPIP) introduces a lightweight
 "request for comments/change" process for the IPFS specifications
@@ -12,7 +12,7 @@ This _InterPlanetary Improvement Proposal_ (IPIP) introduces a lightweight
 
 [1]: https://github.com/ipfs/specs/
 
-# Motivation
+## Motivation
 
 Today, protocol design discussions often take place in a repository of an IPFS
 implementation. These conversations are unintentionally obscured from the useful input of [Specs Stewards], other
@@ -22,7 +22,7 @@ The IPFS Project needs a mechanism for proposing and evaluating specification
 improvements that are not tied to a specific programming language
 or implementation of IPFS.
 
-# Detailed design
+## Detailed design
 
 Adopt an informal IPIP process for the [ipfs/specs][1] repository, providing a
 minimal structure for opening, reviewing, and merging specification changes.
@@ -31,19 +31,19 @@ The purpose of IPIP documents is to **document motivation** behind the change
 applied to the spec. **IPIP is not to be the spec itself**.
 
 To illustrate:
- - In order to understand how (hypothetical) WebDAV Gateway works, one would
-   read contents of specs in `ipfs/specs/WEBDAV_GATEWAY.md`.
- - IPIP in `ipfs/specs/IPIP/000N-webdav-gateway.md` would only include
-   **Motivation** and explainer why certain design decisions were made at a
-   certain point in time. Initial `IPIP/000N-webdav-gateway.md` would explain
-   why we added WebDAV spec in the first place.
- - If we realize the spec has a bug, we will evaluate the impact: adding more
-   details, test vectors, and editorials/cosmetics can be fixed without IPIP.
- - Things that could cause an interop issues require a PR with fix and IPIP in
-   `ipfs/specs/IPIP/000M-webdav-fix-for-foo.md` explaining why we make the
-   breaking spec change, compatibility/migration considerations etc.
+- In order to understand how (hypothetical) WebDAV Gateway works, one would
+  read contents of specs in `ipfs/specs/WEBDAV_GATEWAY.md`.
+- IPIP in `ipfs/specs/IPIP/000N-webdav-gateway.md` would only include
+  **Motivation** and explainer why certain design decisions were made at a
+  certain point in time. Initial `IPIP/000N-webdav-gateway.md` would explain
+  why we added WebDAV spec in the first place.
+- If we realize the spec has a bug, we will evaluate the impact: adding more
+  details, test vectors, and editorials/cosmetics can be fixed without IPIP.
+- Things that could cause an interop issues require a PR with fix and IPIP in
+  `ipfs/specs/IPIP/000M-webdav-fix-for-foo.md` explaining why we make the
+  breaking spec change, compatibility/migration considerations etc.
 
-## Opening an improvement proposal (IPIP)
+### Opening an improvement proposal (IPIP)
 
 Changes to IPFS specifications can be proposed by opening a Git pull-request
 (PR) against the `ipfs/specs` repository.
@@ -53,7 +53,7 @@ document** based on the template in `ipfs/specs/IPIP/0000-template.md`.
 
 When a new specification is added, `ipfs/specs/template.md` can be used.
 
-## Reviewing IPIPs
+### Reviewing IPIPs
 
 [Specs Stewards] will review new IPIP PRs during periodical (best-effort) triage.
 
@@ -66,7 +66,7 @@ IPIP can be either:
 
 The final decision belongs to [Specs Stewards].
 
-## Merging IPIPs
+### Merging IPIPs
 
 PR with a IPIP can be merged only after two [Specs Stewards] approve it and
 there are no objections from other Stewards.
@@ -77,7 +77,7 @@ IPIP author and two approving [Specs Stewards] are added to `CODEOWNERS` file
 to be automatically asked to review any future changes to files added or
 modified by the IPIP.
 
-## Long-term plan
+### Long-term plan
 
 [Specs Stewards] will adjust the process based on usage patterns.
 
