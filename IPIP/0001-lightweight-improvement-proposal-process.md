@@ -1,4 +1,4 @@
-# IPIP 0001: Lightweight "RFC" Process for IPFS Specifications
+# IPIP 0001: Lightweight Improvement Process for IPFS Specifications
 
 - Start Date: 2022-06-10
 - Related Issues:
@@ -27,12 +27,6 @@ or implementation of IPFS.
 Adopt an informal IPIP process for the [ipfs/specs][1] repository, providing a
 minimal structure for opening, reviewing, and merging specification changes.
 
-## Opening an improvement proposal (IPIP)
-
-Changes to IPFS specifications can be proposed by opening a Git pull-request
-(PR) against the repository. In addition to specification changes, such PR must
-include a short IPIP document based on the template in `IPIP/0000-template.md`.
-
 The purpose of IPIP documents is to **document motivation** behind the change
 applied to the spec. **IPIP is not to be the spec itself**.
 
@@ -49,9 +43,19 @@ To illustrate:
    `ipfs/specs/IPIP/000M-webdav-fix-for-foo.md` explaining why we make the
    breaking spec change, compatibility/migration considerations etc.
 
+## Opening an improvement proposal (IPIP)
+
+Changes to IPFS specifications can be proposed by opening a Git pull-request
+(PR) against the `ipfs/specs` repository.
+
+In addition to specification changes, such PR must include a short **IPIP
+document** based on the template in `ipfs/specs/IPIP/0000-template.md`.
+
+When a new specification is added, `ipfs/specs/template.md` can be used.
+
 ## Reviewing IPIPs
 
-[Specs Stewards] will review new IPIP PRs during weekly triage.
+[Specs Stewards] will review new IPIP PRs during periodical (best-effort) triage.
 
 IPFS Community is encouraged to participate in the review process.
 
