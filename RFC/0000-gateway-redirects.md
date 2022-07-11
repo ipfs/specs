@@ -2,14 +2,14 @@
 
 - Start Date: (format: 2022-06-15)
 - Related Issues:
-  - https://github.com/ipfs/specs/issues/257
-  - https://github.com/ipfs/go-ipfs/pull/8890
+  - [ipfs/specs/issues/257](https://github.com/ipfs/specs/issues/257)
+  - [ipfs/kubo/pull/8890](https://github.com/ipfs/kubo/pull/8890)
 
-# Summary
+## Summary
 
 Provide support for URL redirects and rewrites for web sites hosted on Subdomain or DNSLink Gateways, thus enabling support for [single-page applications (SPAs)](https://en.wikipedia.org/wiki/Single-page_application).
 
-# Motivation
+## Motivation
 
 Web sites often need to redirect from one URL to another, for example, to change the appearance of a URL, to change where content is located without changing the URL, to redirect invalid URLs to a pretty 404 page, or to enable URL rewriting. URL rewriting in particular is a critical feature for hosting SPAs, allowing routing logic to be handled by front end code. SPA support is the primary impetus for this RFC.
 
@@ -17,7 +17,7 @@ Currently the only way to handle URL redirects or rewrites is with additional so
 
 This RFC proposes the introduction of redirect support for content hosted on Subdomain or DNSLink Gateways, configured via a `_redirects` file residing underneath the root CID of the web site.
 
-# Detailed design
+## Detailed design
 
 Allow developers to configure redirect support by adding redirect rules to a file named `_redirects` stored underneath the root CID of their web site. The format for this file is similar to those of [Netlify](https://docs.netlify.com/routing/redirects/#syntax-for-the-redirects-file) and [Cloudflare Pages](https://developers.cloudflare.com/pages/platform/redirects) but only supporting a subset of their functionality.
 
@@ -35,7 +35,7 @@ If a `_redirects` file exists but is unable to be processed, perhaps not even pa
 
 The detailed specification is added in `http-gateways/REDIRECTS_FILE.md`.
 
-## Test fixtures
+### Test fixtures
 QmaiAcL7pFedPJXxNJNDVDTUR78We7yBhdLzg151ZMzLCv
 
 See spec for testing details.
