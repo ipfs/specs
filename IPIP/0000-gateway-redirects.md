@@ -1,4 +1,4 @@
-# RFC 0000: Gateway Redirects
+# IPIP 0000: Gateway Redirects
 
 - Start Date: (format: 2022-06-15)
 - Related Issues:
@@ -11,7 +11,8 @@ Provide support for URL redirects and rewrites for web sites hosted on Subdomain
 
 ## Motivation
 
-Web sites often need to redirect from one URL to another, for example, to change the appearance of a URL, to change where content is located without changing the URL, to redirect invalid URLs to a pretty 404 page, or to enable URL rewriting. URL rewriting in particular is a critical feature for hosting SPAs, allowing routing logic to be handled by front end code. SPA support is the primary impetus for this RFC.
+Web sites often need to redirect from one URL to another, for example, to change the appearance of a URL, to change where content is located without changing the URL, to redirect invalid URLs to a pretty 404 page, or to enable URL rewriting.
+URL rewriting in particular is a critical feature for hosting SPAs, allowing routing logic to be handled by front end code. SPA support is the primary impetus for this RFC.
 
 Currently the only way to handle URL redirects or rewrites is with additional software such as NGINX sitting in front of the Gateway. This software introduces operational complexity and decreases the uniformity of experience when navigating to content hosted on a Gateway, thus decreasing the value proposition of hosting web sites in IPFS.
 
@@ -19,7 +20,8 @@ This RFC proposes the introduction of redirect support for content hosted on Sub
 
 ## Detailed design
 
-Allow developers to configure redirect support by adding redirect rules to a file named `_redirects` stored underneath the root CID of their web site. The format for this file is similar to those of [Netlify](https://docs.netlify.com/routing/redirects/#syntax-for-the-redirects-file) and [Cloudflare Pages](https://developers.cloudflare.com/pages/platform/redirects) but only supporting a subset of their functionality.
+Allow developers to configure redirect support by adding redirect rules to a file named `_redirects` stored underneath the root CID of their web site.
+The format for this file is similar to those of [Netlify](https://docs.netlify.com/routing/redirects/#syntax-for-the-redirects-file) and [Cloudflare Pages](https://developers.cloudflare.com/pages/platform/redirects) but only supporting a subset of their functionality.
 
 The format for the file is `from to [status]`.
 
@@ -62,8 +64,10 @@ If by some chance developers are already hosting sites that contain a `_redirect
 
 ### Alternatives
 
-- There was some discussion early on about a [manifest file](https://github.com/ipfs/specs/issues/257) that could be used to configure redirect support in addition to many other things. While the idea of a manifest file has merit, manifest files are much larger in scope and it became challenging to reach agreement on functionality to include. There is already a large need for redirect support for SPAs, and this proposal allows us to provide that critical functionality without being hampered by further design discussion around manifest files. In addition, similar to how Netlify allows redirect support to be configured in either a `_redirects` file or a more general [configuration file](https://docs.netlify.com/configure-builds/file-based-configuration/#redirects), there is nothing precluding IPFS from allowing developers to configure redirect support in an app manifest later on.
-- There was some discussion with the [n0](https://github.com/n0-computer/) team about potential ways to improve the performance of retrieving metadata such as redirect rules, possibly including it as metadata with the root CID such that it would be included with the request for the CID to begin with. I believe the performance concerns are alleviated by not providing forced redirect support.  Never the less, if a more generic metadata facility were to be introduced in the future, it may make sense to reconsider how redirect rules are specified.
+- There was some discussion early on about a [manifest file](https://github.com/ipfs/specs/issues/257) that could be used to configure redirect support in addition to many other things. While the idea of a manifest file has merit, manifest files are much larger in scope and it became challenging to reach agreement on functionality to include. There is already a large need for redirect support for SPAs, and this proposal allows us to provide that critical functionality without being hampered by further design discussion around manifest files.
+In addition, similar to how Netlify allows redirect support to be configured in either a `_redirects` file or a more general [configuration file](https://docs.netlify.com/configure-builds/file-based-configuration/#redirects), there is nothing precluding IPFS from allowing developers to configure redirect support in an app manifest later on.
+- There was some discussion with the [n0](https://github.com/n0-computer/) team about potential ways to improve the performance of retrieving metadata such as redirect rules, possibly including it as metadata with the root CID such that it would be included with the request for the CID to begin with.
+I believe the performance concerns are alleviated by not providing forced redirect support.  Never the less, if a more generic metadata facility were to be introduced in the future, it may make sense to reconsider how redirect rules are specified.
 
 ### Copyright
 
