@@ -2,9 +2,9 @@
 
 - Start Date: (format: 2022-10-10)
 - Related Issues:
-  - https://github.com/ipfs/specs/pull/288
-  - https://github.com/ipfs/go-ipfs/pull/9029
-  - https://github.com/ipfs/go-ipfs/pull/9034
+  - [ipfs/specs/pull/288](https://github.com/ipfs/specs/pull/288)
+  - [ipfs/go-ipfs/pull/9029](https://github.com/ipfs/go-ipfs/pull/9029)
+  - [ipfs/go-ipfs/pull/9034](https://github.com/ipfs/go-ipfs/pull/9034)
 
 ## Summary
 
