@@ -6,18 +6,18 @@
   - https://github.com/ipfs/go-ipfs/pull/9029
   - https://github.com/ipfs/go-ipfs/pull/9034
 
-# Summary
+## Summary
 
 Add TAR as a response format for the HTTP Gateway.
 
-# Motivation
+## Motivation
 
 Currently, the HTTP Gateway only allows the download of single files, or
 CAR archives. However, CAR files are sometimes not necessary and user may
 want to download entire directories. An example use case is for the IPFS
 Web UI, where users are able to download files or directories.
 
-# Detailed design
+## Detailed design
 
 The solution is to allow the Gateway to support producing TAR archives
 by requesting them using either the `Accept` HTTP header or the `format`

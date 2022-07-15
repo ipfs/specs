@@ -249,7 +249,7 @@ Optional, `format=<format>` can be used to request specific response format.
 
 This is a URL-friendly alternative to sending
 `Accept: application/vnd.ipld.<format>` header, see [`Accept`](#accept-request-header)
-for more details. 
+for more details.
 
 In case of `Accept: application/x-tar`, the `?format=` equivalent is `tar`.
 
@@ -465,7 +465,7 @@ The remainder is an optional `filename` parameter that will be prefilled in the
 
 NOTE: when the `filename` includes non-ASCII characters, the header must
 include both ASCII and UTF-8 representations for compatibility with legacy user
-agents and existing web browsers. 
+agents and existing web browsers.
 
 To illustrate, `?filename=testтест.pdf` should produce:
 `Content-Disposition inline; filename="test____.jpg"; filename*=UTF-8''test%D1%82%D0%B5%D1%81%D1%82.jpg`
@@ -622,7 +622,7 @@ IPLD data, starting from that data which the CID identified.
 **Note:** Other types of gateway may allow for passing CID by other means, such
 as `Host` header, changing the rules behind path splitting.
 (See [SUBDOMAIN_GATEWAY.md](./SUBDOMAIN_GATEWAY.md)
-and [DNSLINK_GATEWAY.md](./DNSLINK_GATEWAY.md)). 
+and [DNSLINK_GATEWAY.md](./DNSLINK_GATEWAY.md)).
 
 ### Traversing remaining path
 
