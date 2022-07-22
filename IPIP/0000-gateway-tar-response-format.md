@@ -28,7 +28,7 @@ URL query.
 Existing `curl` and `tar` tools can be used by implementers for testing.
 
 Providing static test vectors has little value here, as different TAR libraries may produce
-different byte-to-byte files  due to unspecified ordering of files and directories inside.
+different byte-to-byte files due to unspecified ordering of files and directories inside.
 
 ## Design rationale
 
@@ -46,7 +46,7 @@ CLI users will be able to download a directory with existing tools like `curl` a
 
 ### Compatibility
 
-This RFC is backwards compatible .
+This RFC is backwards compatible.
 
 ### Security
 

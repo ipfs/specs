@@ -400,7 +400,7 @@ Returned directive depends on requested content path and format:
     value, but it should not be lower than 60 seconds.
 
 - `Cache-Control: no-cache, no-transform`  should be returned with
-  `application/x-tar` responses if the TAR response, is not guaranteed
+  `application/x-tar` responses if the TAR response is not guaranteed
   to be deterministic.
 
 ### `Last-Modified` (response header)
