@@ -60,7 +60,7 @@ The following types are used in the descriptions of the Bitswap subsystems.
 A single Bitswap message may contain any of the following content:
 
 1.  The sender’s wantlist. This wantlist may either be the sender’s complete wantlist or just the changes to the sender’s wantlist that the receiver needs to know.
-2.  Data blocks. These are meant to be blocks that the receiver has requested (i.e. blocks that are on the receiver’s wantlist as far as the sender is aware at the time of sending).
+2.  Data blocks. These are meant to be blocks that the receiver has requested (i.e., blocks that are on the receiver’s wantlist as far as the sender is aware at the time of sending).
 
 #### Wire Format
 
