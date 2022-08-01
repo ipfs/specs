@@ -51,7 +51,7 @@ The following types are used in the descriptions of the Bitswap subsystems.
   - `Message`: A Bitswap message.
   - `Entry`: A wantlist entry that may be included in a Message when adding/removing a particular `CID` from our wantlist. Contains:
       - `CID` referring to a particular block.
-      - `Priority` relative priority with which the user wants `CID` (relevant only if `Cancel` is not true.
+      - `Priority` relative priority with which the user wants `CID` (relevant only if `Cancel` is not true).
       - `Cancel` is a boolean representing whether this `Entry` is meant to remove `CID` from our wantlist.
   - `Ledger`: A record of the aggregate data exchanged between two peers. Each peer stores one `Ledger` for each of their peers.
 
@@ -60,7 +60,7 @@ The following types are used in the descriptions of the Bitswap subsystems.
 A single Bitswap message may contain any of the following content:
 
 1.  The sender’s wantlist. This wantlist may either be the sender’s complete wantlist or just the changes to the sender’s wantlist that the receiver needs to know.
-2.  Data blocks. These are meant to be blocks that the receiver has requested (i.e., blocks on that are on the receiver’s wantlist as far as the sender is aware at the time of sending).
+2.  Data blocks. These are meant to be blocks that the receiver has requested (i.e., blocks that are on the receiver’s wantlist as far as the sender is aware at the time of sending).
 
 #### Wire Format
 

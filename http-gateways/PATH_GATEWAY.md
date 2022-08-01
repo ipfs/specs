@@ -37,6 +37,7 @@ where client prefers to perform all validation locally.
   - [Request Headers](#request-headers)
     - [`If-None-Match` (request header)](#if-none-match-request-header)
     - [`Cache-Control` (request header)](#cache-control-request-header)
+      - [`only-if-cached`](#only-if-cached)
     - [`Accept` (request header)](#accept-request-header)
     - [`Range` (request header)](#range-request-header)
     - [`Service-Worker` (request header)](#service-worker-request-header)
@@ -81,6 +82,7 @@ where client prefers to perform all validation locally.
     - [Handling traversal errors](#handling-traversal-errors)
   - [Best practices for HTTP caching](#best-practices-for-http-caching)
   - [Denylists](#denylists)
+  - [Generated HTML with directory index](#generated-html-with-directory-index)
 
 # HTTP API
 
@@ -155,6 +157,8 @@ would be sent with response. Positive match MUST return HTTP status code 304
 
 Used for HTTP caching.
 
+#### `only-if-cached`
+
 Client can send `Cache-Control: only-if-cached` to request data only if the
 gateway already has the data (e.g. in local datastore) and can return it
 immediately.
@@ -163,7 +167,11 @@ If data is not cached locally, and the response requires an expensive remote
 fetch, a [`412 Precondition Failed`](#412-precondition-failed) HTTP status code
 should be returned by the gateway without any payload or specific HTTP headers.
 
-<!-- TODO: https://github.com/ipfs/go-ipfs/issues/8783 -->
+NOTE: when processing a request for a DAG, traversing it and checking every CID
+might be too expensive. Implementations are free to implement own heuristics to
+maximize cache hits while minimizing performance cost of checking if the entire
+DAG is locally cached. A good rule of thumb is to at the minimum test if the root
+block is in the local cache.
 
 ### `Accept` (request header)
 
@@ -387,10 +395,6 @@ Returned directive depends on requested content path and format:
   - If TTL value is unknown, implementations are free to set it to a static
     value, but it should not be lower than 60 seconds.
 
-- `Cache-Control: no-cache, no-transform`  should be returned with
-  `application/vnd.ipld.car` responses if the block order in CAR stream is not
-  guaranteed to be deterministic.
-
 ### `Last-Modified` (response header)
 
 Optional, used as additional hint for HTTP caching.
@@ -579,7 +583,7 @@ Data sent with HTTP response depends on the type of requested IPFS resource:
   - File
     - Bytes representing file contents
   - Directory
-    - Generated HTML with directory index, and/or link to CAR with directory DAG
+    - Generated HTML with directory index (see [additional notes here](#generated-html-with-directory-index))
     - When `index.html` is present, gateway can skip generating directory index and return it instead
 - Raw block
   - Opaque bytes, see [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw)
@@ -663,3 +667,30 @@ operator is able to inspect and modify the list of denylists that are applied.
   that have been flagged for various reasons (copyright violation, malware,
   etc). Each entry is `sha256()` hashed so that it can easily be checked given
   a plaintext CID, but inconvenient to determine otherwise.
+
+## Generated HTML with directory index
+
+While implementations are free to decide on the way HTML directory listing is
+generated and presented to the user, following below suggestions is advised.
+
+Linking to alternative response types such as CAR and dag-json allows clients
+to consume directory listings programmatically without the need for parsing HTML.
+
+Directory index response time should not grow with the number of items in a directory.
+It should be always fast, even when a directory has 10k of items.
+
+The usual optimizations involve:
+
+- Skipping size and type resolution for child UnixFS items, and using `Tsize`
+  from [logical format](https://ipld.io/specs/codecs/dag-pb/spec/#logical-format)
+  instead, allows gateway to respond much faster, as it no longer need to fetch
+  root nodes of child items.
+  - Additional information about child nodes can be fetched lazily
+    with JS, but only for items in the browser's viewport.
+
+- Alternative approach is resolving child items, but providing pagination UI.
+  - Opening a big directory can return HTTP 302 to the current URL with
+    additional query parameters (`?page=0&limit=100`),
+    limiting the cost of a single page load.
+  - The downside of this approach is that it will always be slower than
+    skipping child block resolution.
