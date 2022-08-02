@@ -36,7 +36,7 @@ This proposal reduces the trust needed by a client, and allows honest gateways t
 1. We consider only IPFS blocks bound to DNS with DNSLink. This is without loss of generality, because an IPFS subgraph referenced by its root hash is directly verifiable by confirming the hashes and thus would not benefit from the DNSSEC proof.
 2. For non-existent URLs, we will not walk the zone (through NSEC records). Including the walkthrough would dramatically increase the proof size. In other words, we will only offer verifiable proof for positive responses.
 3. We will not support wildcards in DNS resolution. This is not a problem because our target subdomains will always begin with "\_dnslink", and domains cannot have wildcards in the middle.
-4. We will not support multiple root Key Signing Keys or changed Key Signing Keys in this version.
+4. We assume that the client is configured to use the correct root zone KSK.
 
 ### Assumptions on resource usage
 1. Informal experiments have shown that chains of DNSSEC responses are between 2-4 KB. This includes denial-of-existence proofs, even in zones that are known to have high DNSSEC adoption (where proofs can be larger).
