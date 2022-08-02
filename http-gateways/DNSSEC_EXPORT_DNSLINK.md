@@ -28,7 +28,7 @@ This proposal reduces the trust needed by a client, and allows honest gateways t
 1. Participating clients should still be compatible with non-participating gateways. In other words, a client benefiting from this solution should still be compatible with all gateways that it can presently use.
 2. Gateways should maintain compatibility with non-participating clients—those clients will not benefit from the DNSSEC proofs, but they should still have full access to data.
 3. Gateways should not rely on any specific public DNS resolver, i.e., the implementation should be resolver agnostic.
-
+4. Existing standards and formats defined by IETF RFCs (DNS, [CBOR](https://datatracker.ietf.org/doc/html/rfc8949)) and IPLD specifications ([CAR](https://ipld.io/specs/transport/car/),  and [DAG-CBOR](https://ipld.io/specs/codecs/dag-cbor/spec/)) should be reused to minimize the cost of adoption. 
 ### Security Considerations
 1. DNSSEC responses can be much larger that vanilla DNS responses, in theory, this could be a vector for DDoS amplification.
 
