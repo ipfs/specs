@@ -87,7 +87,7 @@ The LEAVING state begins by reading the next unread Leaving struct. There are fo
 
 Within the LEAVING state, if the RRType is DS, the validator must check that there is at least one record in ds\_records where the digest equals the hash of the KSK in the subsequent Entering struct. The validator then checks that the next\_name has a longer matching prefix[^1] with the target than the current zone. The protocol then moves back to ENTERING. If the RRType is CNAME, the validator must confirm that next\_name matches target, and fail otherwise. This must be the case because a CNAME can only be used at the leaf subdomain in the DNS tree hierarchy. If next\_name does match target, then name becomes the new target. We pop zones off the stack until the new target is within the topmost zone the reenter the LEAVING state. If the RRType is DNAME, the validator must confirm that next\_name is a super-domain of target, and fail otherwise. If next\_name is a super-domain of target, then the next\_name suffix in target is replaced by name. We then pop zones off the stack until the new target is within the topmost zone and then reenter the LEAVING state. This method supports DNAME chaining.
 
-[^1] A longer match in terms of number of subdomains/domains.
+[^1]: A longer match in terms of number of subdomains/domains.
 
 ```mermaid
 stateDiagram-v2
