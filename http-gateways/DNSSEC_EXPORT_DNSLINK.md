@@ -64,7 +64,7 @@ This proposal reduces the trust needed by a client, and allows honest gateways t
 ```mermaid
 stateDiagram-v2
     state "IPFS Network" as ipfs
-    Client --> Gateway: HTTP GET\n cloudflare-ifps.io/ipfs.example.com
+    Client --> Gateway: HTTP GET\n cloudflare-ipfs.io/ipns/ipfs.example.com
     Gateway --> Client: IpfsDnssecChain
     Gateway --> Resolver: DNSSEC query\n ipfs.example.com
     Resolver --> Gateway: DNSSEC response\n /ipns/abc123
