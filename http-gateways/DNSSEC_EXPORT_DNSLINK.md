@@ -5,7 +5,7 @@
   - https://github.com/ipfs/kubo/issues/6129
 
 ## Summary
-IPFS is connected to DNS through a standard called DNSLink. DNSLink allows a DNS TXT record for a domain to point to an IPNS address or IPFS content ID (CID). This specification describes a method for providing proof to the requesting client that the DNS mapping is provided by honest/trusted name servers and that the IPFS address pointed to by the TXT record corresponds to the content received by the client.
+IPFS is connected to DNS through a standard called DNSLink. DNSLink allows a DNS TXT record for a domain to point to an IPNS address or IPFS content ID (CID). This specification describes a method for providing proof to the requesting client that the DNS TXT records were not spoofed by the Gateway and that the IPFS address pointed to by the TXT record corresponds to the content received by the client.
 
 This specification consists of four logical pieces.
 
