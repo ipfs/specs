@@ -42,8 +42,8 @@ This proposal reduces the trust needed by a client, and allows honest gateways t
 1. Informal experiments have shown that chains of DNSSEC responses are between 2-4 KB. This includes denial-of-existence proofs, even in zones that are known to have high DNSSEC adoption (where proofs can be larger).
 
 ## Threat Model
-- DNS name servers are trusted to provide honest mappings.
-- A resolver may attempt to break the chain of trust.
+- DNS name servers are trusted to provide honest mappings due to DNSSEC chain of trust.
+- A DNS resolver used by a gateway may attempt to break the chain of trust.
 - Cryptographic primitives are assumed to be secure.
 - A gateway can attempt provide either a false DNSSEC proof or incorrect IPFS content and is therefore untrusted.
 
