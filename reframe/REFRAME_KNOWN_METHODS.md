@@ -1,4 +1,4 @@
-# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Reframe: Known Methods
+# ![Status: WIP](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Reframe: Known Methods
 
 **Author(s)**:
 - Adin Schmahmann
@@ -12,24 +12,24 @@
 
 This document is defining known methods (request-response message types) and semantics.
 
-# Organization of this document
+## Organization of this document
 
 - [Known Methods](#known-methods)
   - [Cachable/Non-Cachable Methods](#cachablenon-cachable-methods)
 - [Message Specs](#message-specs)
   - [Error](#error)
   - [Identify](#identify)
-    - [DAG-JSON Examples](#dag-json-examples)
+    - [Identify DAG-JSON Examples](#identify-dag-json-examples)
   - [FindProviders](#findproviders)
-    - [DAG-JSON Examples](#dag-json-examples-1)
+    - [FindProviders DAG-JSON Examples](#findproviders-dag-json-examples)
   - [GetIPNS](#getipns)
-    - [DAG-JSON Examples](#dag-json-examples-2)
+    - [GetIPNS DAG-JSON Examples](#getipns-dag-json-examples)
   - [PutIPNS](#putipns)
-    - [DAG-JSON Examples](#dag-json-examples-3)
+    - [PutIPNS DAG-JSON Examples](#putipns-dag-json-examples)
 - [Method Upgrade Paths](#method-upgrade-paths)
 - [Implementations](#implementations)
 
-# Known Methods
+## Known Methods
 
 The known Request types are the following and are described below:
 
@@ -57,7 +57,7 @@ type Response union {
 Note: Each Request type has a corresponding Response type.
 Every message except the Error type should end in Request/Response.
 
-## Cachable/Non-Cachable Methods
+### Cachable/Non-Cachable Methods
 
 The following methods (request-response pairs) are _cachable_:
 
@@ -73,9 +73,9 @@ Methods that are not listed above are considered _non-cachable_.
 
 Implementations are encouraged to improve performance of  `CachableRequest` methods by applying transport and method-specific caching strategies.
 
-# Message Specs
+## Message Specs
 
-## Error
+### Error
 
 The Error message type should be used in Responses to indicate that an error has occurred.
 
@@ -85,7 +85,7 @@ The Error message type should be used in Responses to indicate that an error has
     }
 ```
 
-## Identify
+### Identify
 
 A message for discovering which messages a server supports. May be used by applications to optimize which servers get sent which types of requests.
 
@@ -99,26 +99,26 @@ A message for discovering which messages a server supports. May be used by appli
 
 `IdentifyResponse` should return the set of supported methods aside from the "Identify" method.
 
-### DAG-JSON Examples
+#### Identify DAG-JSON Examples
 
 Request:
-```
+```json
 {"IdentifyRequest" : {}}
 ```
 
 Response:
-```
+```json
 {"IdentifyResponse" : {
     "Methods" : ["FindProviders", "GetIPNS"]
 }}
 ```
 
-## FindProviders
+### FindProviders
 
 A message for finding nodes that have an interest in a given key. Some common examples include finding which peers have advertised that they have a given CID, or which peers are interested in a given pubsub topic.
 
 ```ipldsch
-    type FindProvidersRequest struct 
+    type FindProvidersRequest struct {
         Key &Any
     }
 ```
@@ -166,17 +166,17 @@ Note: While the Key is a CID it is highly recommended that server implementation
     }
 ```
 
-### DAG-JSON Examples
+#### FindProviders DAG-JSON Examples
 
 Request:
-```
+```json
 {"FindProviders" : {
     "Key" : {"/":{"bytes":"AXIUBPnagss"}}
 }}
 ```
 
 Response:
-```
+```json
 {"FindProviders" : {
     "Key" : {"/":{"bytes":"AXIUBPnagss"}},
     "Providers" : [
@@ -187,7 +187,7 @@ Response:
             "/":{"bytes":"EncodedPeerID2"}},
             "Multiaddresses":[{"/":{"bytes":"EncodedAddr1"}}, {"/":{"bytes":"EncodedAddr2"}}]}}},
                 "Proto" : [
-                    { "2320" : { # the integer of the graphsync-filv1 code
+                    { "2320" : {
                             "PieceCID" : {"/": "bsome-base32-CidV1"},
                             "VerifiedDeal" : true,
                             "FastRetrieval" : false
@@ -199,7 +199,7 @@ Response:
 }}
 ```
 
-## GetIPNS
+### GetIPNS
 
 A message for finding the latest IPNS records for a given identifier.
 
@@ -215,25 +215,25 @@ A message for finding the latest IPNS records for a given identifier.
     }
 ```
 
-### DAG-JSON Examples
+#### GetIPNS DAG-JSON Examples
 
 Request:
-```
+```json
 {"GetIPNS" : {
     "ID" : {"/":{"bytes":"AXIUBPnagss"}}
 }}
 ```
 
 Response:
-```
+```json
 {"GetIPNS" : {
     "Record" : {"/":{"bytes":"firstRecord"}}
 }}{"GetIPNS" : {
     "Record" : {"/":{"bytes":"laterRecord"}}
-}}...
+}}
 ```
 
-## PutIPNS
+### PutIPNS
 
 A message for putting the latest IPNS records for a given identifier.
 
@@ -246,10 +246,10 @@ A message for putting the latest IPNS records for a given identifier.
     type PutIPNSResponse struct {}
 ```
 
-### DAG-JSON Examples
+#### PutIPNS DAG-JSON Examples
 
 Request:
-```
+```json
 {"PutIPNSRequest" : {
     "ID" : {"/":{"bytes":"AXIUBPnagss"}},
     "Record" : {"/":{"bytes":"AXIUBPnagss"}}
@@ -257,17 +257,17 @@ Request:
 ```
 
 Response:
-```
+```json
 {"PutIPNSResponse : {}"}
 ```
 
-# Method Upgrade Paths
+## Method Upgrade Paths
 
 It is acknowledged that the initial methods and mechanisms of this protocol will likely need to change over time and that we should prepare for how to do so without the need to wholesale replace this protocol with an alternative.
 
 2. If it is desired to add optional parameters to a given method (in either a request or response) new fields can be added. It is recommended that new fields be submitted to this spec to prevent conflicts and for unsubmitted features to be added using namespaces unlikely to conflict (e.g. `MyProject-Field`).
 3. New methods can be added in the event a new method needs to be added, or an existing one changed in a way which would be backwards incompatible. It is recommended that new methods be submitted to this spec to prevent conflicts and for unsubmitted features to be added using namespaces unlikely to conflict (e.g. `MyProject-Method`).
 
-# Implementations
+## Implementations
 
-https://github.com/ipfs/go-delegated-routing
+[go-delegated-routing](https://github.com/ipfs/go-delegated-routing)
