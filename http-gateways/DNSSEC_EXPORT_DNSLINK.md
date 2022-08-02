@@ -17,7 +17,7 @@ This specification consists of four logical pieces.
 ## Motivation
 In the current gateway, clients are forced to trust the DNS and IPNS resolutions of the gateway. This entails implicit risk for clients who cannot validate if the content they receive is the content bound to the name they requested. This state of affairs can leave clients vulnerable to MitM attacks.
 
-This proposal reduces the trust needed by a client, and allows honest gateways to prove it is responding truthfully.
+This proposal reduces the trust needed by a client, and allows honest gateways to prove they are responding truthfully.
 
 ## Requirements & Assumptions
 ### Feature Requirements
