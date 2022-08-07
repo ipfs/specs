@@ -1,4 +1,4 @@
-# IPIP 0000: CidV2 - Tagged Pointers
+# IPIP 0000: CIDv2 - Tagged Pointers
 
 <!-- IPIP number will be assigned by an editor. When opening a pull request to
 submit your IPIP, please use number 0000 and an abbreviated title in the filename,
@@ -12,14 +12,15 @@ submit your IPIP, please use number 0000 and an abbreviated title in the filenam
 ## Summary
 
 <!--One paragraph explanation of the IPIP.-->
-Create a new [CID](https://github.com/multiformats/cid) version (CidV2, informally "Tagged Content Identifiers") which combines a data Multicodec-Multihash pair (the pointer) and a metadata Multicodec-Multihash pair (the tag) to create content-addresses with expressive contexts.
+Create a new [CID](https://github.com/multiformats/cid) version (CIDv2, informally "Tagged Content Identifiers") which combines a data Multicodec-Multihash pair (the pointer) and a metadata Multicodec-Multihash pair (the tag) to create content-addresses with expressive contexts.
 
 ## Motivation
-Currently, CIDv1 data is described by a multicodec content type. However, this is meant to describe the overall format of the serialized data e.g. the `dag-cbor` IPLD encoding, and not more specific information such as a data schema or type. For example, it can be useful to have raw IPLD data contextualized by its [IPLD schema](). Since multicodecs are limited to 9 bytes  by the [unsigned-varint spec](https://github.com/multiformats/unsigned-varint#practical-maximum-of-9-bytes-for-security), the available codec space is generally too small to encode such metadata.
+
+Currently, CIDv1 data is described by a multicodec content type. However, this is meant to describe the overall format of the serialized data e.g. the `dag-cbor` IPLD encoding, and not more specific information such as a data schema or type. For example, it can be useful to have raw IPLD data contextualized by its [IPLD schema](https://ipld.io/docs/schemas/intro/). Since multicodecs are limited to 9 bytes  by the [unsigned-varint spec](https://github.com/multiformats/unsigned-varint#practical-maximum-of-9-bytes-for-security), the available codec space is generally too small to encode such metadata.
 
 ## Detailed design
 
-Our solution is a new CID version which contains two multicodec-multihash pairs, one pair for data and another for metadata. The metadata multicodec would then be able to concisely describe a space of metadata tags where the specific tag would then be further specified by the multihash. This could be implemented as follows in Rust:
+Our solution is a new CID version which contains two multicodec-multihash pairs, one pair for data and another for metadata. The metadata multicodec would be able to concisely describe a space of metadata tags where the specific tag would then be further specified by the multihash. This could be implemented as follows in Rust:
 
 ```rust
 pub struct CidV2<const S: usize, const M: usize> {
@@ -56,7 +57,7 @@ which corresponds to the Ipld data: `Ipld::Num(1)`, `Ipld::Num(2)`, `Ipld::Num(0
 
 While you could in principle propose a new multicodec for `Trit`, this might be not suitable if `Trit` is a temporary or ephemeral structure, or if you have a large number of different schemas (For instance, in Lurk-lang's content-addressing we would need to reserve 16-bits of the multicodec table, or 2^16 distinct multicodecs).
 
-However, since IPLD schemas can be represented as JSON (https://ipld.io/specs/schemas/#dsl-vs-dmt) and hashed, with a CIDv2 we could reserve a single IPLD schema multicodec, along with the codec for the data representation (such as dag-cbor)
+However, since IPLD schemas can be [represented as JSON](https://ipld.io/specs/schemas/#dsl-vs-dmt) and hashed, with a CIDv2 we could reserve a single IPLD schema multicodec, along with the codec for the data representation (such as dag-cbor)
 We could then use the above CIDv2 definiton to create a pointer to any Schema+Data pair:
 
 ```
@@ -81,8 +82,8 @@ CidV2 {
 without having to reserve anything new on the multicodec table.
 
 Modified spec file contains the following changes:
-- [Added a definition for Cidv2](https://github.com/yatima-inc/cid/blob/master/README.md)
-- [Added an implementation for Cidv2 to rust-cid](https://github.com/yatima-inc/rust-cid/tree/cid-v2)
+- [Added a definition for CIDv2](https://github.com/yatima-inc/cid/blob/master/README.md)
+- [Added an implementation for CIDv2 to rust-cid](https://github.com/yatima-inc/rust-cid/tree/cid-v2)
 
 ## Test fixtures
 
@@ -105,12 +106,12 @@ Having arbitrary-length CID metadata allows the data to be fully self-describing
 
 ### Compatibility
 
-For backwards compatibility, the existing Cidv2 codec `0x02` could be used to allow interpretation by legacy Cidv1 application logic, e.g.
+For backwards compatibility, the existing CIDv2 codec `0x02` could be used to allow interpretation by legacy CIDv1 application logic, e.g.
 ```
 CidV1 { multicodec: 0x02, hash: <identity-multihash-of-cidv2-serialization> }
 ```
 
-In the canonical Cidv2 form, the data comes before the metadata because a legacy Cidv1 parser can choose to keep only the former and discard the latter.
+In the canonical CIDv2 form, the data comes before the metadata because a legacy CIDv1 parser can choose to keep only the former and discard the latter.
 
 ### Security
 
@@ -120,9 +121,9 @@ The proposal is also designed to be purely opt-in and backwards compatible with 
 
 ### Alternatives
 
-- [Cidv2 with arbitrary-precision multicodec size](
+- [CIDv2 with arbitrary-precision multicodec size](
 https://gist.github.com/johnchandlerburnham/d9b1b88d49b1e98af607754c0034f1c7#appendix-a-cidv2-and-arbitrary-precision-multicodec)
-- Cidv2 with nested hashes
+- CIDv2 with nested hashes
 
 ### Copyright
 
