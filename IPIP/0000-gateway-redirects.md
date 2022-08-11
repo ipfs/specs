@@ -16,7 +16,7 @@ URL rewriting in particular is a critical feature for hosting SPAs, allowing rou
 
 Currently the only way to handle URL redirects or rewrites is with additional software such as NGINX sitting in front of the Gateway. This software introduces operational complexity and decreases the uniformity of experience when navigating to content hosted on a Gateway, thus decreasing the value proposition of hosting web sites in IPFS.
 
-This RFC proposes the introduction of redirect support for content hosted on Subdomain or DNSLink Gateways, configured via a `_redirects` file residing underneath the root CID of the web site.
+This IPIP proposes the introduction of redirect support for content hosted on Subdomain or DNSLink Gateways, configured via a `_redirects` file residing underneath the root CID of the web site.
 
 ## Detailed design
 
