@@ -54,9 +54,10 @@ using a `_redirects` file hosted at the top level of the web site. While we do n
 
 ### User benefit
 
-Provides general URL redirect and rewrite support.
-The primary benefit is that developers will be able to host single-page applications in IPFS.
-Pretty 404 pages will likely be the next most common use of this feature.
+Provides general URL redirect and rewrite support, which enables three important features:
+1. Developers will be able to host single-page applications in IPFS.
+2. Same configuration file used for setting up pretty 404 pages.
+3. The cost of switching hosting of an existing website to IPFS is lowered by making it possible to keep all legacy URLs working.
 
 ### Compatibility
 
