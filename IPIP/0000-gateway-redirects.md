@@ -11,7 +11,7 @@ Provide support for URL redirects and rewrites for web sites hosted on Subdomain
 
 ## Motivation
 
-Web sites often need to redirect from one URL to another, for example, to change the appearance of a URL, to change where content is located without changing the URL, to redirect invalid URLs to a pretty 404 page, or to enable URL rewriting.
+Web sites often need to redirect from one URL to another, for example, to change the appearance of a URL, to change where content is located without breaking existing links (see [Cool URIs don't change](https://www.w3.org/Provider/Style/URI), [link rot](https://en.wikipedia.org/wiki/Link_rot)), to redirect invalid URLs to a pretty 404 page, or to enable URL rewriting.
 URL rewriting in particular is a critical feature for hosting SPAs, allowing routing logic to be handled by front end code. SPA support is the primary impetus for this RFC.
 
 Currently the only way to handle URL redirects or rewrites is with additional software such as NGINX sitting in front of the Gateway. This software introduces operational complexity and decreases the uniformity of experience when navigating to content hosted on a Gateway, thus decreasing the value proposition of hosting web sites in IPFS.
