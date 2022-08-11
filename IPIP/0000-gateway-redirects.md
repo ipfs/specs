@@ -7,7 +7,7 @@
 
 ## Summary
 
-Provide support for URL redirects and rewrites for web sites hosted on Subdomain or DNSLink Gateways, thus enabling support for [single-page applications (SPAs)](https://en.wikipedia.org/wiki/Single-page_application).
+Provide support for URL redirects and rewrites for web sites hosted on Subdomain or DNSLink Gateways, thus enabling support for [single-page applications (SPAs)](https://en.wikipedia.org/wiki/Single-page_application), and avoiding  [link rot](https://en.wikipedia.org/wiki/Link_rot) when moving to IPFS-backed hosting.
 
 ## Motivation
 
