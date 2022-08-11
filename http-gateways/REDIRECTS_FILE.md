@@ -48,6 +48,8 @@ from to [status]
 
 Any line beginning with `#` will be treated as a comment and ignored.
 
+Lines MUST be terminated by either `\n` or `\r\n`.
+
 ## From
 
 The path to redirect from.
@@ -60,14 +62,17 @@ The URL or path to redirect to.
 
 An optional integer specifying the HTTP status code to return from the request.  Supported values are:
 
+- `200` - OK
+  - Redirect will be treated as a rewrite, returning OK without changing the URL in the browser.
 - `301` - Permanent Redirect (default)
-- `302` - Temporary Redirect
+- `302` - Found (commonly used for Temporary Redirect)
+- `303` - See Other (replacing PUT and POST with GET)
+- `307` - Temporary Redirect (explicitly preserving body and HTTP method of original request)
+- `308` - Permanent Redirect (explicitly preserving body and HTTP method of original request)
 - `404` - Not Found
   - Useful for redirecting invalid URLs to a pretty 404 page.
 - `410` - Gone
 - `451` - Unavailable For Legal Reasons  
-- `200` - OK
-  - Redirect will be treated as a rewrite, returning OK without changing the URL in the browser.
 
 ## Placeholders
 
@@ -123,12 +128,12 @@ Parsing of the `_redirects` file should be done safely to prevent any sort of in
 
 ## Test fixtures
 
-A sample site can be found in QmaiAcL7pFedPJXxNJNDVDTUR78We7yBhdLzg151ZMzLCv.  This CID is associated with a CAR file used for test cases in the initial implementation of this feature in go-ipfs.
+A sample site can be found in QmcZzEbsNsQM6PmnvPbtDJdRAen5skkCxDRS8K7HafpAsX.  This CID is associated with a CAR file used for test cases in the initial implementation of this feature in go-ipfs.
 
 ```
-$ ipfs ls /ipfs/QmaiAcL7pFedPJXxNJNDVDTUR78We7yBhdLzg151ZMzLCv/
+$ ipfs ls /ipfs/QmcZzEbsNsQM6PmnvPbtDJdRAen5skkCxDRS8K7HafpAsX                                               
 Qmd9GD7Bauh6N2ZLfNnYS3b7QVAijbud83b8GE8LPMNBBP 7   404.html
-QmdhCvSuBvrgXuWqAvierrtLs4dez1AJmrfRRQm41od1Rb 275 _redirects
+QmUaEwhw7255s4M2abktMYFL8pwCDb1v5yi6fp7ExJv3e7 270 _redirects
 QmaWDLb4gnJcJbT1Df5X3j91ysiwkkyxw6329NLiC1KMDR -   articles/
 QmS6ZNKE9s8fsHoEnArsZXnzMWijKddhXXDsAev8LdTT5z 9   index.html
 QmNwEgMrExwSsE8DCjZjahYfHUfkSWRhtqSkQUh4Fk3udD 7   one.html
@@ -139,7 +144,7 @@ QmUGVnZaofnd5nEDvT2bxcFck7rHyJRbpXkh9znjrJNV92 7   two.html
 The `_redirects` file is as follows.
 
 ```
-$ ipfs cat /ipfs/QmaiAcL7pFedPJXxNJNDVDTUR78We7yBhdLzg151ZMzLCv/_redirects
+$ ipfs cat /ipfs/QmcZzEbsNsQM6PmnvPbtDJdRAen5skkCxDRS8K7HafpAsX/_redirects
 /redirect-one /one.html
 /301-redirect-one /one.html 301
 /302-redirect-two /two.html 302

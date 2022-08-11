@@ -27,7 +27,7 @@ The format for the file is `from to [status]`.
 
 - `from` - specifies the path to intercept (can include placeholders and a trailing splat)
 - `to` - specifies the path or URL to redirect to (can include placeholders or splat matched in `from`)
-- `status` - optional HTTP status code (301 if not specified)
+- `status` - optional [HTTP status code](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) (301 if not specified)
 
 Rules in the file are evaluated top to bottom.
 
@@ -68,7 +68,7 @@ If by some chance developers are already hosting sites that contain a `_redirect
 There is already a large need for redirect support for SPAs, and this proposal allows us to provide that critical functionality without being hampered by further design discussion around manifest files.
 In addition, similar to how Netlify allows redirect support to be configured in either a `_redirects` file or a more general [configuration file](https://docs.netlify.com/configure-builds/file-based-configuration/#redirects), there is nothing precluding IPFS from allowing developers to configure redirect support in an app manifest later on.
 - There was some discussion with the [n0](https://github.com/n0-computer/) team about potential ways to improve the performance of retrieving metadata such as redirect rules, possibly including it as metadata with the root CID such that it would be included with the request for the CID to begin with.
-I believe the performance concerns are alleviated by not providing forced redirect support.  Never the less, if a more generic metadata facility were to be introduced in the future, it may make sense to reconsider how redirect rules are specified.
+I believe the performance concerns are alleviated by not providing forced redirect support, and looking for `_redirects` only if the DAG is missing a requested path.  Never the less, if a more generic metadata facility were to be introduced in the future, it may make sense to reconsider how redirect rules are specified.
 
 ### Copyright
 
