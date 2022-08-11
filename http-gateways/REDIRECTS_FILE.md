@@ -14,7 +14,7 @@ The Redirects File specification is an extension of the Subdomain Gateway and DN
 
 Developers can enable URL redirects or rewrites by adding redirect rules to a file named `_redirects` stored underneath the root CID of their web site.
 
-This can be used, for example, to enable URL rewriting for hosting a single-page application, or to redirect invalid URLs to a pretty 404 page.
+This can be used, for example, to enable URL rewriting for hosting a single-page application, to redirect invalid URLs to a pretty 404 page, or to avoid  [link rot](https://en.wikipedia.org/wiki/Link_rot) when moving to IPFS-based website hosting.
 
 # Table of Contents
 
