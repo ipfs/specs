@@ -107,7 +107,7 @@ Rules MUST be evaluated in order, redirecting or rewriting using the first match
 
 ## No Forced Redirects
 
-All redirect logic MUST only be evaluated if the requested path does not resolve.  This means that any performance impact associated with checking for the existence of a Redirects File or evaluating redirect rules will only be incurred for non-existent paths.
+All redirect logic MUST only be evaluated if the requested path is not present in the DAG.  This means that any performance impact associated with checking for the existence of a Redirects File or evaluating redirect rules will only be incurred for non-existent paths.
 
 # Error Handling
 
