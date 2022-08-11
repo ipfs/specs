@@ -145,7 +145,7 @@ $ ipfs cat /ipfs/QmaiAcL7pFedPJXxNJNDVDTUR78We7yBhdLzg151ZMzLCv/_redirects
 /302-redirect-two /two.html 302
 /200-index /index.html 200
 /posts/:year/:month/:day/:title /articles/:year/:month/:day/:title 301
-/splat/:splat /redirected-splat/:splat 301
+/splat/* /redirected-splat/:splat 301
 /not-found/* /404.html 404
 /* /index.html 200
 ```
