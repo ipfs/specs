@@ -66,11 +66,11 @@ Using lagrange replication, IPNS records are unlikely to disappear, even after e
 
 ### Compatibility
 
-Since the IPNS record holders are the ones that choose to participate in lagrange replication, IPNS records published by old nodes can still be replicated by record holders that use this system.
+Since the IPNS record holders are the ones that choose to participate in lagrange replication, IPNS records published by old nodes can still be replicated by record holders that use this system (although old IPNS records will still expire).
 
 IPNS-PubSub would be the most ideal for lagrange replication, record holders would form a mesh which makes checking the number of record holders easier, however, the DHT will work fine as well.
 
-IPNS records themselves aren't changed in any way by lagrange replication.
+IPNS records won't have anything set for the expiration field, this may interfere with implementations which expect this field to be populated.
 
 ### Security
 
