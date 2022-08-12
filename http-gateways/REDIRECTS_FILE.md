@@ -128,7 +128,20 @@ Parsing of the `_redirects` file should be done safely to prevent any sort of in
 
 ## Test fixtures
 
-A sample site can be found in QmcZzEbsNsQM6PmnvPbtDJdRAen5skkCxDRS8K7HafpAsX.  This CID is associated with a CAR file used for test cases in the initial implementation of this feature in go-ipfs.
+Sample files for various test cases can be found in QmfHFheaikRRB6ap7AdL4FHBkyHPhPBDX7fS25rMzYhLuW, which comes from
+sharness test data for the implementation of this feature in Kubo.
+
+```
+ipfs ls QmfHFheaikRRB6ap7AdL4FHBkyHPhPBDX7fS25rMzYhLuW                                              
+QmcBcFnKKqgpCVMxxGsriw9ByTVF6uDdKDMuEBq3m6f1bm - bad-codes/
+QmcZzEbsNsQM6PmnvPbtDJdRAen5skkCxDRS8K7HafpAsX - examples/
+QmU7ysGXwAtiV7aBarZASJsxKoKyKmd9Xrz2FFamSCbg8S - forced/
+QmWHn2TunA1g7gQ7q9rwAoWuot2hMpojZ6cZ9ERsNKm5gE - good-codes/
+QmRgpzYQESidTtTojN8zRWjiNs9Cy6o7KHRxh7kDpJm3KH - invalid/
+QmYzMrtPyBv7LKiEAGLLRPtvqm3SjQYLWxwWQ2vnpxQwRd - newlines/
+```
+
+For example, the "examples" site can be found in QmcZzEbsNsQM6PmnvPbtDJdRAen5skkCxDRS8K7HafpAsX.
 
 ```
 $ ipfs ls /ipfs/QmcZzEbsNsQM6PmnvPbtDJdRAen5skkCxDRS8K7HafpAsX                                               
