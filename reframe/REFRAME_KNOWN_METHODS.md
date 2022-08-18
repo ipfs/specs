@@ -39,6 +39,7 @@ type Request union {
     | "FindProvidersRequest" FindProvidersRequest
     | "GetIPNSRequest" GetIPNSRequest
     | "PutIPNSRequest" PutIPNSRequest
+    | "ProvideRequest" ProvideRequest
 }
 ```
 
@@ -50,6 +51,7 @@ type Response union {
     | "FindProvidersResponse" FindProvidersResponse
     | "GetIPNSResponse" GetIPNSResponse
     | "PutIPNSResponse" PutIPNSResponse
+    | "ProvideResponse" ProvideResponse
     | "Error" Error
 }
 ```
@@ -131,9 +133,9 @@ Note: While the Key is a CID it is highly recommended that server implementation
     }
 
     type Provider struct {
-     Node Node
-     Proto optional [TransferProtocol]
-     }
+        Node Node
+        Proto optional [TransferProtocol]
+    }
 
     # Note: This is not quite valid IPLD Schema because having fallbacks within unions is not yet implemented and codified https://github.com/ipld/ipld/issues/194. We will use this syntax within this spec though.
 
@@ -259,6 +261,60 @@ Request:
 Response:
 ```json
 {"PutIPNSResponse : {}"}
+```
+
+### Provide
+
+A message for indicating that the client is able to act as a provider for a given key.
+
+```ipldsch
+    type ProvideRequest struct 
+        Key &Any
+        Provider Provider
+        Timestamp Integer
+        AdvisoryTTL Integer
+        Signature Bytes
+    }
+
+    type ProvideResponse struct {
+        AdvisoryTTL Integer
+    }
+```
+
+Note: While the Key is a CID, it is highly recommended that server implementations treat these Requests as if they were for the multihash.
+
+There are a a few semantics relevant to the construction of a ProvideRequest:
+
+* The timestamp should be the current unix timestamp, encoded in an int64
+* AdvistoryTTL may list the time for which the provider desires the content will remain available. If the provider cannot not anticipate how long the content will remain available, it may use a 0 value for this field.
+* The AdvisoryTTL response may provide an expectation from the reframe endpoint of how long the content will remain available.
+  * If it is less than the requested TTL from the request, it indicates that the client should re-issue a ProvideRequest for the content by that point.
+  * If it is greater than the clients request, it indicates that the client may be perceived as responsible for the content for up to that amount of time.
+  * If it is 0, the endpoint is indicating it cannot make any claims about the lifetime of the request.
+* Construction of the Signature is performed as follows:
+  1. Create the ProviderRequest struct, with empty bytes for Signature
+  2. Serialize the ProviderRequest as DagJSON
+  3. Hash the serialization with Sha256
+  4. Sign the Hash using the keypair associated with the Provider.ID
+
+
+#### Provide DAG-JSON Examples
+
+Request:
+```json
+{"ProvideRequest" : {
+    "Key" : {"/":{"bytes":"AXIUBPnagss"}},
+    "Providers" : [
+        {"Node":{"Peer":{"ID":{
+            "/":{"bytes":"EncodedPeerID"}}
+        }}}
+    ]
+}}
+```
+
+Response:
+```json
+{"ProvideResponse : {}"}
 ```
 
 ## Method Upgrade Paths
