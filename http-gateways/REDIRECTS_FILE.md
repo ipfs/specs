@@ -46,10 +46,6 @@ The Redirects File MUST be a text file containing one or more lines with the fol
 from to [status]
 ```
 
-Any line beginning with `#` will be treated as a comment and ignored.
-
-Lines MUST be terminated by either `\n` or `\r\n`.
-
 ## From
 
 The path to redirect from.
@@ -99,6 +95,27 @@ For example:
 This rule will redirect a URL like `/posts/2022/06/15/hello-world` to `/articles/2022/06/15/hello-world`.
 
 Splat logic MUST only apply to a single trailing asterisk, as this is a greedy match, consuming the remainder of the path.
+
+### Comments
+
+Any line beginning with `#` will be treated as a comment and ignored at evaluation time.
+
+For example:
+
+```
+# Redirect home to index.html
+/home /index.html 301
+```
+
+is functionally equivalent to
+
+```
+/home /index.html 301
+```
+
+### Line Termination
+
+Lines MUST be terminated by either `\n` or `\r\n`.
 
 # Evaluation
 
