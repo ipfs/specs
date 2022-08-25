@@ -27,9 +27,9 @@ Bitswap is a data exchange protocol for sending and receiving content addressed 
 
 # Introduction
 
-Bitswap is a message based protocol, as opposed to response-reply. All messages contain wantlists, and/or blocks. Upon receiving a wantlist, a Bitswap server should consider sending out wanted blocks if it has them. Upon receiving blocks, the node should send out a notification called a `Cancel` to any other peers they have already asked for the data signifying that they no longer want the block. At the protocol level, Bitswap is very simple.
+Bitswap is a message-based protocol, as opposed to response-reply. All messages contain wantlists, and/or blocks. Upon receiving a wantlist, a Bitswap server should eventually send wanted blocks if it has them. Upon receiving blocks, the client should send a `Cancel` notification to peers that have asked for the data, signifying that the client no longer wants the block.
 
-Bitswap is a relatively simple protocol, where complexity lives in the particular implementations to optimize for their particular balance of aspects such as throughput, latency, fairness, memory usage, etc.
+Bitswap aims to be a simple protocol, so that implementations can balance aspects such as throughput, latency, fairness, memory usage, etc. for their specific requirements.
 
 # Bitswap Protocol Versions
 
@@ -45,11 +45,11 @@ There are multiple Bitswap versions and more may evolve over time. We give brief
 
 Given that a client C wants to fetch data from some server S:
 
-1. C opens a stream `s_want` to S and sends a message for the blocks it wants
+1. C sends a message to S for the blocks it wants, via a stream `s_want`
     1. C may either send a complete wantlist, or an update to an outstanding wantlist
     2. C may reuse this stream to send new wants
 2. S sends back blocks on a stream `s_receive`. S may reuse this stream to send back subsequent responses 
-3. When C no longer needs a block it previously asked for it should send a Cancel message for that request to any peers that have not already responded about that particular block
+3. When C no longer needs a block it previously asked for, it should send a `Cancel` message for that block to all peers from which it has not received a response about that block
 
 ### Bitswap Message
 
