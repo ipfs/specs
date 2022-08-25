@@ -27,7 +27,9 @@ Bitswap is a data exchange protocol for sending and receiving content addressed 
 
 ## Introduction
 
-Bitswap is a message-based protocol, as opposed to request-response. All messages contain wantlists, and/or blocks. Upon receiving a wantlist, a Bitswap server should eventually process and respond to the requester with either information about the block or the block itself. Upon receiving blocks, the client should send a `Cancel` notification to peers that have asked for the data, signifying that the client no longer wants the block.
+Bitswap is a message-based protocol, as opposed to request-response. All messages contain wantlists, and/or blocks.
+Upon receiving a wantlist, a Bitswap server should eventually process and respond to the requester with either information about the block or the block itself.
+Upon receiving blocks, the client should send a `Cancel` notification to peers that have asked for the data, signifying that the client no longer wants the block.
 
 Bitswap aims to be a simple protocol, so that implementations can balance aspects such as throughput, latency, fairness, memory usage, etc. for their specific requirements.
 
@@ -53,7 +55,7 @@ Given that a client C wants to fetch data from some server S:
     1. C may either send a complete wantlist, or an update to an outstanding wantlist
     2. C may reuse this stream to send new wants
 2. S sends back blocks on a stream `s_receive`. S may reuse this stream to send back subsequent responses.
-  1. S should respect the relative priority of wantlist requests from C, with wants that have higher `priority` values being responded to first.
+    1. S should respect the relative priority of wantlist requests from C, with wants that have higher `priority` values being responded to first.
 3. When C no longer needs a block it previously asked for, it should send a `Cancel` message for that block to all peers from which it has not received a response about that block
 
 ### Bitswap 1.0.0: Message
@@ -88,7 +90,7 @@ message Message {
 
 All protocol messages sent over a stream are prefixed with the message length in
 bytes, encoded as an unsigned variable length integer as defined by the
-[multiformats unsigned-varint spec][uvarint-spec].
+[multiformats unsigned-varint spec](https://github.com/multiformats/unsigned-varint).
 
 All protocol messages must be less than or equal to 4MiB in size
 
@@ -108,11 +110,11 @@ It is otherwise identical to 1.0.0
 message Message {
     message Entry {
       bytes block = 1; // CID of the block
-      int32 priority = 2;	// the priority (normalized). default to 1
+      int32 priority = 2; // the priority (normalized). default to 1
       bool cancel = 3; // whether this revokes an entry
     }
 
-    repeated Entry entries = 1;	// a list of wantlist entries
+    repeated Entry entries = 1; // a list of wantlist entries
     bool full = 2; // whether this is the full wantlist. default to false
   }
 
@@ -160,13 +162,13 @@ message Message {
 
     message Entry {
       bytes block = 1; // CID of the block
-      int32 priority = 2;	// the priority (normalized). default to 1
+      int32 priority = 2; // the priority (normalized). default to 1
       bool cancel = 3; // whether this revokes an entry
       WantType wantType = 4; // Note: defaults to enum 0, ie Block
       bool sendDontHave = 5; // Note: defaults to false
     }
 
-    repeated Entry entries = 1;	// a list of wantlist entries
+    repeated Entry entries = 1; // a list of wantlist entries
     bool full = 2; // whether this is the full wantlist. default to false
   }
   message Block {
