@@ -1,4 +1,4 @@
-# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Bitswap
+# ![Status: WIP](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Bitswap
 
 **Author(s)**:
 - Adin Schmahmann
@@ -16,22 +16,22 @@ Bitswap is a data exchange protocol for sending and receiving content addressed 
 1. Attempt to acquire blocks from the network that have been requested by the client.
 2. Send blocks in its possession to other peers who want them.
 
-# Organization of this document
+## Organization of this document
 
 - [Introduction](#introduction)
 - [Bitswap Protocol Versions](#bitswap-protocol-versions)
-   - [Bitswap 1.0.0](#bitswap-100)
-   - [Bitswap 1.1.0](#bitswap-110)
-   - [Bitswap 1.2.0](#bitswap-120)
+  - [Bitswap 1.0.0](#bitswap-100)
+  - [Bitswap 1.1.0](#bitswap-110)
+  - [Bitswap 1.2.0](#bitswap-120)
 - [Implementations](#implementations)
 
-# Introduction
+## Introduction
 
 Bitswap is a message-based protocol, as opposed to request-response. All messages contain wantlists, and/or blocks. Upon receiving a wantlist, a Bitswap server should eventually process and respond to the requester with either information about the block or the block itself. Upon receiving blocks, the client should send a `Cancel` notification to peers that have asked for the data, signifying that the client no longer wants the block.
 
 Bitswap aims to be a simple protocol, so that implementations can balance aspects such as throughput, latency, fairness, memory usage, etc. for their specific requirements.
 
-# Bitswap Protocol Versions
+## Bitswap Protocol Versions
 
 There are multiple Bitswap versions and more may evolve over time. We give brief overviews as to the changes behind each protocol version.
 
@@ -39,9 +39,13 @@ There are multiple Bitswap versions and more may evolve over time. We give brief
 - `/ipfs/bitswap/1.1.0` - Support CIDv1
 - `/ipfs/bitswap/1.2.0` - Support Wantlist Have's and Have/DontHave responses
 
+## Block Sizes
+
+Bitswap implementations must support sending and receiving individual blocks of sizes less than or equal to 2MiB
+
 ## Bitswap 1.0.0
 
-### Interaction Pattern
+### Bitswap 1.0.0: Interaction Pattern
 
 Given that a client C wants to fetch data from some server S:
 
@@ -52,18 +56,18 @@ Given that a client C wants to fetch data from some server S:
   1. S should respect the relative priority of wantlist requests from C, with wants that have higher `priority` values being responded to first.
 3. When C no longer needs a block it previously asked for, it should send a `Cancel` message for that block to all peers from which it has not received a response about that block
 
-### Bitswap Message
+### Bitswap 1.0.0: Message
 
 A single Bitswap message may contain any of the following content:
 
 1. The sender’s wantlist. This wantlist may either be the sender’s complete wantlist or just the changes to the sender’s wantlist that the receiver needs to know.
 2. Data blocks. These are meant to be blocks that the receiver has requested (i.e., blocks that are on the receiver’s wantlist as far as the sender is aware at the time of sending).
 
-#### Wire Format
+#### Bitswap 1.0.0: Wire Format
 
 The wire format for Bitswap is simply a stream of Bitswap messages. The following protobuf describes the form of these messages. Note: all protobufs are described using proto3 syntax.
 
-```
+```protobuf
 message Message {
   message Wantlist {
     message Entry {
@@ -73,24 +77,20 @@ message Message {
     }
 
     repeated Entry entries = 1; // a list of wantlist entries
-    bool full = 2;     // whether this is the full wantlist. default to false
+    bool full = 2; // whether this is the full wantlist. default to false
   }
 
   Wantlist wantlist = 1;
   repeated bytes blocks = 2;
 ```
 
-### Protocol Format
+### Bitswap 1.0.0: Protocol Format
 
 All protocol messages sent over a stream are prefixed with the message length in
 bytes, encoded as an unsigned variable length integer as defined by the
 [multiformats unsigned-varint spec][uvarint-spec].
 
 All protocol messages must be less than or equal to 4MiB in size
-
-### Block Sizes
-
-Bitswap implementations must support sending and receiving individual blocks of sizes less than or equal to 2MiB
 
 ## Bitswap 1.1.0
 
@@ -102,15 +102,15 @@ end.
 
 It is otherwise identical to 1.0.0
 
-### Wire Format
+### Bitswap 1.1.0: Wire Format
 
-```
+```protobuf
 message Message {
     message Entry {
-			bytes block = 1; // CID of the block
-			int32 priority = 2;	// the priority (normalized). default to 1
-			bool cancel = 3; // whether this revokes an entry
-		}
+      bytes block = 1; // CID of the block
+      int32 priority = 2;	// the priority (normalized). default to 1
+      bool cancel = 3; // whether this revokes an entry
+    }
 
     repeated Entry entries = 1;	// a list of wantlist entries
     bool full = 2; // whether this is the full wantlist. default to false
@@ -133,7 +133,7 @@ Bitswap 1.2.0 extends the Bitswap 1.1.0 protocol with the three changes:
 2. A peer can respond that it does not have some data rather than just not responding
 3. Nodes can indicate on messages how much data they have queued to send to the peer they are sending the message to
 
-### Interaction Pattern
+### Bitswap 1.2.0: Interaction Pattern
 
 Given that a client C wants to fetch data from some server S:
 
@@ -148,9 +148,9 @@ Given that a client C wants to fetch data from some server S:
     4. S should respect the relative priority of wantlist requests from C, with wants that have higher `priority` values being responded to first.
 3. When C no longer needs a block it previously asked for it should send a Cancel message for that request to any peers that have not already responded about that particular block. It should particularly send Cancel messages for Block requests (as opposed to Have requests) that have not yet been answered.
 
-### Wire Format
+### Bitswap 1.2.0: Wire Format
 
-```
+```protobuf
 message Message {
   message Wantlist {
     enum WantType {
@@ -190,7 +190,7 @@ message Message {
 }
 ```
 
-# Implementations
+## Implementations
 
-  - <https://github.com/ipfs/go-bitswap>
-  - <https://github.com/ipfs/js-ipfs-bitswap>
+- <https://github.com/ipfs/go-bitswap>
+- <https://github.com/ipfs/js-ipfs-bitswap>
