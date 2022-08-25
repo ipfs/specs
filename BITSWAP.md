@@ -27,7 +27,7 @@ Bitswap is a data exchange protocol for sending and receiving content addressed 
 
 # Introduction
 
-Bitswap is a message-based protocol, as opposed to response-reply. All messages contain wantlists, and/or blocks. Upon receiving a wantlist, a Bitswap server should eventually send wanted blocks if it has them. Upon receiving blocks, the client should send a `Cancel` notification to peers that have asked for the data, signifying that the client no longer wants the block.
+Bitswap is a message-based protocol, as opposed to request-response. All messages contain wantlists, and/or blocks. Upon receiving a wantlist, a Bitswap server should eventually process and respond to the requester with either information about the block or the block itself. Upon receiving blocks, the client should send a `Cancel` notification to peers that have asked for the data, signifying that the client no longer wants the block.
 
 Bitswap aims to be a simple protocol, so that implementations can balance aspects such as throughput, latency, fairness, memory usage, etc. for their specific requirements.
 
@@ -48,7 +48,8 @@ Given that a client C wants to fetch data from some server S:
 1. C sends a message to S for the blocks it wants, via a stream `s_want`
     1. C may either send a complete wantlist, or an update to an outstanding wantlist
     2. C may reuse this stream to send new wants
-2. S sends back blocks on a stream `s_receive`. S may reuse this stream to send back subsequent responses 
+2. S sends back blocks on a stream `s_receive`. S may reuse this stream to send back subsequent responses.
+  1. S should respect the relative priority of wantlist requests from C, with wants that have higher `priority` values being responded to first.
 3. When C no longer needs a block it previously asked for, it should send a `Cancel` message for that block to all peers from which it has not received a response about that block
 
 ### Bitswap Message
@@ -89,7 +90,7 @@ All protocol messages must be less than or equal to 4MiB in size
 
 ### Block Sizes
 
-Bitswap implementations must support sending and receiving individual blocks of sizes up to 2MiB
+Bitswap implementations must support sending and receiving individual blocks of sizes less than or equal to 2MiB
 
 ## Bitswap 1.1.0
 
@@ -105,13 +106,6 @@ It is otherwise identical to 1.0.0
 
 ```
 message Message {
-
-  message Wantlist {
-    enum WantType {
-      Block = 0;
-      Have = 1;
-    }
-
     message Entry {
 			bytes block = 1; // CID of the block
 			int32 priority = 2;	// the priority (normalized). default to 1
@@ -151,13 +145,13 @@ Given that a client C wants to fetch data from some server S:
     1. If C sends S a Have request for data S has (and is willing to give to C) it should respond with a Have, although it may instead respond with the block itself (e.g. if the block is very small)
     2. If C sends S a Have request for data S does not have (or has but is not willing to give to C) and C has requested for DontHave responses then S should respond with DontHave
     3. S may choose to include the number of bytes that are pending to be sent to C in the response message
+    4. S should respect the relative priority of wantlist requests from C, with wants that have higher `priority` values being responded to first.
 3. When C no longer needs a block it previously asked for it should send a Cancel message for that request to any peers that have not already responded about that particular block. It should particularly send Cancel messages for Block requests (as opposed to Have requests) that have not yet been answered.
 
 ### Wire Format
 
 ```
 message Message {
-
   message Wantlist {
     enum WantType {
       Block = 0;
@@ -170,7 +164,7 @@ message Message {
       bool cancel = 3; // whether this revokes an entry
       WantType wantType = 4; // Note: defaults to enum 0, ie Block
       bool sendDontHave = 5; // Note: defaults to false
-		}
+    }
 
     repeated Entry entries = 1;	// a list of wantlist entries
     bool full = 2; // whether this is the full wantlist. default to false
