@@ -17,9 +17,9 @@ Implement a replication factor for IPNS records, which maintains the number of r
 
 ## Motivation
 
-IPNS record expiration is a constant source of confusion and frustration for many. People attempting to keep an IPNS address active struggle to meet the uptime requirements, and when the requirements are not met the IPNS record disappears from the network, which has made IPNS a difficult to manage system compared to other IPFS records. However, this is not an easy problem to solve:
+IPNS record expiration is a major downside when using IPNS. If your node is offline for too long, the IPNS records will expire and the IPNS address won't be resolvable anymore, and because the records are signed other people can't maintain the record, however, expiration is needed to counter replay attacks. Unfortunately, making a new solution is challenging:
 
-1. IPFS is a volatile network. Nodes disappear and clear their caches fairly frequently; IPNS records will "expire" by themselves even without a set expiration date.
+1. IPFS is a volatile network, nodes disappear and clear their caches fairly frequently, IPNS records will "expire" by themselves even without a set expiration date.
 2. IPNS needs replay attack protection. Whatever replaces IPNS record's expiration needs to mitigate replay attacks at least mostly; the new system shouldn't have significantly worse security than the current one.
 
 ## Detailed design
