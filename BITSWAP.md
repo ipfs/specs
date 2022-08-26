@@ -199,7 +199,7 @@ Bitswap 1.3.0 extends the Bitswap 1.2.0 protocol with the following changes:
 1. Having a list of tokens that may be sent with the message and referenced within the message
 2. Allowing each entry in the wantlist to contain a set of tokens
 3. Allowing responses (both BlockPresences and Blocks) to contain a set of tokens
-4. Adding an `AuthRequired` BlockPresence
+4. Adding an `TokenErr` BlockPresence
 5. Adding a `BlockTooBig` BlockPresence
 
 ### Interaction Pattern
