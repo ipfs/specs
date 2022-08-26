@@ -43,7 +43,7 @@ There are multiple Bitswap versions and more may evolve over time. We give brief
 
 ## Block Sizes
 
-Bitswap implementations must support sending and receiving individual blocks of sizes less than or equal to 2MiB
+Bitswap implementations must support sending and receiving individual blocks of sizes less than or equal to 2MiB. Handling blocks larger than 2MiB is not recommended so as to keep compatibility with implementations which only support up to 2MiB.
 
 ## Bitswap 1.0.0
 
