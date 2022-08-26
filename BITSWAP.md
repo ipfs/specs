@@ -249,7 +249,7 @@ message Message {
       bool cancel = 3; // whether this revokes an entry
       WantType wantType = 4; // Note: defaults to enum 0, ie Block
       bool sendDontHave = 5; // Note: defaults to false
-      repeated tokens int32 = 6; // the indices of the tokens in the token list
+      repeated tokens int32 = 7; // the indices of the tokens in the token list
 		}
 
     repeated Entry entries = 1;	// a list of wantlist entries
@@ -258,7 +258,7 @@ message Message {
   message Block {
     bytes prefix = 1; // CID prefix (all of the CID components except for the digest of the multihash)
     bytes data = 2;
-    repeated tokens int32 = 3; // the indices of the tokens in the token list
+    repeated tokens int32 = 4; // the indices of the tokens in the token list
   }
 
   enum BlockPresenceType {
@@ -270,7 +270,7 @@ message Message {
   message BlockPresence {
     bytes cid = 1;
     BlockPresenceType type = 2;
-    repeated tokens int32 = 3; // the indices of the tokens in the token list
+    repeated tokens int32 = 4; // the indices of the tokens in the token list
   }
 
   Wantlist wantlist = 1;
