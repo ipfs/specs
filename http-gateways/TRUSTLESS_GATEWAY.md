@@ -1,6 +1,6 @@
 # Trustless Gateway Specification
 
-![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
+![Status](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
 
 **Authors**:
 
@@ -20,7 +20,7 @@ The minimal implementation means:
 - no path traversal or recursive resolution, no UnixFS/IPLD decoding server-side
 - response type is always fully verifiable: client can decide between a raw block or a CAR stream
 
-# Table of Contents
+## Table of Contents
 
 - [Trustless Gateway Specification](#trustless-gateway-specification)
 - [Table of Contents](#table-of-contents)
@@ -34,25 +34,25 @@ The minimal implementation means:
   - [HTTP Response Headers](#http-response-headers)
     - [`Content-Disposition` (response header)](#content-disposition-response-header)
 
-# HTTP API
+## HTTP API
 
 A subset of [HTTP API from `PATH_GATEWAY.md`](./PATH_GATEWAY.md#http-api).
 
-## `GET /ipfs/{cid}[?{params}]`
+### `GET /ipfs/{cid}[?{params}]`
 
 Downloads data at specified CID.
 
-## `HEAD /ipfs/{cid}[?{params}]`
+### `HEAD /ipfs/{cid}[?{params}]`
 
 Same as GET, but does not return any payload.
 
-# HTTP Request
+## HTTP Request
 
 Same as in [PATH_GATEWAY.md](./PATH_GATEWAY.md#http-request), but with limited number of supported response types.
 
-## HTTP Request Headers
+### HTTP Request Headers
 
-### `Accept` (request header)
+#### `Accept` (request header)
 
 This HTTP header is required when running in a strict, trustless mode.
 
@@ -63,12 +63,12 @@ Below response types MUST to be supported:
 - [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw) – requests a single, verifiable raw block to be returned
 - [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car) – disables IPLD/IPFS deserialization, requests a verifiable CAR stream to be returned
 
-# HTTP Response
+## HTTP Response
 
 Below MUST be implemented **in addition** to the [HTTP Response section from `PATH_GATEWAY.md`](./PATH_GATEWAY.md#http-response).
 
-## HTTP Response Headers
+### HTTP Response Headers
 
-### `Content-Disposition` (response header)
+#### `Content-Disposition` (response header)
 
 MUST be returned and set to `attachment` to ensure requested bytes are not rendered by a web browser.

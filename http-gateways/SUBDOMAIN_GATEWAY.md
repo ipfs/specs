@@ -1,6 +1,6 @@
 # Subdomain Gateway Specification
 
-![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
+![Status](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
 
 **Authors**:
 
@@ -23,10 +23,9 @@ Summary:
 - The root CID is used to define the [Resource Origin](https://en.wikipedia.org/wiki/Same-origin_policy), aligning it with the web's security model.
   - Files in a DAG defined by the root CID may request other files within the same DAG as part of the same Origin Sandbox.
 - Data is retrieved from IPFS in a way that is compatible with URL-based addressing
-    - URL’s path `/` points at the content root identified by the CID
+  - URL’s path `/` points at the content root identified by the CID
 
-
-# Table of Contents
+## Table of Contents
 
 - [Subdomain Gateway Specification](#subdomain-gateway-specification)
 - [Table of Contents](#table-of-contents)
@@ -51,30 +50,30 @@ Summary:
   - [Security considerations](#security-considerations)
   - [URI router](#uri-router)
 
-# HTTP API
+## HTTP API
 
 The API is a superset of [PATH_GATEWAY.md](./PATH_GATEWAY.md), the differences
 are documented below.
 
 The main one is that Subdomain Gateway expects CID to be present in the `Host` header.
 
-## `GET /[{path}][?{params}]`
+### `GET /[{path}][?{params}]`
 
 Downloads data at specified content path.
 
 - `path` – optional path to a file or a directory under the content root sent in `Host` HTTP header
 
-## `HEAD /[{path}][?{params}]`
+### `HEAD /[{path}][?{params}]`
 
 Same as GET, but does not return any payload.
 
-# HTTP Request
+## HTTP Request
 
 Below MUST be implemented **in addition** to the [HTTP Request section from `PATH_GATEWAY.md`](./PATH_GATEWAY.md#http-request).
 
-## Request Headers
+### Request Headers
 
-### `Host` (request header)
+#### `Host` (request header)
 
 Defines the root that should be prepended to the `path` before IPFS content
 path resolution is performed.
@@ -86,31 +85,30 @@ namespace, and finally the domain name used by the gateway.
 Converting `Host` into a content path depends on the nature of requested resource:
 
 - For content at `/ipfs/{cid}`:
-    - `Host: {cid-mbase32}.ipfs.example.net`
-        - Example: `Host: bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi.ipfs.dweb.link`
+  - `Host: {cid-mbase32}.ipfs.example.net`
+    - Example: `Host: bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi.ipfs.dweb.link`
 - For content at `/ipns/{libp2p-key}`:
-    - `Host: {libp2p-key-mbase36}.ipns.example.net`
-        - Example: `Host: k2k4r8jl0yz8qjgqbmc2cdu5hkqek5rj6flgnlkyywynci20j0iuyfuj.ipns.dweb.link`
-        - Note: Base36 must be used to ensure CIDv1 with ED25519 fits in a single DNS label (63 characters).
+  - `Host: {libp2p-key-mbase36}.ipns.example.net`
+    - Example: `Host: k2k4r8jl0yz8qjgqbmc2cdu5hkqek5rj6flgnlkyywynci20j0iuyfuj.ipns.dweb.link`
+    - Note: Base36 must be used to ensure CIDv1 with ED25519 fits in a single DNS label (63 characters).
 - For content at `/ipns/{dnslink-name}`:
-    - `Host: {inlined-dnslink-name}.ipns.example.net`
-        - DNSLink names include `.` which means they  MUST be inlined into a single DNS label to provide unique origin and work with wildcard TLS certificates.
-            - DNSLink label encoding:
-                - Every `-` is replaced with `--`
-                - Every `.` is replaced with `-`
-            - DNSLink label decoding
-                - Every standalone `-` is replaced with `.`
-                - Every remaining `--` is replaced with `-`
-        - Example:
-            - `example.net/ipns/en.wikipedia-on-ipfs.org` → `Host: en-wikipedia--on--ipfs-org.ipns.example.net`
+  - `Host: {inlined-dnslink-name}.ipns.example.net`
+    - DNSLink names include `.` which means they  MUST be inlined into a single DNS label to provide unique origin and work with wildcard TLS certificates.
+      - DNSLink label encoding:
+        - Every `-` is replaced with `--`
+        - Every `.` is replaced with `-`
+      - DNSLink label decoding
+        - Every standalone `-` is replaced with `.`
+        - Every remaining `--` is replaced with `-`
+    - Example:
+      - `example.net/ipns/en.wikipedia-on-ipfs.org` → `Host: en-wikipedia--on--ipfs-org.ipns.example.net`
 - If `Host` header does not include any subdomain, but the requested path is a
   valid content path, gateway MUST attempt to
   [migrate from Path to Subdomain Gateway](#migrating-from-path-to-subdomain-gateway).
 - Finally, if it is impossible to construct a content path from `Host`,
   return HTTP Error [`400` Bad Request](./PATH_GATEWAY.md#400-bad-request).
 
-
-### `X-Forwarded-Proto` (request header)
+#### `X-Forwarded-Proto` (request header)
 
 Optional. Allows `http://` gateway implementation to be deployed behind
 reverse proxies that provide TLS (`https://`) termination.
@@ -127,7 +125,7 @@ Example (GET with `X-Forwarded-Proto: https`):
 - `GET http://dweb.link/ipfs/{cid}` → HTTP 301 with `Location: https://{cid}.ipfs.dweb.link`
 - `GET http://dweb.link/ipns/your-dnslink.site.example.com` → HTTP 301 with `Location: https://your--dnslink-site-example-com.ipfs.dweb.link`
 
-### `X-Forwarded-Host` (request header)
+#### `X-Forwarded-Host` (request header)
 
 Optional. Enables Path Gateway requests to be redirected to a Subdomain Gateway
 on a different domain name.
@@ -138,26 +136,26 @@ Example (GET with `X-Forwarded-Host: example.com`):
 
 - `GET https://dweb.link/ipfs/{cid}` → HTTP 301 with `Location: https://{cid}.ipfs.example.com`
 
-## Request Query Parameters
+### Request Query Parameters
 
-### `uri` (request query parameter)
+#### `uri` (request query parameter)
 
 Optional. When present, passed address should override regular path routing.
 
 See [URI router](#uri-router) section for usage and implementation details.
 
-# HTTP Response
+## HTTP Response
 
 Below MUST be implemented **in addition** to the [HTTP Response section from `PATH_GATEWAY.md`](./PATH_GATEWAY.md#http-response).
 
-## Response Headers
+### Response Headers
 
-### `Location` (response header)
+#### `Location` (response header)
 
 Below MUST be implemented **in addition** to
 [`Location` reqirements defined in `PATH_GATEWAY.md`](./PATH_GATEWAY.md#location-response-header).
 
-#### Use in interop with Path Gateway
+##### Use in interop with Path Gateway
 
 Returned with [`301` Moved Permanently](./PATH_GATEWAY.md#301-moved-permanently) when `Host` header does
 not follow the subdomain naming convention, but the requested URL path happens
@@ -177,13 +175,13 @@ form if necessary. For example:
 
 See also: [Migrate from Path to Subdomain Gateway](#migrating-from-path-to-subdomain-gateway).
 
-#### Use in URI router
+##### Use in URI router
 
 See: [URI router](#uri-router)
 
-# Appendix: notes for implementers
+## Appendix: notes for implementers
 
-## Migrating from Path to Subdomain Gateway
+### Migrating from Path to Subdomain Gateway
 
 Subdomain Gateway MUST implement a redirect on paths defined in [`PATH_GATEWAY.md`](./PATH_GATEWAY.md).
 
@@ -200,7 +198,7 @@ It is up to the gateway operator to clearly communicate when such a transition
 is to happen, or use a different domain name for subdomain gateway to avoid
 breaking legacy clients that are unable to follow HTTP 301 redirects.
 
-## DNS label limits
+### DNS label limits
 
 DNS labels, must be case-insensitive, and up to a maximum of 63 characters
 [per label](https://datatracker.ietf.org/doc/html/rfc2181#section-11).
@@ -214,12 +212,12 @@ representation to safely fit with the 63 character limit.
 
 How to represent CIDs with a string representation greater than 63
 characters, such as those for `sha2-512` hashes, remains an
-[open question](https://github.com/ipfs/go-ipfs/issues/7318). 
+[open question](https://github.com/ipfs/go-ipfs/issues/7318).
 
 Until a solution is found, subdomain gateway implementations
 should return HTTP 400 Bad Request for CIDs longer than 63.
 
-## Security considerations
+### Security considerations
 
 - Wildcard TLS certificates should be set for `*.ipfs.example.net` and
   `*.ipns.example.net` if a subdomain gateway is to be exposed on the public
@@ -232,14 +230,14 @@ should return HTTP 400 Bad Request for CIDs longer than 63.
   origins still share the parent domain name used by the gateway. To fully
   isolate websites from each other:
 
-    - The gateway operator should add a wildcard entry
+  - The gateway operator should add a wildcard entry
       to the [Public Suffix List](https://publicsuffix.org/) (PSL).
-        - Example: `dweb.link` gateway [is listed on PSL](https://publicsuffix.org/list/public_suffix_list.dat) as `*.dweb.link`
-    - Web browsers with IPFS support should detect subdomain gateway (URL
+    - Example: `dweb.link` gateway [is listed on PSL](https://publicsuffix.org/list/public_suffix_list.dat) as `*.dweb.link`
+  - Web browsers with IPFS support should detect subdomain gateway (URL
       pattern `https://{content-root-id}.ip[f|n]s.example.net`) and dynamically
       add it to PSL.
 
-## URI router
+### URI router
 
 Optional [`uri`](#uri-request-query-parameter) query parameter overrides regular path routing.
 
@@ -256,7 +254,7 @@ present in web browsers. The value passed in `%s` should be
 
 Given registration:
 
-```
+```javascript
 navigator.registerProtocolHandler('ipfs', 'https://dweb.link/ipfs/?uri=%s', 'IPFS resolver')
 navigator.registerProtocolHandler('ipns', 'https://dweb.link/ipns/?uri=%s', 'IPNS resolver')
 ```
@@ -268,4 +266,3 @@ which in turn should redirect to
 `https://dweb.link/ipfs/bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi`.
 
 From there, regular subdomain gateway logic applies.
-

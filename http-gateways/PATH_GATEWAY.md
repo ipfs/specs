@@ -1,6 +1,6 @@
 # Path Gateway Specification
 
-![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
+![Status](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
 
 **Authors**:
 
@@ -23,7 +23,7 @@ extend the below spec and are defined in
 [TRUSTLESS_GATEWAY.md](./TRUSTLESS_GATEWAY.md) specification for use cases
 where client prefers to perform all validation locally.
 
-# Table of Contents
+## Table of Contents
 
 - [Path Gateway Specification](#path-gateway-specification)
 - [Table of Contents](#table-of-contents)
@@ -84,12 +84,12 @@ where client prefers to perform all validation locally.
   - [Denylists](#denylists)
   - [Generated HTML with directory index](#generated-html-with-directory-index)
 
-# HTTP API
+## HTTP API
 
 Path Gateway provides HTTP interface for requesting content-addressed data at
 specified content path.
 
-## `GET /ipfs/{cid}[/{path}][?{params}]`
+### `GET /ipfs/{cid}[/{path}][?{params}]`
 
 Downloads data at specified **immutable** content path.
 
@@ -97,7 +97,7 @@ Downloads data at specified **immutable** content path.
 - `path` – optional path remainer pointing at a file or a directory under the `cid` content root
 - `params` – optional query parameters that adjust response behavior
 
-## `HEAD /ipfs/{cid}[/{path}][?{params}]`
+### `HEAD /ipfs/{cid}[/{path}][?{params}]`
 
 Same as GET, but does not return any payload.
 
@@ -109,7 +109,7 @@ such as
 and [`Content-Type`](#content-type-response-header).
 <!-- TODO add [`X-Ipfs-DataSize`](#x-ipfs-datasize-response-header) -->
 
-### only-if-cached HEAD behavior
+#### only-if-cached HEAD behavior
 
 HTTP client can send `HEAD` request with
 [`Cache-Control: only-if-cached`](#cache-control-request-header)
@@ -120,7 +120,7 @@ fast and does not generate any additional I/O such as IPFS data transfer. This
 allows light clients to probe and prioritize gateways which already
 have the data.
 
-## `GET /ipns/{name}[/{path}][?{params}]`
+### `GET /ipns/{name}[/{path}][?{params}]`
 
 Downloads data at specified **mutable** content path.
 
@@ -131,17 +131,17 @@ Implementation must resolve the `name` to a CID, then serve response behind a
   - cryptographic [IPNS key hash](https://docs.ipfs.io/concepts/glossary/#ipns)
   - human-readable DNS name with [DNSLink](https://docs.ipfs.io/concepts/glossary/#dnslink) set-up
 
-## `HEAD /ipns/{name}[/{path}][?{params}]`
+### `HEAD /ipns/{name}[/{path}][?{params}]`
 
 Same as GET, but does not return any payload.
 
-# HTTP Request
+## HTTP Request
 
-## Request Headers
+### Request Headers
 
 All request headers are optional.
 
-### `If-None-Match` (request header)
+#### `If-None-Match` (request header)
 
 Used for HTTP caching.
 
@@ -153,11 +153,11 @@ The Gateway MUST compare Etag values sent in `If-None-Match` with `Etag` that
 would be sent with response. Positive match MUST return HTTP status code 304
 (Not Modified), without any payload.
 
-### `Cache-Control` (request header)
+#### `Cache-Control` (request header)
 
 Used for HTTP caching.
 
-#### `only-if-cached`
+##### `only-if-cached`
 
 Client can send `Cache-Control: only-if-cached` to request data only if the
 gateway already has the data (e.g. in local datastore) and can return it
@@ -173,7 +173,7 @@ maximize cache hits while minimizing performance cost of checking if the entire
 DAG is locally cached. A good rule of thumb is to at the minimum test if the root
 block is in the local cache.
 
-### `Accept` (request header)
+#### `Accept` (request header)
 
 Can be used for requesting specific response format
 
@@ -186,7 +186,7 @@ For example:
 - application/vnd.ipld.dag-cbor OR application/cbor - requests IPLD Data Model representation serialized into [DAG-CBOR format](https://ipld.io/docs/codecs/known/dag-cbor/)
 -->
 
-### `Range` (request header)
+#### `Range` (request header)
 
 `Range` can be used for requesting specific byte ranges of UnixFS files and raw
 blocks.
@@ -194,12 +194,11 @@ blocks.
 Gateway implementations SHOULD be smart enough to require only the minimal DAG subset
 necessary for handling the range request.
 
-
 NOTE: for more advanced use cases such as partial DAG/CAR streaming, or
 non-UnixFS data structures, see the `selector` query parameter
 [proposal](https://github.com/ipfs/go-ipfs/issues/8769).
 
-### `Service-Worker` (request header)
+#### `Service-Worker` (request header)
 
 Mentioned here for security reasons and should be implemented with care.
 
@@ -217,11 +216,11 @@ Gateway should refuse attempts to register a service worker for entire
 Requests to these paths with `Service-Worker: script` MUST be denied by
 returning HTTP 400 Bad Request error.
 
-## Request Query Parameters
+### Request Query Parameters
 
 All query parameters are optional.
 
-### `filename` (request query parameter)
+#### `filename` (request query parameter)
 
 Optional, can be used for overriding the filename.
 
@@ -230,7 +229,7 @@ it for `Content-Type` calculation.
 
 Example: `https://ipfs.io/ipfs/QmfM2r8seH2GiRaC4esTjeraXEachRt8ZsSeGaWTPLyMoG?filename=hello_world.txt`
 
-### `download` (request query parameter)
+#### `download` (request query parameter)
 
 Optional, can be used to request specific  `Content-Disposition` to be set on the response.
 
@@ -256,39 +255,38 @@ for more details.
     - This is a powerful primitive that allows for fetching subsets of data in specific order, either as raw bytes, or a CAR stream. Think “HTTP range requests”, but for IPLD, and more powerful.
 -->
 
+## HTTP Response
 
-# HTTP Response
+### Response Status Codes
 
-## Response Status Codes
-
-### `200` OK
+#### `200` OK
 
 The request succeeded.
 
 If the HTTP method was `GET`, then data is transmitted in the message body.
 
-### `206` Partial Content
+#### `206` Partial Content
 
 Partial Content: range request succeeded.
 
 Returned when requested range of data described by  [`Range`](#range-request-header) header of the request.
 
-### `301` Moved Permanently
+#### `301` Moved Permanently
 
 Indicates permanent redirection.
 
 The new, canonical URL is returned in the [`Location`](#location-response-header) header.
 
-### `400` Bad Request
+#### `400` Bad Request
 
 A generic client error returned when it is not possible to return a better one
 
-### `404` Not Found
+#### `404` Not Found
 
 Error to indicate that request was formally correct, but traversal of the
 requested content path was not possible due to a invalid or missing DAG node.
 
-### `410` Gone
+#### `410` Gone
 
 Error to indicate that request was formally correct, but this specific Gateway
 refuses to return requested data.
@@ -298,13 +296,13 @@ The name of deny list and unique identifier of blocked entries can be provided i
 
 See: [Denylists](#denylists)
 
-### `412` Precondition Failed
+#### `412` Precondition Failed
 
 Error to indicate that request was formally correct, but Gateway is unable to
 return requested data under the additional (usually cache-related) conditions
 sent by the client.
 
-#### Use with only-if-cached
+##### Use with only-if-cached
 
 - Client sends a request with [`Cache-Control: only-if-cached`](#cache-control-request-header)
 - Gateway does not have requested CIDs in local datastore, and is unable to
@@ -314,14 +312,14 @@ sent by the client.
     the gateway itself, moving the error to client error range and avoiding
     confusing server errors in places like the browser console.
 
-### `429` Too Many Requests
+#### `429` Too Many Requests
 
 A
 [`Retry-After`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After)
 header might be included to this response, indicating how long to wait before
 making a new request.
 
-### `451` Unavailable For Legal Reasons
+#### `451` Unavailable For Legal Reasons
 
 Error to indicate that request was formally correct, but this specific Gateway
 is unable to return requested data due to legal reasons. Response SHOULD
@@ -330,17 +328,17 @@ include an explanation, as noted in
 
 See: [Denylists](#denylists)
 
-### `500` Internal Server Error
+#### `500` Internal Server Error
 
 A generic server error returned when it is not possible to return a better one.
 
-### `504` Gateway Timeout
+#### `504` Gateway Timeout
 
 Returned when Gateway was not able to produce response under set limits.
 
-## Response Headers
+### Response Headers
 
-### `Etag` (response header)
+#### `Etag` (response header)
 
 Used for HTTP caching.
 
@@ -372,8 +370,7 @@ and CDNs, implementations should base it on both CID and response type:
   should be based on requested range in addition to CID and response format:
   `Etag: "bafy..foo.0-42`
 
-
-### `Cache-Control` (response header)
+#### `Cache-Control` (response header)
 
 Used for HTTP caching.
 
@@ -395,7 +392,7 @@ Returned directive depends on requested content path and format:
   - If TTL value is unknown, implementations are free to set it to a static
     value, but it should not be lower than 60 seconds.
 
-### `Last-Modified` (response header)
+#### `Last-Modified` (response header)
 
 Optional, used as additional hint for HTTP caching.
 
@@ -419,7 +416,7 @@ Returning this header depends on the information available:
   providing a static expiration window in `Cache-Control` is easier to reason
   about than cache expiration based on the fuzzy “heuristic freshness”.
 
-### `Content-Type` (response header)
+#### `Content-Type` (response header)
 
 Returned with custom response formats such as `application/vnd.ipld.car` or
 `application/vnd.ipld.raw`. CAR must be returned with explicit version.
@@ -438,7 +435,7 @@ For example:
 - detect SVG image
   and return `Content-Type: image/svg+xml` instead of `text/xml`
 
-### `Content-Disposition` (response header)
+#### `Content-Disposition` (response header)
 
 Returned when `download`, `filename` query parameter, or a custom response
 `format` such as `car` or `raw` block are used.
@@ -457,13 +454,14 @@ The remainder is an optional `filename` parameter that will be prefilled in the
 
 NOTE: when the `filename` includes non-ASCII characters, the header must
 include both ASCII and UTF-8 representations for compatibility with legacy user
-agents and existing web browsers. 
+agents and existing web browsers.
 
 To illustrate, `?filename=testтест.pdf` should produce:
 `Content-Disposition inline; filename="test____.jpg"; filename*=UTF-8''test%D1%82%D0%B5%D1%81%D1%82.jpg`
-  - ASCII representation must have non-ASCII characters replaced with `_`
-  - UTF-8 representation must be wrapped in Percent Encoding ([RFC 3986, Section 2.1](https://www.rfc-editor.org/rfc/rfc3986.html#section-2.1)).
-    - NOTE: `UTF-8''` is not a typo – see [Examples in RFC5987](https://datatracker.ietf.org/doc/html/rfc5987#section-3.2.2)
+
+- ASCII representation must have non-ASCII characters replaced with `_`
+- UTF-8 representation must be wrapped in Percent Encoding ([RFC 3986, Section 2.1](https://www.rfc-editor.org/rfc/rfc3986.html#section-2.1)).
+  - NOTE: `UTF-8''` is not a typo – see [Examples in RFC5987](https://datatracker.ietf.org/doc/html/rfc5987#section-3.2.2)
 
 `Content-Disposition` must be also set when a binary response format was requested:
 
@@ -477,20 +475,20 @@ To illustrate, `?filename=testтест.pdf` should produce:
   not attempt to render raw bytes. CID and `.bin` file extension should be used
   if  a custom `filename` was not provided with the request.
 
-### `Content-Length` (response header)
+#### `Content-Length` (response header)
 
 Represents the length of returned HTTP payload.
 
 NOTE: the value may differ from the real size of requested data if compression or chunked `Transfer-Encoding` are used.
 <!-- TODO (https://github.com/ipfs/in-web-browsers/issues/194) IPFS clients looking for UnixFS file size should use value from `X-Ipfs-DataSize` instead. -->
 
-### `Content-Range` (response header)
+#### `Content-Range` (response header)
 
 Returned only when request was a [`Range`](#range-request-header) request.
 
 See [RFC7233#header.content-range](https://httpwg.org/specs/rfc7233.html#header.content-range).
 
-### `Accept-Ranges` (response header)
+#### `Accept-Ranges` (response header)
 
 Optional, returned to explicitly indicate if gateway supports partial HTTP
 [`Range`](#range-request-header) requests for a specific resource.
@@ -499,22 +497,22 @@ For example, `Accept-Ranges: none` should be returned with
 `application/vnd.ipld.car` responses if the block order in CAR stream is not
 deterministic.
 
-### `Location` (response header)
+#### `Location` (response header)
 
 Returned only when response status code is [`301` Moved Permanently](#301-moved-permanently).
 The value informs the HTTP client about new URL for requested resource.
 
 This header is more widely used in [SUBDOMAIN_GATEWAY.md](./SUBDOMAIN_GATEWAY.md#location-response-header).
 
-#### Use in directory URL normalization
+##### Use in directory URL normalization
 
 Gateway MUST return a redirect when a valid UnixFS directory was requested
 without the trailing `/`, for example:
 - response for `https://ipfs.io/ipns/en.wikipedia-on-ipfs.org/wiki`
-	(no trailing slash) will be HTTP 301 redirect with
+  (no trailing slash) will be HTTP 301 redirect with
   `Location: /ipns/en.wikipedia-on-ipfs.org/wiki/`
 
-### `X-Ipfs-Path` (response header)
+#### `X-Ipfs-Path` (response header)
 
 Used for HTTP caching and indicating the IPFS address of the data.
 
@@ -522,7 +520,7 @@ Indicates the original, requested content path before any path resolution and tr
 
 Example: `X-Ipfs-Path: /ipns/k2..ul6/subdir/file.txt`
 
-### `X-Ipfs-Roots` (response header)
+#### `X-Ipfs-Roots` (response header)
 
 Used for HTTP caching.
 
@@ -557,7 +555,7 @@ change at all, allowing for smarter caching beyond what standard Etag offers.
         - For UnixFS this is equivalent to `Size` from `ipfs files stat` or `ipfs dag stat`
 -->
 
-### `X-Content-Type-Options` (response header)
+#### `X-Content-Type-Options` (response header)
 
 Optional, present in certain response types:
 
@@ -568,14 +566,14 @@ Optional, present in certain response types:
   non-executable binary response types are not used in `<script>` and `<style>`
   HTML tags.
 
-### `X-Trace-Id` (response header)
+#### `X-Trace-Id` (response header)
 
 Optional. Implementations are free to use this header to return a globally
 unique identifier to help in debugging errors and performance issues.
 
 A good practice is to always return it with HTTP error [status codes](#response-status-codes) >=`400`.
 
-## Response Payload
+### Response Payload
 
 Data sent with HTTP response depends on the type of requested IPFS resource:
 
@@ -594,14 +592,14 @@ Data sent with HTTP response depends on the type of requested IPFS resource:
   - See [https://github.com/ipfs/go-ipfs/issues/8823](https://github.com/ipfs/go-ipfs/issues/8823)
 -->
 
-# Appendix: notes for implementers
+## Appendix: notes for implementers
 
-## Content resolution
+### Content resolution
 
 Content resolution is a process of turning an HTTP request into an IPFS content
 path, and then traversing it until the content identifier (CID) is found.
 
-### Finding the content root
+#### Finding the content root
 
 Path Gateway decides what content to serve by taking the path from the URL
 requested and splitting it into two parts: the *CID*  and the *remainder* of
@@ -614,9 +612,9 @@ IPLD data, starting from that data which the CID identified.
 **Note:** Other types of gateway may allow for passing CID by other means, such
 as `Host` header, changing the rules behind path splitting.
 (See [SUBDOMAIN_GATEWAY.md](./SUBDOMAIN_GATEWAY.md)
-and [DNSLINK_GATEWAY.md](./DNSLINK_GATEWAY.md)). 
+and [DNSLINK_GATEWAY.md](./DNSLINK_GATEWAY.md)).
 
-### Traversing remaining path
+#### Traversing remaining path
 
 UnixFS pathing over files and directories is the implicit default used for
 resolving content paths that start with `/ipfs/` and `/ipns/`. It allows for
@@ -625,7 +623,7 @@ low level logical pathing from IPLD:
 
 - Example of UnixFS pathing: `/ipfs/cid/dir-name/file-name.txt`
 
-### Handling traversal errors
+#### Handling traversal errors
 
 Gateway MUST respond with HTTP error when it is not possible to traverse the requested content path:
 - [`404 Not Found`](#404-not-found) should be returned when the root CID is valid and traversable, but
@@ -633,7 +631,7 @@ the DAG it represents does not include content path remainder.
   - Error response body should indicate which part of immutable content path (`/ipfs/{cid}/path/to/file`) is missing
 - [`400 Bad Request`](#400-bad-request) can be used for remaining traversal errors caused by invalid or unsupported DAG types.
 
-## Best practices for HTTP caching
+### Best practices for HTTP caching
 
 - Following [HTTP Caching](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-cache)
   rules around `Etag` , `Cache-Control` , `If-None-Match` and `Last-Modified`
@@ -647,7 +645,7 @@ the DAG it represents does not include content path remainder.
   It allows IPFS-aware HTTP clients to probe and prioritize gateways that
   already have the data cached, significantly improving retrieval speeds.
 
-## Denylists
+### Denylists
 
 Optional, but encouraged.
 
@@ -668,7 +666,7 @@ operator is able to inspect and modify the list of denylists that are applied.
   etc). Each entry is `sha256()` hashed so that it can easily be checked given
   a plaintext CID, but inconvenient to determine otherwise.
 
-## Generated HTML with directory index
+### Generated HTML with directory index
 
 While implementations are free to decide on the way HTML directory listing is
 generated and presented to the user, following below suggestions is advised.

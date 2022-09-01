@@ -1,6 +1,6 @@
 # DNSLink Gateway Specification
 
-![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
+![Status](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
 
 **Authors**:
 
@@ -23,7 +23,7 @@ In short:
 - gateway resolves DNSLink to an immutable content root identified by a CID
 - HTTP response includes the data for the CID
 
-# Table of Contents
+## Table of Contents
 
 - [DNSLink Gateway Specification](#dnslink-gateway-specification)
 - [Table of Contents](#table-of-contents)
@@ -37,26 +37,26 @@ In short:
 - [Appendix: notes for implementers](#appendix-notes-for-implementers)
   - [Leveraging DNS for content routing](#leveraging-dns-for-content-routing)
 
-# HTTP API
+## HTTP API
 
-## `GET /[{path}][?{params}]`
+### `GET /[{path}][?{params}]`
 
-Downloads data at specified path under the content path for DNSLink name provided in `Host` header. 
+Downloads data at specified path under the content path for DNSLink name provided in `Host` header.
 
 - `path` – optional path to a file or a directory under the content root sent in `Host` HTTP header
-    - Example: if `Host: example.com` then the content path to resolve is `/ipns/example.com/{path}`
+  - Example: if `Host: example.com` then the content path to resolve is `/ipns/example.com/{path}`
 
 ## `HEAD /[{path}][?{params}]`
 
 Same as GET, but does not return any payload.
 
-# HTTP Request
+## HTTP Request
 
 Below MUST be implemented **in addition** to the [HTTP Request section from `PATH_GATEWAY.md`](./PATH_GATEWAY.md#http-request).
 
-## Request headers
+### Request headers
 
-### `Host` (request header)
+#### `Host` (request header)
 
 Defines the [DNSLink](https://docs.ipfs.io/concepts/glossary/#dnslink) name
 to RECURSIVELY resolve into an immutable `/ipfs/{cid}/` prefix that should
@@ -85,13 +85,13 @@ content path:
 3. Resolving DNSlink at `b.example.net` replaces `/ipns/b.example.net` with `/ipfs/bafy…qy3k/path-c`
 4. The immutable content path is `/ipfs/bafy…qy3k/path-c/path-b/path-a`
 
-# HTTP Response
+## HTTP Response
 
 Same as [HTTP Response section in `PATH_GATEWAY.md`](./PATH_GATEWAY.md#http-response).
 
-# Appendix: notes for implementers
+## Appendix: notes for implementers
 
-## Leveraging DNS for content routing
+### Leveraging DNS for content routing
 
 - It is a good idea to publish
   [DNSAddr](https://github.com/multiformats/multiaddr/blob/master/protocols/DNSADDR.md)
