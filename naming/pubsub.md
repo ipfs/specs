@@ -91,4 +91,5 @@ every 10 seconds)
 
 # Implementations
 
-  - <https://github.com/ipfs/kubo/tree/master/namesys>
+  - <https://github.com/ipfs/go-namesys>
+
