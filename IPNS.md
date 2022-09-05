@@ -1,8 +1,10 @@
-# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) IPNS - Inter-Planetary Naming System
+# ![draft](https://img.shields.io/badge/status-draft-yellow.svg?style=flat-square) IPNS - Inter-Planetary Naming System
 
 **Authors(s)**:
+
 - Vasco Santos ([@vasco-santos](https://github.com/vasco-santos))
 - Steven Allen ([@Stebalien](https://github.com/Stebalien))
+- Marcin Rataj ([@lidel](https://github.com/lidel))
 
 -----
 
@@ -10,17 +12,20 @@
 
 IPFS is powered by content-addressed data, which by nature is immutable: changing an object would change its hash, and consequently its address, making it a different object altogether. However, there are several use cases where we benefit from having mutable data. This is where IPNS gets into the equation.
 
-All things considered, the IPFS naming layer is responsible for the creation of:
-- mutable pointers to objects
-- human-readable names
+IPNS records provide cryptographically verifiable, mutable pointers to objects.
 
-# Table of Contents
+## Organization of this document
 
 - [Introduction](#introduction)
+- [IPNS Name](#ipns-name)
+  - [Text Format](#text-format)
+  - [Key Types](#key-types)
+  - [Wire Format](#wire-format)
 - [IPNS Record](#ipns-record)
 - [Protocol](#protocol)
-- [Overview](#overview)
-- [API Spec](#api-spec)
+  - [Overview](#overview)
+  - [Record Creation](#record-creation)
+  - [Record Validation](#record-validation)
 - [Integration with IPFS](#integration-with-ipfs)
 
 ## Introduction
@@ -29,53 +34,135 @@ Each time a file is modified, its content address changes. As a consequence, the
 
 IPNS is based on [SFS](http://en.wikipedia.org/wiki/Self-certifying_File_System). It consists of a PKI namespace, where a name is simply the hash of a public key. As a result, whoever controls the private key has full control over the name. Accordingly, records are signed by the private key and then distributed across the network (in IPFS, via the routing system). This is an egalitarian way to assign mutable names on the Internet at large, without any centralization whatsoever, or certificate authorities.
 
+## IPNS Name
+
+### Text Format
+
+To maximize interop with IPFS tools and wider ecosystem, IPNS Name can be represented as a [CID](https://docs.ipfs.tech/concepts/glossary/#cid) with `libp2p-key` [multicodec](https://docs.ipfs.tech/concepts/glossary/#multicodec) (code `0x72`), and encoded with [Multibase](https://docs.ipfs.io/concepts/glossary/#multibase) as Base32 (or Base36, for use in DNS contexts).
+
+A good practice is to prefix IPNS Name with `/ipns/` namespace: `/ipns/{ipns-name}` (or `/ipns/{libp2p-key}`).
+
+### Key Types
+
+Implementations MUST support Ed25519. Ed25519 signatures MUST follow the [standard from RFC8032](https://www.rfc-editor.org/rfc/rfc8032#section-5.1).
+
+Implementations MAY support RSA, Secp256k1 and ECDSA for private use, but peers from the public IPFS swarm and DHT may not be able to resolve IPNS records signed by these optional key types.
+When implementing support for optional key types, follow signature implementation notes from [PeerID specs](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#key-types).
+
+In all cases, the IPNS implementation MAY allow the user to enable/disable specific key types via configuration. Note that disabling support for compulsory key type will hinder IPNS interop.
+
+### Wire Format
+
+In the binary form, IPNS Name is a [Multihash](https://docs.ipfs.io/concepts/glossary/#multibase) of a `PublicKey` [Protocol Buffer](https://github.com/google/protobuf) envelope originally defined in [PeerID specs](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#keys):
+
+```protobuf
+syntax = "proto2";
+
+enum KeyType {
+ RSA = 0;
+ Ed25519 = 1;
+ Secp256k1 = 2;
+ ECDSA = 3;
+}
+
+// PublicKey struct below is often labeled as 'libp2p-key' (multicodec 0x72)
+message PublicKey {
+ required KeyType Type = 1;
+ required bytes Data = 2;
+}
+
+message PrivateKey {
+ required KeyType Type = 1;
+ required bytes Data = 2;
+}
+```
+
+If PeerID specification changes in the future, the protobuf above takes the precedence.
+
+If `PublicKey` is small (e.g., Ed25519), it can be inlined by using the `identity` Multihash function.
+
 ## IPNS Record
 
-An IPNS record is a data structure containing the following fields:
+A logical IPNS record is a data structure containing the following fields:
 
-- 1. **Value** (bytes)
-  - It can be any path, such as a path to another IPNS record, a `dnslink` path (eg. `/ipns/example.com`) or an IPFS path (eg. `/ipfs/Qm...`)
-- 2. **Validity** (bytes)
-  - Expiration date of the record using [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) with nanoseconds precision.
-  - Note: Currently, the expiration date is the only available type of validity.
-- 3. **Validity Type** (uint64)
-   - Allows us to define the conditions under which the record is valid.
-   - Only supports expiration date with `validityType = 0` for now.
-- 4. **Signature** (bytes)
-  - Concatenate value, validity field and validity type
-  - Sign the concatenation result with the provided private key
-  - Note: Once we add new validity types, the signature must be changed. More information on [ipfs/notes#249](https://github.com/ipfs/notes/issues/249)
-- 5. **Sequence** (uint64)
-  - Represents the current version of the record (starts at 0)
-- 6. **Public Key** (bytes)
-  - Public key used to sign this record
-  - Note: The public key **must** be included if it cannot be extracted from the peer ID (reference [libp2p/specs#100](https://github.com/libp2p/specs/pull/100/files)).
-- 7. **ttl** (uint64)
+- **Value** (bytes)
+  - It can be any path, such as a `/ipns/{ipns-key}` path to another IPNS record, a [DNSLink](https://dnslink.dev/) path (`/ipns/example.com`) or an immutable IPFS path (`/ipfs/baf...`).
+  - Implementations MUST include this value in both `IpnsEntry.value` and inside the DAG-CBOR document in `IpnsEntry.data[value]`.
+- **Validity Type** (uint64)
+  - Defines the conditions under which the record is valid.
+  - The only supported value is `0`, which indicates the `validity` field contains the expiration date after which the IPNS record becomes invalid.
+  - Implementations MUST support `validityType = 0` and include this value in both `IpnsEntry.validityType` and inside the DAG-CBOR document at `IpnsEntry.data[validityType]`.
+- **Validity** (bytes)
+  - When `validityType = 0`
+    - Expiration date of the record with nanoseconds precision.
+    - Represented as an ASCII string that follows notation from [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) (`1970-01-01T00:00:00.000000001Z`).
+  - Implementations MUST include this value in both `IpnsEntry.validity` and inside the DAG-CBOR document at `IpnsEntry.data[validity]`.
+- **Sequence** (uint64)
+  - Represents the current version of the record (starts at 0).
+  - Implementations MUST include this value in both `IpnsEntry.sequence` and inside the DAG-CBOR document at `IpnsEntry.data[sequence]`.
+- **TTL** (uint64)
   - A hint for how long the record should be cached before going back to, for instance the DHT, in order to check if it has been updated.
+  - Implementations MUST include this value in both `IpnsEntry.ttl` and inside the DAG-CBOR document at `IpnsEntry.data[ttl]`.
+- **Public Key** (bytes)
+  - Public key used to sign this record.
+    - If public key is small enough to fit in IPNS name (e.g., Ed25519 keys inlined using `identity` multihash), `IpnsEntry.pubKey` field is redundant and MAY be skipped to save space.
+    - The public key MUST be included if it cannot be extracted from the IPNS name (e.g., legacy RSA keys). Implementers MUST follow key serialization defined in [PeerID specs](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#key-types).
+- **Signature** (bytes)
+  - Provides the cryptographic proof that the IPNS record was created by the owner of the private key.
+  - Implementations MUST include this value in `IpnsEntry.signatureV2` and follow signature creation and verification as described in [Record Creation](#record-creation) and [Record Validation](#record-validation).
+- **Extensible Data** (DAG-CBOR)
+  - Extensible record data in [DAG-CBOR](https://ipld.io/specs/codecs/dag-cbor/spec/) format.
+  - The default set of fields can be augmented with additional information. Implementations are free to leverage this, or simply ignore unexpected fields.
 
-These records are stored locally, as well as spread across the network, in order to be accessible to everyone. For storing this structured data, we use [Protocol Buffers](https://github.com/google/protobuf), which is a language-neutral, platform neutral extensible mechanism for serializing structured data.
+IPNS records are stored locally, as well as spread across the network, in order to be accessible to everyone.
 
-```
+For storing this structured data at rest and on the wire, we use `IpnsEntry` encoded as [Protocol Buffer](https://github.com/google/protobuf), which is a language-neutral, platform neutral extensible mechanism for serializing structured data.
+The extensible part of IPNS Record is placed in `IpnsEntry.data` field, which itself is encoded using a strict and deterministic subset of CBOR named [DAG-CBOR](https://ipld.io/specs/codecs/dag-cbor/spec/).
+
+The maximum size of `IpnsEntry` is 2 MiB. Bigger records MUST be ignored by IPNS implementations.
+
+```protobuf
 message IpnsEntry {
-	enum ValidityType {
-		// setting an EOL says "this record is valid until..."
-		EOL = 0;
-	}
-	required bytes value = 1;
-	required bytes signature = 2;
+ enum ValidityType {
+  // setting an EOL says "this record is valid until..."
+  EOL = 0;
+ }
 
-	optional ValidityType validityType = 3;
-	optional bytes validity = 4;
+ // deserialized copy of data[value]
+ optional bytes value = 1;
 
-	optional uint64 sequence = 5;
+ // unused legacy field, use 'signatureV2' instead
+ optional bytes signature = 2;
 
-	optional uint64 ttl = 6;
+ // deserialized copies of data[validityType] and data[validity]
+ optional ValidityType validityType = 3;
+ optional bytes validity = 4;
 
-	optional bytes pubKey = 7;
+ // deserialized copy of data[sequence]
+ optional uint64 sequence = 5;
+
+ // record TTL in nanoseconds, a deserialized copy of data[ttl]
+ optional uint64 ttl = 6;
+
+ // in order for nodes to properly validate a record upon receipt, they need the public
+ // key associated with it. For old RSA keys, its easiest if we just send this as part of
+ // the record itself. For newer Ed25519 keys, the public key can be embedded in the
+ // IPNS Name itself, making this field unnecessary.
+ optional bytes pubKey = 7;
+
+ // the signature of the IPNS record
+ optional bytes signatureV2 = 8;
+
+ // extensible record data in DAG-CBOR format
+ optional bytes data = 9;
 }
 ```
 
 ## Protocol
+
+### Overview
+
+![](img/ipns-overview.png)
 
 Taking into consideration a p2p network, each peer should be able to publish IPNS records to the network, as well as to resolve the IPNS records published by other peers.
 
@@ -91,24 +178,59 @@ As soon as the node has the most recent record, the signature and the validity m
 
 Finally, the network nodes may also republish their records, so that the records in the network continue to be valid to the other nodes.
 
-## Overview
+### Record Creation
 
-![](img/ipns-overview.png)
+IPNS record MUST be serialized as `IpnsEntry` protobuf and the raw record data MUST be signed using the private key.
 
-## API Spec
+Creating a new IPNS record MUST follow the below steps:
 
-  - [API_CORE](https://github.com/ipfs/specs/blob/master/API_CORE.md)
+1. Create `IpnsEntry` and set `value`, `validity`, `validityType`, `sequence`, and `ttl`
+   - If you are updating an existing record, remember to increase values in `sequence` and `validity`
+2. Create a DAG-CBOR document with the same values for `value`, `validity`, `validityType`, `sequence`, and `ttl`
+3. Store DAG-CBOR in `IpnsEntry.data`.
+   - If you want to store additional metadata in the record, add it under unique keys at `IpnsEntry.data`.
+   - The order of fields impacts signature verification. If you are using an alternative CBOR implementation, make sure the CBOR field order follows [RFC7049](https://www.rfc-editor.org/rfc/rfc7049) sorting rules: length and then bytewise. The order of fields impacts signature verification.
+4. If your public key can't be inlined inside the IPNS Name, include a serialized copy in `IpnsEntry.pubKey`
+   - This step SHOULD be skipped for Ed25519 keys.
+6. Create bytes for signing by concatenating `ipns-signature:` prefix (bytes in hex: `69706e732d7369676e61747572653a`) with raw CBOR bytes from `IpnsEntry.data`
+7. Sign bytes from the previous step using the private key, and store the signature in `IpnsEntry.signatureV2`
+
+### Record Validation
+
+Implementations MUST resolve IPNS Names using only verified records.
+Record's data and signature verification MUST be implemented as outlined below, and fail on the first error.
+
+1. Before parsing protobuf, confirm `IpnsEntry` size is less than 2 MiB
+2. Confirm `IpnsEntry.signatureV2` and `IpnsEntry.data` are present and are not empty
+3. Extract public key
+   - Use `IpnsEntry.pubKey` or a cached entry in the local key store, if present.
+   - If public key is missing
+     - Assume the public key is inlined in the IPNS Name itself (e.g., Ed25519 inlined using `identity` multihash)
+     - Confirm Multihash type is `identity`
+     - Unmarshall public key from Multihash digest
+4. Deserialize `IpnsEntry.data` as a DAG-CBOR document
+5. Confirm values in `IpnsEntry` Protobuf match deserialized ones from `IpnsEntry.data`:
+   - `IpnsEntry.value` must match `IpnsEntry.data[value]`
+   - `IpnsEntry.validity` must match `IpnsEntry.data[validity]`
+   - `IpnsEntry.validityType` must match `IpnsEntry.data[validityType]`
+   - `IpnsEntry.sequence` must match `IpnsEntry.data[sequence]`
+   - `IpnsEntry.ttl` must match `IpnsEntry.data[ttl]`
+6. Create bytes for signature verification by concatenating `ipns-signature:` prefix (bytes in hex: `69706e732d7369676e61747572653a`) with raw CBOR bytes from `IpnsEntry.data`
+7. Verify signature in `IpnsEntry.signatureV2` against data from the previous step.
 
 ## Implementations
 
-  - [js-ipfs](https://github.com/ipfs/js-ipfs/tree/master/packages/ipfs-core/src/ipns)
-  - [go-namesys](https://github.com/ipfs/go-namesys)
+- [js-ipfs](https://github.com/ipfs/js-ipfs/tree/master/packages/ipfs-core/src/ipns)
+- [go-namesys](https://github.com/ipfs/go-namesys)
 
 ## Integration with IPFS
+
+Below are additional notes for implementers, documenting how IPNS is integrated within IPFS ecosystem.
 
 #### Local record
 
 This record is stored in the peer's repo datastore and contains the **latest** version of the IPNS record published by the provided key. This record is useful for republishing, as well as tracking the sequence number.
+A legacy convention that implementers MAY want to follow:
 
 **Key format:** `/ipns/base32(<HASH>)`
 
@@ -117,7 +239,11 @@ Note: Base32 according to the [RFC4648](https://tools.ietf.org/html/rfc4648).
 #### Routing record
 
 The routing record is spread across the network according to the available routing systems.
+The two routing systems currently available in IPFS are the `DHT` and `pubsub`.
 
 **Key format:** `/ipns/BINARY_ID`
 
-The two routing systems currently available in IPFS are the `DHT` and `pubsub`. As the `pubsub` topics must be `utf-8` for interoperability among different implementations
+- `/ipns/` is the ASCII prefix (bytes in hex: `2f69706e732f)
+- `BINARY_ID` is the binary representation of IPNS Name (`libp2p-key` protobuf)
+
+As the `pubsub` topics must be `utf-8` for interoperability among different implementations, IPNS over PubSub topics use additional wrapping `/record/base64url-unpadded(key)`
