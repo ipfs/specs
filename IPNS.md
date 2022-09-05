@@ -200,7 +200,7 @@ Creating a new IPNS record MUST follow the below steps:
 Implementations MUST resolve IPNS Names using only verified records.
 Record's data and signature verification MUST be implemented as outlined below, and fail on the first error.
 
-1. Before parsing protobuf, confirm `IpnsEntry` size is less than 2 MiB
+1. Before parsing the protobuf, confirm that `IpnsEntry` is less than 2MiB in size
 2. Confirm `IpnsEntry.signatureV2` and `IpnsEntry.data` are present and are not empty
 3. Extract public key
    - Use `IpnsEntry.pubKey` or a cached entry in the local key store, if present.
