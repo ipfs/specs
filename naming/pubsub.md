@@ -91,5 +91,5 @@ every 10 seconds)
 
 # Implementations
 
-  - <https://github.com/ipfs/go-namesys>
+  - Kubo:  <https://github.com/ipfs/go-namesys> and <https://github.com/libp2p/go-libp2p-pubsub-router>
 
