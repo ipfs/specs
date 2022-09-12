@@ -166,7 +166,7 @@ message IpnsEntry {
  optional bytes value = 1;
 
  // unused legacy field, use 'signatureV2' instead
- optional bytes signature = 2;
+ optional bytes signatureV1 = 2;
 
  // deserialized copies of data[validityType] and data[validity]
  optional ValidityType validityType = 3;
