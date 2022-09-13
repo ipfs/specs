@@ -283,6 +283,8 @@ Record's data and signature verification MUST be implemented as outlined below, 
 6. Create bytes for signature verification by concatenating `ipns-signature:` prefix (bytes in hex: `69706e732d7369676e61747572653a`) with raw CBOR bytes from `IpnsEntry.data`
 7. Verify signature in `IpnsEntry.signatureV2` against concatenation result from the previous step.
 
+Value in `IpnsEntry.signatureV1` MUST be ignored.
+
 ## Integration with IPFS
 
 Below are additional notes for implementers, documenting how IPNS is integrated within IPFS ecosystem.
