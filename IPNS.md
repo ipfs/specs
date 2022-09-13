@@ -145,9 +145,12 @@ A logical IPNS record is a data structure containing the following fields:
   - Extensible record data in [DAG-CBOR](https://ipld.io/specs/codecs/dag-cbor/spec/) format.
   - The default set of fields can be augmented with additional information.
     - Implementations are free to leverage this, or simply ignore unexpected fields.
-    - A good practice is to prefix custom field names with `_` to avoid
-      collisions with any new mandatory fields that may be added in a future
-      version of this specification.
+    - A good practice is to:
+      - prefix custom field names with `_` to avoid collisions with any new
+        mandatory fields that may be added in a future version of this
+        specification.
+      - and/or create own namespace by setting value to DAG-CBOR:
+        `IpnsEntry.data[_namespace][customfield]`.
 
 IPNS records are stored locally, as well as spread across the network, in order to be accessible to everyone.
 
