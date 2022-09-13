@@ -24,6 +24,7 @@ IPNS records provide cryptographically verifiable, mutable pointers to objects.
   - [String Representation](#string-representation)
 - [IPNS Record](#ipns-record)
   - [Record Serialization Format](#record-serialization-format)
+  - [Record Size Limit](#record-size-limit)
 - [Protocol](#protocol)
   - [Overview](#overview)
   - [Record Creation](#record-creation)
@@ -194,13 +195,17 @@ message IpnsEntry {
 
 Notes:
 
-- IPNS implementations must support sending and receiving serialized
-  `IpnsEntry` of size less or equal 10 kiB. Handling records larger than 10 kiB
-  is not recommended so as to keep compatibility with implementations
-  and transports which only support up to 10 kiB.
-
 - For legacy reasons, some values must be stored in both `IpnsEntry` protobuf and `IpnsEntry.data` CBOR.
-  This should not be ignore, as it impact interoperability with old software.
+  This should not be ignored, as it impacts interoperability with old software.
+
+### Record Size Limit
+
+IPNS implementations MUST support sending and receiving a serialized
+`IpnsEntry` less than or equal to **10 KiB** in size.
+
+Records over the limit MAY be ignored. Handling records larger than the
+limit is not recommended so as to keep compatibility with implementations and
+transports that follow this specification.
 
 ## Protocol
 
@@ -244,14 +249,14 @@ Creating a new IPNS record MUST follow the below steps:
    - This step SHOULD be skipped for Ed25519, and any other key types that are inlined inside of [IPNS Name](#ipns-name) itself.
 6. Create bytes for signing by concatenating `ipns-signature:` prefix (bytes in hex: `69706e732d7369676e61747572653a`) with raw CBOR bytes from `IpnsEntry.data`
 7. Sign concatenated bytes from the previous step using the private key, and store the signature in `IpnsEntry.signatureV2`
-8. Confirm that bytes with serialized `IpnsEntry` are less than or equal 10 kiB in size
+8. Confirm that the serialized `IpnsEntry` bytes sum to less than or equal to [the size limit](#record-size-limit).
 
 ### Record Verification
 
 Implementations MUST resolve IPNS Names using only verified records.
 Record's data and signature verification MUST be implemented as outlined below, and fail on the first error.
 
-1. Before parsing the protobuf, confirm that bytes with serialized `IpnsEntry` are less than or equal 10 kiB in size
+1. Before parsing the protobuf, confirm that the serialized `IpnsEntry` bytes sum to less than or equal to [the size limit](#record-size-limit).
 2. Confirm `IpnsEntry.signatureV2` and `IpnsEntry.data` are present and are not empty
 3. Extract public key
    - Use `IpnsEntry.pubKey` or a cached entry in the local key store, if present.
