@@ -42,11 +42,17 @@ IPNS is based on [SFS](http://en.wikipedia.org/wiki/Self-certifying_File_System)
 ### Key Types
 
 Implementations MUST support Ed25519 with signatures defined in [RFC8032](https://www.rfc-editor.org/rfc/rfc8032#section-5.1).
+Ed25519 is the current default key type.
 
-Implementations MAY support RSA, Secp256k1 and ECDSA for private use, but peers
+Implementations SHOULD support RSA if they wish to interoperate with legacy
+IPNS names (RSA was used before Ed25519).
+
+Implementations MAY support Secp256k1 and ECDSA for private use, but peers
 from the public IPFS swarm and DHT may not be able to resolve IPNS records
-signed by these optional key types. When implementing support for these optional key
-types, follow signature implementation notes from [PeerID specs](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#key-types).
+signed by these optional key types.
+
+When implementing support for key types, follow signature implementation notes
+from [PeerID specs](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#key-types).
 
 In all cases, the IPNS implementation MAY allow the user to enable/disable specific key types via configuration. Note that disabling support for compulsory key type will hinder IPNS interop.
 
