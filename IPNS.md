@@ -25,6 +25,7 @@ IPNS records provide cryptographically verifiable, mutable pointers to objects.
 - [IPNS Record](#ipns-record)
   - [Record Serialization Format](#record-serialization-format)
   - [Record Size Limit](#record-size-limit)
+  - [Backward Compatibility](#backward-compatibility)
 - [Protocol](#protocol)
   - [Overview](#overview)
   - [Record Creation](#record-creation)
@@ -175,7 +176,7 @@ message IpnsEntry {
  // deserialized copy of data[value]
  optional bytes value = 1;
 
- // unused legacy field, use 'signatureV2' instead
+ // legacy field, verify 'signatureV2' instead
  optional bytes signatureV1 = 2;
 
  // deserialized copies of data[validityType] and data[validity]
@@ -216,6 +217,24 @@ Records over the limit MAY be ignored. Handling records larger than the
 limit is not recommended so as to keep compatibility with implementations and
 transports that follow this specification.
 
+### Backward Compatibility
+
+Implementations that want to interop with the public IPFS swarm MUST maintain
+backward compatibility for legacy consumers of IPNS records:
+
+
+- A legacy publisher MUST always be able to update to the latest implementation
+  of this specification without breaking record resolution for legacy consumers.
+- A legacy consumer MUST always be able to resolve IPNS name, even when publisher
+  updated to the latest implementation of this specification.
+
+This means, for example, that changes made to the `IpnsEntry` protobuf, or
+validation logic should always be additive.
+
+Future changes to this spec should include design decisions that allow legacy
+nodes to gracefully ignore new fields and verify compatible records using
+legacy logic.
+
 ## Protocol
 
 ### Overview
@@ -243,8 +262,7 @@ Finally, the network nodes may also republish their records, so that the records
 
 ### Record Creation
 
-IPNS record MUST be serialized as `IpnsEntry` protobuf and `IpfsEntry.data` MUST be signed using the private key.
-
+IPNS record MUST be serialized as `IpnsEntry` protobuf, and `IpfsEntry.data` MUST be signed using the private key.
 Creating a new IPNS record MUST follow the below steps:
 
 1. Create `IpnsEntry` and set `value`, `validity`, `validityType`, `sequence`, and `ttl`
@@ -256,9 +274,13 @@ Creating a new IPNS record MUST follow the below steps:
    - The order of fields impacts signature verification. If you are using an alternative CBOR implementation, make sure the CBOR field order follows [RFC7049](https://www.rfc-editor.org/rfc/rfc7049) sorting rules: length and then bytewise. The order of fields impacts signature verification.
 4. If your public key can't be inlined inside the IPNS Name, include a serialized copy in `IpnsEntry.pubKey`
    - This step SHOULD be skipped for Ed25519, and any other key types that are inlined inside of [IPNS Name](#ipns-name) itself.
-6. Create bytes for signing by concatenating `ipns-signature:` prefix (bytes in hex: `69706e732d7369676e61747572653a`) with raw CBOR bytes from `IpnsEntry.data`
-7. Sign concatenated bytes from the previous step using the private key, and store the signature in `IpnsEntry.signatureV2`
-8. Confirm that the serialized `IpnsEntry` bytes sum to less than or equal to [the size limit](#record-size-limit).
+5. Create `IpnsEntry.signatureV2`
+   - Create bytes for signing by concatenating `ipns-signature:` prefix (bytes in hex: `69706e732d7369676e61747572653a`) with raw CBOR bytes from `IpnsEntry.data`
+   - Sign concatenated bytes from the previous step using the private key, and store the signature in `IpnsEntry.signatureV2`
+6. Create `IpnsEntry.signatureV1` (backward compatibility, for legacy software)
+   - Create bytes for signing by concatenating `IpnsEntry.value` + `IpnsEntry.validity` + `string(IpnsEntry.validityType)`
+   - Sign concatenated bytes from the previous step using the private key, and store the legacy signature in `IpnsEntry.signatureV1`
+7. Confirm that the serialized `IpnsEntry` bytes sum to less than or equal to [the size limit](#record-size-limit).
 
 ### Record Verification
 
