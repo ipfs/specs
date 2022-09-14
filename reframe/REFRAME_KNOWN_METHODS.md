@@ -26,6 +26,8 @@ This document is defining known methods (request-response message types) and sem
     - [GetIPNS DAG-JSON Examples](#getipns-dag-json-examples)
   - [PutIPNS](#putipns)
     - [PutIPNS DAG-JSON Examples](#putipns-dag-json-examples)
+  - [Provide](#provide)
+    - [Provide DAG-JSON Examples](#provide-dag-json-examples)
 - [Method Upgrade Paths](#method-upgrade-paths)
 - [Implementations](#implementations)
 
