@@ -43,7 +43,7 @@ Servers MUST support `GET` for methods marked as cachable and MUST support `POST
 
 If a server supports HTTP/1.1, then it MAY send chunked-encoded messages. Clients supporting HTTP/1.1 MUST accept chunked-encoded responses.
 
-Requests and Responses MUST occur over a single HTTP call instead of the server being allowed to dial back the client with a response at a later time.
+Requests and Responses MUST occur over a single HTTP call instead of the server being allowed to dial back the client with a response at a later time. The response status code MUST be 200 if the RPC transaction succeeds, even when there's an error at the application layer, and a non-200 status code if the RPC transaction fails.
 
 If a server chooses to respond to a single request message with a group of messages in the response it should do so as a set of `\n` delimited DAG-JSON messages (i.e. `{Response1}\n{Response2}...`).
 
