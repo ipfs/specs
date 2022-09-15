@@ -26,6 +26,8 @@ This document is defining known methods (request-response message types) and sem
     - [GetIPNS DAG-JSON Examples](#getipns-dag-json-examples)
   - [PutIPNS](#putipns)
     - [PutIPNS DAG-JSON Examples](#putipns-dag-json-examples)
+  - [Provide](#provide)
+    - [Provide DAG-JSON Examples](#provide-dag-json-examples)
 - [Method Upgrade Paths](#method-upgrade-paths)
 - [Implementations](#implementations)
 
@@ -269,7 +271,7 @@ A message for indicating that the client is able to act as a provider for a give
 
 ```ipldsch
     type ProvideRequest struct 
-        Key &Any
+        Key [&Any]
         Provider Provider
         Timestamp Integer
         AdvisoryTTL Integer
@@ -281,9 +283,9 @@ A message for indicating that the client is able to act as a provider for a give
     }
 ```
 
-Note: While the Key is a CID, it is highly recommended that server implementations treat these Requests as if they were for the multihash.
+Note: While keys are formatted as CIDs, it is highly recommended that server implementations treat these requests at the multihash level - subsequent calls to `FindProviders` should be multicodec agnostic.
 
-There are a a few semantics relevant to the construction of a ProvideRequest:
+There are a few semantics relevant to the construction of a ProvideRequest:
 
 * The timestamp should be the current unix timestamp, encoded in an int64
 * AdvistoryTTL may list the time for which the provider desires the content will remain available. If the provider cannot not anticipate how long the content will remain available, it may use a 0 value for this field.
@@ -303,18 +305,27 @@ There are a a few semantics relevant to the construction of a ProvideRequest:
 Request:
 ```json
 {"ProvideRequest" : {
-    "Key" : {"/":{"bytes":"AXIUBPnagss"}},
-    "Providers" : [
-        {"Node":{"Peer":{"ID":{
-            "/":{"bytes":"EncodedPeerID"}}
-        }}}
-    ]
+    "Key" : [{"/":{"bytes":"AXIUBPnagss"}}],
+    "Provider" : {
+        "Peer":{
+            "ID": {"/":{"bytes":"EncodedPeerID"}},
+            "Multiaddresses" [{"/":{"bytes":"Encoded Multiaddr"}}]
+        },
+        "ProviderProto": [
+            { "2304" : {} }
+        ]
+    },
+    "Timestamp" : 1589788800,
+    "AdvisoryTTL": 3600,
+    "Signature": {"/":{"bytes":"Encoded Signature"}}
 }}
 ```
 
 Response:
 ```json
-{"ProvideResponse : {}"}
+{"ProvideResponse : {
+    AdvisoryTTL: 3600
+}"}
 ```
 
 ## Method Upgrade Paths
