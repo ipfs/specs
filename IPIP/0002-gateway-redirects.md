@@ -1,4 +1,4 @@
-# IPIP 0000: Gateway Redirects
+# IPIP 0002: Gateway Redirects
 
 - Start Date: (format: 2022-06-15)
 - Related Issues:
