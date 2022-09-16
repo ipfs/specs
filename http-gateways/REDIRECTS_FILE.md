@@ -25,6 +25,9 @@ This can be used, for example, to enable URL rewriting for hosting a single-page
   - [Status](#status)
   - [Placeholders](#placeholders)
   - [Splat](#splat)
+  - [Comments](#comments)
+  - [Line Termination](#line-termination)
+  - [Max File Size](#max-file-size)
 - [Evaluation](#evaluation)
   - [Subdomain or DNSLink Gateways](#subdomain-or-dnslink-gateways)
   - [Order](#order)
@@ -117,6 +120,10 @@ is functionally equivalent to
 
 Lines MUST be terminated by either `\n` or `\r\n`.
 
+### Max File Size
+
+The file size MUST NOT exceed 64 KiB.
+
 # Evaluation
 
 ## Subdomain or DNSLink Gateways
@@ -141,21 +148,24 @@ This functionality will only be evaluated for Subdomain or DNSLink Gateways, to 
 
 Parsing of the `_redirects` file should be done safely to prevent any sort of injection vector or daemon crash.
 
+The [max file size](#max-file-size) helps to prevent an additional [denial of service attack](https://en.wikipedia.org/wiki/Denial-of-service_attack) vector.
+
 # Appendix: notes for implementors
 
 ## Test fixtures
 
-Sample files for various test cases can be found in QmfHFheaikRRB6ap7AdL4FHBkyHPhPBDX7fS25rMzYhLuW, which comes from
+Sample files for various test cases can be found in QmXqMQ5Sja34NaBEFD7x1hH4VTZWEGmmFF8fGQvAqRsJ1e, which comes from
 sharness test data for the implementation of this feature in Kubo.
 
 ```
-ipfs ls QmfHFheaikRRB6ap7AdL4FHBkyHPhPBDX7fS25rMzYhLuW                                              
+»  ipfs ls QmXqMQ5Sja34NaBEFD7x1hH4VTZWEGmmFF8fGQvAqRsJ1e                                              
 QmcBcFnKKqgpCVMxxGsriw9ByTVF6uDdKDMuEBq3m6f1bm - bad-codes/
 QmcZzEbsNsQM6PmnvPbtDJdRAen5skkCxDRS8K7HafpAsX - examples/
 QmU7ysGXwAtiV7aBarZASJsxKoKyKmd9Xrz2FFamSCbg8S - forced/
 QmWHn2TunA1g7gQ7q9rwAoWuot2hMpojZ6cZ9ERsNKm5gE - good-codes/
 QmRgpzYQESidTtTojN8zRWjiNs9Cy6o7KHRxh7kDpJm3KH - invalid/
 QmYzMrtPyBv7LKiEAGLLRPtvqm3SjQYLWxwWQ2vnpxQwRd - newlines/
+QmXEZAp8vRLhfqY6wSCdHg6e9pjBAd56QUYGzcqdgkAYwi - too-large/
 ```
 
 For example, the "examples" site can be found in QmcZzEbsNsQM6PmnvPbtDJdRAen5skkCxDRS8K7HafpAsX.
