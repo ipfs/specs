@@ -50,7 +50,7 @@ where base64url-unpadded is an unpadded base64url as specified in [IETF RFC 4648
 
 # Layering persistence onto libp2p PubSub
 
-libp2p PubSub does not have any notion of persistent data built into it. However, we can layer persistence on top of PubSub by utilizing [libp2p Fetch](https://github.com/libp2p/specs/pull/204).
+libp2p PubSub does not have any notion of persistent data built into it. However, we can layer persistence on top of PubSub by utilizing [libp2p Fetch](https://github.com/libp2p/specs/tree/master/fetch).
 
 The protocol has the following steps:
 1. Start State: Node `A` subscribes to the PubSub topic `t` corresponding to the local IPNS record key `k`
@@ -91,4 +91,5 @@ every 10 seconds)
 
 # Implementations
 
-  - <https://github.com/ipfs/go-ipfs/tree/master/namesys>
+  - Kubo:  <https://github.com/ipfs/go-namesys> and <https://github.com/libp2p/go-libp2p-pubsub-router>
+
