@@ -154,24 +154,24 @@ The [max file size](#max-file-size) helps to prevent an additional [denial of se
 
 ## Test fixtures
 
-Sample files for various test cases can be found in QmXqMQ5Sja34NaBEFD7x1hH4VTZWEGmmFF8fGQvAqRsJ1e, which comes from
+Sample files for various test cases can be found in QmQprDnhzptPQZwC5dnSvGgmeF9yKCvnNqWA94yVAZCv3a, which comes from
 sharness test data for the implementation of this feature in Kubo.
 
 ```
-»  ipfs ls QmXqMQ5Sja34NaBEFD7x1hH4VTZWEGmmFF8fGQvAqRsJ1e                                              
+$ ipfs ls QmQprDnhzptPQZwC5dnSvGgmeF9yKCvnNqWA94yVAZCv3a
 QmcBcFnKKqgpCVMxxGsriw9ByTVF6uDdKDMuEBq3m6f1bm - bad-codes/
 QmcZzEbsNsQM6PmnvPbtDJdRAen5skkCxDRS8K7HafpAsX - examples/
 QmU7ysGXwAtiV7aBarZASJsxKoKyKmd9Xrz2FFamSCbg8S - forced/
 QmWHn2TunA1g7gQ7q9rwAoWuot2hMpojZ6cZ9ERsNKm5gE - good-codes/
 QmRgpzYQESidTtTojN8zRWjiNs9Cy6o7KHRxh7kDpJm3KH - invalid/
 QmYzMrtPyBv7LKiEAGLLRPtvqm3SjQYLWxwWQ2vnpxQwRd - newlines/
-QmXEZAp8vRLhfqY6wSCdHg6e9pjBAd56QUYGzcqdgkAYwi - too-large/
+QmQTfvjGmvTfxFpUcZNLdTLuKV227KJkGiN6xooHVeVZAS - too-large/
 ```
 
 For example, the "examples" site can be found in QmcZzEbsNsQM6PmnvPbtDJdRAen5skkCxDRS8K7HafpAsX.
 
 ```
-$ ipfs ls /ipfs/QmcZzEbsNsQM6PmnvPbtDJdRAen5skkCxDRS8K7HafpAsX                                               
+$ ipfs ls /ipfs/QmcZzEbsNsQM6PmnvPbtDJdRAen5skkCxDRS8K7HafpAsX
 Qmd9GD7Bauh6N2ZLfNnYS3b7QVAijbud83b8GE8LPMNBBP 7   404.html
 QmUaEwhw7255s4M2abktMYFL8pwCDb1v5yi6fp7ExJv3e7 270 _redirects
 QmaWDLb4gnJcJbT1Df5X3j91ysiwkkyxw6329NLiC1KMDR -   articles/
