@@ -1,6 +1,6 @@
-# Redirects File Specification
+# `_redirects` File Specification
 
-![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
+![draft](https://img.shields.io/badge/status-draft-yellow.svg?style=flat-square)
 
 **Authors**:
 
@@ -71,7 +71,7 @@ An optional integer specifying the HTTP status code to return from the request. 
 - `404` - Not Found
   - Useful for redirecting invalid URLs to a pretty 404 page.
 - `410` - Gone
-- `451` - Unavailable For Legal Reasons  
+- `451` - Unavailable For Legal Reasons
 
 ## Placeholders
 
@@ -154,11 +154,11 @@ The [max file size](#max-file-size) helps to prevent an additional [denial of se
 
 ## Test fixtures
 
-Sample files for various test cases can be found in QmQyqMY5vUBSbSxyitJqthgwZunCQjDVtNd8ggVCxzuPQ4, which comes from
-sharness test data for the implementation of this feature in Kubo.
+Sample files for various test cases can be found in `QmQyqMY5vUBSbSxyitJqthgwZunCQjDVtNd8ggVCxzuPQ4`.
+Implementations are free to use it for internal testing.
 
 ```
-$ ipfs ls QmQyqMY5vUBSbSxyitJqthgwZunCQjDVtNd8ggVCxzuPQ4                                                          
+$ ipfs ls QmQyqMY5vUBSbSxyitJqthgwZunCQjDVtNd8ggVCxzuPQ4
 QmcBcFnKKqgpCVMxxGsriw9ByTVF6uDdKDMuEBq3m6f1bm - bad-codes/
 QmYBhLYDwVFvxos9h8CGU2ibaY66QNgv8hpfewxaQrPiZj - examples/
 QmU7ysGXwAtiV7aBarZASJsxKoKyKmd9Xrz2FFamSCbg8S - forced/
@@ -168,10 +168,10 @@ QmYzMrtPyBv7LKiEAGLLRPtvqm3SjQYLWxwWQ2vnpxQwRd - newlines/
 QmQTfvjGmvTfxFpUcZNLdTLuKV227KJkGiN6xooHVeVZAS - too-large/
 ```
 
-For example, the "examples" site can be found in QmYBhLYDwVFvxos9h8CGU2ibaY66QNgv8hpfewxaQrPiZj.
+For example, the "examples" site can be found in `QmYBhLYDwVFvxos9h8CGU2ibaY66QNgv8hpfewxaQrPiZj`.
 
 ```
-$ ipfs ls /ipfs/QmYBhLYDwVFvxos9h8CGU2ibaY66QNgv8hpfewxaQrPiZj                                                
+$ ipfs ls /ipfs/QmYBhLYDwVFvxos9h8CGU2ibaY66QNgv8hpfewxaQrPiZj
 Qmd9GD7Bauh6N2ZLfNnYS3b7QVAijbud83b8GE8LPMNBBP 7   404.html
 QmSmR9NShZ89VEBrn9SBy7Xxvjw8Qe6XArD5GqtHvbtBM3 7   410.html
 QmVQqj9oZig9tH3ENHo4bxV5pNgssUwFCXUjAJAVcZVbJG 7   451.html
@@ -186,7 +186,7 @@ QmUGVnZaofnd5nEDvT2bxcFck7rHyJRbpXkh9znjrJNV92 7   two.html
 The `_redirects` file is as follows.
 
 ```
-$ ipfs cat /ipfs/QmYBhLYDwVFvxos9h8CGU2ibaY66QNgv8hpfewxaQrPiZj/_redirects                          
+$ ipfs cat /ipfs/QmYBhLYDwVFvxos9h8CGU2ibaY66QNgv8hpfewxaQrPiZj/_redirects
 /redirect-one /one.html
 /301-redirect-one /one.html 301
 /302-redirect-two /two.html 302

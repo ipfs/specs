@@ -1,9 +1,10 @@
-# IPIP 0002: Gateway Redirects
+# IPIP 0002: _redirects File Support on Web Gateways
 
 - Start Date: (format: 2022-06-15)
 - Related Issues:
   - [ipfs/specs/issues/257](https://github.com/ipfs/specs/issues/257)
   - [ipfs/kubo/pull/8890](https://github.com/ipfs/kubo/pull/8890)
+  - [ipfs-docs/pull/1275](https://github.com/ipfs/ipfs-docs/pull/1275)
 
 ## Summary
 
