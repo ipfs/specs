@@ -154,13 +154,13 @@ The [max file size](#max-file-size) helps to prevent an additional [denial of se
 
 ## Test fixtures
 
-Sample files for various test cases can be found in QmQprDnhzptPQZwC5dnSvGgmeF9yKCvnNqWA94yVAZCv3a, which comes from
+Sample files for various test cases can be found in QmQyqMY5vUBSbSxyitJqthgwZunCQjDVtNd8ggVCxzuPQ4, which comes from
 sharness test data for the implementation of this feature in Kubo.
 
 ```
-$ ipfs ls QmQprDnhzptPQZwC5dnSvGgmeF9yKCvnNqWA94yVAZCv3a
+$ ipfs ls QmQyqMY5vUBSbSxyitJqthgwZunCQjDVtNd8ggVCxzuPQ4                                                          
 QmcBcFnKKqgpCVMxxGsriw9ByTVF6uDdKDMuEBq3m6f1bm - bad-codes/
-QmcZzEbsNsQM6PmnvPbtDJdRAen5skkCxDRS8K7HafpAsX - examples/
+QmYBhLYDwVFvxos9h8CGU2ibaY66QNgv8hpfewxaQrPiZj - examples/
 QmU7ysGXwAtiV7aBarZASJsxKoKyKmd9Xrz2FFamSCbg8S - forced/
 QmWHn2TunA1g7gQ7q9rwAoWuot2hMpojZ6cZ9ERsNKm5gE - good-codes/
 QmRgpzYQESidTtTojN8zRWjiNs9Cy6o7KHRxh7kDpJm3KH - invalid/
@@ -168,12 +168,14 @@ QmYzMrtPyBv7LKiEAGLLRPtvqm3SjQYLWxwWQ2vnpxQwRd - newlines/
 QmQTfvjGmvTfxFpUcZNLdTLuKV227KJkGiN6xooHVeVZAS - too-large/
 ```
 
-For example, the "examples" site can be found in QmcZzEbsNsQM6PmnvPbtDJdRAen5skkCxDRS8K7HafpAsX.
+For example, the "examples" site can be found in QmYBhLYDwVFvxos9h8CGU2ibaY66QNgv8hpfewxaQrPiZj.
 
 ```
-$ ipfs ls /ipfs/QmcZzEbsNsQM6PmnvPbtDJdRAen5skkCxDRS8K7HafpAsX
+$ ipfs ls /ipfs/QmYBhLYDwVFvxos9h8CGU2ibaY66QNgv8hpfewxaQrPiZj                                                
 Qmd9GD7Bauh6N2ZLfNnYS3b7QVAijbud83b8GE8LPMNBBP 7   404.html
-QmUaEwhw7255s4M2abktMYFL8pwCDb1v5yi6fp7ExJv3e7 270 _redirects
+QmSmR9NShZ89VEBrn9SBy7Xxvjw8Qe6XArD5GqtHvbtBM3 7   410.html
+QmVQqj9oZig9tH3ENHo4bxV5pNgssUwFCXUjAJAVcZVbJG 7   451.html
+QmZU3kboiyi9jV59D8Mw8wzuvsr3HmvskqhYRRhdFA8wRq 317 _redirects
 QmaWDLb4gnJcJbT1Df5X3j91ysiwkkyxw6329NLiC1KMDR -   articles/
 QmS6ZNKE9s8fsHoEnArsZXnzMWijKddhXXDsAev8LdTT5z 9   index.html
 QmNwEgMrExwSsE8DCjZjahYfHUfkSWRhtqSkQUh4Fk3udD 7   one.html
@@ -184,7 +186,7 @@ QmUGVnZaofnd5nEDvT2bxcFck7rHyJRbpXkh9znjrJNV92 7   two.html
 The `_redirects` file is as follows.
 
 ```
-$ ipfs cat /ipfs/QmcZzEbsNsQM6PmnvPbtDJdRAen5skkCxDRS8K7HafpAsX/_redirects
+$ ipfs cat /ipfs/QmYBhLYDwVFvxos9h8CGU2ibaY66QNgv8hpfewxaQrPiZj/_redirects                          
 /redirect-one /one.html
 /301-redirect-one /one.html 301
 /302-redirect-two /two.html 302
@@ -192,6 +194,8 @@ $ ipfs cat /ipfs/QmcZzEbsNsQM6PmnvPbtDJdRAen5skkCxDRS8K7HafpAsX/_redirects
 /posts/:year/:month/:day/:title /articles/:year/:month/:day/:title 301
 /splat/* /redirected-splat/:splat 301
 /not-found/* /404.html 404
+/gone/* /410.html 410
+/unavail/* /451.html 451
 /* /index.html 200
 ```
 
