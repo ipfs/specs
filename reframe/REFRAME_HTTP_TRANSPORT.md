@@ -16,36 +16,74 @@ The Reframe over HTTP protocol is defining the transport and message
 serialization mechanisms for sending Reframe messages over HTTP `POST` and
 `GET`, and provides guidance for implementers around HTTP caching.
 
-# Organization of this document
+## Organization of this document
 
-- [HTTP Transport Design](#http-transport-design)
-  - [HTTP Caching Considerations](#http-caching-considerations)
-    - [POST vs GET](#post-vs-get)
-    - [Avoiding sending the same response messages twice](#avoiding-sending-the-same-response-messages-twice)
-    - [Client controls for time-based caching](#client-controls-for-time-based-caching)
-    - [Rate-limiting non-cachable POST requests](#rate-limiting-non-cachable-post-requests)
+- [HTTP Endpoint](#http-endpoint)
+  - [Content type](#content-type)
+  - [HTTP methods](#http-methods)
+  - [Other notes](#other-notes)
+- [HTTP Caching Considerations](#http-caching-considerations)
+  - [POST vs GET](#post-vs-get)
+  - [Avoiding sending the same response messages twice](#avoiding-sending-the-same-response-messages-twice)
+  - [Client controls for time-based caching](#client-controls-for-time-based-caching)
+  - [Rate-limiting non-cachable POST requests](#rate-limiting-non-cachable-post-requests)
 - [Implementations](#implementations)
 
-# HTTP Transport Design
+## HTTP Endpoint
 
-All messages sent in HTTP body MUST be encoded as DAG-JSON and use explicit content type `application/vnd.ipfs.rpc+dag-json; version=1`
+```
+https://rpc-service.example.net/reframe
+```
+
+URL of a Reframe endpoint must end with `/reframe` path.
+
+### Content type
+
+Requests SHOULD be sent with explicit `Accept` and `Content-Type` HTTP headers specifying the body format.
+
+All messages sent in HTTP body MUST be encoded as either:
+
+- [DAG-CBOR](https://ipld.io/specs/codecs/dag-cbor/spec/), and use explicit content type `application/vnd.ipfs.rpc+dag-cbor; version=1`
+  - **This is a CBOR (binary) format for use in production.**
+  - CBOR request MUST include HTTP header: `Accept: application/vnd.ipfs.rpc+dag-cbor; version=1`
+  - CBOR request AND response MUST include header: `Content-Type: application/vnd.ipfs.rpc+dag-cbor; version=1`
+- [DAG-JSON](https://ipld.io/specs/codecs/dag-json/spec/), and use explicit content type `application/vnd.ipfs.rpc+dag-json; version=1`
+  - **This is a human-readable plain text format for use in testing and debugging.**
+  - JSON request MUST include header: `Accept: application/vnd.ipfs.rpc+dag-json; version=1`
+  - JSON request AND response MUST include header: `Content-Type: application/vnd.ipfs.rpc+dag-json; version=1`
+
+Implementations SHOULD error when an explicit content type is missing, but MAY decide to implement some defaults instead.
+The rules around implicit content type are as follows:
+
+- Requests without a matching `Content-Type` header MAY be interpreted as DAG-JSON.
+- Requests without a matching `Accept` header MAY produce a DAG-JSON response.
+- Responses without a matching `Content-Type` header MAY be interpreted as DAG-JSON.
+
+### HTTP methods
 
 Requests MUST be sent as either:
 
+- `GET /reframe/{mbase64url-dag-cbor}`
+  - Cachable HTTP `GET` requests with message passed as DAG-CBOR in HTTP path segment, encoded as URL-safe [`base64url` multibase](https://docs.ipfs.io/concepts/glossary/#base64url) string
+    - DAG-CBOR in multibase `base64url` is used (even when request body is DAG-JSON) because JSON may include characters that are not safe to be used in URLs, and percent-encoding or base-encoding a big JSON query may take too much space.
+  - Suitable for sharing links, sending bigger messages, and when a query result MUST benefit from HTTP caching (see _HTTP Caching Considerations_ below).
 - `GET /reframe?q={percent-encoded-dag-json}`
   - DAG-JSON is supported via a `?q` query parameter, and the value MUST be [percent-encoded](https://en.wikipedia.org/wiki/Percent-encoding)
   - Suitable for sharing links, sending smaller messages, testing and debugging.
 - `POST /reframe`
-  - Ephemeral HTTP `POST` request with message passed as DAG-JSON in HTTP request body
+  - Ephemeral HTTP `POST` request with DAG-JSON or DAG-CBOR message passed in HTTP request body
   - Suitable for bigger messages, and when HTTP caching should be skipped for the most fresh results
 
 Servers MUST support `GET` for methods marked as cachable and MUST support `POST` for all methods (both cachable and not-cachable). This allows servers to rate-limit `POST` when cachable `GET` could be used instead, and enables clients to use `POST` as a fallback in case there is a technical problem with bigger Reframe messages not fitting in a `GET` URL. See "Caching Considerations" section.
+
+### Other notes
 
 If a server supports HTTP/1.1, then it MAY send chunked-encoded messages. Clients supporting HTTP/1.1 MUST accept chunked-encoded responses.
 
 Requests and Responses MUST occur over a single HTTP call instead of the server being allowed to dial back the client with a response at a later time. The response status code MUST be 200 if the RPC transaction succeeds, even when there's an error at the application layer, and a non-200 status code if the RPC transaction fails.
 
-If a server chooses to respond to a single request message with a group of messages in the response it should do so as a set of `\n` delimited DAG-JSON messages (i.e. `{Response1}\n{Response2}...`).
+If a server chooses to respond to a single request message with a group of DAG-JSON messages in the response it should do so as a set of `\n` delimited DAG-JSON messages (i.e. `{Response1}\n{Response2}...`).
+DAG-CBOR responses require no special handling, as they are already self-delimiting due to the nature of the CBOR encoding.
 
 Requests and responses MUST come with `version=1` as a _Required Parameter_  in the `Accept` and `Content-Type` HTTP headers.
 
@@ -99,6 +137,6 @@ Retry-After: 3600
 too many POST requests: consider switching to cachable GET or try again later (see Retry-After header)
 ```
 
-# Implementations
+## Implementations
 
 https://github.com/ipfs/go-delegated-routing
