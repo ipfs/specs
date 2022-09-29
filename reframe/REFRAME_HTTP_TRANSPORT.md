@@ -30,10 +30,6 @@ serialization mechanisms for sending Reframe messages over HTTP `POST` and
 All messages sent in HTTP body MUST be encoded as DAG-JSON and use explicit content type `application/vnd.ipfs.rpc+dag-json; version=1`
 
 Requests MUST be sent as either:
-- `GET /reframe/{mbase64url-dag-cbor}`
-  - Cachable HTTP `GET` requests with message passed as DAG-CBOR in HTTP path segment, encoded as URL-safe [`base64url` multibase](https://docs.ipfs.io/concepts/glossary/#base64url) string
-    - DAG-CBOR in multibase `base64url` is used instead of DAG-JSON because JSON may include characters that are not safe to be used in URLs, and re-encoding JSON in base would take too much space
-  - Suitable for sharing links, sending smaller messages, and when a query result MUST benefit from HTTP caching (see _HTTP Caching Considerations_ below).
 - `GET /reframe?q={percent-encoded-dag-json}`
   - DAG-JSON is supported via a `?q` query parameter, and the value MUST be [percent-encoded](https://en.wikipedia.org/wiki/Percent-encoding)
   - Suitable for sharing links, sending smaller messages, testing and debugging.
