@@ -97,6 +97,8 @@ The other operation benefit comes after the wide adoption of the proposed denyli
 
 No existing implementations yet.
 
+JSON format is used to maximize interoperability.  The intent is for IPFS implementations and services to standardize content filtering around this format for exchanging and storing allow and deny lists.
+
 ### Security
 
 The following concern may not lie in this scope, but it is worth to be mentioned in this proposal. The blocking of CIDs which are not malicious and are widely used can potentially jeopardize the availability of multiple sites on that IPFS gateway. Possible examples include common images, javascript bundles, or stylesheets.
