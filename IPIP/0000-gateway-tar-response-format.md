@@ -8,7 +8,7 @@
 
 ## Summary
 
-Add TAR as a response format for the HTTP Gateway.
+Add TAR as a response format for the [HTTP Gateway](../http-gateways/).
 
 ## Motivation
 
