@@ -50,7 +50,11 @@ This RFC is backwards compatible.
 
 ### Security
 
-See below.
+Manually created UnixFS DAGs can be turned into malicious TAR files. For example,
+if a UnixFS directory contains a file that points at a relative path outside of
+its root, the unpacking of the TAR file may overwrite local files. In order to prevent
+this, all relative paths in the produced TAR **MUST** be sanitized/truncated to never
+go beyond the root of the exported directory.
 
 ### Alternatives
 
