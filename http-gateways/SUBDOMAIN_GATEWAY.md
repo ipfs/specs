@@ -50,6 +50,7 @@ Summary:
   - [DNS label limits](#dns-label-limits)
   - [Security considerations](#security-considerations)
   - [URI router](#uri-router)
+  - [Redirects, single-page applications, and custom 404s](#redirects-single-page-applications-and-custom-404s)
 
 # HTTP API
 
@@ -269,3 +270,6 @@ which in turn should redirect to
 
 From there, regular subdomain gateway logic applies.
 
+## Redirects, single-page applications, and custom 404s
+
+Subdomain Gateway implementations are free to include `_redirects` file support defined in [`REDIRECTS_FILE.md`](./REDIRECTS_FILE.md).
