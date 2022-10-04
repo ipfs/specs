@@ -36,6 +36,7 @@ In short:
 - [HTTP Response](#http-response)
 - [Appendix: notes for implementers](#appendix-notes-for-implementers)
   - [Leveraging DNS for content routing](#leveraging-dns-for-content-routing)
+  - [Redirects, single-page applications, and custom 404s](#redirects-single-page-applications-and-custom-404s)
 
 # HTTP API
 
@@ -98,3 +99,7 @@ Same as [HTTP Response section in `PATH_GATEWAY.md`](./PATH_GATEWAY.md#http-resp
   TXT records with known content providers for the data behind a DNSLink. IPFS
   clients will be able to detect DNSAddr and preconnect to known content
   providers, removing the need for expensive DHT lookup.
+
+## Redirects, single-page applications, and custom 404s
+
+DNSLink Gateway implementations are free to include `_redirects` file support defined in [`REDIRECTS_FILE.md`](./REDIRECTS_FILE.md).

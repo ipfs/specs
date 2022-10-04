@@ -1,6 +1,7 @@
-# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Reframe: HTTP Transport
+# ![draft](https://img.shields.io/badge/status-draft-yellow.svg?style=flat-square) Reframe: HTTP Transport
 
 **Author(s)**:
+
 - Adin Schmahmann
 - Petar Maymounkov
 - Marcin Rataj
@@ -30,16 +31,15 @@ serialization mechanisms for sending Reframe messages over HTTP `POST` and
 All messages sent in HTTP body MUST be encoded as DAG-JSON and use explicit content type `application/vnd.ipfs.rpc+dag-json; version=1`
 
 Requests MUST be sent as either:
-- `GET /reframe/{mbase64url-dag-cbor}`
-  - Cachable HTTP `GET` requests with message passed as DAG-CBOR in HTTP path segment, encoded as URL-safe [`base64url` multibase](https://docs.ipfs.io/concepts/glossary/#base64url) string
-    - DAG-CBOR in multibase `base64url` is used instead of DAG-JSON because JSON may include characters that are not safe to be used in URLs, and re-encoding JSON in base would take too much space
-  - Suitable for sharing links, sending smaller messages, and when a query result MUST benefit from HTTP caching (see _HTTP Caching Considerations_ below).
+
+- `GET /reframe?q={percent-encoded-dag-json}`
+  - DAG-JSON is supported via a `?q` query parameter, and the value MUST be [percent-encoded](https://en.wikipedia.org/wiki/Percent-encoding)
+  - Suitable for sharing links, sending smaller messages, testing and debugging.
 - `POST /reframe`
   - Ephemeral HTTP `POST` request with message passed as DAG-JSON in HTTP request body
   - Suitable for bigger messages, and when HTTP caching should be skipped for the most fresh results
 
 Servers MUST support `GET` for methods marked as cachable and MUST support `POST` for all methods (both cachable and not-cachable). This allows servers to rate-limit `POST` when cachable `GET` could be used instead, and enables clients to use `POST` as a fallback in case there is a technical problem with bigger Reframe messages not fitting in a `GET` URL. See "Caching Considerations" section.
-
 
 If a server supports HTTP/1.1, then it MAY send chunked-encoded messages. Clients supporting HTTP/1.1 MUST accept chunked-encoded responses.
 
@@ -76,7 +76,7 @@ header, which will skip when the response message did not change.
 
 ### Client controls for time-based caching
 
-Implementations can also return (optional) 
+Implementations can also return (optional)
 [`Last-Modified`](https://httpwg.org/specs/rfc7232.html#header.last-modified)
 HTTP header, allowing clients to send conditional requests with
 [`If-Modified-Since`](https://httpwg.org/specs/rfc7232.html#header.if-modified-since)
@@ -91,14 +91,13 @@ with `Retry-After` header to throttle the number of `POST` requests a client can
 The body returned with `429` response should suggest use of HTTP `GET` endpoint
 for cachable Reframe methods:
 
-```
+```plaintext
 HTTP/1.1 429 Too Many Requests
 Content-Type: text/plain
 Retry-After: 3600
 
 too many POST requests: consider switching to cachable GET or try again later (see Retry-After header)
 ```
-
 
 # Implementations
 
