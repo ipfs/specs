@@ -53,10 +53,21 @@ This RFC is backwards compatible.
 Manually created UnixFS DAGs can be turned into malicious TAR files. For example,
 if a UnixFS directory contains a file that points at a relative path outside of
 its root, the unpacking of the TAR file may overwrite local files. In order to prevent
-this, all relative paths in the produced TAR **MUST** be sanitized/truncated to never
-go beyond the root of the exported directory.
+this, if the UnixFS directory contains a file that points at a relative path outside
+of the root, the TAR file creation **MUST** fail.
+
+To test this, we provide two car files:
+
+* ✅ [inside-root.car](0000-gateway-tar-response-format/inside-root.car) is a UnixFS DAG that contains
+a file with a relative path that points inside the root directory. Downloading it as a TAR must work.
+* ❌ [outside-root.car](0000-gateway-tar-response-format/outside-root.car) is a UnixFS DAG that contains
+a file with a relative path that points outside the root directory. Downloading it as a TAR must error.
 
 ### Alternatives
+
+One discussed alternative would be to support uncompressed ZIP files. However, TAR and
+TAR-related libraries are already supported in IPFS. Therefore, the addition of a TAR response
+format is facilitated, avoiding adding unnecessary libraries.
 
 An alternative was considered to also support [Gzipped TAR](https://github.com/ipfs/go-ipfs/pull/9034).
 However, there is a concern that that may be a vector for DOS attacks since compression requires
