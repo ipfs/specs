@@ -54,7 +54,8 @@ Manually created UnixFS DAGs can be turned into malicious TAR files. For example
 if a UnixFS directory contains a file that points at a relative path outside of
 its root, the unpacking of the TAR file may overwrite local files. In order to prevent
 this, if the UnixFS directory contains a file that points at a relative path outside
-of the root, the TAR file creation **must** fail.
+of the root, the TAR file creation **must** fail using the [Trailer Header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Trailer)
+`X-Stream-Error` to indicate the error in a human-readable format.
 
 To test this, we provide two car files:
 
