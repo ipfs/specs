@@ -54,14 +54,18 @@ Manually created UnixFS DAGs can be turned into malicious TAR files. For example
 if a UnixFS directory contains a file that points at a relative path outside of
 its root, the unpacking of the TAR file may overwrite local files. In order to prevent
 this, if the UnixFS directory contains a file that points at a relative path outside
-of the root, the TAR file creation **MUST** fail.
+of the root, the TAR file creation **must** fail.
 
 To test this, we provide two car files:
 
-* ✅ [inside-root.car](0000-gateway-tar-response-format/inside-root.car) is a UnixFS DAG that contains
-a file with a relative path that points inside the root directory. Downloading it as a TAR must work.
-* ❌ [outside-root.car](0000-gateway-tar-response-format/outside-root.car) is a UnixFS DAG that contains
-a file with a relative path that points outside the root directory. Downloading it as a TAR must error.
+* ✅ [inside-root.car](0000-gateway-tar-response-format/inside-root.car) is a UnixFS
+DAG that contains a file with a relative path that points inside the root directory.
+Downloading it as a TAR must work.
+* ❌ [outside-root.car](0000-gateway-tar-response-format/outside-root.car) is a UnixFS
+DAG that contains a file with a relative path that points outside the root directory.
+Downloading it as a TAR must error.
+
+The user should be suggested to use a CAR file if they really want to download the raw files.
 
 ### Alternatives
 
