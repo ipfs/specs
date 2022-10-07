@@ -1,6 +1,6 @@
 # IPIP 0000: Gateway TAR Response Format
 
-- Start Date: (format: 2022-10-10)
+- Start Date: 2022-06-10
 - Related Issues:
   - [ipfs/specs/pull/288](https://github.com/ipfs/specs/pull/288)
   - [ipfs/go-ipfs/pull/9029](https://github.com/ipfs/go-ipfs/pull/9029)
@@ -8,14 +8,19 @@
 
 ## Summary
 
-Add TAR as a response format for the [HTTP Gateway](../http-gateways/).
+Add TAR response format to the [HTTP Gateway](../http-gateways/).
 
 ## Motivation
 
 Currently, the HTTP Gateway only allows the download of single files, or
-CAR archives. However, CAR files are sometimes not necessary and user may
-want to download entire directories. An example use case is for the IPFS
-Web UI, where users are able to download files or directories.
+CAR archives. However, CAR files are sometimes not necessary and users may
+want to download entire directories.
+
+An example use case is for the IPFS Web UI, which currently allows users to
+download directories using a workaround. This workaround works via an API
+that only supports `POST` requests and the Web UI has to store the entire
+directory in memory before the user can download it. By introducing TAR files
+on the HTTP Gateway, we improve the way of downloading entire directories.
 
 ## Detailed design
 
