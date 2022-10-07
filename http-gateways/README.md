@@ -40,3 +40,4 @@ model](https://en.wikipedia.org/wiki/Same-origin_policy).
 
 * [SUBDOMAIN_GATEWAY.md](./SUBDOMAIN_GATEWAY.md)
 * [DNSLINK_GATEWAY.md](./DNSLINK_GATEWAY.md)
+* [REDIRECTS_FILE.md](./REDIRECTS_FILE.md)

@@ -49,6 +49,7 @@ Summary:
   - [DNS label limits](#dns-label-limits)
   - [Security considerations](#security-considerations)
   - [URI router](#uri-router)
+  - [Redirects, single-page applications, and custom 404s](#redirects-single-page-applications-and-custom-404s)
 
 ## HTTP API
 
@@ -266,3 +267,7 @@ which in turn should redirect to
 `https://dweb.link/ipfs/bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi`.
 
 From there, regular subdomain gateway logic applies.
+
+## Redirects, single-page applications, and custom 404s
+
+Subdomain Gateway implementations are free to include `_redirects` file support defined in [`REDIRECTS_FILE.md`](./REDIRECTS_FILE.md).
