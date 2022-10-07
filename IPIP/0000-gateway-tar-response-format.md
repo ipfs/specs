@@ -35,6 +35,9 @@ Existing `curl` and `tar` tools can be used by implementers for testing.
 Providing static test vectors has little value here, as different TAR libraries may produce
 different byte-to-byte files due to unspecified ordering of files and directories inside.
 
+There are relevant fixtures for testing certain security concerns and behaviors.
+These are referred on the following sections by their CIDs.
+
 ## Design rationale
 
 The current gateway already supports different response formats via the
