@@ -2,7 +2,7 @@
 
 - Start Date: (format: 2022-10-10)
 - Related Issues:
-  - [ipfs/specs/pull/288](https://github.com/ipfs/specs/pull/288)
+  - [ipfs/specs/pull/328](https://github.com/ipfs/specs/pull/328)
   - [ipfs/kubo/issues/8823](https://github.com/ipfs/kubo/issues/8823)
   - [ipfs/kubo/pull/9335](https://github.com/ipfs/kubo/pull/9335)
 
