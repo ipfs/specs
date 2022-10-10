@@ -34,9 +34,8 @@ Existing `curl` and `tar` tools can be used by implementers for testing.
 
 Providing static test vectors has little value here, as different TAR libraries may produce
 different byte-to-byte files due to unspecified ordering of files and directories inside.
-
-There are relevant fixtures for testing certain security concerns and behaviors.
-These are referred on the following sections by their CIDs.
+However, there are relevant fixtures for testing certain behaviors. These are
+referred by their CID on the following sections.
 
 ## Design rationale
 
@@ -60,10 +59,11 @@ This RFC is backwards compatible.
 
 Manually created UnixFS DAGs can be turned into malicious TAR files. For example,
 if a UnixFS directory contains a file that points at a relative path outside of
-its root, the unpacking of the TAR file may overwrite local files. In order to prevent
-this, if the UnixFS directory contains a file that points at a relative path outside
-of the root, the TAR file download **must** fail by force-closing the HTTP connection,
-leading to a network error.
+its root, the unpacking of the TAR file may overwrite local files.
+
+In order to prevent this, if the UnixFS directory contains a file whose path
+points outside of the root, the TAR file download **must** fail by force-closing
+the HTTP connection, leading to a network error.
 
 To test this, we provide two car files:
 
@@ -74,17 +74,16 @@ Downloading it as a TAR must work.
 DAG that contains a file with a relative path that points outside the root directory.
 Downloading it as a TAR must error.
 
-The user should be suggested to use a CAR file if they really want to download the raw files.
+The user should be suggested to use a CAR file if they want to download the raw files.
 
 ### Alternatives
 
 One discussed alternative would be to support uncompressed ZIP files. However, TAR and
-TAR-related libraries are already supported in IPFS. Therefore, the addition of a TAR response
-format is facilitated, avoiding adding unnecessary libraries.
+TAR-related libraries are already supported and implemented for UnixFS files. Therefore,
+the addition of a TAR response format is facilitated.
 
-An alternative was considered to also support [Gzipped TAR](https://github.com/ipfs/go-ipfs/pull/9034).
-However, there is a concern that that may be a vector for DOS attacks since compression requires
-high CPU power.
+In addition, we considered supporting [Gzipped TAR](https://github.com/ipfs/go-ipfs/pull/9034).
+However, there it may be a vector for DOS attacks since compression requires high CPU power.
 
 ### Copyright
 
