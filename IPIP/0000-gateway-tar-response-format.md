@@ -49,7 +49,7 @@ Users will be able to directly download UnixFs directories from the gateway. In 
 for example, we will be able to create a direct link to download the file, instead of using the
 API to put the whole file in memory before downloading it, saving resources and avoiding bugs.
 
-CLI users will be able to download a directory with existing tools like `curl` and `tar`.
+CLI users will be able to download a directory with existing tools like `curl` and `tar` without having to talk to implementation-specific RPC APIs like `/api/v0/get`.
 
 ### Compatibility
 
