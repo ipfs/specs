@@ -83,6 +83,7 @@ where client prefers to perform all validation locally.
   - [Best practices for HTTP caching](#best-practices-for-http-caching)
   - [Denylists](#denylists)
   - [Generated HTML with directory index](#generated-html-with-directory-index)
+  - [Streaming errors](#streaming-errors)
 
 # HTTP API
 

@@ -1,4 +1,4 @@
-# IPIP 0000: Error Handling in HTTP Gateways
+# IPIP 0000: Streaming Error Handling in HTTP Gateways
 
 - Start Date: 2022-10-12
 - Related Issues:
@@ -7,7 +7,7 @@
 
 ## Summary
 
-Ensure error handling in web gateways is clear and consistent.
+Ensure streaming error handling in web gateways is clear and consistent.
 
 ## Motivation
 
@@ -24,7 +24,7 @@ handling, the server attempts to notify the user.
 ## Detailed design
 
 If the server encounters an error before streaming the contents to the client,
-the server should fail with the respective `4xx`  or `5xx` HTTP status code.
+the server must fail with the respective `4xx`  or `5xx` HTTP status code (no change).
 
 If the server encounters an error while streaming the contents, the server must
 force-close the HTTP connection to the user. This way, the user will receive a
