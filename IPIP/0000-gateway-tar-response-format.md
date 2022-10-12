@@ -1,4 +1,4 @@
-# IPIP 0000: Gateway TAR Response Format
+# IPIP 0000: TAR Response Format on Web Gateways
 
 - Start Date: 2022-06-10
 - Related Issues:
