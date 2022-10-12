@@ -1,6 +1,6 @@
 # Path Gateway Specification
 
-![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
+![Status: Work In Progress](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
 
 **Authors**:
 
