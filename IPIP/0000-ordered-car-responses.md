@@ -1,10 +1,10 @@
-# IPIP 0000: InterPlanetary Improvement Proposal Template
+# IPIP 0000: Block Ordering in CAR Responses
 
 - Start Date: 2022-10-07
 - Related Issues:
   - Car Spec https://ipld.io/specs/transport/car/carv1/
 
-This IPIP follow RFC2119.
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and  "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
 
 ## Summary
 
@@ -12,7 +12,7 @@ Specify a traversal order allowing exchange of ready-to-unpack car files.
 
 ## Motivation
 
-We are building light-clients for IPFS.
+We want to make it easier to build light-clients for IPFS.
 
 Thoses uses the [trustless gateway](../http-gateways/TRUSTLESS_GATEWAY.md) specs to download raw blocks and car files and only do content verifications.
 
