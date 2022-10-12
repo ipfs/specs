@@ -27,7 +27,7 @@ If the server encounters an error before streaming the contents to the client,
 the server must fail with the respective `4xx`  or `5xx` HTTP status code (no change).
 
 If the server encounters an error while streaming the contents, the server must
-force-close the HTTP connection to the user. This way, the user will receive a
+force-close the HTTP stream to the user. This way, the user will receive a
 network error, making it clear that the downloaded file is not valid.
 
 ## Test fixtures
