@@ -195,7 +195,6 @@ blocks.
 Gateway implementations SHOULD be smart enough to require only the minimal DAG subset
 necessary for handling the range request.
 
-
 NOTE: for more advanced use cases such as partial DAG/CAR streaming, or
 non-UnixFS data structures, see the `selector` query parameter
 [proposal](https://github.com/ipfs/go-ipfs/issues/8769).
@@ -258,7 +257,6 @@ In case of `Accept: application/x-tar`, the `?format=` equivalent is `tar`.
     - Selector should be in dag-json or dag-cbor format
     - This is a powerful primitive that allows for fetching subsets of data in specific order, either as raw bytes, or a CAR stream. Think “HTTP range requests”, but for IPLD, and more powerful.
 -->
-
 
 # HTTP Response
 
@@ -377,7 +375,6 @@ and CDNs, implementations should base it on both CID and response type:
   should be based on requested range in addition to CID and response format:
   `Etag: "bafy..foo.0-42`
 
-
 ### `Cache-Control` (response header)
 
 Used for HTTP caching.
@@ -438,6 +435,7 @@ or optional [`filename`](#filename-request-query-parameter) parameter)
 and magic bytes to improve the utility of produced responses.
 
 For example:
+
 - detect plain text file
   and return `Content-Type: text/plain` instead of `application/octet-stream`
 - detect SVG image
@@ -451,6 +449,7 @@ Returned when `download`, `filename` query parameter, or a custom response
 The first parameter passed in this header indicates if content should be
 displayed `inline` by the browser, or sent as an `attachment` that opens the
 “Save As” dialog:
+
 - `Content-Disposition: inline` is the default, returned when request was made
   with  `download=false`  or a custom `filename` was provided with the request
   without any explicit `download` parameter.
@@ -466,9 +465,10 @@ agents and existing web browsers.
 
 To illustrate, `?filename=testтест.pdf` should produce:
 `Content-Disposition inline; filename="test____.jpg"; filename*=UTF-8''test%D1%82%D0%B5%D1%81%D1%82.jpg`
-  - ASCII representation must have non-ASCII characters replaced with `_`
-  - UTF-8 representation must be wrapped in Percent Encoding ([RFC 3986, Section 2.1](https://www.rfc-editor.org/rfc/rfc3986.html#section-2.1)).
-    - NOTE: `UTF-8''` is not a typo – see [Examples in RFC5987](https://datatracker.ietf.org/doc/html/rfc5987#section-3.2.2)
+
+- ASCII representation must have non-ASCII characters replaced with `_`
+- UTF-8 representation must be wrapped in Percent Encoding ([RFC 3986, Section 2.1](https://www.rfc-editor.org/rfc/rfc3986.html#section-2.1)).
+  - NOTE: `UTF-8''` is not a typo – see [Examples in RFC5987](https://datatracker.ietf.org/doc/html/rfc5987#section-3.2.2)
 
 `Content-Disposition` must be also set when a binary response format was requested:
 
@@ -515,8 +515,9 @@ This header is more widely used in [SUBDOMAIN_GATEWAY.md](./SUBDOMAIN_GATEWAY.md
 
 Gateway MUST return a redirect when a valid UnixFS directory was requested
 without the trailing `/`, for example:
+
 - response for `https://ipfs.io/ipns/en.wikipedia-on-ipfs.org/wiki`
-	(no trailing slash) will be HTTP 301 redirect with
+ (no trailing slash) will be HTTP 301 redirect with
   `Location: /ipns/en.wikipedia-on-ipfs.org/wiki/`
 
 ### `X-Ipfs-Path` (response header)
@@ -633,6 +634,7 @@ low level logical pathing from IPLD:
 ### Handling traversal errors
 
 Gateway MUST respond with HTTP error when it is not possible to traverse the requested content path:
+
 - [`404 Not Found`](#404-not-found) should be returned when the root CID is valid and traversable, but
 the DAG it represents does not include content path remainder.
   - Error response body should indicate which part of immutable content path (`/ipfs/{cid}/path/to/file`) is missing
@@ -660,6 +662,7 @@ Implementations are encouraged to support pluggable denylists to allow IPFS
 node operators to opt into not hosting previously flagged content.
 
 Gateway MUST respond with HTTP error when requested CID is on any of active denylists:
+
 - [410 Gone](#410-gone) returned when CID is denied for non-legal reasons, or when the exact reason is unknown
 - [451 Unavailable For Legal Reasons](#451-unavailable-for-legal-reasons) returned when denylist indicates that content was blocked on legal basis
 
