@@ -29,7 +29,7 @@ We already support DAG-JSON, with its own content type.
 The change here is to add support for requests and responses sent as DAG-CBOR,
 with own content type: `application/vnd.ipfs.rpc+dag-cbor`.
 
-For details, see changes  made to `reframe/REFRAME_HTTP_TRANSPORT.md`
+For details, see changes made to `reframe/REFRAME_HTTP_TRANSPORT.md`.
 
 ## Test fixtures
 
@@ -38,9 +38,9 @@ TODO: add CIDs of sample DAG-CBOR messages after https://github.com/ipfs/go-dele
 ## Design rationale
 
 IPFS stack aims to support both DAG-CBOR and DAG-JSON. Users can store JSON as
-CBOR and vice versa. Having consitent support for both in Reframe not only
+CBOR and vice versa. Having consistent support for both in Reframe not only
 aligns with user expectations, but also allows us to save some bytes
-(bandwidth, response caching requirements) by using a binary CBOR as  the
+(bandwidth, response caching requirements) by using a binary CBOR as the
 production format.
 
 ### User benefit
@@ -63,7 +63,7 @@ N/A, we will use the same DAG-CBOR encoder/decoder as the rest of the stack.
 
 Alternative is to do nothing, and end up with:
 
-- inconsitent user experience
+- inconsistent user experience
 - wasted bandwidth and cache storage
 
 ### Copyright
