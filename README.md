@@ -85,6 +85,8 @@ This repository falls under the IPFS [Code of Conduct](https://github.com/ipfs/c
 - Want to propose a change to an existing specification?
 - Or add a new protocol?
 
-See [IPIP 0001: Lightweight Improvement Process for IPFS Specifications](./IPIP/0001-lightweight-improvement-proposal-process.md).
+See:
+ - [IPIP: Improvement Process for IPFS Specifications](./IPIP_PROCESS.md).
+ - List of [IPIPs](./IPIP/)
 
 Accepted proposals can be found in the [`IPIP/`](./IPIP/) directory.
