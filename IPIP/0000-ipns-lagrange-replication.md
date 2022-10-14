@@ -76,7 +76,7 @@ IPNS records won't have anything set for the expiration field, this may interfer
 
 To prevent old IPNS records from being replicated, the optional 5th step stated in https://github.com/ipfs/specs/blob/main/naming/pubsub.md#protocol should be followed. This should make replay attacks difficult to execute.
 
-IPNS records can contain inline CIDs, and Kubo specifically accepts arbitrary bytes for the `Value` field (See https://github.com/ipfs/specs/issues/273), so deliberately huge IPNS records could be distributed.
+IPNS V1 (Perhaps? Need clarification) records can contain inline CIDs, and Kubo specifically accepts arbitrary bytes for the `Value` field (See https://github.com/ipfs/specs/issues/273), so deliberately huge IPNS records could be distributed. IPNS V2 records explicitly don't have this problem as they have a max size of 10KiB (https://github.com/ipfs/specs/pull/319).
 
 IPFS nodes **must** check the current number of record holders before accepting to hold the IPNS record. Without this check, a record holder with a high threshold value could over replicate an IPNS record.
 
