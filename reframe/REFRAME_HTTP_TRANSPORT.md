@@ -32,7 +32,7 @@ All messages sent in HTTP body MUST be encoded as DAG-JSON and use explicit cont
 
 Requests MUST be sent as either:
 
-- `GET /reframe?q={percent-encoded-dag-json}`
+- `GET /reframe?q={percent-encoded-dag-cbor}`
   - DAG-JSON is supported via a `?q` query parameter, and the value MUST be [percent-encoded](https://en.wikipedia.org/wiki/Percent-encoding)
   - Suitable for sharing links, sending smaller messages, testing and debugging.
 - `POST /reframe`
