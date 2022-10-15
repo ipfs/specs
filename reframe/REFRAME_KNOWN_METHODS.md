@@ -219,6 +219,9 @@ A message for finding nodes with interest in a given key using double hashing to
 ```
 
 The query is a derived hash of the multihash being requested.
+It is constructed by taking the raw bytes of the multihash, prepending the ascii bytes "CR_DOUBLEHASH", and taking the SHA256 hash of that data.
+The resulting digest is then packed itself into a multihash, using the multihash code identifier multihash.DBL_SHA2_256.
+
 The full semantics of double hashing in the context of content routing are described at https://www.notion.so/protocollabs/IPFS-Double-Hashing-Repurpose-8fdaae8748414ae592a5d24d59c0d8ed
 
 ```ipldsch
