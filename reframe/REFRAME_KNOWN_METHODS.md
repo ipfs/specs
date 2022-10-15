@@ -22,6 +22,7 @@ This document is defining known methods (request-response message types) and sem
     - [Identify DAG-JSON Examples](#identify-dag-json-examples)
   - [FindProviders](#findproviders)
     - [FindProviders DAG-JSON Examples](#findproviders-dag-json-examples)
+  - [FindProvidersBlinded](#findproviders-blinded)
   - [GetIPNS](#getipns)
     - [GetIPNS DAG-JSON Examples](#getipns-dag-json-examples)
   - [PutIPNS](#putipns)
@@ -39,6 +40,7 @@ The known Request types are the following and are described below:
 type Request union {
     | "IdentifyRequest" IdentifyRequest
     | "FindProvidersRequest" FindProvidersRequest
+    | "FindHashedSHA256Request" FindHashedSHA256Request
     | "GetIPNSRequest" GetIPNSRequest
     | "PutIPNSRequest" PutIPNSRequest
     | "ProvideRequest" ProvideRequest
@@ -51,6 +53,7 @@ The known Response types are the following and are described below:
 type Response union {
     | "IdentifyResponse" IdentifyResponse
     | "FindProvidersResponse" FindProvidersResponse
+    | "FindHashedSHA256Response" FindHashedSHA256Response
     | "GetIPNSResponse" GetIPNSResponse
     | "PutIPNSResponse" PutIPNSResponse
     | "ProvideResponse" ProvideResponse
@@ -69,6 +72,7 @@ The following methods (request-response pairs) are _cachable_:
 type CachableRequest union {
     | "IdentifyRequest" IdentifyRequest
     | "FindProvidersRequest" FindProvidersRequest
+    | "FindHashedSHA256Request" FindHashedSHA256Request
     | "GetIPNSRequest" GetIPNSRequest
 }
 ```
@@ -145,6 +149,7 @@ Note: While the Key is a CID it is highly recommended that server implementation
     # We expect different types of nodes, e.g. peer, miner, public IP, etc.
     type Node union {
      | Peer "peer"
+     | AuthenticatedPeer "apeer"  # This type will be returned in blinded queries
      | Any default
     } representation keyed
 
@@ -202,6 +207,36 @@ Response:
     ]
 }}
 ```
+
+### FindProviders Blinded
+
+A message for finding nodes with interest in a given key using double hashing to blind the key being requested.
+
+```ipldsch
+    type FindHashedSHA256Request struct {
+        Query Bytes
+    }
+```
+
+The query is a derived hash of the multihash being requested.
+The full semantics of double hashing in the context of content routing are described at https://www.notion.so/protocollabs/IPFS-Double-Hashing-Repurpose-8fdaae8748414ae592a5d24d59c0d8ed
+
+```ipldsch
+    type FindHashedSHA256Response struct {
+        Providers [Provider]
+    }
+
+    type AuthenticatedPeer struct {
+        // ID is included in this superset of 'Peer'
+        ID Bytes // Enc_{MH}(PeerID || 0[32bytes]) 
+        // Multiaddresses may be set as a hint if the server knows the publisher.
+        Multiaddresses optional [Bytes]
+
+        Signature Bytes // signature of ID field by the publisher's PeerID.
+    }
+}
+```
+
 
 ### GetIPNS
 
