@@ -113,7 +113,7 @@ Path segments can have additional parameters added to them by separating them us
 This format is based on the [Matrix URI proposal from the W3C](https://www.w3.org/DesignIssues/MatrixURIs.html).
 Note that these parameters are stripped from the segment name when passed to any underlying traversal code.
 
-This spec only perscribes two reserved parameter names: `ADL` for specifying [Advanced Data Layouts](https://ipld.io/docs/advanced-data-layouts/) to process the data with, and `schema` to specify an [IPLD schema](https://ipld.io/docs/schemas/intro/) to use to interpret the data.
+This spec only perscribes two reserved parameter names: `adl` for specifying [Advanced Data Layouts](https://ipld.io/docs/advanced-data-layouts/) to process the data with, and `schema` to specify an [IPLD schema](https://ipld.io/docs/schemas/intro/) to use to interpret the data.
 Other names may be specified in future specs that build upon this one.
 
 #### ADL (segment parameter)
