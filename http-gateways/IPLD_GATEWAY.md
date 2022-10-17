@@ -191,6 +191,6 @@ Similarly, the path segment name `😁` should be escaped to `%F0%9F%98%81`.
 
 ## Interaction with URLs
 
-`/ipld/` HTTP paths map directly to `ipld://` URLs.
+`/ipld/` HTTP paths map directly to `urn:ipld:` URNs,  `ipld:` URIs or `ipld://` pseudo-URLs.
 Similarly, `ipld://` URLs can be mapped back to `/ipld/` paths on the gateway.
 This gives us an easy way to convert between URLs within applications and paths on gateways running either locally or remotely.
