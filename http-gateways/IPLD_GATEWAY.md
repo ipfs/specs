@@ -110,7 +110,7 @@ Example:
 ```
 
 Path segments can have additional parameters added to them by separating them using semicolons (`;`) and having key-value pairs separated by an `=`.
-This format is based on the [Matrix URI proposal from the w3c](https://www.w3.org/DesignIssues/MatrixURIs.html).
+This format is based on the [Matrix URI proposal from the W3C](https://www.w3.org/DesignIssues/MatrixURIs.html).
 Note that these parameters are stripped from the segment name when passed to any underlying traversal code.
 
 This spec only perscribes two reserved parameter names: `ADL` for specifying [Advanced Data Layouts](https://ipld.io/docs/advanced-data-layouts/) to process the data with, and `schema` to specify an [IPLD schema](https://ipld.io/docs/schemas/intro/) to use to interpret the data.
