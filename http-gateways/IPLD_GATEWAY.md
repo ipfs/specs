@@ -53,7 +53,7 @@ TODO: Only allow `/localhost/`? Get rid of `/localhost` from the spec if light c
 
 ### `PATCH /ipld/{cid}[/{segments}][?{params}]`
 
-This endpoint enables you to apply a [patch set](https://ipld.io/specs/patch/) to existing IPLD data.
+This endpoint enables you to apply an [IPLD Patch](https://ipld.io/specs/patch/) to existing IPLD data.
 
 <!--
 TODO: Talk about content encoding
