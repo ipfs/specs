@@ -128,7 +128,7 @@ An example value would be `;adl=hamt` to specify the [HAMT](https://ipld.io/spec
 
 For example `/ipld/bafyreic672jz6huur4c2yekd3uycswe2xfqhjlmtmm5dorb6yoytgflova;adl=hamt/yes` (taken from the HAMT examples), should resolve to the following:
 
-```
+```json
 [
   {
     "line": 9,
