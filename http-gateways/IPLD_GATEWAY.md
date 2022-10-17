@@ -28,7 +28,7 @@ The path segments will be traversed with any parameters used to transform data a
 
 The `format` query string parameter, or the `Accept` request header can be used to control the format which will be used to return the data.
 
-By default, data will be returned as `dag-json`
+By default, data will be returned as [DAG-JSON](https://ipld.io/specs/codecs/dag-json/).  Implementations MUST also support [DAG-CBOR](https://ipld.io/specs/codecs/dag-cbor/) as an opt-in (requested by the client).
 
 <!--
 TODO: Cache control semantics?
