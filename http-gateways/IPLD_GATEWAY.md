@@ -1,5 +1,7 @@
 # IPLD Gateway Specification
 
+![wip](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
+
 **Authors**:
 
 - Mauve Signweaver ([@RangerMauve](https://github.com/RangerMauve))
