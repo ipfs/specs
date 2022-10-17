@@ -122,6 +122,8 @@ Other names may be specified in future specs that build upon this one.
 
 Segments may contain an `adl` key which points to a name of an [Advanced Data Layout](https://ipld.io/docs/advanced-data-layouts/intro/) to process the node with.
 
+If no `adl` key is specified, then no ADL will be applied to this point in the traversal.
+
 The supported ADL names will vary based on gateway.
 
 An example value would be `;adl=hamt` to specify the [HAMT](https://ipld.io/specs/advanced-data-layouts/hamt/) ADL that's used to represent large maps.
@@ -136,6 +138,8 @@ For example `/ipld/bafyreic672jz6huur4c2yekd3uycswe2xfqhjlmtmm5dorb6yoytgflova;a
   }
 ]
 ```
+
+Note that in the path, the CID refers to a root of the HAMT which is what the HAMT ADL is being applied to. There is then a subpath, `yes` which contains the instances of the word `yes`.
 
 #### Schema (segment parameter)
 
