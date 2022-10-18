@@ -1,6 +1,6 @@
 # Path Gateway Specification
 
-![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
+![Status: Work In Progress](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
 
 **Authors**:
 
@@ -181,10 +181,10 @@ For example:
 
 - [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw) – disables [IPLD codec deserialization](https://ipld.io/docs/codecs/), requests a verifiable raw [block](https://docs.ipfs.io/concepts/glossary/#block) to be returned
 - [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car) – disables [IPLD codec deserialization](https://ipld.io/docs/codecs/), requests a verifiable [CAR](https://docs.ipfs.io/concepts/glossary/#car) stream to be returned
-<!-- TODO: https://github.com/ipfs/go-ipfs/issues/8823
-- application/vnd.ipld.dag-json OR application/json – requests IPLD Data Model representation serialized into [DAG-JSON format](https://ipld.io/docs/codecs/known/dag-json/)
-- application/vnd.ipld.dag-cbor OR application/cbor - requests IPLD Data Model representation serialized into [DAG-CBOR format](https://ipld.io/docs/codecs/known/dag-cbor/)
--->
+- [application/vnd.ipld.dag-json](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-json) – requests [IPLD model](https://ipld.io/docs/data-model/) representation serialized into [DAG-JSON format](https://ipld.io/docs/codecs/known/dag-json/)
+- [application/vnd.ipld.dag-cbor](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-cbor) – requests [IPLD model](https://ipld.io/docs/data-model/) representation serialized into [DAG-CBOR format](https://ipld.io/docs/codecs/known/dag-cbor/)
+- [application/json](https://www.iana.org/assignments/media-types/application/json) – same as `application/vnd.ipld.dag-json`, unless the CID's codec is JSON. Then, data will be serialized as JSON
+- [application/cbor](https://www.iana.org/assignments/media-types/application/cbor) – same as `application/vnd.ipld.dag-cbor`, unless the CID's codec is CBOR. Then, data will be serialized as CBOR
 
 ### `Range` (request header)
 
@@ -246,9 +246,13 @@ parameter, if present)
 
 Optional, `format=<format>` can be used to request specific response format.
 
-This is a URL-friendly alternative to sending
-`Accept: application/vnd.ipld.<format>` header, see [`Accept`](#accept-request-header)
-for more details.
+This is a URL-friendly alternative to sending an [`Accept`](#accept-request-header) header. These are the equivalents:
+- `format=raw` → `Accept: application/vnd.ipld.raw`
+- `format=car` → `Accept: application/vnd.ipld.car`
+- `format=dag-json` → `Accept: application/vnd.ipld.dag-json`
+- `format=dag-cbor` → `Accept: application/vnd.ipld.dag-cbor`
+- `format=json` → `Accept: application/json`
+- `format=cbor` → `Accept: application/cbor`
 
 <!-- TODO Planned: https://github.com/ipfs/go-ipfs/issues/8769
 - `selector=<cid>`  can be used for passing a CID with [IPLD selector](https://ipld.io/specs/selectors)
@@ -589,12 +593,6 @@ Data sent with HTTP response depends on the type of requested IPFS resource:
   - Opaque bytes, see [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw)
 - CAR
   - CAR file or stream, see [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car)
-<!-- TODO: https://github.com/ipfs/go-ipfs/issues/8823
-- dag-json / dag-cbor
-  - See [https://github.com/ipfs/go-ipfs/issues/8823](https://github.com/ipfs/go-ipfs/issues/8823)
--->
-
-# Appendix: notes for implementers
 
 ## Content resolution
 
