@@ -46,7 +46,9 @@ one more supported format to that list.
 
 ### User benefit
 
-TODO
+The user benefits from this change as they will now be able to retrieve
+content encoded in the traversable DAG-JSON and DAG-CBOR formats. This is
+something that has been [requested before][ipfs/go-ipfs/issues/7552].
 
 ### Compatibility
 
