@@ -61,7 +61,7 @@ Downloading it as a TAR must error.
 ## Design rationale
 
 The current gateway already supports different response formats via the
-`Accept` HTTP header and the `format` URL query. This RFC proposes adding
+`Accept` HTTP header and the `format` URL query. This IPIP proposes adding
 one more supported format to that list.
 
 ### User benefit
