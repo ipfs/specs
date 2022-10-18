@@ -30,7 +30,9 @@ to traversing IPLD data.
 
 ## Detailed design
 
-TODO
+The solution is to allow the Gateway to support serializing an IPLD model
+representation as [DAG-JSON], [DAG-CBOR], JSON and CBOR by requesting them
+using either the `Accept` HTTP header or the `format` URL query.
 
 ## Test fixtures
 
