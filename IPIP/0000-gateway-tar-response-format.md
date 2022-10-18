@@ -94,7 +94,7 @@ In order to prevent this, the specification requires implementations to do
 basic sanitization of paths returned inside a TAR response.
 
 If the UnixFS directory contains a file whose path
-points outside the root, the TAR file download **must** fail by force-closing
+points outside the root, the TAR file download **should** fail by force-closing
 the HTTP connection, leading to a network error.
 
 To test this, we provide some [test fixtures](#test-fixtures). The user should be
