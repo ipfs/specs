@@ -594,6 +594,8 @@ Data sent with HTTP response depends on the type of requested IPFS resource:
 - CAR
   - CAR file or stream, see [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car)
 
+# Appendix: notes for implementers
+
 ## Content resolution
 
 Content resolution is a process of turning an HTTP request into an IPFS content
