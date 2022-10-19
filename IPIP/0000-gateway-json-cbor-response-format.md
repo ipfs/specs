@@ -43,7 +43,17 @@ using either the `Accept` HTTP header or the `format` URL query.
 
 ## Test fixtures
 
-TODO
+- `bafybeiegxwlgmoh2cny7qlolykdf7aq7g6dlommarldrbm7c4hbckhfcke` is a DAG-PB directory.
+- `bafkreidmwhhm6myajxlpu7kofe3aqwf4ezxxn46cp5fko7mb6x74g4k5nm` is the aforementioned
+  DAG-PB directory's Logical DAG-JSON representation that is expected to be returned
+  when using `?format=dag-json`.
+- Traversal Test Fixtures: the following test fixtures contain two levels of nested
+  documents of their encoding. Accessing `/ipfs/$CID/foo/bar` should return the JSON
+  equivalent of `{"hello":"this is not a link"}`.
+  - DAG-CBOR: `bafyreiehxu373cu3v5gyxyxfsfjryscs7sq6fh3unqcqgqhdfn3n43vrgu`
+  - DAG-JSON: `baguqeeraoaeabj5hdfcmpkzfeiwtfwb3qbvfwzbiknqn7itcwsb2fdtu7eta`
+- `TODO` is a valid JSON but not a valid DAG-JSON
+- `TODO` is a valid CBOR but not a valid DAG-CBOR
 
 ## Design rationale
 
