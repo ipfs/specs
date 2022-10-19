@@ -59,7 +59,8 @@ something that has been [requested before][ipfs/go-ipfs/issues/7552].
 
 ### Compatibility
 
-This IPIP is backwards compatible.
+This IPIP adds a new response types and does not modify existing ones,
+making it a backwards-compatible change.
 
 ### Security
 
