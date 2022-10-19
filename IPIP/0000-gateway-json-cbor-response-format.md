@@ -18,7 +18,14 @@ Currently, the gateway supports requesting data in the [DAG-PB], RAW, and [CAR]
 formats. However, it should be possible to download deserialized  version of  data other than UnixFS
 in order to unlock the potential of the [IPLD Data Model][ipld-data-model] beyond files and directories.
 
-For example, DAG-PB has a [logical format][dag-pb-format] which makes it possible
+
+The main functional gap in IPFS ecosystem is the lack of support for non-UnixFS DAGs on HTTP Gateways.
+Users are able to create custom DAGs based on traversable DAG-CBOR thanks to [CBOR tag 42 being reserved for CIDs](https://github.com/core-wg/yang-cbor/issues/13#issuecomment-524378859), 
+but they are unable to load deserialized  DAG-CBOR documents from local gateway, 
+which is severely decreasing the utility of non-UnixFS DAGs.
+
+Adding new responses types will also benefit UnixFS.
+DAG-PB has a [logical format][dag-pb-format] which makes it possible
 to represent a DAG-PB directory as a [DAG-JSON] document. This means that, if we
 support DAG-JSON in the gateway, then we would support
 [JSON responses for directory listings][ipfs/go-ipfs/issues/7552], which has been
