@@ -63,16 +63,20 @@ The rules around implicit content type are as follows:
 
 Requests MUST be sent as either:
 
-- `GET /reframe/{mbase64url-dag-cbor}`
+- `GET /reframe/{CachableRequestMethodName}/{request-as-mbase64url-dag-cbor}`
   - Cachable HTTP `GET` requests with message passed as DAG-CBOR in HTTP path segment, encoded as URL-safe [`base64url` multibase](https://docs.ipfs.io/concepts/glossary/#base64url) string
+    - Cachable method name is placed on the URL path, allowing for different caching strategies per method, and custom routing/scaling per method, if needed.
     - DAG-CBOR in multibase `base64url` is used (even when request body is DAG-JSON) because JSON may include characters that are not safe to be used in URLs, and percent-encoding or base-encoding a big JSON query may take too much space.
   - Suitable for sharing links, sending bigger messages, and when a query result MUST benefit from HTTP caching (see _HTTP Caching Considerations_ below).
-- `GET /reframe?q={percent-encoded-dag-json}`
+  - DAG-CBOR response is the implicit default, unless explicit `Accept` header is passed
+- `GET /reframe?q={percent-encoded-request-as-dag-json}`
   - DAG-JSON is supported via a `?q` query parameter, and the value MUST be [percent-encoded](https://en.wikipedia.org/wiki/Percent-encoding)
   - Suitable for sharing links, sending smaller messages, testing and debugging.
+  - DAG-JSON response is the implicit default, unless explicit `Accept` header is passed
 - `POST /reframe`
-  - Ephemeral HTTP `POST` request with DAG-JSON or DAG-CBOR message passed in HTTP request body
+  - Ephemeral HTTP `POST` request with DAG-JSON or DAG-CBOR message passed in HTTP request body and a mandatory `Content-Type` header informing endpoint how to parse the body
   - Suitable for bigger messages, and when HTTP caching should be skipped for the most fresh results
+  - Response type is the same as request, unless explicit `Accept` header is passed
 
 Servers MUST support `GET` for methods marked as cachable and MUST support `POST` for all methods (both cachable and not-cachable). This allows servers to rate-limit `POST` when cachable `GET` could be used instead, and enables clients to use `POST` as a fallback in case there is a technical problem with bigger Reframe messages not fitting in a `GET` URL. See "Caching Considerations" section.
 
