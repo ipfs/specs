@@ -15,8 +15,8 @@ Add [DAG-JSON], [DAG-CBOR], JSON and CBOR response formats to the [HTTP Gateway]
 ## Motivation
 
 Currently, the gateway supports requesting data in the [DAG-PB], RAW, and [CAR]
-formats. However, it should be possible to download everything over the gateway
-in order to unlock the potentials of the [IPLD Data Model][ipld-data-model].
+formats. However, it should be possible to download deserialized  version of  data other than UnixFS
+in order to unlock the potential of the [IPLD Data Model][ipld-data-model] beyond files and directories.
 
 For example, DAG-PB has a [logical format][dag-pb-format] which makes it possible
 to represent a DAG-PB directory as a [DAG-JSON] document. This means that, if we
