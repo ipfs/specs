@@ -24,78 +24,98 @@
 - [Implementations](#implementations)
 
 # API Specification
-By default, the Delegated Routing HTTP API uses the `application/json` content type. Clients and servers may optionally negotiate other content types such as `application/cbor`, `application/vnd.ipfs.rpc+dag-json`, etc. using the standard `Accept` and `Content-Type` headers.
+The Delegated Routing HTTP API uses the `application/json` content type by default. Clients and servers *should* support `application/cbor`, which can be negotiated using the standard `Accept` and `Content-Type` headers.
 
+## Common Data Types:
+
+- CIDs are always encoded using a [multibase](https://github.com/multiformats/multibase)-encoded [CIDv1](https://github.com/multiformats/cid#cidv1).
+- Multiaddrs are encoded according to the [human-readable multiaddr specification](https://github.com/multiformats/multiaddr#specification)
+- Peer IDs are encoded according [PeerID string representation specification](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#string-representation)
+- Multibase bytes are encoded according to [the Multibase spec](https://github.com/multiformats/multibase), and *should* use Base64.
+
+## API
 - `GET /v1/providers/{CID}`
     - Reframe equivalent: FindProviders
     - Response
         
         ```json
         {
-        	"Providers": [
-        		{
-        			"PeerID": "...",
-        			"Multiaddrs": ["...", "..."]
-        			"Protocols": [
-        				{
-        					"Codec": 2320,
-        					"Payload": <opaque data>
-        				}
-        			]
-        		}
-        	]
-        	"NextPageToken": "<token>"
+            "Providers": [
+                {
+                    "PeerID": "12D3K...",
+                    "Multiaddrs": ["/ip4/.../tcp/.../p2p/...", "/ip4/..."],
+                    "Protocols": [
+                        {
+                            "Codec": 2320,
+                            "Payload": { ... }
+                        }
+                    ]
+                }
+            ]
         }
         ```
         
     - Default limit: 100 providers
     - Optional query parameters
-        - `transfer` only return providers who support the passed transfer protocols, expressed as a comma-separated list of multicodec IDs such as `2304,2320`,
-        - `transport` only return providers whose published multiaddrs explicitly support the passed transport protocols, such as `/quic` or `/tls/ws`.
-- `GET /v1/providers/hash/{multihash}`
-    - This is the same as `GET /v1/providers/{CID}`, but takes a hashed CID encoded as a multihash
+        - `transfer` only return providers who support the passed transfer protocols, expressed as a comma-separated list of [multicodec codes](https://github.com/multiformats/multicodec/blob/master/table.csv) in decimal form such as `2304,2320`
+        - `transport` only return providers whose published multiaddrs explicitly support the passed transport protocols, such as `460,478` (`/quic` and `/tls/ws`)
+        - Servers should treat the multicodec codes used in the `transfer` and `transport` parameters as opaque, and not validate them, for forwards compatibility
+- `GET /v1/providers/hashed/{multihash}`
+    - This is the same as `GET /v1/providers/{CID}`, but takes a hashed CID encoded as a [multihash](https://github.com/multiformats/multihash/)
 - `GET /v1/ipns/{ID}`
     - Reframe equivalent: GetIPNS
+	- `ID`: multibase-encoded bytes
     - Response
         - record bytes
-- `POST /v1/ipns/{ID}`
+- `POST /v1/ipns`
     - Reframe equivalent: PutIPNS
     - Body
-        - record bytes
-    - No need for idempotency
-- `PUT /v1/providers/{CID}`
-    - Reframe equivalent: Provide
-    - Body
-        
         ```json
         {
-        	"Keys": ["cid1", "cid2"],
-        	"Timestamp": 1234,
-        	"AdvisoryTTL": 1234,
-        	"Signature": "multibase bytes",
-        	"Provider": {
-        		"Peer": {
-        			"ID": "peerID",
-        			"Addrs": ["multiaddr1", "multiaddr2"]
-        		},
-        		"Protocols": [
-        			{
-        				"Codec": 1234,
-        				"Payload": <opaque data>
-        			}
-        		]
-        	}
+			"Records": [
+				{
+					"ID": "multibase bytes",
+					"Record": "multibase bytes"
+				}
+			]
         }
         ```
-        
+    - Not idempotent (this doesn't really make sense for IPNS)
+    - Default limit of 100 records per request
+- `PUT /v1/providers`
+    - Reframe equivalent: Provide
+    - Body
+		```json
+		{
+			"Signature": "multibase bytes",
+			"Payload": {
+        		"Keys": ["cid1", "cid2"],
+        		"Timestamp": 1234,
+        		"AdvisoryTTL": 1234,
+        		"Signature": "multibase bytes",
+        		"Provider": {
+					"PeerID": "12D3K...",
+					"Multiaddrs": ["/ip4/.../tcp/.../p2p/...", "/ip4/..."],
+          			"Protocols": [
+        				{
+        					"Codec": 1234,
+        					"Payload": { ... }
+						}
+					]
+        		}
+			}
+		}
+		```
+        - `Signature` is a multibase-encoded signature of the encoded bytes of the `Payload` field, signed using the private key of the Peer ID specified in the `Payload`. See the [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#keys) specification for the encoding of Peer IDs. Servers must verify the payload using the public key from the Peer ID. If the verification fails, the server must return a 403 status code.
     - Idempotent
+	- Default limit of 100 keys per request
 - `GET /v1/ping`
-    - This is absent from Reframe but is necessary for supporting e.g. the accelerated DHT client which can take many minutes to bootstrap
+    - This is absent from Reframe but is necessary for supporting e.g. the accelerated DHT client which can take many minutes to bootstrap, and light clients who want to probe multiple HTTP endpoints and use the fastest one
     - Returns 200 once the server is ready to accept requests
     - An alternate approach is w/ an orchestration dance in the server by not listening on the socket until the dependencies are ready, but this makes the “dance” easier to implement
-- Pagination
+- Limits
     - Responses with collections of results must have a default limit on the number of results that will be returned in a single response
-    - Servers may optionally implement pagination by responding with an opaque page token which, when provided as a subsequent query parameter, will fetch the next page of results.
-    - Clients may continue paginating until no `NextPageToken` is returned.
-    - Clients making calls that return collections may limit the number of per-page results returned with the `limit` query parameter, i.e. `GET /v1/providers/{CID}?limit=10`
-    - Additional filtering/sorting operations may be defined on a per-path basis, as needed
+    - Pagination and/or dynamic limit configuration may be added to this spec in the future, once there is a concrete requirement
+- Error Codes
+    - A 404 must be returned if a resource was not found
+	- A 501 must be returned if a method is not supported
