@@ -77,7 +77,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 [DAG-PB]: https://ipld.io/docs/codecs/known/dag-pb/
 [dag-pb-format]: https://ipld.io/specs/codecs/dag-pb/spec/#logical-format
 [DAG-JSON]: https://ipld.io/docs/codecs/known/dag-json/
-[DAG-CBOR]: https://ipld.io/docs/codecs/known/dag-json/
+[DAG-CBOR]: https://ipld.io/docs/codecs/known/dag-cbor/
 [CAR]: https://ipld.io/specs/transport/car/
 [ipld-data-model]: https://ipld.io/docs/data-model/
 [ipfs/in-web-browsers/issues/182]: https://github.com/ipfs/in-web-browsers/issues/182
