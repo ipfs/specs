@@ -24,8 +24,9 @@ serialization mechanisms for sending Reframe messages over HTTP `POST` and
   - [Other notes](#other-notes)
 - [HTTP Caching Considerations](#http-caching-considerations)
   - [POST vs GET](#post-vs-get)
-  - [Avoiding sending the same response messages twice](#avoiding-sending-the-same-response-messages-twice)
-  - [Client controls for time-based caching](#client-controls-for-time-based-caching)
+  - [Etag](#etag)
+  - [Last-Modified](#last-modified)
+  - [Cache-Control](#cache-control)
   - [Rate-limiting non-cachable POST requests](#rate-limiting-non-cachable-post-requests)
 - [Implementations](#implementations)
 
@@ -43,14 +44,14 @@ Requests SHOULD be sent with explicit `Accept` and `Content-Type` HTTP headers s
 
 All messages sent in HTTP body MUST be encoded as either:
 
-- [DAG-CBOR](https://ipld.io/specs/codecs/dag-cbor/spec/), and use explicit content type `application/vnd.ipfs.rpc+dag-cbor; version=1`
+- [DAG-CBOR](https://ipld.io/specs/codecs/dag-cbor/spec/), and use explicit content type `application/vnd.ipfs.rpc+dag-cbor; version=2`
   - **This is a CBOR (binary) format for use in production.**
-  - CBOR request MUST include HTTP header: `Accept: application/vnd.ipfs.rpc+dag-cbor; version=1`
-  - CBOR request AND response MUST include header: `Content-Type: application/vnd.ipfs.rpc+dag-cbor; version=1`
-- [DAG-JSON](https://ipld.io/specs/codecs/dag-json/spec/), and use explicit content type `application/vnd.ipfs.rpc+dag-json; version=1`
+  - CBOR request MUST include HTTP header: `Accept: application/vnd.ipfs.rpc+dag-cbor; version=2`
+  - CBOR request AND response MUST include header: `Content-Type: application/vnd.ipfs.rpc+dag-cbor; version=2`
+- [DAG-JSON](https://ipld.io/specs/codecs/dag-json/spec/), and use explicit content type `application/vnd.ipfs.rpc+dag-json; version=2`
   - **This is a human-readable plain text format for use in testing and debugging.**
-  - JSON request MUST include header: `Accept: application/vnd.ipfs.rpc+dag-json; version=1`
-  - JSON request AND response MUST include header: `Content-Type: application/vnd.ipfs.rpc+dag-json; version=1`
+  - JSON request MUST include header: `Accept: application/vnd.ipfs.rpc+dag-json; version=2`
+  - JSON request AND response MUST include header: `Content-Type: application/vnd.ipfs.rpc+dag-json; version=2`
 
 Implementations SHOULD error when an explicit content type is missing, but MAY decide to implement some defaults instead.
 The rules around implicit content type are as follows:
@@ -76,7 +77,7 @@ Requests MUST be sent as either:
 - `POST /reframe/{method}`
   - Ephemeral HTTP `POST` request with DAG-JSON or DAG-CBOR message passed in HTTP request body and a mandatory `Content-Type` header informing endpoint how to parse the body
   - Suitable for bigger messages, and when HTTP caching should be skipped for the most fresh results
-  - Response type is the same as request, unless explicit `Accept` header is passed
+  - Response type is the same as `Content-Type` of the request, unless explicit `Accept` header is passed
 
 Servers MUST support `GET` for methods marked as cachable and MUST support `POST` for all methods (both cachable and not-cachable). This allows servers to rate-limit `POST` when cachable `GET` could be used instead, and enables clients to use `POST` as a fallback in case there is a technical problem with bigger Reframe messages not fitting in a `GET` URL. See "Caching Considerations" section.
 
@@ -89,7 +90,7 @@ Requests and Responses MUST occur over a single HTTP call instead of the server 
 If a server chooses to respond to a single request message with a group of DAG-JSON messages in the response it should do so as a set of `\n` delimited DAG-JSON messages (i.e. `{Response1}\n{Response2}...`).
 DAG-CBOR responses require no special handling, as they are already self-delimiting due to the nature of the CBOR encoding.
 
-Requests and responses MUST come with `version=1` as a _Required Parameter_  in the `Accept` and `Content-Type` HTTP headers.
+Requests and responses MUST come with `version=2` as a _Required Parameter_  in the `Accept` and `Content-Type` HTTP headers.
 
 Note: This version header is what allows the transport to more easily evolve over time (e.g. if it was desired to change the transport to support other encodings than DAG-JSON, utilize headers differently, move the request data from the body, etc.). Not including the version number is may lead to incompatibility with future versions of the transport.
 
@@ -107,22 +108,41 @@ Use of `GET` endpoint is not mandatory, but suggested if a Reframe deployment
 expects to handle the same message query multiple times, and want to leverage
 existing HTTP tooling to maximize HTTP cache hits.
 
-### Avoiding sending the same response messages twice
+### Etag
 
-Implementations MUST always return strong
+For small responses.
+
+Implementations MAY return
 [`Etag`](https://httpwg.org/specs/rfc7232.html#header.etag) HTTP header based
-on digest of DAG-JSON response messages. This allows clients to send
-inexpensive conditional requests with
+on a digest of response messages ONLY when `Etag` generation does not require
+buffering bigger response in memory before sending it to the client.
+
+In other words, do not use `Etag` if it will block a big, streaming response.
+Streaming responses should use `Last-Modified` instead.
+
+`Etag` allows clients to send inexpensive conditional requests with
 [`If-None-Match`](https://httpwg.org/specs/rfc7232.html#header.if-none-match)
 header, which will skip when the response message did not change.
 
-### Client controls for time-based caching
+### Last-Modified
 
-Implementations can also return (optional)
+For streaming responses.
+
+Implementations SHOULD return
 [`Last-Modified`](https://httpwg.org/specs/rfc7232.html#header.last-modified)
-HTTP header, allowing clients to send conditional requests with
+HTTP header with bigger, streaming responses.
+
+This allows clients to send conditional requests with
 [`If-Modified-Since`](https://httpwg.org/specs/rfc7232.html#header.if-modified-since)
 header to specify their acceptance for stale (cached) responses.
+
+### Cache-Control
+
+Implementations MAY return custom `Cache-Control` per Reframe method,
+when a specific cache window makes sense in the context of specific method.
+
+It is also acceptable to leave it out and let reverse HTTP provies / CDNs to
+set it. Value will depend on use case, and expected load.
 
 ### Rate-limiting non-cachable POST requests
 
