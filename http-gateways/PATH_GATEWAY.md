@@ -593,6 +593,15 @@ Data sent with HTTP response depends on the type of requested IPFS resource:
   - Opaque bytes, see [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw)
 - CAR
   - CAR file or stream, see [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car)
+- JSON
+  - Bytes representing a JSON file, see [application/json](https://www.iana.org/assignments/media-types/application/json)
+- DAG-JSON
+  - Bytes representing a DAG-JSON file, see [application/vnd.ipld.dag-json](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-json)
+- CBOR
+  - Bytes representing a CBOR file, see [application/cbor](https://www.iana.org/assignments/media-types/application/cbor)
+- DAG-CBOR
+  - Bytes representing a DAG-CBOR file, see [application/vnd.ipld.dag-cbor](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-cbor)
+
 
 # Appendix: notes for implementers
 
