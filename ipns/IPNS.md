@@ -1,4 +1,4 @@
-# ![draft](https://img.shields.io/badge/status-draft-yellow.svg?style=flat-square) IPNS - Inter-Planetary Naming System
+# ![reliable](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square) IPNS - Inter-Planetary Naming System 
 
 **Authors(s)**:
 
@@ -252,7 +252,7 @@ Once the record is created, it is ready to be spread through the network. This w
 The means of distribution are left unspecified. Implementations MAY choose to
 publish signed record using multiple routing systems, such as
 [libp2p Kademlia DHT](https://github.com/libp2p/specs/tree/master/kad-dht),
-[PubSub topic](naming/pubsub.md), or a [Reframe endpoint](reframe/) (see [Routing record](#routing-record)).
+[PubSub topic](./IPNS_PUBSUB.md), or a [Reframe endpoint](../reframe/) (see [Routing record](#routing-record)).
 
 On the other side, each peer must be able to get a record published by another node. It only needs to have the unique identifier used to publish the record to the network. Taking into account the routing system being used, we may obtain a set of occurrences of the record from the network. In this case, records can be compared using the sequence number, in order to obtain the most recent one.
 
@@ -323,7 +323,7 @@ Note: Base32 according to the [RFC4648](https://tools.ietf.org/html/rfc4648).
 ### Routing Record
 
 The routing record is spread across the network according to the available routing systems.
-The two routing systems currently available in IPFS are the [libp2p Kademlia DHT](https://github.com/libp2p/specs/tree/master/kad-dht) and [IPNS over PubSub](naming/pubsub.md).
+The two routing systems currently available in IPFS are the [libp2p Kademlia DHT](https://github.com/libp2p/specs/tree/master/kad-dht) and [IPNS over PubSub](./IPNS_PUBSUB.md).
 
 **Key format:** `/ipns/BINARY_ID`
 

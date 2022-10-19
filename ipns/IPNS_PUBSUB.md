@@ -1,4 +1,4 @@
-# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) IPNS PubSub Router
+# ![reliable](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square) IPNS PubSub Router
 
 Authors:
 
@@ -10,7 +10,7 @@ Reviewers:
   
 # Abstract
 
-[Inter-Planetary Naming System (IPNS)](/README.md) is a naming system responsible for the creating, reading and updating of mutable pointers to data.
+[Inter-Planetary Naming System (IPNS)](./IPNS.md) is a naming system responsible for the creating, reading and updating of mutable pointers to data.
 IPNS consists of a public/private asymmetric cryptographic key pair, a record type and a protocol.
 Part of the protocol involves a routing layer that is used for the distribution and discovery of new or updated IPNS records.
 
@@ -35,7 +35,7 @@ In this spec we address building a router based on a PubSub system, particularly
 # PubSub Protocol Overview
 
 The protocol has four components:
-- [IPNS Records and Validation](/README.md)
+- [IPNS Records and Validation](./IPNS.md)
 - [libp2p PubSub](https://github.com/libp2p/specs/tree/master/pubsub)
 - Translating an IPNS record name to/from a PubSub topic
 - Layering persistence onto libp2p PubSub
@@ -91,5 +91,8 @@ every 10 seconds)
 
 # Implementations
 
-  - Kubo:  <https://github.com/ipfs/go-namesys> and <https://github.com/libp2p/go-libp2p-pubsub-router>
-
+- Kubo
+  - <https://github.com/ipfs/go-namesys>
+  - <https://github.com/libp2p/go-libp2p-pubsub-router>
+  - <https://github.com/ipfs/kubo/blob/master/docs/experimental-features.md#ipns-pubsub>
+  - <https://github.com/ipfs/kubo/issues/8591>
