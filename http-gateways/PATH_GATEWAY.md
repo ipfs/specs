@@ -595,6 +595,8 @@ Data sent with HTTP response depends on the type of requested IPFS resource:
   - Opaque bytes, see [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw)
 - CAR
   - CAR file or stream, see [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car)
+- TAR
+  - TAR file or stream, see [application/x-tar](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types)
 <!-- TODO: https://github.com/ipfs/go-ipfs/issues/8823
 - dag-json / dag-cbor
   - See [https://github.com/ipfs/go-ipfs/issues/8823](https://github.com/ipfs/go-ipfs/issues/8823)
