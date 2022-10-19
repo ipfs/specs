@@ -64,7 +64,7 @@ The Delegated Routing HTTP API uses the `application/json` content type by defau
     - This is the same as `GET /v1/providers/{CID}`, but takes a hashed CID encoded as a [multihash](https://github.com/multiformats/multihash/)
 - `GET /v1/ipns/{ID}`
     - Reframe equivalent: GetIPNS
-	- `ID`: multibase-encoded bytes
+    - `ID`: multibase-encoded bytes
     - Response
         - record bytes
 - `POST /v1/ipns`
@@ -72,12 +72,12 @@ The Delegated Routing HTTP API uses the `application/json` content type by defau
     - Body
         ```json
         {
-			"Records": [
-				{
-					"ID": "multibase bytes",
-					"Record": "multibase bytes"
-				}
-			]
+            "Records": [
+                {
+                    "ID": "multibase bytes",
+                    "Record": "multibase bytes"
+                }
+            ]
         }
         ```
     - Not idempotent (this doesn't really make sense for IPNS)
@@ -85,37 +85,39 @@ The Delegated Routing HTTP API uses the `application/json` content type by defau
 - `PUT /v1/providers`
     - Reframe equivalent: Provide
     - Body
-		```json
-		{
-			"Signature": "multibase bytes",
-			"Payload": {
-        		"Keys": ["cid1", "cid2"],
-        		"Timestamp": 1234,
-        		"AdvisoryTTL": 1234,
-        		"Signature": "multibase bytes",
-        		"Provider": {
-					"PeerID": "12D3K...",
-					"Multiaddrs": ["/ip4/.../tcp/.../p2p/...", "/ip4/..."],
-          			"Protocols": [
-        				{
-        					"Codec": 1234,
-        					"Payload": { ... }
-						}
-					]
-        		}
-			}
-		}
-		```
+        ```json
+        {
+            "Signature": "multibase bytes",
+            "Payload": {
+                "Keys": ["cid1", "cid2"],
+                "Timestamp": 1234,
+                "AdvisoryTTL": 1234,
+                "Signature": "multibase bytes",
+                "Provider": {
+                    "PeerID": "12D3K...",
+                    "Multiaddrs": ["/ip4/.../tcp/.../p2p/...", "/ip4/..."],
+                    "Protocols": [
+                        {
+                            "Codec": 1234,
+                            "Payload": { ... }
+                        }
+                    ]
+                }
+            }
+        }
+        ```
         - `Signature` is a multibase-encoded signature of the encoded bytes of the `Payload` field, signed using the private key of the Peer ID specified in the `Payload`. See the [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#keys) specification for the encoding of Peer IDs. Servers must verify the payload using the public key from the Peer ID. If the verification fails, the server must return a 403 status code.
     - Idempotent
 	- Default limit of 100 keys per request
 - `GET /v1/ping`
-    - This is absent from Reframe but is necessary for supporting e.g. the accelerated DHT client which can take many minutes to bootstrap, and light clients who want to probe multiple HTTP endpoints and use the fastest one
     - Returns 200 once the server is ready to accept requests
-    - An alternate approach is w/ an orchestration dance in the server by not listening on the socket until the dependencies are ready, but this makes the “dance” easier to implement
-- Limits
+
+## Limits
+
     - Responses with collections of results must have a default limit on the number of results that will be returned in a single response
     - Pagination and/or dynamic limit configuration may be added to this spec in the future, once there is a concrete requirement
-- Error Codes
+
+## Error Codes
+
     - A 404 must be returned if a resource was not found
 	- A 501 must be returned if a method is not supported
