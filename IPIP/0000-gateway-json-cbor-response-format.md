@@ -91,7 +91,17 @@ is not strict enough:
 
 ### Alternatives
 
-TODO
+Introducing DAG-JSON, DAG-CBOR, JSON and CBOR in the HTTP Gateway allows for
+a broader usage of the IPLD Data Model. If we do not introduce more IPLD
+response formats in the gateway, the usage of IPFS is constricted to files
+and directories represented by UnixFS (DAG-PB) codec. Therefore, it would keep
+the IPLD potential locked due to an artificial barrier created by the gateways.
+
+In addition, we could introduce only DAG-JSON and DAG-CBOR. However, not
+supporting the generic variants, JSON and CBOR, would lead to poor UX. The
+ability to retrieve DAG-JSON as `application/json` is an important step
+for the interoperability of the HTTP Gateway with web browsers and other tools
+that expect specific Content Types.
 
 ### Copyright
 
