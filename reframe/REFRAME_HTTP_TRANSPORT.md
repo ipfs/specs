@@ -70,8 +70,8 @@ Requests MUST be sent as either:
     - DAG-CBOR in multibase `base64url` is used (even when request body is DAG-JSON) because JSON may include characters that are not safe to be used in URLs, and percent-encoding or base-encoding a big JSON query may take too much space.
   - Suitable for sharing links, sending bigger messages, and when a query result MUST benefit from HTTP caching (see _HTTP Caching Considerations_ below).
   - DAG-CBOR response is the implicit default, unless explicit `Accept` header is passed
-- `GET /reframe/{method}?q={percent-encoded-request-as-dag-json}`
-  - DAG-JSON is supported via a `?q` query parameter, and the value MUST be [percent-encoded](https://en.wikipedia.org/wiki/Percent-encoding)
+- `GET /reframe/{method}?json={percent-encoded-request-as-dag-json}`
+  - DAG-JSON is supported via a `?json` query parameter, and the value MUST be [percent-encoded](https://en.wikipedia.org/wiki/Percent-encoding)
   - Suitable for sharing links, sending smaller messages, testing and debugging.
   - DAG-JSON response is the implicit default, unless explicit `Accept` header is passed
 - `POST /reframe/{method}`
