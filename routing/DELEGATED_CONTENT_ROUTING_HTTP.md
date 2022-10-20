@@ -20,6 +20,7 @@ The Delegated Content Routing Routing HTTP API uses the `application/json` conte
 - Multiaddrs are encoded according to the [human-readable multiaddr specification](https://github.com/multiformats/multiaddr#specification)
 - Peer IDs are encoded according [PeerID string representation specification](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#string-representation)
 - Multibase bytes are encoded according to [the Multibase spec](https://github.com/multiformats/multibase), and *should* use Base64.
+- Timestamps are Unix millisecond epoch timestamps
 
 ## API
 - `GET /v1/providers/{CID}`
