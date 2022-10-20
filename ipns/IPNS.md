@@ -334,6 +334,5 @@ As the `pubsub` topics must be `utf-8` for interoperability among different impl
 
 ### Implementations
 
-- [js-ipfs](https://github.com/ipfs/js-ipfs/tree/master/packages/ipfs-core/src/ipns)
-- [go-namesys](https://github.com/ipfs/go-namesys)
-
+- <https://github.com/ipfs/go-ipns>
+- <https://github.com/ipfs/js-ipns>
