@@ -55,7 +55,12 @@ The Delegated Content Routing Routing HTTP API uses the `application/json` conte
         ```json
         {
             "Signature": "multibase bytes",
-            "Payload": {
+            "Payload": "multibase bytes"
+        }
+        ```
+	    - `Payload` is a multibase-encoded string containing a JSON object with the following schema:
+		```json
+		{
                 "Keys": ["cid1", "cid2"],
                 "Timestamp": 1234,
                 "AdvisoryTTL": 1234,
@@ -69,10 +74,9 @@ The Delegated Content Routing Routing HTTP API uses the `application/json` conte
                         }
                     ]
                 }
-            }
-        }
-        ```
-        - `Signature` is a multibase-encoded signature of the encoded bytes of the `Payload` field, signed using the private key of the Peer ID specified in the `Payload`. See the [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#keys) specification for the encoding of Peer IDs. Servers must verify the payload using the public key from the Peer ID. If the verification fails, the server must return a 403 status code.
+		}
+		```
+        - `Signature` is a multibase-encoded signature of the `Payload` field, signed using the private key of the Peer ID specified in the `Payload` JSON. See the [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#keys) specification for the encoding of Peer IDs. Servers must verify the payload using the public key from the Peer ID. If the verification fails, the server must return a 403 status code.
     - Idempotent
 	- Default limit of 100 keys per request
 - `GET /v1/ping`
