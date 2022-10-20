@@ -21,13 +21,22 @@ messages are not designed to be created or read by humans.
 
 The plaintext  DAG-JSON representation of messages does not really bring
 anything to the table (because both CIDs and Multiaddrs are in a format that
-needs manual encoding/decoding anyway),
+needs manual encoding/decoding anyway), and the utility is limited to debugging
+and use in examples.
+
+We've also identified some HTTP caching and scaling issues due to all methods
+sharing the same URL path and the way `Etag` header is generated, and how
+it made streaming responses impossible.
 
 ## Detailed design
 
 We already support DAG-JSON, with its own content type.
 The change here is to add support for requests and responses sent as DAG-CBOR,
 with own content type: `application/vnd.ipfs.rpc+dag-cbor`.
+
+We change the URL to include method name on the path. This allows deployments
+to scale better: set different HTTP cache control policies, or route different
+methods to different backend services.
 
 For details, see changes made to `reframe/REFRAME_HTTP_TRANSPORT.md`.
 
@@ -48,12 +57,16 @@ production format.
 User will be able to choose between binary and human-readable representation,
 just like they do in other parts of IPFS/IPLD stack.
 
+DAG-JSON is the implicit default, improving ergonomics when debugging with `curl`
+in CLI or fetching response via regular web browser
+
 ### Compatibility
 
-Explain the upgrade considerations for existing implementations.
+IPFS / IPLD stack already includes both DAG-CBOR and DAG-JSON libraries.
+The `version` parameter of the HTTP wire protocol is bumped to `2`.
 
-This IPIP add DAG-CBOR next to already existing DAG-JSON. Preexisting clients
-that only speak DAG-JSON will continue working, no change is required.
+Reframe endpoints that care about backward-compatibility with Kubo 0.16
+can keep support for requests sent with `version=1`.
 
 ### Security
 
@@ -65,6 +78,7 @@ Alternative is to do nothing, and end up with:
 
 - inconsistent user experience
 - wasted bandwidth and cache storage
+- difficult deployment and scaling (all methods under same endpoint)
 
 ### Copyright
 
