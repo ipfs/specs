@@ -92,7 +92,6 @@ The Delegated Routing HTTP API uses the `application/json` content type by defau
                 "Keys": ["cid1", "cid2"],
                 "Timestamp": 1234,
                 "AdvisoryTTL": 1234,
-                "Signature": "multibase bytes",
                 "Provider": {
                     "PeerID": "12D3K...",
                     "Multiaddrs": ["/ip4/.../tcp/.../p2p/...", "/ip4/..."],
