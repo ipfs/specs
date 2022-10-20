@@ -20,8 +20,8 @@ in order to unlock the potential of the [IPLD Data Model][ipld-data-model] beyon
 
 
 The main functional gap in IPFS ecosystem is the lack of support for non-UnixFS DAGs on HTTP Gateways.
-Users are able to create custom DAGs based on traversable DAG-CBOR thanks to [CBOR tag 42 being reserved for CIDs](https://github.com/core-wg/yang-cbor/issues/13#issuecomment-524378859), 
-but they are unable to load deserialized  DAG-CBOR documents from local gateway, 
+Users are able to create custom DAGs based on traversable DAG-CBOR thanks to [CBOR tag 42 being reserved for CIDs](https://github.com/core-wg/yang-cbor/issues/13#issuecomment-524378859),
+but they are unable to load deserialized  DAG-CBOR documents from local gateway,
 which is severely decreasing the utility of non-UnixFS DAGs.
 
 Adding new responses types will also benefit UnixFS.
@@ -75,7 +75,19 @@ making it a backwards-compatible change.
 
 ### Security
 
-TODO
+Serializers and deserializers for the JSON and CBOR must follow the security
+considerations of the original specifications, found in:
+
+- [RFC 8259 (JSON), Section 12][rfc8259-sec12]
+- [RFC 8949 (CBOR), Section 10][rfc8949-sec10]
+
+DAG-JSON and DAG-CBOR follow the same security considerations as JSON and CBOR.
+Note that DAG-JSON and DAG-CBOR are stricter variants of JSON and CBOR, respectively.
+Therefore they must follow their IPLD specification and error if the payload
+is not strict enough:
+
+- [DAG-JSON Spec][dag-json-spec]
+- [DAG-CBOR Spec][dag-cbor-spec]
 
 ### Alternatives
 
@@ -100,3 +112,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 [dag-pb-json]: https://dweb.link/ipfs/bafkreidmwhhm6myajxlpu7kofe3aqwf4ezxxn46cp5fko7mb6x74g4k5nm
 [dag-cbor-traversal]: https://dweb.link/ipfs/bafyreiehxu373cu3v5gyxyxfsfjryscs7sq6fh3unqcqgqhdfn3n43vrgu
 [dag-json-traversal]: https://dweb.link/ipfs/baguqeeraoaeabj5hdfcmpkzfeiwtfwb3qbvfwzbiknqn7itcwsb2fdtu7eta
+[rfc8259-sec12]: https://datatracker.ietf.org/doc/html/rfc8259#section-12
+[rfc8949-sec10]: https://datatracker.ietf.org/doc/html/rfc8949#section-10
+[dag-json-spec]: https://ipld.io/specs/codecs/dag-json/spec/
+[dag-cbor-spec]: https://ipld.io/specs/codecs/dag-cbor/spec/
