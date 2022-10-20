@@ -30,8 +30,10 @@ The Delegated Content Routing Routing HTTP API uses the `application/json` conte
         {
             "Providers": [
                 {
-                    "PeerID": "12D3K...",
-                    "Multiaddrs": ["/ip4/.../tcp/.../p2p/...", "/ip4/..."],
+					"Peer": {
+						"ID": "12D3K...",
+						"Multiaddrs": ["/ip4/.../tcp/.../p2p/...", "/ip4/..."]
+					}
                     "Protocols": [
                         {
                             "Codec": 2320,
@@ -66,8 +68,10 @@ The Delegated Content Routing Routing HTTP API uses the `application/json` conte
                 "Timestamp": 1234,
                 "AdvisoryTTL": 1234,
                 "Provider": {
-                    "PeerID": "12D3K...",
-                    "Multiaddrs": ["/ip4/.../tcp/.../p2p/...", "/ip4/..."],
+					"Peer": {
+						"ID": "12D3K...",
+						"Multiaddrs": ["/ip4/.../tcp/.../p2p/...", "/ip4/..."]
+					}
                     "Protocols": [
                         {
                             "Codec": 1234,
