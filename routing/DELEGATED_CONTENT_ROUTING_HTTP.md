@@ -85,7 +85,7 @@ The Delegated Content Routing Routing HTTP API uses the `application/json` conte
     - Idempotent
 	- Default limit of 100 keys per request
 - `GET /v1/ping`
-    - Returns 200 once the server is ready to accept requests
+    - Returns 200 once the server is ready to accept requests, otherwise returns 503
 
 ## Limits
 
