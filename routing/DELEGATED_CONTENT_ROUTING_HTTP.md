@@ -1,4 +1,4 @@
-# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Delegated Routing HTTP API
+# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Delegated Content Routing HTTP API
 
 **Author(s)**:
 - Gus Eggert
@@ -9,22 +9,10 @@
 
 **Abstract**
 
-"Delegated routing" is a mechanism for IPFS implementations to use for offloading content routing to another process/server. This spec describes an HTTP API for delegated routing.
-
-# Organization of this document
-
-- [Introduction](#introduction)
-- [Spec](#spec)
-  - [Interaction Pattern](#interaction-pattern)
-  - [Cachability](#cachability)
-  - [Transports](#transports)
-  - [Protocol Message Overview](#protocol-message-overview)
-    - [Known Methods](#known-methods)
-- [Method Upgrade Paths](#method-upgrade-paths)
-- [Implementations](#implementations)
+"Delegated content routing" is a mechanism for IPFS implementations to use for offloading content routing to another process/server. This spec describes an HTTP API for delegated routing.
 
 # API Specification
-The Delegated Routing HTTP API uses the `application/json` content type by default. Clients and servers *should* support `application/cbor`, which can be negotiated using the standard `Accept` and `Content-Type` headers.
+The Delegated Content Routing Routing HTTP API uses the `application/json` content type by default. Clients and servers *should* support `application/cbor`, which can be negotiated using the standard `Accept` and `Content-Type` headers.
 
 ## Common Data Types:
 
@@ -35,7 +23,6 @@ The Delegated Routing HTTP API uses the `application/json` content type by defau
 
 ## API
 - `GET /v1/providers/{CID}`
-    - Reframe equivalent: FindProviders
     - Response
         
         ```json
@@ -62,26 +49,6 @@ The Delegated Routing HTTP API uses the `application/json` content type by defau
         - Servers should treat the multicodec codes used in the `transfer` and `transport` parameters as opaque, and not validate them, for forwards compatibility
 - `GET /v1/providers/hashed/{multihash}`
     - This is the same as `GET /v1/providers/{CID}`, but takes a hashed CID encoded as a [multihash](https://github.com/multiformats/multihash/)
-- `GET /v1/ipns/{ID}`
-    - Reframe equivalent: GetIPNS
-    - `ID`: multibase-encoded bytes
-    - Response
-        - record bytes
-- `POST /v1/ipns`
-    - Reframe equivalent: PutIPNS
-    - Body
-        ```json
-        {
-            "Records": [
-                {
-                    "ID": "multibase bytes",
-                    "Record": "multibase bytes"
-                }
-            ]
-        }
-        ```
-    - Not idempotent (this doesn't really make sense for IPNS)
-    - Default limit of 100 records per request
 - `PUT /v1/providers`
     - Reframe equivalent: Provide
     - Body
