@@ -82,8 +82,9 @@ The Delegated Content Routing Routing HTTP API uses the `application/json` conte
 		}
 		```
         - `Signature` is a multibase-encoded signature of the sha256 hash of the `Payload` field, signed using the private key of the Peer ID specified in the `Payload` JSON. See the [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#keys) specification for the encoding of Peer IDs. Servers must verify the payload using the public key from the Peer ID. If the verification fails, the server must return a 403 status code.
+            - Note that this only supports Peer IDs expressed as identity multihashes. Peer IDs with older key types that exceed 42 bytes are not verifiable since they only contain a hash of the key, not the key itself. Normally, if the Peer ID contains only a hash of the key, then the key is obtained out-of-band (e.g. by fetching the block over IPFS). If support for these Peer IDs is needed in the future, this spec can be updated to allow the client to provide the key and key type out-of-band by adding optional `PublicKey` and `PublicKeyType` fields, and if the Peer ID is a CID, then the server can verify the public key's authenticity against the CID, and then proceed with the rest of the verification scheme.
     - Idempotent
-	- Default limit of 100 keys per request
+    - Default limit of 100 keys per request
 - `GET /v1/ping`
     - Returns 200 once the server is ready to accept requests, otherwise returns 503
 
@@ -95,4 +96,4 @@ The Delegated Content Routing Routing HTTP API uses the `application/json` conte
 ## Error Codes
 
     - A 404 must be returned if a resource was not found
-	- A 501 must be returned if a method is not supported
+    - A 501 must be returned if a method is not supported
