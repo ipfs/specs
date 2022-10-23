@@ -1,6 +1,5 @@
 # IPIP: Improvement Process for IPFS Specifications
 
-
 - [Introduction](#introduction)
 - [Process design](#process-design)
   - [What is an IPIP?](#what-is-an-ipip)
@@ -25,6 +24,8 @@ in the decision making process
 We adopted an formal change management process for the [ipfs/specs][1] repository, providing a
 minimal structure for opening, reviewing, and merging specification changes.
 
+[1]: https://github.com/ipfs/specs/
+
 ### What is an IPIP?
 
 IPIP Provides an orderly mechanism for considering proposed changes to IPFS specifications.
@@ -32,6 +33,7 @@ IPIP Provides an orderly mechanism for considering proposed changes to IPFS spec
 a specification.**
 
 To illustrate:
+
 - In order to understand how (hypothetical) WebDAV Gateway works, one would
   read contents of specs in `ipfs/specs/WEBDAV_GATEWAY.md`.
 - IPIP in `ipfs/specs/IPIP/000N-webdav-gateway.md` would only include
@@ -40,6 +42,7 @@ To illustrate:
   why we added WebDAV spec in the first place.
 
 ### What changes need the IPIP process?
+
 - **Does Not Need IPIP**: The spec has a bug - something that is plainly a mistake
 - **Does Not need IPIP**: Adding more details, test vectors, and editorials/cosmetic changes
 - **Needs IPIP**: An addition to the protocol
@@ -81,7 +84,7 @@ open for another month
 consideration at a monthly sync, to be announced at least a week ahead of time on the forum.
 6. After discussion, Spec Stewards will make call on whether to approve or reject the proposal.
 7. At this point approved proposals get assigned a number (encoded in the filename),
-and merged into the IPIP folder on `main` branch. Potentially useful (but rejected for now) 
+and merged into the IPIP folder on `main` branch. Potentially useful (but rejected for now)
 proposals should be also merged to `main`, but in a subfolder called `/IPIP/deferred`. Proposals rejected in intial
 triage will simply have the PR declined.
 8. IPIP author and two approving [Specs Stewards] are added to `CODEOWNERS` file to be
