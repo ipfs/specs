@@ -65,7 +65,7 @@ IPIPs that are approved before accepting into `main` branch.
 
 Proposals are officially submitted when a pull request into `main` is opened
 
-Proposals that were reviewed and rejected will be moved into `IPIP/rejected` folder and then merged into `main`
+Proposals that were reviewed as useful, but rejected for now, will be moved into `IPIP/deferred` folder and then merged into `main`
 
 ### Reviewing IPIPs
 
@@ -81,8 +81,8 @@ open for another month
 consideration at a monthly sync, to be announced at least a week ahead of time on the forum.
 6. After discussion, Spec Stewards will make call on whether to approve or reject the proposal.
 7. At this point approved proposals get assigned a number (encoded in the filename),
-and merged into the IPIP folder on `main` branch. Rejected
-proposals should be also merged to master, but in a subfolder called `/IPIP/rejected`. Proposals rejected in intial
+and merged into the IPIP folder on `main` branch. Potentially useful (but rejected for now) 
+proposals should be also merged to `main`, but in a subfolder called `/IPIP/deferred`. Proposals rejected in intial
 triage will simply have the PR declined.
 8. IPIP author and two approving [Specs Stewards] are added to `CODEOWNERS` file to be
 automatically asked to review any future changes to files added or modified by the IPIP.
