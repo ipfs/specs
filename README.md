@@ -68,7 +68,8 @@ The specs contained in this and related repositories are:
 - **Networking layer:**
   - [libp2p](https://github.com/libp2p/specs) - libp2p is a modular and extensible network stack, built and use by IPFS, but that it can be reused as a standalone project. Covers:
 - **Records, Naming and Record Systems:**
-  - [IPNS](./IPNS.md) - InterPlanetary Naming System
+  - [IPNS](./ipns/IPNS.md) - InterPlanetary Naming System
+    - [IPNS over PubSub](./ipns/IPNS_PUBSUB.md) - IPNS over PubSub Router
   - [DNSLink](https://dnslink.dev)
 - **Other/related/included:**
   - [PDD](https://github.com/ipfs/pdd) - Protocol Driven Development
@@ -85,6 +86,8 @@ This repository falls under the IPFS [Code of Conduct](https://github.com/ipfs/c
 - Want to propose a change to an existing specification?
 - Or add a new protocol?
 
-See [IPIP 0001: Lightweight Improvement Process for IPFS Specifications](./IPIP/0001-lightweight-improvement-proposal-process.md).
+See:
+ - [IPIP: Improvement Process for IPFS Specifications](./IPIP_PROCESS.md).
+ - List of [IPIPs](./IPIP/)
 
 Accepted proposals can be found in the [`IPIP/`](./IPIP/) directory.
