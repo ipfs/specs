@@ -701,5 +701,9 @@ The usual optimizations involve:
 
 ## Streaming errors
 
-Gateways MUST force-close HTTP connections if they detect an error while
-streaming a file to avoid that users receive incomplete, yet valid, files.
+To avoid users receiving an incomplete, yet valid, files, the gateway MUST
+close the HTTP stream if an error occurs while streaming a file to the client.
+This can be done via the following mechanisms:
+
+- Sending a `RST` (reset) frame for HTTP/1.1
+- Sending a `RST_STREAM` (reset stream) frame for HTTP/2

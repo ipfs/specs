@@ -41,7 +41,7 @@ an HTTP status code for the error. However, after the HTTP headers are set
 and the body started being streamed, there are no clear ways in the HTTP
 specification to show an error. Since the gateway is browser-first, it is
 important to show an error and avoid users receiving an incomplete file.
-Therefore, the server can force-close the HTTP connection, leading to a network
+Therefore, the server can force-close the HTTP stream, leading to a network
 error. This tells the user that an error happened.
 
 ### User benefit
