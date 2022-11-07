@@ -1,4 +1,4 @@
-# ![reliable](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square) IPNS - Inter-Planetary Naming System 
+# ![reliable](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square) IPNS - Inter-Planetary Naming System
 
 **Authors(s)**:
 
@@ -87,7 +87,7 @@ message PrivateKey {
 
 Note:
 
--  `Data` encoding depends on `KeyType` (see [Key Types](#key-types))
+- `Data` encoding depends on `KeyType` (see [Key Types](#key-types))
 
 - Although private keys are not transmitted over the wire, the `PrivateKey`
   serialization format used to store keys on disk is also included as a
@@ -222,7 +222,6 @@ transports that follow this specification.
 Implementations that want to interop with the public IPFS swarm MUST maintain
 backward compatibility for legacy consumers of IPNS records:
 
-
 - A legacy publisher MUST always be able to update to the latest implementation
   of this specification without breaking record resolution for legacy consumers.
 - A legacy consumer MUST always be able to resolve IPNS name, even when publisher
@@ -239,7 +238,7 @@ legacy logic.
 
 ### Overview
 
-![](img/ipns-overview.png)
+![IPNS overview](img/ipns-overview.png)
 
 Taking into consideration a p2p network, each peer should be able to publish [IPNS records](#ipns-record) to the network, as well as to resolve the IPNS records published by other peers.
 
@@ -334,6 +333,5 @@ As the `pubsub` topics must be `utf-8` for interoperability among different impl
 
 ### Implementations
 
-- [js-ipfs](https://github.com/ipfs/js-ipfs/tree/master/packages/ipfs-core/src/ipns)
-- [go-namesys](https://github.com/ipfs/go-namesys)
-
+- <https://github.com/ipfs/go-ipns>
+- <https://github.com/ipfs/js-ipns>

@@ -43,6 +43,13 @@ To illustrate:
   `ipfs/specs/IPIP/000M-webdav-fix-for-foo.md` explaining why we make the
   breaking spec change, compatibility/migration considerations etc.
 
+### IPIP Lifecycle
+
+Up-to-date process and IPIP lifecycle will be published in [`ipfs/specs/IPIP_PROCESS.md`](../IPIP_PROCESS.md).
+
+<details>
+  <summary>Click to expand the initial (historical) flow</summary>
+
 ### Opening an improvement proposal (IPIP)
 
 Changes to IPFS specifications can be proposed by opening a Git pull-request
@@ -77,6 +84,9 @@ IPIP number is assigned before the PR merge.
 IPIP author and two approving [Specs Stewards] are added to `CODEOWNERS` file
 to be automatically asked to review any future changes to files added or
 modified by the IPIP.
+
+</details>
+
 
 ### Long-term plan
 
