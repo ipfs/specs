@@ -707,3 +707,4 @@ This can be done via the following mechanisms:
 
 - Sending a `FIN` (close) frame for HTTP/1.1
 - Sending a `RST_STREAM` (reset stream) frame for HTTP/2
+- Sending a `CANCEL_PUSH` frame for HTTP/3, see RFC9114 section A.2.5.3.
