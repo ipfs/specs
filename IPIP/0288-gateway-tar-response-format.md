@@ -1,4 +1,4 @@
-# IPIP 0000: TAR Response Format on Web Gateways
+# IPIP-288: TAR Response Format on HTTP Gateways
 
 - Start Date: 2022-06-10
 - Related Issues:
@@ -48,15 +48,20 @@ directories inside.
 However, there are certain behaviors, detailed in the [security section](#security)
 that should be handled. To test such behaviors, the following fixtures can be used:
 
-- [`bafybeibfevfxlvxp5vxobr5oapczpf7resxnleb7tkqmdorc4gl5cdva3y`][inside-dag] is a UnixFS
-DAG that contains a file with a relative path that points inside the root directory.
-Downloading it as a TAR must work.
-- [`bafkreict7qp5aqs52445bk4o7iuymf3davw67tpqqiscglujx3w6r7hwoq`][inside-dag-tar] is an
-example TAR file that corresponds to the aforementioned UnixFS DAG. Its structure can be
-inspected in order to check if new implementations conform to the specification.
-- [`bafybeicaj7kvxpcv4neaqzwhrqqmdstu4dhrwfpknrgebq6nzcecfucvyu`][outside-dag] is a UnixFS
-DAG that contains a file with a relative path that points outside the root directory.
-Downloading it as a TAR must error.
+- [`bafybeibfevfxlvxp5vxobr5oapczpf7resxnleb7tkqmdorc4gl5cdva3y`][inside-dag]
+  is a UnixFS DAG that contains a file with a name that looks like a relative
+  path that points inside the root directory. Downloading it as a TAR must
+  work.
+
+- [`bafkreict7qp5aqs52445bk4o7iuymf3davw67tpqqiscglujx3w6r7hwoq`][inside-dag-tar]
+  is an example TAR file that corresponds to the aforementioned UnixFS DAG. Its
+  structure can be inspected in order to check if new implementations conform
+  to the specification.
+
+- [`bafybeicaj7kvxpcv4neaqzwhrqqmdstu4dhrwfpknrgebq6nzcecfucvyu`][outside-dag]
+  is a UnixFS DAG that contains a file with a name that looks like a relative
+  path that points outside the root directory. Downloading it as a TAR must
+  error.
 
 ## Design rationale
 
@@ -78,12 +83,27 @@ downloading it.
 CLI users will be able to download a directory with existing tools like `curl` and `tar` without
 having to talk to implementation-specific RPC APIs like `/api/v0/get` from Kubo.
 
+Fetching a directory from a local gateway will be as simple as:
+
+```console
+$ export DIR_CID=bafybeigccimv3zqm5g4jt363faybagywkvqbrismoquogimy7kvz2sj7sq
+$ curl "http://127.0.0.1:8080/ipfs/$DIR_CID?format=tar" | tar xv
+bafybeigccimv3zqm5g4jt363faybagywkvqbrismoquogimy7kvz2sj7sq
+bafybeigccimv3zqm5g4jt363faybagywkvqbrismoquogimy7kvz2sj7sq/1 - Barrel - Part 1 - alt.txt
+bafybeigccimv3zqm5g4jt363faybagywkvqbrismoquogimy7kvz2sj7sq/1 - Barrel - Part 1 - transcript.txt
+bafybeigccimv3zqm5g4jt363faybagywkvqbrismoquogimy7kvz2sj7sq/1 - Barrel - Part 1.png
+```
+
 ### Compatibility
 
 This IPIP is backwards compatible: adds a new opt-in response type, does not
 modify preexisting behaviors.
 
+Existing content type `application/x-tar` is used when request is made with an `Accept` header.
+
 ### Security
+
+Third-party UnixFS file names may include unexpected values, such as `../`.
 
 Manually created UnixFS DAGs can be turned into malicious TAR files. For example,
 if a UnixFS directory contains a file that points at a relative path outside
@@ -102,18 +122,20 @@ suggested to use a CAR file if they want to download the raw files.
 
 ### Alternatives
 
-One discussed alternative would be to support uncompressed ZIP files. However, TAR and
-TAR-related libraries are already supported and implemented for UnixFS files. Therefore,
-the addition of a TAR response format is facilitated, while introduction of ZIP would increase
-implementation complexity.
+One discussed alternative would be to support uncompressed ZIP files. However,
+TAR and TAR-related libraries are already supported by some IPFS
+implementations, and are easier to work with in CLI. TAR provides simpler
+abstraction, and layering compression on top of TAR stream allows for greater
+flexibility than alternative options that come with own, opinionated approaches
+to compression.
 
-In addition, we considered supporting [Gzipped TAR](https://github.com/ipfs/go-ipfs/pull/9034).
-However, there it may be a vector for DOS attacks since compression requires high CPU power.
+In addition, we considered supporting [Gzipped TAR](https://github.com/ipfs/go-ipfs/pull/9034) out of the box,
+but decided against it as gzip or alternative compression may be introduced on the HTTP transport layer.
 
 ### Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
-[inside-dag]: https://dweb.link/ipfs/bafybeibfevfxlvxp5vxobr5oapczpf7resxnleb7tkqmdorc4gl5cdva3y
-[inside-dag-tar]: https://dweb.link/ipfs/bafkreict7qp5aqs52445bk4o7iuymf3davw67tpqqiscglujx3w6r7hwoq
-[outside-dag]: https://dweb.link/ipfs/bafybeicaj7kvxpcv4neaqzwhrqqmdstu4dhrwfpknrgebq6nzcecfucvyu
+[inside-dag]: https://dweb.link/ipfs/bafybeibfevfxlvxp5vxobr5oapczpf7resxnleb7tkqmdorc4gl5cdva3y?format=car
+[inside-dag-tar]: https://dweb.link/ipfs/bafkreict7qp5aqs52445bk4o7iuymf3davw67tpqqiscglujx3w6r7hwoq?format=car
+[outside-dag]: https://dweb.link/ipfs/bafybeicaj7kvxpcv4neaqzwhrqqmdstu4dhrwfpknrgebq6nzcecfucvyu?format=car
