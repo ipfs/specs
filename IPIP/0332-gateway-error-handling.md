@@ -29,12 +29,12 @@ the server must fail with the respective `4xx`  or `5xx` HTTP status code (no ch
 If the server encounters an error while streaming the contents, the server must
 force-close the HTTP stream to the user. This way, the user will receive a
 network error, making it clear that the downloaded file is not valid.
-
 In addition, the server must set an header `X-On-Error: reset` to indicate that
-connection will be reset if an error occurs. The client can opt-out of this behavior
-by sending a `X-Error-Behavior: trailer`. In that case, the server will not
-reset the connection, but send the `X-Stream-Error` header with the error
-message.
+connection will be reset if an error occurs.
+
+The client can opt-out of this behavior by sending a `X-Error-Behavior: trailer`.
+In that case, the server will not force-close the HTTP stream. Instead, the server
+will send the trailing header `X-Stream-Error` header with the error message.
 
 ## Test fixtures
 
