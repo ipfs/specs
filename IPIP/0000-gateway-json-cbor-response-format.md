@@ -18,7 +18,6 @@ Currently, the gateway supports requesting data in the [DAG-PB], RAW, and [CAR]
 formats. However, it should be possible to download deserialized  version of  data other than UnixFS
 in order to unlock the potential of the [IPLD Data Model][ipld-data-model] beyond files and directories.
 
-
 The main functional gap in IPFS ecosystem is the lack of support for non-UnixFS DAGs on HTTP Gateways.
 Users are able to create custom DAGs based on traversable DAG-CBOR thanks to [CBOR tag 42 being reserved for CIDs](https://github.com/core-wg/yang-cbor/issues/13#issuecomment-524378859),
 but they are unable to load deserialized  DAG-CBOR documents from local gateway,
@@ -43,16 +42,16 @@ using either the `Accept` HTTP header or the `format` URL query.
 
 ## Test fixtures
 
-- [`bafybeiegxwlgmoh2cny7qlolykdf7aq7g6dlommarldrbm7c4hbckhfcke`][dag-pb] is a
+- [`bafybeiegxwlgmoh2cny7qlolykdf7aq7g6dlommarldrbm7c4hbckhfcke`][f-dag-pb] is a
   DAG-PB directory.
-- [`bafkreidmwhhm6myajxlpu7kofe3aqwf4ezxxn46cp5fko7mb6x74g4k5nm`][dag-pb-json]
+- [`bafkreidmwhhm6myajxlpu7kofe3aqwf4ezxxn46cp5fko7mb6x74g4k5nm`][f-dag-pb-json]
   is the aforementioned DAG-PB directory's Logical DAG-JSON representation that
   is expected to be returned when using `?format=dag-json`.
 - Traversal Test Fixtures: the following test fixtures contain two levels of nested
   documents of their encoding. Accessing `/ipfs/$CID/foo/bar` should return the JSON
   equivalent of `{"hello":"this is not a link"}`.
-  - DAG-CBOR: [`bafyreiehxu373cu3v5gyxyxfsfjryscs7sq6fh3unqcqgqhdfn3n43vrgu`][dag-cbor-traversal]
-  - DAG-JSON: [`baguqeeraoaeabj5hdfcmpkzfeiwtfwb3qbvfwzbiknqn7itcwsb2fdtu7eta`][dag-json-traversal]
+  - DAG-CBOR: [`bafyreiehxu373cu3v5gyxyxfsfjryscs7sq6fh3unqcqgqhdfn3n43vrgu`][f-dag-cbor-traversal]
+  - DAG-JSON: [`baguqeeraoaeabj5hdfcmpkzfeiwtfwb3qbvfwzbiknqn7itcwsb2fdtu7eta`][f-dag-json-traversal]
 - `TODO` is a valid JSON but not a valid DAG-JSON
 - `TODO` is a valid CBOR but not a valid DAG-CBOR
 
@@ -118,10 +117,10 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 [ipfs/kubo/issues/8823]: https://github.com/ipfs/kubo/issues/8823
 [ipfs/kubo/pull/9335]: https://github.com/ipfs/kubo/pull/9335
 [ipfs/go-ipfs/issues/7552]: https://github.com/ipfs/go-ipfs/issues/7552
-[dag-pb]: https://dweb.link/ipfs/bafybeiegxwlgmoh2cny7qlolykdf7aq7g6dlommarldrbm7c4hbckhfcke
-[dag-pb-json]: https://dweb.link/ipfs/bafkreidmwhhm6myajxlpu7kofe3aqwf4ezxxn46cp5fko7mb6x74g4k5nm
-[dag-cbor-traversal]: https://dweb.link/ipfs/bafyreiehxu373cu3v5gyxyxfsfjryscs7sq6fh3unqcqgqhdfn3n43vrgu
-[dag-json-traversal]: https://dweb.link/ipfs/baguqeeraoaeabj5hdfcmpkzfeiwtfwb3qbvfwzbiknqn7itcwsb2fdtu7eta
+[f-dag-pb]: https://dweb.link/ipfs/bafybeiegxwlgmoh2cny7qlolykdf7aq7g6dlommarldrbm7c4hbckhfcke
+[f-dag-pb-json]: https://dweb.link/ipfs/bafkreidmwhhm6myajxlpu7kofe3aqwf4ezxxn46cp5fko7mb6x74g4k5nm
+[f-dag-cbor-traversal]: https://dweb.link/ipfs/bafyreiehxu373cu3v5gyxyxfsfjryscs7sq6fh3unqcqgqhdfn3n43vrgu
+[f-dag-json-traversal]: https://dweb.link/ipfs/baguqeeraoaeabj5hdfcmpkzfeiwtfwb3qbvfwzbiknqn7itcwsb2fdtu7eta
 [rfc8259-sec12]: https://datatracker.ietf.org/doc/html/rfc8259#section-12
 [rfc8949-sec10]: https://datatracker.ietf.org/doc/html/rfc8949#section-10
 [dag-json-spec]: https://ipld.io/specs/codecs/dag-json/spec/
