@@ -1,6 +1,6 @@
 # DNSLink Gateway Specification
 
-![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
+![reliable](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square)
 
 **Authors**:
 
@@ -42,10 +42,10 @@ In short:
 
 ## `GET /[{path}][?{params}]`
 
-Downloads data at specified path under the content path for DNSLink name provided in `Host` header. 
+Downloads data at specified path under the content path for DNSLink name provided in `Host` header.
 
 - `path` – optional path to a file or a directory under the content root sent in `Host` HTTP header
-    - Example: if `Host: example.com` then the content path to resolve is `/ipns/example.com/{path}`
+  - Example: if `Host: example.com` then the content path to resolve is `/ipns/example.com/{path}`
 
 ## `HEAD /[{path}][?{params}]`
 
@@ -65,6 +65,7 @@ be prepended to the `path` before the final IPFS content path resolution
 is performed.
 
 Implementations MUST ensure DNSLink resolution is safe and correct:
+
 - each DNSLink may include an additional path segment, which MUST be preserved
 - each DNSLink may point at other DNSLink, which means there MUST be a hard
   recursion limit (e.g. 32) and HTTP 400 Bad Request error MUST be returned

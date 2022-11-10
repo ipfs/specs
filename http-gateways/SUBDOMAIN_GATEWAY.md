@@ -1,6 +1,6 @@
 # Subdomain Gateway Specification
 
-![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
+![reliable](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square)
 
 **Authors**:
 
@@ -23,8 +23,7 @@ Summary:
 - The root CID is used to define the [Resource Origin](https://en.wikipedia.org/wiki/Same-origin_policy), aligning it with the web's security model.
   - Files in a DAG defined by the root CID may request other files within the same DAG as part of the same Origin Sandbox.
 - Data is retrieved from IPFS in a way that is compatible with URL-based addressing
-    - URL’s path `/` points at the content root identified by the CID
-
+  - URL’s path `/` points at the content root identified by the CID
 
 # Table of Contents
 
@@ -87,29 +86,28 @@ namespace, and finally the domain name used by the gateway.
 Converting `Host` into a content path depends on the nature of requested resource:
 
 - For content at `/ipfs/{cid}`:
-    - `Host: {cid-mbase32}.ipfs.example.net`
-        - Example: `Host: bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi.ipfs.dweb.link`
+  - `Host: {cid-mbase32}.ipfs.example.net`
+    - Example: `Host: bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi.ipfs.dweb.link`
 - For content at `/ipns/{libp2p-key}`:
-    - `Host: {libp2p-key-mbase36}.ipns.example.net`
-        - Example: `Host: k2k4r8jl0yz8qjgqbmc2cdu5hkqek5rj6flgnlkyywynci20j0iuyfuj.ipns.dweb.link`
-        - Note: Base36 must be used to ensure CIDv1 with ED25519 fits in a single DNS label (63 characters).
+  - `Host: {libp2p-key-mbase36}.ipns.example.net`
+    - Example: `Host: k2k4r8jl0yz8qjgqbmc2cdu5hkqek5rj6flgnlkyywynci20j0iuyfuj.ipns.dweb.link`
+    - Note: Base36 must be used to ensure CIDv1 with ED25519 fits in a single DNS label (63 characters).
 - For content at `/ipns/{dnslink-name}`:
-    - `Host: {inlined-dnslink-name}.ipns.example.net`
-        - DNSLink names include `.` which means they  MUST be inlined into a single DNS label to provide unique origin and work with wildcard TLS certificates.
-            - DNSLink label encoding:
-                - Every `-` is replaced with `--`
-                - Every `.` is replaced with `-`
-            - DNSLink label decoding
-                - Every standalone `-` is replaced with `.`
-                - Every remaining `--` is replaced with `-`
-        - Example:
-            - `example.net/ipns/en.wikipedia-on-ipfs.org` → `Host: en-wikipedia--on--ipfs-org.ipns.example.net`
+  - `Host: {inlined-dnslink-name}.ipns.example.net`
+    - DNSLink names include `.` which means they  MUST be inlined into a single DNS label to provide unique origin and work with wildcard TLS certificates.
+      - DNSLink label encoding:
+        - Every `-` is replaced with `--`
+        - Every `.` is replaced with `-`
+      - DNSLink label decoding
+        - Every standalone `-` is replaced with `.`
+        - Every remaining `--` is replaced with `-`
+      - Example:
+        - `example.net/ipns/en.wikipedia-on-ipfs.org` → `Host: en-wikipedia--on--ipfs-org.ipns.example.net`
 - If `Host` header does not include any subdomain, but the requested path is a
   valid content path, gateway MUST attempt to
   [migrate from Path to Subdomain Gateway](#migrating-from-path-to-subdomain-gateway).
 - Finally, if it is impossible to construct a content path from `Host`,
   return HTTP Error [`400` Bad Request](./PATH_GATEWAY.md#400-bad-request).
-
 
 ### `X-Forwarded-Proto` (request header)
 
@@ -169,6 +167,7 @@ replacement compatible with regular path gateways.
 
 NOTE: the content root identifier must be converted to case-insensitive/inlined
 form if necessary. For example:
+
 - `https://dweb.link/ipfs/QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR`
   returns HTTP 301 redirect to the same CID but in case-insensitive base32:
   - `Location: https://bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi.ipfs.dweb.link/`
@@ -215,7 +214,7 @@ representation to safely fit with the 63 character limit.
 
 How to represent CIDs with a string representation greater than 63
 characters, such as those for `sha2-512` hashes, remains an
-[open question](https://github.com/ipfs/go-ipfs/issues/7318). 
+[open question](https://github.com/ipfs/go-ipfs/issues/7318).
 
 Until a solution is found, subdomain gateway implementations
 should return HTTP 400 Bad Request for CIDs longer than 63.
@@ -232,13 +231,12 @@ should return HTTP 400 Bad Request for CIDs longer than 63.
 - Subdomain gateways provide unique origin per content root, however the
   origins still share the parent domain name used by the gateway. To fully
   isolate websites from each other:
-
-    - The gateway operator should add a wildcard entry
-      to the [Public Suffix List](https://publicsuffix.org/) (PSL).
-        - Example: `dweb.link` gateway [is listed on PSL](https://publicsuffix.org/list/public_suffix_list.dat) as `*.dweb.link`
-    - Web browsers with IPFS support should detect subdomain gateway (URL
-      pattern `https://{content-root-id}.ip[f|n]s.example.net`) and dynamically
-      add it to PSL.
+  - The gateway operator should add a wildcard entry
+    to the [Public Suffix List](https://publicsuffix.org/) (PSL).
+    - Example: `dweb.link` gateway [is listed on PSL](https://publicsuffix.org/list/public_suffix_list.dat) as `*.dweb.link`
+  - Web browsers with IPFS support should detect subdomain gateway (URL
+    pattern `https://{content-root-id}.ip[f|n]s.example.net`) and dynamically
+    append it to internal PSL.
 
 ## URI router
 

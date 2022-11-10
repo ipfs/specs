@@ -39,7 +39,8 @@ If a `_redirects` file exists but is unable to be processed, perhaps not even pa
 The detailed specification is added in [`http-gateways/REDIRECTS_FILE.md`](../http-gateways/REDIRECTS_FILE.md).
 
 ### Test fixtures
-QmQyqMY5vUBSbSxyitJqthgwZunCQjDVtNd8ggVCxzuPQ4
+
+`QmQyqMY5vUBSbSxyitJqthgwZunCQjDVtNd8ggVCxzuPQ4`
 
 See spec for testing details.
 
