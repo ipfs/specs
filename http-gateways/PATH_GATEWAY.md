@@ -41,6 +41,7 @@ where client prefers to perform all validation locally.
     - [`Accept` (request header)](#accept-request-header)
     - [`Range` (request header)](#range-request-header)
     - [`Service-Worker` (request header)](#service-worker-request-header)
+    - [`X-Error-Behavior` (request header)](#x-error-behavior-request-header)
   - [Request Query Parameters](#request-query-parameters)
     - [`filename` (request query parameter)](#filename-request-query-parameter)
     - [`download` (request query parameter)](#download-request-query-parameter)
@@ -74,6 +75,8 @@ where client prefers to perform all validation locally.
     - [`X-Ipfs-Roots` (response header)](#x-ipfs-roots-response-header)
     - [`X-Content-Type-Options` (response header)](#x-content-type-options-response-header)
     - [`X-Trace-Id` (response header)](#x-trace-id-response-header)
+    - [`X-On-Error` (response header)](#x-on-error-response-header)
+    - [`X-Stream-Error` (response header)](#x-stream-error-response-header)
   - [Response Payload](#response-payload)
 - [Appendix: notes for implementers](#appendix-notes-for-implementers)
   - [Content resolution](#content-resolution)
@@ -217,6 +220,17 @@ Gateway should refuse attempts to register a service worker for entire
 
 Requests to these paths with `Service-Worker: script` MUST be denied by
 returning HTTP 400 Bad Request error.
+
+### `X-Error-Behavior` (request header)
+
+Clients can request a different behavior when errors occur during an HTTP
+stream. The possible values, and behaviors are defined as follows:
+
+- `reset` (default): resets the HTTP stream.
+- `trailer`: a trailer header [`X-Stream-Error`](#x-stream-error-response-header) will
+be sent with the error message.
+
+See the [streaming errors](#streaming-errors) section for more information.
 
 ## Request Query Parameters
 
@@ -582,6 +596,17 @@ Optional. Implementations are free to use this header to return a globally
 unique identifier to help in debugging errors and performance issues.
 
 A good practice is to always return it with HTTP error [status codes](#response-status-codes) >=`400`.
+
+### `X-On-Error` (response header)
+
+Returned on streaming requests to indicate the server behavior in case an error happens.
+The header can have the value `reset`, or `trailer`. See the [streaming errors](#streaming-errors)
+section for more information.
+
+### `X-Stream-Error` (response header)
+
+Returned if the client set [`X-Error-Behavior`](#x-error-behavior-request-header) to `trailer`. This trailing header will
+contain the error message that occurred while streaming a file.
 
 ## Response Payload
 
