@@ -285,6 +285,8 @@ A message for indicating that the client is able to act as a provider for a give
 
 Note: While keys are formatted as CIDs, it is highly recommended that server implementations treat these requests at the multihash level - subsequent calls to `FindProviders` should be multicodec agnostic.
 
+Note 2: There is a default max Key count of 30000 (that will generate ~1MB payloads). Some server implementations MAY accept more keys per request.
+
 There are a few semantics relevant to the construction of a ProvideRequest:
 
 * The timestamp should be the current unix timestamp, encoded in an int64
