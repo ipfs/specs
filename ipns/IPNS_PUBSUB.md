@@ -1,16 +1,16 @@
-# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) IPNS PubSub Router
+# ![reliable](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square) IPNS PubSub Router
 
 Authors:
 
-  - Adin Schmahmann ([@aschmahmann](https://github.com/aschmahmann))
-  
+- Adin Schmahmann ([@aschmahmann](https://github.com/aschmahmann))
+
 Reviewers:
 
 -----
-  
+
 # Abstract
 
-[Inter-Planetary Naming System (IPNS)](/README.md) is a naming system responsible for the creating, reading and updating of mutable pointers to data.
+[Inter-Planetary Naming System (IPNS)](./IPNS.md) is a naming system responsible for the creating, reading and updating of mutable pointers to data.
 IPNS consists of a public/private asymmetric cryptographic key pair, a record type and a protocol.
 Part of the protocol involves a routing layer that is used for the distribution and discovery of new or updated IPNS records.
 
@@ -20,10 +20,10 @@ This implies that as long as a peer on the network has an IPNS record it can be 
 
 # Organization of this document
 
-  - [Introduction](#introduction)
-  - [Protocol Overview](#pubsub-protocol-overview)
-  - [Protocol](#protocol)
-  - [Implementations](#implementations)
+- [Introduction](#introduction)
+- [Protocol Overview](#pubsub-protocol-overview)
+- [Protocol](#protocol)
+- [Implementations](#implementations)
 
 # Introduction
 
@@ -35,7 +35,8 @@ In this spec we address building a router based on a PubSub system, particularly
 # PubSub Protocol Overview
 
 The protocol has four components:
-- [IPNS Records and Validation](/README.md)
+
+- [IPNS Records and Validation](./IPNS.md)
 - [libp2p PubSub](https://github.com/libp2p/specs/tree/master/pubsub)
 - Translating an IPNS record name to/from a PubSub topic
 - Layering persistence onto libp2p PubSub
@@ -53,6 +54,7 @@ where base64url-unpadded is an unpadded base64url as specified in [IETF RFC 4648
 libp2p PubSub does not have any notion of persistent data built into it. However, we can layer persistence on top of PubSub by utilizing [libp2p Fetch](https://github.com/libp2p/specs/tree/master/fetch).
 
 The protocol has the following steps:
+
 1. Start State: Node `A` subscribes to the PubSub topic `t` corresponding to the local IPNS record key `k`
 2. `A` notices that a node `B` has connected to it and subscribed to `t`
 3. Some time passes (might be 0 seconds, or could use a more complex system to determine the duration)
@@ -80,6 +82,7 @@ by the above logic and properly running the persistence protocol can be difficul
 republishing can then act as a fall-back plan in the event of errors in the persistence protocol.
 
 Persistence Error Example:
+
 1. `B` connects to `A`
 2. `A` gets the latest record (`R1`) from `B`
 3. `B` then disconnects from `A`
@@ -91,5 +94,8 @@ every 10 seconds)
 
 # Implementations
 
-  - Kubo:  <https://github.com/ipfs/go-namesys> and <https://github.com/libp2p/go-libp2p-pubsub-router>
-
+- Kubo
+  - <https://github.com/ipfs/go-namesys>
+  - <https://github.com/libp2p/go-libp2p-pubsub-router>
+  - <https://github.com/ipfs/kubo/blob/master/docs/experimental-features.md#ipns-pubsub>
+  - <https://github.com/ipfs/kubo/issues/8591>

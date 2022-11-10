@@ -1,6 +1,6 @@
 # `_redirects` File Specification
 
-![draft](https://img.shields.io/badge/status-draft-yellow.svg?style=flat-square)
+![reliable](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square)
 
 **Authors**:
 
