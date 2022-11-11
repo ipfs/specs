@@ -47,11 +47,6 @@ using either the `Accept` HTTP header or the `format` URL query.
 - [`bafkreidmwhhm6myajxlpu7kofe3aqwf4ezxxn46cp5fko7mb6x74g4k5nm`][f-dag-pb-json]
   is the aforementioned DAG-PB directory's Logical DAG-JSON representation that
   is expected to be returned when using `?format=dag-json`.
-- Traversal Test Fixtures: the following test fixtures contain two levels of nested
-  documents of their encoding. Accessing `/ipfs/$CID/foo/bar` should return the JSON
-  equivalent of `{"hello":"this is not a link"}`.
-  - DAG-CBOR: [`bafyreiehxu373cu3v5gyxyxfsfjryscs7sq6fh3unqcqgqhdfn3n43vrgu`][f-dag-cbor-traversal]
-  - DAG-JSON: [`baguqeeraoaeabj5hdfcmpkzfeiwtfwb3qbvfwzbiknqn7itcwsb2fdtu7eta`][f-dag-json-traversal]
 - `TODO` is a valid JSON but not a valid DAG-JSON
 - `TODO` is a valid CBOR but not a valid DAG-CBOR
 
@@ -102,6 +97,24 @@ ability to retrieve DAG-JSON as `application/json` is an important step
 for the interoperability of the HTTP Gateway with web browsers and other tools
 that expect specific Content Types.
 
+Finally, we considered supporting pathing for both DAG and non-DAG variants of
+the JSON and CBOR codecs. However, supporting pathing raises questions whose
+answers are not clearly defined or agreed upon yet:
+
+1. Pathing is an important element of DAG-JSON and DAG-CBOR as they can materialize
+CIDs. That would allow users to traverse an IPLD document directly by using the paths
+in the gateway. However, if we support paths that materialize CIDs, we would also
+need to support pathing to extract nested fields in the document. That raises questions
+regarding caching and Etags.
+2. Pathing could be done on CBOR documents, as the tag 42 indicates that there is a CID.
+However, that would raise the same question as in the previous point: if we materialize
+CIDs, do we support extracting all nested fields? If so, why? Then, how would caching
+work?
+
+Therefore, we deferred this decision for a future IPIP. Giving users the possibility
+to retrieve JSON, CBOR, DAG-JSON AND DAG-CBOR documents through the gateway is, in
+itself, a progress and will open the doors for new tools and explorations.
+
 ### Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
@@ -119,8 +132,6 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 [ipfs/go-ipfs/issues/7552]: https://github.com/ipfs/go-ipfs/issues/7552
 [f-dag-pb]: https://dweb.link/ipfs/bafybeiegxwlgmoh2cny7qlolykdf7aq7g6dlommarldrbm7c4hbckhfcke
 [f-dag-pb-json]: https://dweb.link/ipfs/bafkreidmwhhm6myajxlpu7kofe3aqwf4ezxxn46cp5fko7mb6x74g4k5nm
-[f-dag-cbor-traversal]: https://dweb.link/ipfs/bafyreiehxu373cu3v5gyxyxfsfjryscs7sq6fh3unqcqgqhdfn3n43vrgu
-[f-dag-json-traversal]: https://dweb.link/ipfs/baguqeeraoaeabj5hdfcmpkzfeiwtfwb3qbvfwzbiknqn7itcwsb2fdtu7eta
 [rfc8259-sec12]: https://datatracker.ietf.org/doc/html/rfc8259#section-12
 [rfc8949-sec10]: https://datatracker.ietf.org/doc/html/rfc8949#section-10
 [dag-json-spec]: https://ipld.io/specs/codecs/dag-json/spec/
