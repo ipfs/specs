@@ -108,9 +108,9 @@ Each object in the `Providers` list is a *write provider record*.
     ]
 }
 ```
-    - `ProvideResults` is a list of results in the same order as the `Providers` in the request, and the schema of each object is determined by the `Protocol` of the corresponding write object (called "Write Provider Records Response" in the Known Transfer Protocols section)
-      - This may contain output information such as TTLs, errors, etc.
-      - It is undefined whether the server will allow partial results
+- `ProvideResults` is a list of results in the same order as the `Providers` in the request, and the schema of each object is determined by the `Protocol` of the corresponding write object (called "Write Provider Records Response" in the Known Transfer Protocols section)
+  - This may contain output information such as TTLs, errors, etc.
+  - It is undefined whether the server will allow partial results
 - The work for processing each provider record should be idempotent so that it can be retried without excessive cost in the case of full or partial failure of the request
 - Default limit of 100 keys per request
 - Implements pagination according to the Pagination section
