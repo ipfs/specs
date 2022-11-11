@@ -84,7 +84,6 @@ Each object in the `Providers` list is a *read provider record*.
 - `PUT /routing/v1/providers`
   - Response Codes
     - `200`: the server processed the full list of provider records (possibly unsuccessfully, depending on the semantics of the particular records)
-    - `400`: 
   - Request Body
 ```json
 {
