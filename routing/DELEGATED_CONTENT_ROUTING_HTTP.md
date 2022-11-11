@@ -156,7 +156,7 @@ Multicodec code: 0x0900
 - `Addrs`: a list of known multiaddrs for the peer
   - This list may be incomplete or incorrect and should only be treated as *hints* to improve performance by avoiding extra peer lookups
 
-The server should respect a passed `transport` query parameter by filtering against the `Multiaddrs` list.
+The server should respect a passed `transport` query parameter by filtering against the `Addrs` list.
 
 
 #### Write Provider Records
