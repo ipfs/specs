@@ -171,24 +171,28 @@ The server should respect a passed `transport` query parameter by filtering agai
 
 - `Signature`: a multibase-encoded signature of the sha256 hash of the `Payload` field, signed using the private key of the Peer ID specified in the `Payload` JSON
   - Servers may ignore this field if they do not require signature verification
-- `Payload`: a multibase-encoded JSON object which conforms with the following schema:
+- `Payload`: a string containing a serialized JSON object which conforms with the following schema:
 ```json
 {
     "Keys": ["cid1", "cid2"],
     "Timestamp": 0,
     "AdvisoryTTL": 0,
-    "PeerID": "12D3K...",
-    "Multiaddrs": ["/ip4/..."],
+    "ID": "12D3K...",
+    "Addrs": ["/ip4/..."],
 }
 ```
   - `Keys` is a list of the CIDs being provided
   - `Timestamp` is the current time
   - `AdvisoryTTL` is the time by which the caller expects the server to keep the record available
     - If this value is unknown, the caller may use a value of 0
+  - `ID` is the peer ID that was used to sign the record
+  - `Addrs` is a list of string-encoded multiaddrs
 
 A 403 response code should be returned if the signature check fails.
 
 Note that this only supports Peer IDs expressed as identity multihashes. Peer IDs with older key types that exceed 42 bytes are not verifiable since they only contain a hash of the key, not the key itself. Normally, if the Peer ID contains only a hash of the key, then the key is obtained out-of-band (e.g. by fetching the block via IPFS). If support for these Peer IDs is needed in the future, this spec can be updated to allow the client to provide the key and key type out-of-band by adding optional `PublicKey` and `PublicKeyType` fields, and if the Peer ID is a CID, then the server can verify the public key's authenticity against the CID, and then proceed with the rest of the verification scheme.
+
+The `Payload` field is a string, not a proper JSON object, to prevent its contents from being accidentally parsed and re-encoded by intermediaries, which may change the order of JSON fields and thus cause the record to fail validation.
 
 #### Write Provider Records Response
 ```json
