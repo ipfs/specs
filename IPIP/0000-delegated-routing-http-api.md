@@ -31,7 +31,7 @@ See the [Delegated Content Routing HTTP API spec](../routing/DELEGATED_CONTENT_R
 ## Design rationale
 To understand the design rationale, it is important to consider the concrete Reframe limitations that we know about:
 
-- Reframe [method types](../reframe/REFRAME_KNOWN_METHODS.md) are encoded inside IPLD-encoded messages
+- Reframe [method types](../reframe/REFRAME_KNOWN_METHODS.md) using the HTTP transport are encoded inside IPLD-encoded messages
   - This prevents URL-based pattern matching on methods, which makes it hard and expensive to do basic HTTP scaling and optimizations:
     - Configuring different caching strategies for different methods
     - Configuring reverse proxies on a per-method basis
