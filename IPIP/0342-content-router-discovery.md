@@ -69,7 +69,7 @@ hash.
 * The server will have a parameter for a number of servers it wants to return
 to content routing queries. By default this will be 10. (This default is picked
 as the result of modeling router propagation). It will iterate through it's
-list of known content routers, hashing htem against the bloom filter and
+list of known content routers, hashing them against the bloom filter and
 selecting the top routers that are not already known to the client. It will
 return this list, along with it's reliability score for each. This response
 is structured as an IPLD list lists, conceptually:
