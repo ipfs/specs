@@ -214,12 +214,16 @@ Multicodec code: 0x0910
 ```json
 {
     "Protocol": "filecoin-graphsync-v1",
+    "ID": "12D3K...",
+    "Addrs": ["/ip4/..."],
     "PieceCID": "<cid>",
     "VerifiedDeal": true,
     "FastRetrieval": true
 }
 ```
 
+- `ID`: the peer ID of the provider
+- `Addrs`: a list of known multiaddrs for the peer
 - `PieceCID`:
 - `VerifiedDeal`:
 - `FastRetrieval`:
