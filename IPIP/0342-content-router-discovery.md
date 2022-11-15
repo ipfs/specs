@@ -1,8 +1,4 @@
-# IPIP 0000: Content Router Ambient Discovery
-
-<!-- IPIP number will be assigned by an editor. When opening a pull request to
-submit your IPIP, please use number 0000 and an abbreviated title in the filename,
-`0000-draft-title-abbrev.md`. -->
+# IPIP 0342: Content Router Ambient Discovery
 
 - Start Date: 2022-11-11
 - Related Issues:
