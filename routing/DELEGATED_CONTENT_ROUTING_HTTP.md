@@ -75,7 +75,7 @@ Specifications for some transfer protocols are provided in the "Transfer Protoco
         
 - Default limit: 100 providers
 - Optional query parameters
-  - `transfer` only return providers who support the passed transfer protocols, expressed as a comma-separated list of transfer protocol names such as `transfer=bitswap,filecoin-graphsync`
+  - `transfer` only return providers who support the passed transfer protocols, expressed as a comma-separated list of transfer protocol names such as `transfer=bitswap,filecoin-graphsync-v1`
   - `transport` for provider records with multiaddrs, only return records with multiaddrs explicitly supporting the passed transport protocols, encoded as decimal multicodec codes such as `transport=460,478` (`/quic` and `/tls/ws` respectively)
 - Implements pagination according to the Pagination section
 
@@ -206,14 +206,14 @@ The `Payload` field is a string, not a proper JSON object, to prevent its conten
   - If 0, the server makes no claims about the lifetime of the record
 
 
-### filecoin-graphsync
+### filecoin-graphsync-v1
 Multicodec code: 0x0910
 
 #### Read Provider Records
 
 ```json
 {
-    "Protocol": "filecoin-graphsync",
+    "Protocol": "filecoin-graphsync-v1",
     "PieceCID": "<cid>",
     "VerifiedDeal": true,
     "FastRetrieval": true
