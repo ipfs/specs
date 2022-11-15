@@ -588,7 +588,7 @@ A good practice is to always return it with HTTP error [status codes](#response-
 
 ## Response Payload
 
-Data sent with HTTP response depends on the type of requested IPFS resource:
+Data sent with HTTP response depends on the type of the requested IPFS resource, and the requested response type. The following response formats are selected according to the codec of the resolved CID:
 
 - UnixFS (implicit default)
   - File
@@ -596,20 +596,25 @@ Data sent with HTTP response depends on the type of requested IPFS resource:
   - Directory
     - Generated HTML with directory index (see [additional notes here](#generated-html-with-directory-index))
     - When `index.html` is present, gateway can skip generating directory index and return it instead
-- Raw block
-  - Opaque bytes, see [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw)
-- CAR
-  - Arbitrary DAG as a verifiable CAR file or a stream, see [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car)
-- TAR
-  - Deserialized UnixFS files and directories as a TAR file or a stream, see [application/x-tar](https://en.wikipedia.org/wiki/Tar_(computing))
 - JSON
-  - Bytes representing a JSON file, see [application/json](https://www.iana.org/assignments/media-types/application/json)
-- DAG-JSON
-  - Bytes representing a DAG-JSON file, see [application/vnd.ipld.dag-json](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-json)
+  - Bytes representing a JSON file, see [application/json](https://www.iana.org/assignments/media-types/application/json).
 - CBOR
   - Bytes representing a CBOR file, see [application/cbor](https://www.iana.org/assignments/media-types/application/cbor)
+- DAG-JSON
+  - If the `Accept` header includes `text/html`: generated HTML with options to download DAG-JSON as-is, or converted to DAG-CBOR.
+  - Bytes representing a DAG-JSON file, see [application/vnd.ipld.dag-json](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-json)
 - DAG-CBOR
+  - If the `Accept` header includes `text/html`: generated HTML with options to download DAG-CBOR as-is, or converted to DAG-JSON.
   - Bytes representing a DAG-CBOR file, see [application/vnd.ipld.dag-cbor](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-cbor)
+
+The following response types can only be requested with [`format`](#format-request-query-parameter) query parameter or [`Accept`](#accept-request-header) header:
+
+- Raw Block
+  - Opaque bytes, see [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw).
+- CAR
+  - Arbitrary DAG as a verifiable CAR file or a stream, see [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car).
+- TAR
+  - Deserialized UnixFS files and directories as a TAR file or a stream, see [application/x-tar](https://en.wikipedia.org/wiki/Tar_(computing)).
 
 # Appendix: notes for implementers
 
