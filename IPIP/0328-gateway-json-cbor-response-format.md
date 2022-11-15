@@ -54,7 +54,7 @@ using either the `Accept` HTTP header or the `format` URL query.
 
 The current gateway already supports different response formats via the
 `Accept` HTTP header and the `format` URL query. This IPIP proposes adding
-one more supported format to that list.
+more supported formats to that list.
 
 ### User benefit
 
