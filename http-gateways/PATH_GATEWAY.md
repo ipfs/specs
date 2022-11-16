@@ -185,8 +185,8 @@ For example:
 - [application/x-tar](https://en.wikipedia.org/wiki/Tar_(computing)) – returns UnixFS tree (files and directories) as a [TAR](https://en.wikipedia.org/wiki/Tar_(computing)) stream. Returned tree starts at a root item which name is the same as the requested CID. Produces 400 Bad Request for content that is not UnixFS.
 - [application/vnd.ipld.dag-json](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-json) – requests [IPLD Data Model](https://ipld.io/docs/data-model/) representation serialized into [DAG-JSON format](https://ipld.io/docs/codecs/known/dag-json/). If the requested CID has `dag-json` codec, data is validated as DAG-JSON before being returned as-is. Invalid DAG-JSON produces HTTP Error 500.
 - [application/vnd.ipld.dag-cbor](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-cbor) – requests [IPLD Data Model](https://ipld.io/docs/data-model/) representation serialized into [DAG-CBOR format](https://ipld.io/docs/codecs/known/dag-cbor/). If the requested CID has `dag-cbor` codec,  data is validated as DAG-CBOR before being returned as-is. Invalid DAG-CBON produces HTTP Error 500.
-- [application/json](https://www.iana.org/assignments/media-types/application/json) – same as `application/vnd.ipld.dag-json`, unless the CID's codec is JSON. Then, the raw JSON block can be returned
-- [application/cbor](https://www.iana.org/assignments/media-types/application/cbor) – same as `application/vnd.ipld.dag-cbor`, unless the CID's codec is CBOR. Then, the raw CBOR block can be returned
+- [application/json](https://www.iana.org/assignments/media-types/application/json) – same as `application/vnd.ipld.dag-json`, unless the CID's codec is JSON. Then, the raw JSON block can be returned.
+- [application/cbor](https://www.iana.org/assignments/media-types/application/cbor) – same as `application/vnd.ipld.dag-cbor`, unless the CID's codec is CBOR. Then, the raw CBOR block can be returned.
 
 ### `Range` (request header)
 
@@ -589,9 +589,10 @@ A good practice is to always return it with HTTP error [status codes](#response-
 
 ## Response Payload
 
-Data sent with HTTP response depends on the type of the requested IPFS resource, and the requested response type. The following response formats are selected according to the codec of the resolved CID:
+Data sent with HTTP response depends on the type of the requested IPFS resource, and the requested response type.
+The following response formats are selected according to the codec of the resolved CID:
 
-- UnixFS (implicit default)
+- UnixFS
   - File
     - Bytes representing file contents
   - Directory
