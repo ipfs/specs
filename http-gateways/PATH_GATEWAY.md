@@ -650,7 +650,7 @@ better user experience:
 
 ### Traversing through DAG-JSON and DAG-CBOR
 
-Traversing through [DAG-JSON][dag-json] and [DAG-CBOR][dag-json] is possible
+Traversing through [DAG-JSON][dag-json] and [DAG-CBOR][dag-cbor] is possible
 through fields that encode a link:
 
 - DAG-JSON: link are represented as a base encoded CID under the `/` reserved

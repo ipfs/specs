@@ -1,4 +1,4 @@
-# IPIP 0000: Gateway JSON and TAR Response Formats
+# IPIP 0328: Gateway JSON and TAR Response Formats
 
 - Start Date: 2022-10-07
 - Related Issues:
@@ -10,23 +10,28 @@
 
 ## Summary
 
-Add [DAG-JSON], [DAG-CBOR], JSON and CBOR response formats to the [HTTP Gateway](../http-gateways/).
+Add support for the [DAG-JSON], [DAG-CBOR], JSON and CBOR response formats in
+the [HTTP Gateway](../http-gateways/).
 
 ## Motivation
 
-Currently, the gateway supports requesting data in the [DAG-PB], RAW, and [CAR]
-formats. However, it should be possible to download deserialized versions of data other than UnixFS
-in order to unlock the potential of the [IPLD Data Model][ipld-data-model] beyond files and directories.
+Currently, the gateway supports requesting data in the [DAG-PB], RAW, [CAR] and
+TAR formats. In addition, it allows for traversing of IPLD links encoded in
+DAG-JSON and DAG-CBOR, as long as they are intermediate links, and not the final
+document. However, it should be possible to download deserialized versions
+of data other than UnixFS in order to unlock the potential of the
+[IPLD Data Model][ipld-data-model] beyond files and directories.
 
-The main functional gap in the IPFS ecosystem is the lack of support for non-UnixFS DAGs on HTTP gateways.
-Users are able to create custom DAGs based on traversable DAG-CBOR thanks to [CBOR tag 42 being reserved for CIDs](https://github.com/core-wg/yang-cbor/issues/13#issuecomment-524378859),
-but they are unable to load deserialized DAG-CBOR documents from a local gateway,
-which is severely decreasing the utility of non-UnixFS DAGs.
+The main functional gap in the IPFS ecosystem is the lack of support for
+non-UnixFS DAGs on HTTP gateways. Users are able to create custom DAGs based on
+traversable DAG-CBOR thanks to [CBOR tag 42 being reserved for CIDs][cbor-42]
+and DAG-JSON documents, but they are unable to load deserialized documents from
+a local gateway, which is severely decreasing the utility of non-UnixFS DAGs.
 
-Adding new responses types will also benefit UnixFS.
-DAG-PB has a [logical format][dag-pb-format] which makes it possible
-to represent a DAG-PB directory as a [DAG-JSON] document. This means that, if we
-support DAG-JSON in the gateway, then we would support
+Adding new responses types will also benefit UnixFS. DAG-PB has a
+[logical format][dag-pb-format] which makes it possible to represent a DAG-PB
+directory as a [DAG-JSON] document. This means that, if we support DAG-JSON in
+the gateway, then we would support
 [JSON responses for directory listings][ipfs/go-ipfs/issues/7552], which has been
 requested by our users in the past.
 
@@ -38,7 +43,9 @@ to traversing IPLD data.
 
 The solution is to allow the Gateway to support serializing an IPLD Data Model
 representation as [DAG-JSON], [DAG-CBOR], JSON and CBOR by requesting them
-using either the `Accept` HTTP header or the `format` URL query.
+using either the `Accept` HTTP header or the `format` URL query. In addition,
+if the resolved CID is of one of the aforementioned types, the gateway should
+be able to resolve them instead of failing with `node type unknown`.
 
 ## Test fixtures
 
@@ -55,6 +62,11 @@ using either the `Accept` HTTP header or the `format` URL query.
 The current gateway already supports different response formats via the
 `Accept` HTTP header and the `format` URL query. This IPIP proposes adding
 more supported formats to that list.
+
+In addition, the current gateway already supports traversing through DAG-CBOR
+and DAG-JSON links if they are intermediary documents. With this IPIP, we aim
+to be able to download the DAG-CBOR, DAG-JSON, JSON and CBOR documents
+themselves.
 
 ### User benefit
 
@@ -97,28 +109,50 @@ ability to retrieve DAG-JSON as `application/json` is an important step
 for the interoperability of the HTTP Gateway with web browsers and other tools
 that expect specific Content Types.
 
-Finally, we considered supporting pathing for both DAG and non-DAG variants of
-the JSON and CBOR codecs. However, supporting pathing raises questions whose
-answers are not clearly defined or agreed upon yet:
+Finally, we considered supporting pathing within both DAG and non-DAG variants
+of the JSON and CBOR codecs. Pathing within these documents could lead to replies
+with extracts from the document. For example, if we have the document:
 
-1. Pathing is an important element of DAG-JSON and DAG-CBOR as they can materialize
-CIDs. That would allow users to traverse an IPLD document directly by using the paths
-in the gateway. However, if we support paths that materialize CIDs, we would also
-need to support pathing to extract nested fields in the document. That raises questions
-regarding caching and Etags.
-2. Pathing could be done on CBOR documents, as the tag 42 indicates that there is a CID.
-However, that would raise the same question as in the previous point: if we materialize
-CIDs, do we support extracting all nested fields? If so, why? Then, how would caching
-work?
+```json
+{ 
+  "link" {
+    "to": {
+      "some": {
+        "cid2": <cbor tag 42 pointing at different CID>
+       } 
+    } 
+  } 
+}
+```
 
-Therefore, we deferred this decision for a future IPIP. Giving users the possibility
-to retrieve JSON, CBOR, DAG-JSON AND DAG-CBOR documents through the gateway is, in
-itself, a progress and will open the doors for new tools and explorations.
+With CID `bafy`, and we navigate to `/ipfs/bafy/link/to`, we would be able to
+retrieve an extract from the document.
+
+```json
+{
+  "some": {
+    "cid2": <cbor tag 42 pointing at different CID>
+    } 
+} 
+```
+
+However, supporting this raises questions whose answers are not clearly defined
+or agreed upon yet. The main question this raises is caching and Etags. Therefore,
+this IPIP only supports pathing within DAG-JSON and DAG-CBOR if they resolve
+a CID, as it is the current behavior. In addition, it adds support to retrieve
+the documents in those formats. Pathing within JSON and CBOR documents is not
+supported.
+
+The decision to support document path extractions id deferred to a future IPIP.
+Giving users the possibility to retrieve JSON, CBOR, DAG-JSON AND DAG-CBOR
+documents through the gateway is, in itself, a progress and will open the doors
+for new tools and explorations.
 
 ### Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
+[cbor-42]: https://github.com/core-wg/yang-cbor/issues/13#issuecomment-524378859
 [DAG-PB]: https://ipld.io/docs/codecs/known/dag-pb/
 [dag-pb-format]: https://ipld.io/specs/codecs/dag-pb/spec/#logical-format
 [DAG-JSON]: https://ipld.io/docs/codecs/known/dag-json/
