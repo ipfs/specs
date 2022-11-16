@@ -20,7 +20,7 @@ in order to unlock the potential of the [IPLD Data Model][ipld-data-model] beyon
 
 The main functional gap in the IPFS ecosystem is the lack of support for non-UnixFS DAGs on HTTP gateways.
 Users are able to create custom DAGs based on traversable DAG-CBOR thanks to [CBOR tag 42 being reserved for CIDs](https://github.com/core-wg/yang-cbor/issues/13#issuecomment-524378859),
-but they are unable to load deserialized  DAG-CBOR documents from local gateway,
+but they are unable to load deserialized DAG-CBOR documents from a local gateway,
 which is severely decreasing the utility of non-UnixFS DAGs.
 
 Adding new responses types will also benefit UnixFS.
