@@ -641,11 +641,21 @@ and [DNSLINK_GATEWAY.md](./DNSLINK_GATEWAY.md)).
 ### Traversing remaining path
 
 UnixFS pathing over files and directories is the implicit default used for
-resolving content paths that start with `/ipfs/` and `/ipns/`. It allows for
-traversal based on link names,  which provides a better user experience than
-low level logical pathing from IPLD:
+resolving content paths that start with `/ipfs/` and `/ipns/`. It is an abstraction
+over the low level [logical pathing][dag-pb-format] from IPLD, providing a
+better user experience:
 
 - Example of UnixFS pathing: `/ipfs/cid/dir-name/file-name.txt`
+
+### Traversing through DAG-JSON and DAG-CBOR
+
+Traversing through [DAG-JSON][dag-json] and [DAG-CBOR][dag-json] is possible
+through fields that encode a link:
+
+- DAG-JSON: link are represented as a base encoded CID under the `/` reserved
+namespace, see [specification](https://ipld.io/specs/codecs/dag-json/spec/#links).
+- DAG-CBOR: links are tagged with CBOR tag 42, indicating that they encode a CID,
+see [specification](https://ipld.io/specs/codecs/dag-cbor/spec/#links).
 
 ### Handling traversal errors
 
@@ -706,9 +716,8 @@ It should be always fast, even when a directory has 10k of items.
 The usual optimizations involve:
 
 - Skipping size and type resolution for child UnixFS items, and using `Tsize`
-  from [logical format](https://ipld.io/specs/codecs/dag-pb/spec/#logical-format)
-  instead, allows gateway to respond much faster, as it no longer need to fetch
-  root nodes of child items.
+  from [logical format][dag-pb-format] instead, allows gateway to respond much
+  faster, as it no longer need to fetch root nodes of child items.
   - Additional information about child nodes can be fetched lazily
     with JS, but only for items in the browser's viewport.
 
@@ -718,3 +727,7 @@ The usual optimizations involve:
     limiting the cost of a single page load.
   - The downside of this approach is that it will always be slower than
     skipping child block resolution.
+
+[dag-pb-format]: https://ipld.io/specs/codecs/dag-pb/spec/#logical-format
+[dag-json]: https://ipld.io/specs/codecs/dag-json/spec/
+[dag-cbor]: https://ipld.io/specs/codecs/dag-cbor/spec/
