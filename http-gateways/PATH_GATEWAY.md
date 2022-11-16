@@ -79,6 +79,7 @@ where client prefers to perform all validation locally.
   - [Content resolution](#content-resolution)
     - [Finding the content root](#finding-the-content-root)
     - [Traversing remaining path](#traversing-remaining-path)
+    - [Traversing through DAG-JSON and DAG-CBOR](#traversing-through-dag-json-and-dag-cbor)
     - [Handling traversal errors](#handling-traversal-errors)
   - [Best practices for HTTP caching](#best-practices-for-http-caching)
   - [Denylists](#denylists)
