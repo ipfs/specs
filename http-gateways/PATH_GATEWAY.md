@@ -609,9 +609,6 @@ The following response formats are selected according to the codec of the resolv
   - If the `Accept` header includes `text/html`: generated HTML with options to download DAG-CBOR as-is, or converted to DAG-JSON.
   - Bytes representing a DAG-CBOR file, see [application/vnd.ipld.dag-cbor](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-cbor)
 
-Pathing through JSON, CBOR, DAG-JSON and DAG-CBOR returns an HTTP error 400 Bad
-Request unless it resolves to a CID.
-
 The following response types can only be requested with [`format`](#format-request-query-parameter) query parameter or [`Accept`](#accept-request-header) header:
 
 - Raw Block
