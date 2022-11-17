@@ -39,7 +39,10 @@ This registry will be able to understand for a given content router two
 properties:
 * reliability - how many good vs bad responses has this router responded
 with. This statistic should be windowed, such that the client can calculate
-it in terms of the last week or month.
+it in terms of the last week or month. This will in practice be stored as
+daily buckets of successful and unsuccessful queries against a router, where
+success indicates that the router was queried, and the data was subsequently
+retrieved from a node returned as a provider by that router.
 * performance - how quickly does this router respond.
 
 This protocol expects nodes to be able to keep reliability (a metric
@@ -50,29 +53,40 @@ In addtion, nodes may wish to track the most recent time they have learned
 content routing information from the other peers they are and have been
 connected with.
 
+Conceptually, propagation of content routers will look like nodes gossiping
+their knowledge of router existance to each other. Initially, we expect that
+the current topology will look a bit more like a feedback loop over a
+bipartite graph - where one side of the graph is the set of general purpose
+IPFS nodes, and the other side are the bootstrap and core-infrastructural
+nodes with high connectivity in the network.
+
 ### 1. content-routing as a libp2p protocol
 
 IPFS nodes will advertise and coordinate discover of content routers using a
-new libp2p protocol advertised as "".
+new libp2p protocol advertised as "/ipfs/content-router-discovery/1.0.0".
 
 The protocol will follow a request-response model.
-A node will open a a stream on the protocol when it wants to discover new
+A node will open a stream on the protocol when it wants to discover new
 content routers it does not already know.
-It will send a bloom filter as it's query.
-* The size of the bloom filter is chosen by the client, and is sized such
-that it receives a greater than 99% certainly that it receives a useful
+The node wants to request the best set of known content routers from it's peer
+that it does not already know. The query will make use of a bloom filter to
+support this prioritization without leaking the exact list of known content
+routers that the client already knows.
+
+* The size of the bloom filter is chosen by the client. It is sized such
+that it has a greater than 99% certainly that it will receive a useful
 response. The maximum size of a query may be capped by the server, but can be
 effectively considered to be under 10kb.
 * The client will hash it's known content routers into the bloom filter
 to set bits in the filter at the locations to which these known routers
 hash.
 * The server will have a parameter for a number of servers it wants to return
-to content routing queries. By default this will be 10. (This default is picked
-as the result of modeling router propagation). It will iterate through it's
-list of known content routers, hashing them against the bloom filter and
+to content discovery queries. By default this will be 10. (This default is
+picked as the result of modeling router propagation). It will iterate through
+it's list of known content routers, hashing them against the bloom filter and
 selecting the top routers that are not already known to the client. It will
 return this list, along with it's reliability score for each. This response
-is structured as an IPLD list lists, conceptually:
+is structured as a list, conceptually:
 ```json
 [
   ["https://cid.contact/", 0.95],
@@ -233,6 +247,13 @@ amount of querying before a client happens to run into a provider, leading to
 degraded experiences for most clients. The single global list that a provider
 can automatically add itself to leads to issues for how to mitigate an
 enumeration of all network participants by a malicious content router.
+
+Pros:
+* Network is already there, no need to create a new protocol to "provide" new providers instead of CIDs.
+* You could potentially associate a provider with a specific root CID content.
+Cons:
+* Nodes cannot drop use of the DHT / other content routing options always are 'second tier'.
+
 
 #### Static list of known routers distributed with IPFS clients
 
