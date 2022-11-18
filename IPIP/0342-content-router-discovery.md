@@ -32,6 +32,20 @@ is also insufficient long term because:
 
 ## Detailed design
 
+This spec is designed for the ability of IPFS nodes to automatically discover
+and make use of 'content routers'. Content routers are services which are able
+to fulfill libp2p's [ContentRouting](https://github.com/libp2p/go-libp2p/blob/master/core/routing/routing.go#L26)
+API. These routers currently are considered to directly support queries using
+the protocols specified by
+[IPIP-337](https://github.com/ipfs/specs/pulls)
+and/or
+[IPIP-327](https://github.com/ipfs/specs/pull/327).
+
+In addition, this protocol expects that content routers that may be considered
+for auto-configuration/discovery by IPFS nodes will have knowledge of the
+entire CID space - in other words a delegation to such a router may be
+considered 'exhaustive'.
+
 ### 0. content-router discovery state tracking
 
 Nodes will conceptually track a registry about known content routers.
@@ -110,8 +124,13 @@ To perform a probe, the node will consider the set of peers it is currently
 connected to. It will order peers. The specific ordering is left to the
 node, but it should strive for diversity - an example ordering would be to
 rank peers by how recently a content routing discovery query has been make
-to that peer, with tie breaking preference for LAN nodes and for boostrap
-nodes.
+to that peer, with tie breaking preference for LAN nodes and for nodes
+with explicit peering agreements.
+
+Other factors that may be considered include:
+* Reputation of the peer, including how long it has been connected and if it
+  has served useful content in the past.
+* Latency / ping time of the peer.
 
 ### 3. selection of routers
 
@@ -124,7 +143,7 @@ The node maintains two thresholds:
 * uncertain (queries < 5)
 
 Content routers meeting the good reliability threshold are ordered by
-perforamnce. the top one is queried, as is an 'uncertain' router if
+performance. the top one is queried, as is an 'uncertain' router if
 one exists.
 
 These threshold values are maintained for a year for the purposes
@@ -167,7 +186,7 @@ The design limits the ability of an adversary to impact user experience:
 1. it does not propose at this stage to replace DHT queries, but only to
 supplement them with content routing queries, which minimized user
 noticable impact.
-2. nodes will only propogate content routers they believe to work,
+2. nodes will only propagate content routers they believe to work,
 limiting the spread of spam / unavailable content routers to the directly
 connected peers of an adversary.
 
@@ -184,20 +203,28 @@ where sharded latency observations may be relevant. For example:
 
 ### User benefit
 
-Users will benefit from faster discovery of content providers.
-Users will also benefit from access to more CIDs than they currently do through
+- Users will benefit from faster discovery of content providers.
+- Users will also benefit from access to more CIDs than they currently do through
 queries limited to the IPFS DHT
+- Router discovery and reputation mechanism improves relisience. 
+- IPFS user agents will not be tied to static set of hard-coded HTTP endpoints
+  that may stop working at any time.
+- Users will benefit from replacing misbehaving (censorship, DoS, hardware
+  failure) routers with useful ones without having to upgrade their software.
+
 
 ### Compatibility
 
 Nodes which do not upgrade to support this IPIP will be limited to the sub-set of
 content available in the DHT. this will potentially degrade over time as more
-large providers limit their publishing per the IPNI ingestion protocol.
+large providers limit their publishing per the [IPNI](https://github.com/ipni)
+ingestion protocol.
 
 Nodes may limit their complexity through a hard-coded list of known content
 routers, essentially limiting their implementation to design section 3 of this
-IPIP. In doing so, they may limit their risk of exposure to malicious parties.
-They risk being out of date and to offer sub-optimal performance through their
+IPIP. This comes at a price: (1) hard-coded routers become easy targets 
+for denial of service attacks, decreasing the resilliency of the entire setup;
+(2) nodes risk being out of date and to offer sub-optimal performance through their
 failure to discover additional near-by content routing instances.
 
 ### Security
@@ -221,8 +248,8 @@ included as this draft develops.
 
 * a new provider is only visible to directly connected peers. they only forward it to peers asking them if it meets their bar
 for reliability.  This means propogation through the network is only posisble for routers that behave correctly.
-* because clients only propogate their 'top' routers, latency is also relevant, and with sufficient number of routers, the would only
-propogate in their local geographic area before becoming uncompetitive on latencyk
+* because clients only propagate their 'top' routers, latency is also relevant, and with sufficient number of routers, the would only
+propagate in their local geographic area before becoming uncompetitive on latencyk
 
 ### Alternatives
 
