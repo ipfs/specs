@@ -17,6 +17,14 @@ these alernative content routing systems automatically. This IPIP proposes
 a mechanism by which IPFS nodes can discover and make use of content routing
 systems.
 
+The mechanism proposed by this IPIP, where nodes gossip preferred routers
+to their connected peers, can also have broader applications. The same
+mechnism could be used for external IPNS, peer routers, relays, or DNS
+resolvers. We point out the label allowing re-use of this mechanism for
+other systems in the (protocol design)[#1-content-routing-as-a-libp2p-protocol],
+but otherwise leave the concerete design for other systems to subsequent
+IPIPs.
+
 ## Motivation
 
 There is currently not a process by which IPFS nodes can discover alernative
@@ -34,10 +42,10 @@ is also insufficient long term because:
 
 This spec is designed for the ability of IPFS nodes to automatically discover
 and make use of 'content routers'. Content routers are services which are able
-to fulfill libp2p's [ContentRouting](https://github.com/libp2p/go-libp2p/blob/master/core/routing/routing.go#L26)
+to fulfill IPFS's [ContentRouting](https://github.com/libp2p/go-libp2p/blob/master/core/routing/routing.go#L26)
 API. These routers currently are considered to directly support queries using
 the protocols specified by
-[IPIP-337](https://github.com/ipfs/specs/pulls)
+[IPIP-337](https://github.com/ipfs/specs/pulls/337)
 and/or
 [IPIP-327](https://github.com/ipfs/specs/pull/327).
 
@@ -77,15 +85,15 @@ nodes with high connectivity in the network.
 ### 1. content-routing as a libp2p protocol
 
 IPFS nodes will advertise and coordinate discover of content routers using a
-new libp2p protocol advertised as "/ipfs/content-router-discovery/1.0.0".
+new libp2p protocol advertised as "/ipfs/router-discovery/1.0.0".
 
 The protocol will follow a request-response model.
 A node will open a stream on the protocol when it wants to discover new
 content routers it does not already know.
-The node wants to request the best set of known content routers from it's peer
-that it does not already know. The query will make use of a bloom filter to
-support this prioritization without leaking the exact list of known content
-routers that the client already knows.
+The node will request routers from the peer that it does not already know.
+To express what it does know, it will query with a bloom filter. The
+statistical data structure provides a minimal amount of deniability around
+the routers that the client already knows.
 
 * The size of the bloom filter is chosen by the client. It is sized such
 that it has a greater than 99% certainly that it will receive a useful
@@ -99,12 +107,50 @@ to content discovery queries. By default this will be 10. (This default is
 picked as the result of modeling router propagation). It will iterate through
 it's list of known content routers, hashing them against the bloom filter and
 selecting the top routers that are not already known to the client. It will
-return this list, along with it's reliability score for each. This response
-is structured as a list, conceptually:
+return this list, along with it's reliability score for each.
+
+#### protocol messages
+
+Protocol messages are encoded using *cbor*. The following protocol examples demonstrate
+the schemas of requests and responses if they were to be encoded with JSON.
+
+A query on the "/ipfs/router-discovery/1.0.0" protocol will look like:
+```json
+{
+  "router": "string",
+  "filter": "bytes of the bloom filter"
+}
+```
+
+A concrete example would be:
+```json
+{
+  "router": "content-routing",
+  "filter": {"/": {"Bytes": "xhCakxnfIHbzeOjqlbZjawUKf7uvCXAkp0L5z9jF3actECFyCzriAuS1xiyhBCailtsYEwoy/hanhiIHqTZgnA=="}}
+}
+```
+
+A response is a list of entries, which looks like:
 ```json
 [
-  ["https://cid.contact/", 0.95],
-  ["https://dev.cid.contact/", 0.90],
+  {
+    "peer": "multiaddr.MultiAddr",
+    "score": float
+  }
+]
+```
+
+A concrete example would be:
+```json
+[
+  {
+    "peer": "/dns4/cid.contact/tcp/443/https",
+    "score": 0.95
+  },
+  {
+    "peer": "/dns4/dev.cid.contact/tcp/443/https",
+    "score": 0.90
+  },
 ]
 ```
 
