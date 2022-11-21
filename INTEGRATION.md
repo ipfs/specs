@@ -12,7 +12,7 @@ Integration here has 2 different meanings.
 
 1. The implementing application can handle IPFS resources with the `ipfs` and `ipns` protocols. As an example, the implementing application should be able to handle a url in this format `ipfs://QmbGtJg23skhvFmu9mJiePVByhfzu5rwo74MEkVDYAmF5T` which in this case would give you the big buck bunny video. Likewise a url in the `ipns` should be handled too. Making these protocols usable is left up to the specific application implementing this support.
 
-2. One way to handle the protocols is to use the [http gateway](https://docs.ipfs.io/concepts/ipfs-gateway/). This document describes how to determine that gateway to use.
+2. One way to handle the protocols is to use the [HTTP gateway](https://docs.ipfs.tech/concepts/ipfs-gateway/). This document describes how to determine which gateway to use.
 
 ## Decision tree
 The below decision tree defines the decisions to be made in order to choose the proper gateway. Do note that the tree, when implementing this logic, is more elaborate then this tree makes you think it is. Validation here is left out of the tree but should be added in a local implementation.
