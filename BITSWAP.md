@@ -1,202 +1,198 @@
-# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Bitswap
+# ![Status: WIP](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Bitswap
 
-**Authors(s)**:
+**Author(s)**:
+- Adin Schmahmann
 - David Dias
 - Jeromy Johnson
 - Juan Benet
 
-**Maintainers(s)**:
+**Maintainer(s)**:
 
 * * *
 
 **Abstract**
 
-Bitswap is the data trading module for IPFS. Its purpose is to request blocks from and send blocks to other peers in the network. Bitswap has two primary jobs:
+Bitswap is a data exchange protocol for sending and receiving content addressed blocks of data. Bitswap has two primary jobs:
 1. Attempt to acquire blocks from the network that have been requested by the client.
-2. Judiciously (though strategically) send blocks in its possession to other peers who want them.
+2. Send blocks in its possession to other peers who want them.
 
-# Organization of this document
+## Organization of this document
 
 - [Introduction](#introduction)
-- [Subsystems](#subsystems)
-- [Implementation Details](#implementation-details)
-- [API Spec](#api-spec)
+- [Bitswap Protocol Versions](#bitswap-protocol-versions)
+  - [Bitswap 1.0.0](#bitswap-100)
+  - [Bitswap 1.1.0](#bitswap-110)
+  - [Bitswap 1.2.0](#bitswap-120)
 - [Implementations](#implementations)
 
-# Introduction
+## Introduction
 
-Bitswap is IPFS’s central block exchange protocol. It handles the requests made by an IPFS user, human, or application to fetch data blocks from the network. It interacts with other Bitswap agents present in other IPFS nodes, exchanging (fetching + serving) blocks as it needs.
+Bitswap is a message-based protocol, as opposed to request-response. All messages contain wantlists, and/or blocks.
+Upon receiving a wantlist, a Bitswap server should eventually process and respond to the requester with either information about the block or the block itself.
+Upon receiving blocks, the client should send a `Cancel` notification to peers that have asked for the data, signifying that the client no longer wants the block.
 
-Bitswap is a message based protocol, as opposed to response-reply. All messages contain wantlists, or blocks. Upon receiving a wantlist, an IPFS node should consider sending out wanted blocks if it has them. Upon receiving blocks, the node should send out a notification called a `Cancel` signifying that they no longer want the block. At the protocol level, Bitswap is very simple.
+Bitswap aims to be a simple protocol, so that implementations can balance aspects such as throughput, latency, fairness, memory usage, etc. for their specific requirements.
 
-While Bitswap is a relatively simple protocol, a time- and memory- performant implementation requires that many details be carefully thought out. We aim to document these details here so that future implementers may build upon the knowledge gathered over the several iterations of Bitswap.
+## Bitswap Protocol Versions
 
-# Subsystems
+There are multiple Bitswap versions and more may evolve over time. We give brief overviews as to the changes behind each protocol version.
 
-There are two primary flows that Bitswap manages: requesting blocks from and serving blocks to peers. Block requests are primarily mediated by the want-manager, which tells our peers whenever we want a new block. Serving blocks is primarily handled by the decision engine, which decides how resources should be allocated among our peers.
+- `/ipfs/bitswap/1.0.0` - Initial version
+- `/ipfs/bitswap/1.1.0` - Support CIDv1
+- `/ipfs/bitswap/1.2.0` - Support Wantlist Have's and Have/DontHave responses
 
-The subsystems involved in these flows are detailed in the following subsections.
+## Block Sizes
 
-**TODO**: Update graphic
+Bitswap implementations must support sending and receiving individual blocks of sizes less than or equal to 2MiB. Handling blocks larger than 2MiB is not recommended so as to keep compatibility with implementations which only support up to 2MiB.
 
-![](https://cloud.githubusercontent.com/assets/1211152/21071077/4620387a-be4a-11e6-895c-aa8f2b06aa4e.png)
+## Bitswap 1.0.0
 
-## Types
+### Bitswap 1.0.0: Interaction Pattern
 
-The following types are used in the descriptions of the Bitswap subsystems.
+Given that a client C wants to fetch data from some server S:
 
-  - `CID`: A [content-addressed identifier](https://github.com/ipld/cid) that refers to a particular `Block`.
-  - `Peer`: Another Bitswap instance that we are connected to.
-  - `Block`: A binary blob.
-  - `Message`: A Bitswap message.
-  - `Entry`: A wantlist entry that may be included in a Message when adding/removing a particular `CID` from our wantlist. Contains:
-      - `CID` referring to a particular block.
-      - `Priority` relative priority with which the user wants `CID` (relevant only if `Cancel` is not true.
-      - `Cancel` is a boolean representing whether this `Entry` is meant to remove `CID` from our wantlist.
-  - `Ledger`: A record of the aggregate data exchanged between two peers. Each peer stores one `Ledger` for each of their peers.
+1. C sends a message to S for the blocks it wants, via a stream `s_want`
+    1. C may either send a complete wantlist, or an update to an outstanding wantlist
+    2. C may reuse this stream to send new wants
+2. S sends back blocks on a stream `s_receive`. S may reuse this stream to send back subsequent responses.
+    1. S should respect the relative priority of wantlist requests from C, with wants that have higher `priority` values being responded to first.
+3. When C no longer needs a block it previously asked for, it should send a `Cancel` message for that block to all peers from which it has not received a response about that block
 
-### Bitswap Message
+### Bitswap 1.0.0: Message
 
 A single Bitswap message may contain any of the following content:
 
-1.  The sender’s wantlist. This wantlist may either be the sender’s complete wantlist or just the changes to the sender’s wantlist that the receiver needs to know.
-2.  Data blocks. These are meant to be blocks that the receiver has requested (i.e., blocks on that are on the receiver’s wantlist as far as the sender is aware at the time of sending).
+1. The sender’s wantlist. This wantlist may either be the sender’s complete wantlist or just the changes to the sender’s wantlist that the receiver needs to know.
+2. Data blocks. These are meant to be blocks that the receiver has requested (i.e., blocks that are on the receiver’s wantlist as far as the sender is aware at the time of sending).
 
-#### Wire Format
+#### Bitswap 1.0.0: Wire Format
 
-The wire format for Bitswap is simply a stream of Bitswap messages. The following protobuf describes the form of these messages.
+The wire format for Bitswap is simply a stream of Bitswap messages. The following protobuf describes the form of these messages. Note: all protobufs are described using proto3 syntax.
 
-```
+```protobuf
 message Message {
   message Wantlist {
     message Entry {
-      optional bytes block = 1; // the block key
-      optional int32 priority = 2; // the priority (normalized). default to 1
-      optional bool cancel = 3;  // whether this revokes an entry
+      bytes block = 1; // the block key, i.e. a CIDv0
+      int32 priority = 2; // the priority (normalized). default to 1
+      bool cancel = 3;  // whether this revokes an entry
     }
 
     repeated Entry entries = 1; // a list of wantlist entries
-    optional bool full = 2;     // whether this is the full wantlist. default to false
+    bool full = 2; // whether this is the full wantlist. default to false
+  }
+
+  Wantlist wantlist = 1;
+  repeated bytes blocks = 2;
+```
+
+### Bitswap 1.0.0: Protocol Format
+
+All protocol messages sent over a stream are prefixed with the message length in
+bytes, encoded as an unsigned variable length integer as defined by the
+[multiformats unsigned-varint spec](https://github.com/multiformats/unsigned-varint).
+
+All protocol messages must be less than or equal to 4MiB in size
+
+## Bitswap 1.1.0
+
+Bitswap 1.1.0 introduces a 'payload' field to the protobuf message and deprecates the
+existing 'blocks' field. The 'payload' field is an array of pairs of cid
+prefixes and block data. The cid prefixes are used to ensure the correct
+codecs and hash functions are used to handle the block on the receiving
+end.
+
+It is otherwise identical to 1.0.0
+
+### Bitswap 1.1.0: Wire Format
+
+```protobuf
+message Message {
+    message Entry {
+      bytes block = 1; // CID of the block
+      int32 priority = 2; // the priority (normalized). default to 1
+      bool cancel = 3; // whether this revokes an entry
+    }
+
+    repeated Entry entries = 1; // a list of wantlist entries
+    bool full = 2; // whether this is the full wantlist. default to false
   }
 
   message Block {
-    bytes prefix = 1;		// CID prefix (cid version, multicodec and multihash prefix (type + length)
+    bytes prefix = 1; // CID prefix (all of the CID components except for the digest of the multihash)
     bytes data = 2;
   }
 
   Wantlist wantlist = 1;
-  optional repeated bytes blocks = 2; 	// used to send Blocks in bitswap 1.0.0
-  repeated Block payload = 3; // used to send Blocks in bitswap 1.1.0
+  repeated Block payload = 3; 
 }
 ```
 
-## Want-Manager
+## Bitswap 1.2.0
 
-The want-manager handles requests for blocks. For a requested block, identified by `cid`, the `Bitswap.GetBlock(cid)` method is invoked. `Bitswap.GetBlock(cid)` requests `cid` from the network and, if the corresponding `Block` is received, returns it. More concretely, `Bitswap.GetBlock(cid)` adds `cid` to our wantlist. The want-manager then updates all peers with this addition by adding a new `Entry` to each peer’s message queue, who then may or may not respond with the desired block.
+Bitswap 1.2.0 extends the Bitswap 1.1.0 protocol with the three changes:
+1. Being able to ask if a peer has the data, not just to send the data
+2. A peer can respond that it does not have some data rather than just not responding
+3. Nodes can indicate on messages how much data they have queued to send to the peer they are sending the message to
 
-## Decision Engine
+### Bitswap 1.2.0: Interaction Pattern
 
-The decision engine decides how to allocate resources to peers. When a `Message` with a wantlist from a peer is received, the `Message` is sent to the decision engine. For every `CID` in the wantlist that we have the corresponding `Block` for, the block has a `Task` added to the peer’s `TaskQueue`. A `Task` is considered complete once the corresponding `Block` has been sent to the message queue for that peer.
+Given that a client C wants to fetch data from some server S:
 
-The primary data structure in the decision engine is the peer request queue (`PRQ`). The `PRQ` adds peers to a weighted round-robin queue, where the weights are based on one or more peer-specific metrics. This is where Bitswap *strategies* come in. Currently, a `Strategy` is a function whose input is a peer’s `Ledger` and output is a weight for that peer. The peers are then served the `Task`s in their respective `TaskQueue`s. The amount of data each peer is served in a given round-robin round is determined by their relative weight in the queue. The in-progress Bitswap strategy implementation can be found [here](https://github.com/ipfs/research-bitswap/tree/docs/strategy_impl/strategy-impl). Further Bitswap strategy metrics and configuration interfaces are planned for the near future.
+1. C opens a stream `s_want` to S and sends a message for the blocks it wants
+    1. C may either send a complete wantlist, or an update to an outstanding wantlist
+    2. C may reuse this stream to send new wants
+    3. For each of the items in the wantlist C may ask if S has the block (i.e. a Have request) or for S to send the block (i.e. a block request). C may also ask S to send back a DontHave message in the event it doesn't have the block
+2. S responds back on a stream `s_receive`. S may reuse this stream to send back subsequent responses
+    1. If C sends S a Have request for data S has (and is willing to give to C) it should respond with a Have, although it may instead respond with the block itself (e.g. if the block is very small)
+    2. If C sends S a Have request for data S does not have (or has but is not willing to give to C) and C has requested for DontHave responses then S should respond with DontHave
+    3. S may choose to include the number of bytes that are pending to be sent to C in the response message
+    4. S should respect the relative priority of wantlist requests from C, with wants that have higher `priority` values being responded to first.
+3. When C no longer needs a block it previously asked for it should send a Cancel message for that request to any peers that have not already responded about that particular block. It should particularly send Cancel messages for Block requests (as opposed to Have requests) that have not yet been answered.
 
-*Note: The Bitswap strategy implementations in the current releases of* `go-ipfs` *and* `js-ipfs` *do not conform to the description here as of the time of this writing.*
+### Bitswap 1.2.0: Wire Format
 
-## Message Queue
+```protobuf
+message Message {
+  message Wantlist {
+    enum WantType {
+      Block = 0;
+      Have = 1;
+    }
 
-Each active peer has an associated message queue. The message queue holds the next message to be sent to that peer. The message queues receive updates from two other subsystems:
+    message Entry {
+      bytes block = 1; // CID of the block
+      int32 priority = 2; // the priority (normalized). default to 1
+      bool cancel = 3; // whether this revokes an entry
+      WantType wantType = 4; // Note: defaults to enum 0, ie Block
+      bool sendDontHave = 5; // Note: defaults to false
+    }
 
-1.  Wantlist manager: When a `CID` is added or removed from our wantlist, we must update our peers – these wantlist updates are sent to all relevant peers’ message queues.
-2.  Decision engine: When we have a block that a peer wants and the decision engine decides to send the block, we propagate the block to that peer’s message queue.
+    repeated Entry entries = 1; // a list of wantlist entries
+    bool full = 2; // whether this is the full wantlist. default to false
+  }
+  message Block {
+    bytes prefix = 1; // CID prefix (all of the CID components except for the digest of the multihash)
+    bytes data = 2;
+  }
 
-Task workers watch the message queues, dequeue a waiting message, and send it to the recipient.
+  enum BlockPresenceType {
+    Have = 0;
+    DontHave = 1;
+  }
+  message BlockPresence {
+    bytes cid = 1;
+    BlockPresenceType type = 2;
+  }
 
-## Network
-
-The network is the abstraction representing all Bitswap peers that are connected to us by one or more hops. Bitswap messages flow in and out of the network. This is where a game-theoretical analysis of Bitswap becomes relevant – in an arbitrary network we must assume that all of our peers are rational and self-interested, and we act accordingly. Work along these lines can be found in the [research-bitswap repository](https://github.com/ipfs/research-bitswap), with a preliminary game-theoretical analysis currently in-progress [here](https://github.com/ipfs/research-bitswap/blob/docs/strategy_analysis/analysis/prelim_strategy_analysis.pdf).
-
-# Implementation Details
-
-## Coalescing Messages
-
-When a message queue that already contains a Bitswap message receives another, the new message should be coalesced with the original to reduce the overhead of sending separate packets.
-
-## Bitswap Sessions
-
-Bitswap sessions are an attempt to optimize the block requests sent to other Bitswap clients. When requesting a graph of blocks from the network, we send a wantlist update containing the graph’s root block to all of our peers. Then, for each peer who sends the root block back, we add that peer to the graph’s *active set*. We then send all requests for other nodes in the graph only to the peers in the active set. The idea is that peers who have the root node of a graph are likely to have its children as well, while those who do not have the root are unlikely to have its children.
-
-**TODO**: Everything below must either be updated/integrated above, or removed
-
-Also, make sure to read - <https://github.com/ipfs/go-ipfs/tree/master/exchange/bitswap#go-ipfs-implementation>
-
-Implementation suggestions:
-
-  - maintain a peer set of “live partners”
-  - protocol listener accept streams for partners to receive messages
-  - protocol sender opens streams to partners to send messages
-  - separate out a decision engine that selects which blocks to send to which partners, and at what time. (this is a bit tricky, but it’s super easy to make as a whole if the engine is separated out)
-
-Sender:
-
-1.  open a bitswap stream
-2.  send one or more bitswap messages
-3.  close bistwap stream
-
-Listener:
-
-1.  accept a bitswap stream
-2.  receive one or more bitswap messages
-3.  close bitswap stream
-
-Events:
-
-  - bitswap.addedBlock(block)
-      - see if any peers want this block, and send it
-  - bitswap.getBlock(key, cb)
-      - add to wantlist
-      - maybe send wantlist updates to peers
-  - bitswap.cancelGet(key)
-      - so that can send wantlist cancels
-  - bitswap.receivedMessage(msg)
-      - process the wantlist changes
-      - process the blocks
-  - bitswap.peerConnected(peer)
-      - add peer to peer set + send them wantlist (maybe)
-  - bitswap.peerDisconnected(peer)
-      - remove peer from peer set
-
-Tricky Bits:
-
-  - clients to bitswap may call `getBlock` then `cancelBlock`
-  - partners may spam wantlists
-  - normalize priorities only per-peer
-
-Modules:
-
-  - bitswap-decision-engine
-  - bitswap-message
-  - bitswap-net
-  - bitswap-wantlist
-
-Notes:
-
-```
-var bs = new BlockService(repo, bitswap)
-bs.getBlock(multihash, (err, block) => {
-  // 1) try to fetch from repo
-  // 2) if not -> ask bitswap
-    // 2.1) bitswap will cb() once the block is back, once.
-    //      bitswap will write to the repo as well.
-})
+  Wantlist wantlist = 1;
+  repeated Block payload = 3;
+  repeated BlockPresence blockPresences = 4;
+  int32 pendingBytes = 5;
+}
 ```
 
-# API Spec
+## Implementations
 
-**TODO**: Fill this in, may need some input from @diasdavid, @whyrusleeping
-
-> **Will be written once it gets stable, by now, it still requires a ton of experimentation**
-
-# Implementations
-
-  - <https://github.com/ipfs/go-bitswap>
-  - <https://github.com/ipfs/js-ipfs-bitswap>
+- <https://github.com/ipfs/go-bitswap>
+- <https://github.com/ipfs/js-ipfs-bitswap>

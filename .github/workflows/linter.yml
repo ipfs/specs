@@ -1,0 +1,29 @@
+name: lint
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  #markdownlint:
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #    - uses: actions/checkout@v2
+  #    - uses: xt0rted/markdownlint-problem-matcher@b643b0751c371f357690337d4549221347c0e1bc # v1.0
+  #    - run: npx markdownlint **/*.md --ignore node_modules
+  super-linter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          # Full git history is needed to get a proper list of changed files within `super-linter`
+          fetch-depth: 0
+      - name: Lint
+        uses: github/super-linter/slim@v4
+        env:
+          LINTER_RULES_PATH: '.'
+          MARKDOWN_CONFIG_FILE: .markdownlint.json
+          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_MARKDOWN: true
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

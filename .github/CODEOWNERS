@@ -1,0 +1,14 @@
+# This is a CODEOWNERS file
+# Each line is a file pattern followed by one or more owners.
+# Order is important; the last matching pattern takes the most precedence.
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# global IPIP
+IPIP/ @ipfs/specs-stewards
+
+# Selected Spec Stewards can be defined below to be automatically requested for
+# review when someone opens a pull request that modifies area of their
+# interest.
+
+http-gateways/  @lidel
+reframe/*HTTP*  @lidel

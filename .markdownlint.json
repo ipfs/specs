@@ -1,0 +1,8 @@
+{
+  "single-h1": false,
+  "no-bare-urls": false,
+  "no-emphasis-as-header": false,
+  "fenced-code-language": false,
+  "blanks-around-lists": false,
+  "line-length": false
+}

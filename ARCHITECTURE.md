@@ -147,7 +147,7 @@ The merkledag is the "thin waist" of authenticated datastructures. It is a minim
 - **bitcoin** and other blockchains
 - **unixfs**, a content-addressed unix filesystem
 
-See more in the [IPLD spec](https://github.com/ipld/specs/).
+See more in the [IPLD spec](https://ipld.io/specs/).
 
 ## 3.4.1 Merkledag Paths
 

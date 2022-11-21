@@ -1,4 +1,4 @@
-# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Reframe
+# ![Status: WIP](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Reframe: Known Methods
 
 **Author(s)**:
 - Adin Schmahmann
@@ -10,63 +10,28 @@
 
 **Abstract**
 
-The Reframe protocol is designed for request-response messages that is sufficiently generic and extensible to evolve over time as new needs for it arise. This includes separately defining the transport and message serialization mechanisms from the actual method types and semantics.
+This document is defining known methods (request-response message types) and semantics.
 
-The initial use case motivating the protocol's design is to help peers discover various routing hints that enable them to find the content or service they are actually looking for. The extensibility required in this case is that various routing systems could share the protocol so that applications can work on them generically and that recursive routing systems could choose to use the protocol themselves to maximize interoperability.
+## Organization of this document
 
-# Organization of this document
-
-- [Introduction](#introduction)
-- [Spec](#spec)
-- [Intended Upgrade Paths](#intended-upgrade-paths)
+- [Known Methods](#known-methods)
+  - [Cachable/Non-Cachable Methods](#cachablenon-cachable-methods)
+- [Message Specs](#message-specs)
+  - [Error](#error)
+  - [Identify](#identify)
+    - [Identify DAG-JSON Examples](#identify-dag-json-examples)
+  - [FindProviders](#findproviders)
+    - [FindProviders DAG-JSON Examples](#findproviders-dag-json-examples)
+  - [GetIPNS](#getipns)
+    - [GetIPNS DAG-JSON Examples](#getipns-dag-json-examples)
+  - [PutIPNS](#putipns)
+    - [PutIPNS DAG-JSON Examples](#putipns-dag-json-examples)
+  - [Provide](#provide)
+    - [Provide DAG-JSON Examples](#provide-dag-json-examples)
+- [Method Upgrade Paths](#method-upgrade-paths)
 - [Implementations](#implementations)
 
-# Introduction
-
-The Reframe protocol is a request-response based protocol. Upon receiving a request a Reframe server should respond to clients with information they have pertaining to the request. It's possible that a Reframe server may not have all of the information necessary for a client to actually get the data they need, but even partial resolution is acceptable. For example, if a peer is looking to download some block of data a Reframe server may only know about some peers that have the data but not their network addresses. That's ok and the client can always choose alternative mechanisms to discover the missing information. 
-
-# Spec
-
-To build an implementation of the protocol it is required to both define a transport for the messages and the method types supported by the given implementation. Over time both the method and transport types may grow and also be included in this specification.
-
-## Interaction Pattern
-
-Given that a client C wants to request information from some server S:
-
-1. C opens sends a request to S that is a single message
-2. S will respond to C with either a single message or a group of messages
-
-## Transports
-
-### HTTP + DAG-JSON
-
-All messages MUST be encoded as DAG-JSON and use explicit content type `application/vnd.ipfs.reframe+dag-json; version=1`
-
-
-Requests MUST be sent as HTTP POST requests. If a server supports HTTP/1.1, then it MAY send chunked-encoded messages. Clients supporting HTTP/1.1 MUST accept chunked-encoded responses.
-
-Requests and Responses MUST occur over a single HTTP call instead of the server being allowed to dial back the client with a response at a later time.
-
-If a server chooses to respond to a single request message with a group of messages in the response it should do so as a set of `\n` delimited DAG-JSON messages (i.e. `{Response1}\n{Response2}...`).
-
-Requests and responses MUST come with `version=1` as a _Required Parameter_  in the `Accept` and `Content-Type` HTTP headers.
-
-
-Note: This version header is what allows the transport to more easily evolve over time (e.g. if it was desired to change the transport to support other encodings than DAG-JSON, utilize headers differently, move the request data from the body, etc.). Not including the version number is may lead to incompatibility with future versions of the transport.
-
-## Protocol Message Overview
-
-We can represent each message as an IPLD Schema to denote its abstract representation independent of the serialization scheme. 
-
-To help visualize example messages and illustrate implementation of the first concrete transport (HTTP + DAG-JSON) example messages will be given in DAG-JSON.
-
-The payload sent as a request is a single message. The response is a repeated set of messages until the transport signals that the response is completed (e.g. closing a stream, connection, etc.)
-
-Reception, on the server or client side, of:
-1. New or unknown fields in any request or response message are ignored (rather than causing an error)
-2. Missing fields or unknown union cases cause a terminal error
-
-### Known Methods
+## Known Methods
 
 The known Request types are the following and are described below:
 
@@ -76,6 +41,7 @@ type Request union {
     | "FindProvidersRequest" FindProvidersRequest
     | "GetIPNSRequest" GetIPNSRequest
     | "PutIPNSRequest" PutIPNSRequest
+    | "ProvideRequest" ProvideRequest
 }
 ```
 
@@ -87,6 +53,7 @@ type Response union {
     | "FindProvidersResponse" FindProvidersResponse
     | "GetIPNSResponse" GetIPNSResponse
     | "PutIPNSResponse" PutIPNSResponse
+    | "ProvideResponse" ProvideResponse
     | "Error" Error
 }
 ```
@@ -94,7 +61,25 @@ type Response union {
 Note: Each Request type has a corresponding Response type.
 Every message except the Error type should end in Request/Response.
 
-#### Error
+### Cachable/Non-Cachable Methods
+
+The following methods (request-response pairs) are _cachable_:
+
+```ipldsch
+type CachableRequest union {
+    | "IdentifyRequest" IdentifyRequest
+    | "FindProvidersRequest" FindProvidersRequest
+    | "GetIPNSRequest" GetIPNSRequest
+}
+```
+
+Methods that are not listed above are considered _non-cachable_.
+
+Implementations are encouraged to improve performance of  `CachableRequest` methods by applying transport and method-specific caching strategies.
+
+## Message Specs
+
+### Error
 
 The Error message type should be used in Responses to indicate that an error has occurred.
 
@@ -104,7 +89,7 @@ The Error message type should be used in Responses to indicate that an error has
     }
 ```
 
-#### Identify
+### Identify
 
 A message for discovering which messages a server supports. May be used by applications to optimize which servers get sent which types of requests.
 
@@ -118,26 +103,26 @@ A message for discovering which messages a server supports. May be used by appli
 
 `IdentifyResponse` should return the set of supported methods aside from the "Identify" method.
 
-##### DAG-JSON Examples
+#### Identify DAG-JSON Examples
 
 Request:
-```
+```json
 {"IdentifyRequest" : {}}
 ```
 
 Response:
-```
+```json
 {"IdentifyResponse" : {
     "Methods" : ["FindProviders", "GetIPNS"]
 }}
 ```
 
-#### FindProviders
+### FindProviders
 
 A message for finding nodes that have an interest in a given key. Some common examples include finding which peers have advertised that they have a given CID, or which peers are interested in a given pubsub topic.
 
 ```ipldsch
-    type FindProvidersRequest struct 
+    type FindProvidersRequest struct {
         Key &Any
     }
 ```
@@ -150,9 +135,9 @@ Note: While the Key is a CID it is highly recommended that server implementation
     }
 
     type Provider struct {
-     Node Node
-     Proto optional [TransferProtocol]
-     }
+        Node Node
+        Proto optional [TransferProtocol]
+    }
 
     # Note: This is not quite valid IPLD Schema because having fallbacks within unions is not yet implemented and codified https://github.com/ipld/ipld/issues/194. We will use this syntax within this spec though.
 
@@ -185,17 +170,17 @@ Note: While the Key is a CID it is highly recommended that server implementation
     }
 ```
 
-##### DAG-JSON Examples
+#### FindProviders DAG-JSON Examples
 
 Request:
-```
+```json
 {"FindProviders" : {
     "Key" : {"/":{"bytes":"AXIUBPnagss"}}
 }}
 ```
 
 Response:
-```
+```json
 {"FindProviders" : {
     "Key" : {"/":{"bytes":"AXIUBPnagss"}},
     "Providers" : [
@@ -206,7 +191,7 @@ Response:
             "/":{"bytes":"EncodedPeerID2"}},
             "Multiaddresses":[{"/":{"bytes":"EncodedAddr1"}}, {"/":{"bytes":"EncodedAddr2"}}]}}},
                 "Proto" : [
-                    { "2320" : { # the integer of the graphsync-filv1 code
+                    { "2320" : {
                             "PieceCID" : {"/": "bsome-base32-CidV1"},
                             "VerifiedDeal" : true,
                             "FastRetrieval" : false
@@ -218,7 +203,7 @@ Response:
 }}
 ```
 
-#### GetIPNS
+### GetIPNS
 
 A message for finding the latest IPNS records for a given identifier.
 
@@ -234,25 +219,25 @@ A message for finding the latest IPNS records for a given identifier.
     }
 ```
 
-##### DAG-JSON Examples
+#### GetIPNS DAG-JSON Examples
 
 Request:
-```
+```json
 {"GetIPNS" : {
     "ID" : {"/":{"bytes":"AXIUBPnagss"}}
 }}
 ```
 
 Response:
-```
+```json
 {"GetIPNS" : {
     "Record" : {"/":{"bytes":"firstRecord"}}
 }}{"GetIPNS" : {
     "Record" : {"/":{"bytes":"laterRecord"}}
-}}...
+}}
 ```
 
-#### PutIPNS
+### PutIPNS
 
 A message for putting the latest IPNS records for a given identifier.
 
@@ -265,10 +250,10 @@ A message for putting the latest IPNS records for a given identifier.
     type PutIPNSResponse struct {}
 ```
 
-##### DAG-JSON Examples
+#### PutIPNS DAG-JSON Examples
 
 Request:
-```
+```json
 {"PutIPNSRequest" : {
     "ID" : {"/":{"bytes":"AXIUBPnagss"}},
     "Record" : {"/":{"bytes":"AXIUBPnagss"}}
@@ -276,17 +261,82 @@ Request:
 ```
 
 Response:
-```
+```json
 {"PutIPNSResponse : {}"}
 ```
 
-# Method Upgrade Paths
+### Provide
+
+A message for indicating that the client is able to act as a provider for a given key.
+
+```ipldsch
+    type ProvideRequest struct 
+        Key [&Any]
+        Provider Provider
+        Timestamp Integer
+        AdvisoryTTL Integer
+        Signature Bytes
+    }
+
+    type ProvideResponse struct {
+        AdvisoryTTL Integer
+    }
+```
+
+Note: While keys are formatted as CIDs, it is highly recommended that server implementations treat these requests at the multihash level - subsequent calls to `FindProviders` should be multicodec agnostic.
+
+Note 2: There is a default max Key count of 30000 (that will generate ~1MB payloads). Some server implementations MAY accept more keys per request.
+
+There are a few semantics relevant to the construction of a ProvideRequest:
+
+* The timestamp should be the current unix timestamp, encoded in an int64
+* AdvistoryTTL may list the time for which the provider desires the content will remain available. If the provider cannot not anticipate how long the content will remain available, it may use a 0 value for this field.
+* The AdvisoryTTL response may provide an expectation from the reframe endpoint of how long the content will remain available.
+  * If it is less than the requested TTL from the request, it indicates that the client should re-issue a ProvideRequest for the content by that point.
+  * If it is greater than the clients request, it indicates that the client may be perceived as responsible for the content for up to that amount of time.
+  * If it is 0, the endpoint is indicating it cannot make any claims about the lifetime of the request.
+* Construction of the Signature is performed as follows:
+  1. Create the ProviderRequest struct, with empty bytes for Signature
+  2. Serialize the ProviderRequest as DagJSON
+  3. Hash the serialization with Sha256
+  4. Sign the Hash using the keypair associated with the Provider.ID
+
+
+#### Provide DAG-JSON Examples
+
+Request:
+```json
+{"ProvideRequest" : {
+    "Key" : [{"/":{"bytes":"AXIUBPnagss"}}],
+    "Provider" : {
+        "Peer":{
+            "ID": {"/":{"bytes":"EncodedPeerID"}},
+            "Multiaddresses" [{"/":{"bytes":"Encoded Multiaddr"}}]
+        },
+        "ProviderProto": [
+            { "2304" : {} }
+        ]
+    },
+    "Timestamp" : 1589788800,
+    "AdvisoryTTL": 3600,
+    "Signature": {"/":{"bytes":"Encoded Signature"}}
+}}
+```
+
+Response:
+```json
+{"ProvideResponse : {
+    AdvisoryTTL: 3600
+}"}
+```
+
+## Method Upgrade Paths
 
 It is acknowledged that the initial methods and mechanisms of this protocol will likely need to change over time and that we should prepare for how to do so without the need to wholesale replace this protocol with an alternative.
 
 2. If it is desired to add optional parameters to a given method (in either a request or response) new fields can be added. It is recommended that new fields be submitted to this spec to prevent conflicts and for unsubmitted features to be added using namespaces unlikely to conflict (e.g. `MyProject-Field`).
 3. New methods can be added in the event a new method needs to be added, or an existing one changed in a way which would be backwards incompatible. It is recommended that new methods be submitted to this spec to prevent conflicts and for unsubmitted features to be added using namespaces unlikely to conflict (e.g. `MyProject-Method`).
 
-# Implementations
+## Implementations
 
-https://github.com/ipfs/go-delegated-routing
+[go-delegated-routing](https://github.com/ipfs/go-delegated-routing)
