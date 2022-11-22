@@ -1,8 +1,8 @@
-# IPIP 0000: Delegated Content Routing HTTP API
+# IPIP-337: Delegated Content Routing HTTP API
 
 - Start Date: 2022-10-18
 - Related Issues:
-  - (add links here)
+  - https://github.com/ipfs/specs/pull/337
 
 ## Summary
 
@@ -29,6 +29,7 @@ We expect this API to be extended beyond "content routing" in the future, so add
 See the [Delegated Content Routing HTTP API spec](../routing/DELEGATED_CONTENT_ROUTING_HTTP.md) included with this IPIP.
 
 ## Design rationale
+
 To understand the design rationale, it is important to consider the concrete Reframe limitations that we know about:
 
 - Reframe [method types](../reframe/REFRAME_KNOWN_METHODS.md) using the HTTP transport are encoded inside IPLD-encoded messages
@@ -81,12 +82,14 @@ and increasing data availability.
 ### Compatibility
 
 #### Backwards Compatibility
+
 IPFS Stewards will implement this API in [go-delegated-routing](https://github.com/ipfs/go-delegated-routing), using breaking changes in a new minor version.
 Because the existing Reframe spec can't be safely used in JavaScript and we won't be investing time and resources into changing the wire format implemented in edelweiss to fix it, 
 the experimental support for Reframe in Kubo will be deprecated in the next release and delegated content routing will subsequently use this HTTP API. 
 We may decide to re-add Reframe support in the future once these issues have been resolved.-
 
 #### Forwards Compatibility
+
 Standard HTTP mechanisms for forward compatibility are used:
 - The API is versioned using a version number prefix in the path
 - The `Accept` and `Content-Type` headers are used for content type negotiation, allowing for backwards-compatible additions of new MIME types, hypothetically such as:
@@ -101,11 +104,12 @@ As a proof-of-concept, the tests for the initial implementation of this HTTP API
 
 ### Security
 
-None
+- TODO: cover user privacy
+- TODO: parsing best practices: what are limits (e.g., per message / field)?
 
 ### Alternatives
 
-TODO
+- Reframe (general-purpose RPC) was evaluated, see "Design rationale" section for rationale why it was not selected.
 
 ### Copyright
 

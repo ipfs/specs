@@ -1,4 +1,6 @@
-# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Delegated Content Routing HTTP API
+# Delegated Content Routing HTTP API
+
+![wip](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Delegated Content Routing HTTP API
 
 **Author(s)**:
 - Gus Eggert
@@ -125,6 +127,7 @@ APIs that return collections of results should support pagination as follows:
 - A `pageLimit` query parameter specifies the maximum size of a single page
 
 ### Implementation Notes
+
 Servers are required to return *at most* `pageLimit` results in a page. It is recommended for pages to be as dense as possible, but it is acceptable for them to return any number of items in the closed interval [0, pageLimit]. This is dependent on the capabilities of the backing database implementation. For example, a query specifying a `transfer` filter for a rare transfer protocol should not *require* the server to perform a very expensive database query for a single request. Instead, this is left to the server implementation to decide based on the constraints of the database.
 
 Implementations should encode into the token whatever information is necessary for fetching the next page. This could be a base32-encoded JSON object like `{"offset":3,"limit":10}`, an object ID of the last scanned item, etc.
@@ -134,6 +137,23 @@ Implementations should encode into the token whatever information is necessary f
 - `501`: must be returned if a method/path is not supported
 - `429`: may be returned to indicate to the caller that it is issuing requests too quickly
 - `400`: must be returned if an unknown path is requested
+
+## CORS and Web Browsers
+
+Browser interoperability requires implementations to support
+[CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS).
+
+JavaScript client running on a third-party Origin must be able to send HTTP
+request to the endpoints defined in this specification, and read the received
+values. This means HTTP server implementing this API must (1) support
+[CORS preflight requests](https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request)
+sent as HTTP OPTIONS, and (2) always respond with headers that remove CORS
+limits, allowing every website to query the API for results:
+
+```plaintext
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS
+```
 
 ## Known Transfer Protocols
 This section contains a non-exhaustive list of known transfer protocols (by name) that may be supported by clients and servers.
