@@ -162,7 +162,7 @@ situations:
 1. When it needs to perform a content routing query, and has not
 successfully performed a sync in over a day.
 2. When it's auto-nat status indicates it is eligible to be a DHT server, and
-it has not successfully performed a synce in over a day.
+it has not successfully performed a sync in over a day.
 
 These parameters are also set through modeling.
 
@@ -294,7 +294,7 @@ included as this draft develops.
 
 * a new provider is only visible to directly connected peers. they only forward it to peers asking them if it meets their bar
 for reliability.  This means propogation through the network is only posisble for routers that behave correctly.
-* because clients only propagate their 'top' routers, latency is also relevant, and with sufficient number of routers, the would only
+* because clients only propagate their 'top' routers, latency is also relevant, and with sufficient number of routers, they would only
 propagate in their local geographic area before becoming uncompetitive on latencyk
 
 ### Alternatives
@@ -324,6 +324,7 @@ enumeration of all network participants by a malicious content router.
 Pros:
 * Network is already there, no need to create a new protocol to "provide" new providers instead of CIDs.
 * You could potentially associate a provider with a specific root CID content.
+
 Cons:
 * Nodes cannot drop use of the DHT / other content routing options always are 'second tier'.
 
