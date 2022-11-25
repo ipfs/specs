@@ -183,10 +183,10 @@ For example:
 - [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw) – disables [IPLD codec deserialization](https://ipld.io/docs/codecs/), requests a verifiable raw [block](https://docs.ipfs.io/concepts/glossary/#block) to be returned
 - [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car) – disables [IPLD codec deserialization](https://ipld.io/docs/codecs/), requests a verifiable [CAR](https://docs.ipfs.io/concepts/glossary/#car) stream to be returned
 - [application/x-tar](https://en.wikipedia.org/wiki/Tar_(computing)) – returns UnixFS tree (files and directories) as a [TAR](https://en.wikipedia.org/wiki/Tar_(computing)) stream. Returned tree starts at a root item which name is the same as the requested CID. Produces 400 Bad Request for content that is not UnixFS.
-- [application/vnd.ipld.dag-json](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-json) – requests [IPLD Data Model](https://ipld.io/docs/data-model/) representation serialized into [DAG-JSON format](https://ipld.io/docs/codecs/known/dag-json/). If the requested CID has `dag-json` codec, data is validated as DAG-JSON before being returned as-is. Invalid DAG-JSON produces HTTP Error 500.
-- [application/vnd.ipld.dag-cbor](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-cbor) – requests [IPLD Data Model](https://ipld.io/docs/data-model/) representation serialized into [DAG-CBOR format](https://ipld.io/docs/codecs/known/dag-cbor/). If the requested CID has `dag-cbor` codec,  data is validated as DAG-CBOR before being returned as-is. Invalid DAG-CBON produces HTTP Error 500.
-- [application/json](https://www.iana.org/assignments/media-types/application/json) – same as `application/vnd.ipld.dag-json`, unless the CID's codec is JSON. Then, the raw JSON block can be returned.
-- [application/cbor](https://www.iana.org/assignments/media-types/application/cbor) – same as `application/vnd.ipld.dag-cbor`, unless the CID's codec is CBOR. Then, the raw CBOR block can be returned.
+- [application/vnd.ipld.dag-json](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-json) – requests [IPLD Data Model](https://ipld.io/docs/data-model/) representation serialized into [DAG-JSON format](https://ipld.io/docs/codecs/known/dag-json/). If the requested CID already has `dag-json` (0x0129) codec, data is validated as DAG-JSON before being returned as-is. Invalid DAG-JSON produces HTTP Error 500.
+- [application/vnd.ipld.dag-cbor](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-cbor) – requests [IPLD Data Model](https://ipld.io/docs/data-model/) representation serialized into [DAG-CBOR format](https://ipld.io/docs/codecs/known/dag-cbor/). If the requested CID already has `dag-cbor` (0x71) codec,  data is validated as DAG-CBOR before being returned as-is. Invalid DAG-CBON produces HTTP Error 500.
+- [application/json](https://www.iana.org/assignments/media-types/application/json) – same as `application/vnd.ipld.dag-json`, unless the CID's codec already is `json` (0x0200). Then, the raw JSON block can be returned.
+- [application/cbor](https://www.iana.org/assignments/media-types/application/cbor) – same as `application/vnd.ipld.dag-cbor`, unless the CID's codec already is `cbor` (0x51). Then, the raw CBOR block can be returned.
 
 ### `Range` (request header)
 
@@ -592,31 +592,31 @@ A good practice is to always return it with HTTP error [status codes](#response-
 Data sent with HTTP response depends on the type of the requested IPFS resource, and the requested response type.
 The following response formats are selected according to the codec of the resolved CID:
 
-- UnixFS
+- UnixFS, either `dag-pb` (0x70) or `raw` (0x55)
   - File
     - Bytes representing file contents
   - Directory
     - Generated HTML with directory index (see [additional notes here](#generated-html-with-directory-index))
     - When `index.html` is present, gateway can skip generating directory index and return it instead
-- JSON
+- JSON (0x0200)
   - Bytes representing a JSON file, see [application/json](https://www.iana.org/assignments/media-types/application/json).
-- CBOR
+- CBOR (0x51)
   - Bytes representing a CBOR file, see [application/cbor](https://www.iana.org/assignments/media-types/application/cbor)
-- DAG-JSON
+- DAG-JSON (0x0129)
   - If the `Accept` header includes `text/html`: generated HTML with options to download DAG-JSON as-is, or converted to DAG-CBOR.
   - Bytes representing a DAG-JSON file, see [application/vnd.ipld.dag-json](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-json)
-- DAG-CBOR
+- DAG-CBOR (0x71)
   - If the `Accept` header includes `text/html`: generated HTML with options to download DAG-CBOR as-is, or converted to DAG-JSON.
   - Bytes representing a DAG-CBOR file, see [application/vnd.ipld.dag-cbor](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-cbor)
 
-The following response types can only be requested with [`format`](#format-request-query-parameter) query parameter or [`Accept`](#accept-request-header) header:
+The following response types are opt-in, can only be requested with [`format`](#format-request-query-parameter) query parameter or [`Accept`](#accept-request-header) header:
 
 - Raw Block
   - Opaque bytes, see [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw).
 - CAR
   - Arbitrary DAG as a verifiable CAR file or a stream, see [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car).
 - TAR
-  - Deserialized UnixFS files and directories as a TAR file or a stream, see [application/x-tar](https://en.wikipedia.org/wiki/Tar_(computing)).
+  - Deserialized UnixFS files and directories as a TAR file or a stream, see [IPIP-288](https://github.com/ipfs/specs/pull/288)
 
 # Appendix: notes for implementers
 
@@ -658,6 +658,8 @@ through fields that encode a link:
 namespace, see [specification](https://ipld.io/specs/codecs/dag-json/spec/#links).
 - DAG-CBOR: links are tagged with CBOR tag 42, indicating that they encode a CID,
 see [specification](https://ipld.io/specs/codecs/dag-cbor/spec/#links).
+
+Note: pathing into [IPLD Kind](https://ipld.io/docs/data-model/kinds/) other than Link (CID) is not supported at the moment. Implementations should return HTTP 501 Not Implemented when fully resolved content path has any remainder left.  This feature may be specified in a future IPIP that introduces data onboarding  and [IPLD Patch](https://ipld.io/specs/patch/) semantics.
 
 ### Handling traversal errors
 

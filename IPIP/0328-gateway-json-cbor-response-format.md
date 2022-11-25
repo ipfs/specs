@@ -52,7 +52,7 @@ be able to resolve them instead of failing with `node type unknown`.
 - [`bafybeiegxwlgmoh2cny7qlolykdf7aq7g6dlommarldrbm7c4hbckhfcke`][f-dag-pb] is a
   DAG-PB directory.
 - [`bafkreidmwhhm6myajxlpu7kofe3aqwf4ezxxn46cp5fko7mb6x74g4k5nm`][f-dag-pb-json]
-  is the aforementioned DAG-PB directory's Logical DAG-JSON representation that
+  is the aforementioned DAG-PB directory's [Logical DAG-JSON representation][dag-pb-format] that
   is expected to be returned when using `?format=dag-json`.
 - `TODO` is a valid JSON but not a valid DAG-JSON
 - `TODO` is a valid CBOR but not a valid DAG-CBOR
@@ -107,10 +107,11 @@ In addition, we could introduce only DAG-JSON and DAG-CBOR. However, not
 supporting the generic variants, JSON and CBOR, would lead to poor UX. The
 ability to retrieve DAG-JSON as `application/json` is an important step
 for the interoperability of the HTTP Gateway with web browsers and other tools
-that expect specific Content Types.
+that expect specific Content Types. Namely, `Content-Type: application/json` with
+`Content-Disposition: inline` allows for JSON preview to be rendered in a web browser.
 
 Finally, we considered supporting pathing within both DAG and non-DAG variants
-of the JSON and CBOR codecs. Pathing within these documents could lead to replies
+of the JSON and CBOR codecs. Pathing within these documents could lead to responses
 with extracts from the document. For example, if we have the document:
 
 ```json
