@@ -1,6 +1,6 @@
 # Gateway Integration
 
-![](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square)
+![Specification status is reliable](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square)
 
 **Author(s)**:
 - [Mark Gaiser](https://github.com/markg85/)
@@ -77,13 +77,14 @@ The decision tree is influences by a couple environement variables.
 
 ### Gateway from command argument
 
-**This feature is optional and only for applications integrating IPFS support.** 
+**This feature is optional and only for applications integrating IPFS support.**
 
 An application can opt to support a command line option to provide a gateway. If a user does provide this option then it should overrule any other gateway detection and be used as the gateway of choice. If implemented, it's recommended to go for either a `--gateway` or `--ipfs-gateway` argument. It depends very much on the application itself as to which option is most sensible.
 
 An example implementation that is doing this is ffmpeg with the ffplay utility. It allows the `-gateway` argument which by default is empty but can be set like: `-gateway http://127.0.0.1:8080` and would then be used to handle `ipfs://<cid>` or `ipns://<cid>`.
 
 ### Gateway from IPFS_GATEWAY environment variable
+
 When there is no command line argument, the `IPFS_GATEWAY` environment is next. If it contains a value, it will be used as gateway.
 
 ### Gateway file
