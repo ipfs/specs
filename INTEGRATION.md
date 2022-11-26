@@ -22,7 +22,7 @@ Applications wanting to use IPFS resources are, without this spec, left to inven
 
 Simultaneously the spec also defines how IPFS implementations should expose their gateway.
 
-## Detailed description
+## Detailed design
 This integration spec defines the recommended way for a third party applications to integrate IPFS support in their application and thereby gaining easy access to resources stored on the IPFS platform.
 
 Integration here has 2 different meanings.
@@ -99,12 +99,34 @@ The conditions for this file are the same as those in $HOME/.ipfs/gateway.
 
 In the, admitedly rare, event of running multiple IPFS implementations each hosting their own gateway. First-come-first-serve applies here. The application that created the gateway file owns it and takes care of removing it. Subsequent instances or different application should not touch the file if it's already there.
 
-## Example implementations
-### ffmpeg
+### Example implementations
+#### ffmpeg
 As of ffmpeg 5.1, it implements this logic. The source for it's implementation can be found [here](https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/ipfsgateway.c).
 
-### curl
+#### curl
 The implementation for curl is currently a work in progress but it too follows the steps as outlined in the decision tree.
 
-### libipfsclient
+#### libipfsclient
 A reference implementation of this spec along with more functionality to retrieve data from IPFS. This is intended to be used by applications wanting to implement IPFS support.
+
+## Test fixtures
+N/A
+
+## Design rationale
+To simplify IPFS integrations in third party applications it's important to know if said application can use a gateway. This spec defines the rules to find such a gateway and/or how to influence it.
+
+### User benefit
+Users as in applications using IPFS. They get a defined way to find out if their host pc runs an IPFS gateway. Without this spec there is no defined way.
+
+### Compatibility
+Kubo currently makes `$HOME/.ipfs/gateway`, this should stay for backwards compatibility.
+A new version implementing this spec should create `$XDG_CONFIG_HOME/ipfs/gateway` in exactly the same fashion.
+
+### Security
+N/A
+
+### Alternatives
+There are no alternatives I'm aware of. There is [this](https://github.com/ipfs/kubo/issues/8847) issue that predates this very IPIP but also serves as starting block to this IPIP.
+
+### Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
