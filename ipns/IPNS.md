@@ -255,6 +255,8 @@ publish signed record using multiple routing systems, such as
 
 On the other side, each peer must be able to get a record published by another node. It only needs to have the unique identifier used to publish the record to the network. Taking into account the routing system being used, we may obtain a set of occurrences of the record from the network. In this case, records can be compared using the sequence number, in order to obtain the most recent one.
 
+Additionally, in the case where the public key that verifies the record's signature is also the public key of a node the record was fetched from, the comparison MAY be skipped by implementations as the owner of a record is implicitly trusted to hold the most recent record.
+
 As soon as the node has the most recent record, the signature and the validity must be [verified](#record-verification), in order to conclude that the record is still valid and not compromised.
 
 Finally, the network nodes may also republish their records, so that the records in the network continue to be valid to the other nodes.
