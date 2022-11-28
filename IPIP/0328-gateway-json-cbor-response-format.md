@@ -72,6 +72,10 @@ The user benefits from this change as they will now be able to retrieve
 content encoded in the traversable DAG-JSON and DAG-CBOR formats. This is
 something that has been [requested before][ipfs/go-ipfs/issues/7552].
 
+In addition, both UX and DX are significantly improved, since every block can
+now be inspected in a regular web browser via `?format=json`. This can remove the
+need for additional tools, decoders, and/or libraries.
+
 ### Compatibility
 
 This IPIP adds new response types and does not modify existing ones,
