@@ -115,14 +115,14 @@ of the JSON and CBOR codecs. Pathing within these documents could lead to respon
 with extracts from the document. For example, if we have the document:
 
 ```json
-{ 
+{
   "link" {
     "to": {
       "some": {
         "cid2": <cbor tag 42 pointing at different CID>
-       } 
-    } 
-  } 
+       }
+    }
+  }
 }
 ```
 
@@ -133,21 +133,22 @@ retrieve an extract from the document.
 {
   "some": {
     "cid2": <cbor tag 42 pointing at different CID>
-    } 
-} 
+    }
+}
 ```
 
 However, supporting this raises questions whose answers are not clearly defined
-or agreed upon yet. The main question this raises is caching and Etags. Therefore,
-this IPIP only supports pathing within DAG-JSON and DAG-CBOR if they resolve
-a CID, as it is the current behavior. In addition, it adds support to retrieve
-the documents in those formats. Pathing within JSON and CBOR documents is not
-supported.
+or agreed upon yet. Right now, pathing is only supported over CID-based Links,
+such as Tag 42 in CBOR. In addition, some HTTP headers regarding caching are based
+on the CID, and adding pathing for other IPLD Kinds would require additional
+refactor. Adding those changes prematurely, before adding support to
+[IPLD Patch](https://ipld.io/specs/patch/), may lead to confusion for both
+the developers and users.
 
-The decision to support document path extractions id deferred to a future IPIP.
-Giving users the possibility to retrieve JSON, CBOR, DAG-JSON AND DAG-CBOR
-documents through the gateway is, in itself, a progress and will open the doors
-for new tools and explorations.
+We want to support full IPLD pathing support after introducing IPLD Patch,
+which will be in a future, separate IPIP. Giving users the possibility to retrieve
+JSON, CBOR, DAG-JSON AND DAG-CBOR documents through the gateway is, in itself,
+a progress and will open the doors for new tools and explorations.
 
 ### Copyright
 
