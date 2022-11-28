@@ -1,6 +1,6 @@
 # Gateway Integration
 
-![Specification status is reliable](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square)
+![wip](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
 
 **Author(s)**:
 - [Mark Gaiser](https://github.com/markg85/)
