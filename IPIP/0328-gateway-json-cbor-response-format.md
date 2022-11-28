@@ -54,8 +54,6 @@ be able to resolve them instead of failing with `node type unknown`.
 - [`bafkreidmwhhm6myajxlpu7kofe3aqwf4ezxxn46cp5fko7mb6x74g4k5nm`][f-dag-pb-json]
   is the aforementioned DAG-PB directory's [Logical DAG-JSON representation][dag-pb-format] that
   is expected to be returned when using `?format=dag-json`.
-- `TODO` is a valid JSON but not a valid DAG-JSON
-- `TODO` is a valid CBOR but not a valid DAG-CBOR
 
 ## Design rationale
 
