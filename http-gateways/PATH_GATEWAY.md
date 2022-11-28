@@ -79,6 +79,7 @@ where client prefers to perform all validation locally.
   - [Content resolution](#content-resolution)
     - [Finding the content root](#finding-the-content-root)
     - [Traversing remaining path](#traversing-remaining-path)
+    - [Traversing through UnixFS](#traversing-through-unixfs)
     - [Traversing through DAG-JSON and DAG-CBOR](#traversing-through-dag-json-and-dag-cbor)
     - [Handling traversal errors](#handling-traversal-errors)
   - [Best practices for HTTP caching](#best-practices-for-http-caching)
@@ -642,12 +643,19 @@ and [DNSLINK_GATEWAY.md](./DNSLINK_GATEWAY.md)).
 
 ### Traversing remaining path
 
-UnixFS pathing over files and directories is the implicit default used for
-resolving content paths that start with `/ipfs/` and `/ipns/`. It is an abstraction
-over the low level [logical pathing][dag-pb-format] from IPLD, providing a
-better user experience:
+After the content route is found, the remaining of the path should be traversed
+and resolved. Depending on the data type, that may occur through UnixFS pathing,
+or DAG-JSON, and DAG-CBOR pathing.
+
+### Traversing through UnixFS
+
+UnixFS is an abstraction over the low level [logical DAG-PB pathing][dag-pb-format]
+from IPLD, providing a better user experience:
 
 - Example of UnixFS pathing: `/ipfs/cid/dir-name/file-name.txt`
+
+For more details regarding DAG-PB pathing, please read the "Path Resolution" section
+of [this document](https://ipld.io/design/tricky-choices/dag-pb-forms-impl-and-use/#path-resolution).
 
 ### Traversing through DAG-JSON and DAG-CBOR
 
