@@ -1,4 +1,4 @@
-# IPIP 0328: Gateway JSON and TAR Response Formats
+# IPIP-328: JSON and CBOR Response Formats on HTTP Gateways
 
 - Start Date: 2022-10-07
 - Related Issues:
