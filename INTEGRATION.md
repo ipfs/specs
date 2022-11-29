@@ -49,7 +49,7 @@ As a reference, [this](https://github.com/cjbassi/platform-dirs-rs#path-list) li
 
 In the same manner as $CONFIG, $GATEWAY and $LEGACY_GATEWAY are names for this spec only to simplify reading.
 
-`$GWFILE` = `$CONFIG/gateway`
+`$GWFILE` = `$CONFIG/gateways`
 `$LEGACY_GWFILE` = `~/.ipfs/gateway`
 
 ### Gateway file and Legacy gateway file
@@ -151,8 +151,7 @@ Users as in applications using IPFS. They get a defined way to find out if their
 
 ### Compatibility
 
-Kubo currently makes `$HOME/.ipfs/gateway`, this should stay for backwards compatibility.
-A new version implementing this spec should create `$XDG_CONFIG_HOME/ipfs/gateway` in exactly the same fashion.
+See [Gateway file and Legacy gateway file](#Gateway-file-and-Legacy-gateway-file).
 
 ### Security
 
