@@ -21,7 +21,7 @@ For clarity upon reading this document:
 
 ## Motivation
 
-Applications wanting to use IPFS resources are, without this spec, left to invent their own ways of finding a gateway. This spec defines how application wanting to implement IPFS support can find a gateway.
+Applications wanting to use IPFS resources are, without this spec, left to invent their own ways of finding a gateway. This spec defines how an application wanting to implement IPFS support can find (at least one) gateway to use.
 
 Simultaneously the spec also defines how IPFS implementations should expose their gateway.
 
@@ -35,6 +35,39 @@ Integration here has 2 different meanings.
 
 2. One way to handle the protocols is to use the [HTTP gateway](https://docs.ipfs.tech/concepts/ipfs-gateway/). This document describes how to determine which gateway to use.
 
+### $CONFIG folder, $GWFILE and $LAGACY_GWFILE
+
+Throughout this spec you might see `$CONFIG/ipfs/...`. `$CONFIG` is a mere abbreviation for the config folder, the variable doesn't exist and only serves to make this spec more readable. This section defines where `$CONFIG` should point to in a cross-platform manner.
+
+As a reference, [this](https://github.com/cjbassi/platform-dirs-rs#path-list) list of configuration folders is used.
+
+| | with variables | full paths |
+| -------- | -------- | -------- |
+| Windows     | %APPDATA%/ipfs     | C:/Users/%USERNAME%/AppData/Roaming/ipfs     |
+| macOS     | $XDG_CONFIG_HOME/ipfs     | ~/Library/Application Support/ipfs     |
+| Linux     | $XDG_CONFIG_HOME/ipfs     | ~/.config/ipfs     |
+
+In the same manner as $CONFIG, $GATEWAY and $LEGACY_GATEWAY are names for this spec only to simplify reading.
+
+`$GWFILE` = `$CONFIG/gateway`
+`$LEGACY_GWFILE` = `~/.ipfs/gateway`
+
+### Gateway file and Legacy gateway file
+#### For KUBO only
+The legacy gateway file ($LAGACY_GWFILE) was made up as a response to a need to know which gateway an IPFS node would expose. While that file itself was never specced out, it served the need. Some applications are using this file therefore the file has to be maintained for the KUBO reference implemenation. Any other IPFS implementation should ignore $LAGACY_GWFILE.
+
+The file only contains a single line being the http gateway url. For example: "http://localhost:8080".
+
+The file conditions:
+    1. is named "gateway"
+    2. **only** exists when KUBO actually starts a gateway
+    3. is removed when KUBO shuts down
+
+Future KUBO implemenations will do the above via symlinking `$LAGACY_GWFILE` to `$GWFILE` while maintaining the same rules as stated above.
+
+#### For all implemenations
+The gateway file ($GWFILE) is a successor to the $LAGACY_GWFILE. This new file is stored in a vendor agnostic location and contians a list of gateways. The file can be empty and even non-existing.
+
 ### Decision tree
 
 The below decision tree defines the decisions to be made in order to choose the proper gateway. Do note that the tree, when implementing this logic, is more elaborate then this tree makes you think it is. Validation here is left out of the tree but should be added in a local implementation.
@@ -44,34 +77,37 @@ The below decision tree defines the decisions to be made in order to choose the 
       A[Has gateway argument] --> |yes| B(gateway from argument);
       A[Has gateway argument] --> |no| C(try IPFS_GATEWAY env);
       C --> |yes| D(gateway from IPFS_GATEWAY env);
-      C --> |no| E(try IPFS_PATH env);
-      E --> |yes| F;
-      E --> |no| G(assume $HOME/.ipfs);
-      G --> F(Gateway file exists in path);
-      F --> |yes| I(gateway is first line);
-      F --> |no| J(try racing gateway*);
+      C --> |no| E(try $GWFILE exists*);
+      E --> |yes| F(read file);
+      E --> |no| L;
+      F --> |yes| I(gateway is any line);
+      F --> |no or empty file| J(try racing gateway**);
       J --> |yes| K(test n-th gateway from list);
-      K --> KA(find the best** gateway);
       J --> |no| L(fallback);
-      L --> |yes| M(dweb.link***);
+      L --> |yes| M(dweb.link****);
       L --> |no| N(error);
+      K --> KA(find the best*** gateways);
+      KA --> KB(append found gateways in $GWFILE);
+      KB --> E;
 ```
 
-\* `try racing gateway` depends on the environment variable `IPFS_RACING_GATEWAY`. See below for details.
+\* `try $GWFILE exists` in case of KUBO, a legacy path should be done here when `$GWFILE` doesn't exists. It should check for `$LEGACY_GWFILE` and proceed with it's output instead. Any other implementation can ignore this point.
 
-\** `find the best* gateway`. The heuristics to find the best gateway are as follows. A racing gateway logic fires of a request to n-th gateways simultaneously (say 10 gateways out of a list of potentially 100's). Of those 10, the one that responds fastest is stored in a list. If this one is already responding within 50ms then this gateway is used. If this one is taking more then 200ms then the next batch of 10 gateways is probed. This flow continues till:
-1. a gateway with a response below 50ms has been found
-2. gateways have been probed for over 2 seconds (in which case it just stops and uses the fastest one).
+\** `try racing gateway` depends on the environment variable `IPFS_RACING_GATEWAY`. See below for details.
 
-The result of this probe will be stored in `$CONFIG/ipfs/racing_gateway_response` as a single line being the gateway that responded fastest. In subsequent racing gateway requests this file will be read and used as starting point. If this gateway still responds within 50ms then no other gateways will be probed.
+\*** `find the best* gateways`. The heuristics to find the best gateway are as follows. A racing gateway logic fires a request to n-th gateways simultaneously (say 10 gateways out of a list of potentially 100's). Of those 10, those that respond within 300ms are appended in $GWFILE. This flow continues till:
+1. all gateways in the list have been checked
+2. more then 2 seconds have passed in which case it aborts all current and pending requests
 
-\*** `dweb.link`, see the below `IPFS_FALLBACK_GATEWAY` for details.
+The result of this probe will be stored in `$GWFILE` as a list of gateways that responded within the set bounds.
+
+\**** `dweb.link`, see the below `IPFS_FALLBACK_GATEWAY` for details.
 
 #### Environment variables
 
-The decision tree is influences by a couple environement variables.
+The decision tree is influenced by a couple environement variables.
 
-**`IPFS_RACING_GATEWAY`** When this environemnt variable isn't found (the default), racing gateways should be attempted upon reaching this point in the flow. When the environment variable exists it's value should be used. If it's value is `1` (or `true`) then racing gateways should be attempted. If this value is `0` (or `false`) then racing gateways are off. The control flow proceeds in the `no` branch.
+**`IPFS_RACING_GATEWAY`** When this environemnt variable isn't found (the default), racing gateways will be attempted upon reaching this point in the flow. When the environment variable exists it's value should be used. If it's value is `1` (or `true`) then racing gateways should be attempted. If this value is `0` (or `false`) then racing gateways are off. The control flow proceeds in the `no` branch.
 
 **`IPFS_FALLBACK_GATEWAY`** When this variable doesn't exist `dweb.link` will be used. When the variable does exist it's value will be used instead.
 
@@ -85,28 +121,7 @@ An example implementation that is doing this is ffmpeg with the ffplay utility. 
 
 ### Gateway from IPFS_GATEWAY environment variable
 
-When there is no command line argument, the `IPFS_GATEWAY` environment is next. If it contains a value, it will be used as gateway.
-
-### Gateway file
-
-**This feature is only for IPFS implementers, not for IPFS application integrations.**
-
-When the implementation provides a gateway (and it's not disabled through other means) then it should make that known to other local applications. The gateway file serves this purpose. It's a file with only 1 single line containing the full http URL to your gateway. For example, it could contain the line: "http://localhost:8080".
-
-The file conditions:
-    1. is named "gateway"
-    2. **only** exists when your implementation actually starts a gateway
-    3. is removed when your implementation shuts down
-
-For historical and compatibility readons, this file shall be placed in:
-$HOME/.ipfs/ thus the resulting end path is going to be $HOME/.ipfs/gateway
-
-Future implementers must follow the [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) where the gateway file will placed in:
-**$XDG_CONFIG_HOME/ipfs/gateway**
-
-The conditions for this file are the same as those in $HOME/.ipfs/gateway.
-
-In the, admitedly rare, event of running multiple IPFS implementations each hosting their own gateway. First-come-first-serve applies here. The application that created the gateway file owns it and takes care of removing it. Subsequent instances or different application should not touch the file if it's already there.
+When there is no command line argument, the `IPFS_GATEWAY` environment is next. It should contain 1 and only 1 gateway http address.
 
 ### Example implementations
 
