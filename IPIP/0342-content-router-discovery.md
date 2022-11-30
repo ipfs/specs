@@ -19,10 +19,10 @@ systems.
 
 The mechanism proposed by this IPIP, where nodes gossip preferred routers
 to their connected peers, can also have broader applications. The same
-mechnism could be used for external IPNS, peer routers, relays, or DNS
+mechanism could be used for external IPNS, peer routers, relays, or DNS
 resolvers. We point out the label allowing re-use of this mechanism for
 other systems in the (protocol design)[#1-content-routing-as-a-libp2p-protocol],
-but otherwise leave the concerete design for other systems to subsequent
+but otherwise leave the concrete design for other systems to subsequent
 IPIPs.
 
 ## Motivation
@@ -30,7 +30,7 @@ IPIPs.
 There is currently not a process by which IPFS nodes can discover alernative
 content routing systems automatically. This has led to a reliance on
 centralized systems, like the hydra boosters, to fill the gap and offer
-content only available in network indexer to current IPFS nodes. This strategy
+content only available in network indexers to current IPFS nodes. This strategy
 is also insufficient long term because:
 1. It limits speed to the use of a globally distributed kademlia DHT
 2. It is insufficient for providing content in applications where content grows
