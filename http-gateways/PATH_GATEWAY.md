@@ -251,12 +251,11 @@ Optional, `format=<format>` can be used to request specific response format.
 This is a URL-friendly alternative to sending an [`Accept`](#accept-request-header) header. These are the equivalents:
 - `format=raw` → `Accept: application/vnd.ipld.raw`
 - `format=car` → `Accept: application/vnd.ipld.car`
+- `format=tar` → `Accept: application/x-tar`
 - `format=dag-json` → `Accept: application/vnd.ipld.dag-json`
 - `format=dag-cbor` → `Accept: application/vnd.ipld.dag-cbor`
 - `format=json` → `Accept: application/json`
 - `format=cbor` → `Accept: application/cbor`
-
-In case of `Accept: application/x-tar`, the `?format=` equivalent is `tar`.
 
 <!-- TODO Planned: https://github.com/ipfs/go-ipfs/issues/8769
 - `selector=<cid>`  can be used for passing a CID with [IPLD selector](https://ipld.io/specs/selectors)
