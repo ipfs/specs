@@ -16,11 +16,11 @@ the [HTTP Gateway](../http-gateways/).
 ## Motivation
 
 Currently, the gateway supports requesting data in the [DAG-PB], RAW, [CAR] and
-TAR formats. In addition, it allows for traversing of IPLD links encoded in
-DAG-JSON and DAG-CBOR, as long as they are intermediate links, and not the final
-document. However, it should be possible to download deserialized versions
-of data other than UnixFS in order to unlock the potential of the
-[IPLD Data Model][ipld-data-model] beyond files and directories.
+TAR formats. In addition, it allows for traversing of links encoded through CBOR
+Tag 42, as long as they are intermediate links, and not the final document.
+It works on both DAG-CBOR, and its JSON representation, DAG-JSON. However, it
+should be possible to download deserialized versions of data other than UnixFS,
+such as JSON and CBOR.
 
 The main functional gap in the IPFS ecosystem is the lack of support for
 non-UnixFS DAGs on HTTP gateways. Users are able to create custom DAGs based on
@@ -37,15 +37,15 @@ requested by our users in the past.
 
 In addition, this functionality is already present on the current Kubo CLI. By
 bringing it to the gateways, we provide users with more power when it comes
-to traversing IPLD data.
+to storing and fetching CBOR and JSON in IPFS.
 
 ## Detailed design
 
-The solution is to allow the Gateway to support serializing an IPLD Data Model
-representation as [DAG-JSON], [DAG-CBOR], JSON and CBOR by requesting them
-using either the `Accept` HTTP header or the `format` URL query. In addition,
-if the resolved CID is of one of the aforementioned types, the gateway should
-be able to resolve them instead of failing with `node type unknown`.
+The solution is to allow the Gateway to support serializing data as [DAG-JSON],
+[DAG-CBOR], JSON and CBOR by requesting them using either the `Accept` HTTP header
+or the `format` URL query. In addition, if the resolved CID is of one of the
+aforementioned types, the gateway should be able to resolve them instead of
+failing with `node type unknown`.
 
 ## Test fixtures
 
@@ -90,20 +90,20 @@ considerations of the original specifications, found in:
 - [RFC 8949 (CBOR), Section 10][rfc8949-sec10]
 
 DAG-JSON and DAG-CBOR follow the same security considerations as JSON and CBOR.
-Note that DAG-JSON and DAG-CBOR are stricter variants of JSON and CBOR, respectively.
-Therefore they must follow their IPLD specification and error if the payload
-is not strict enough:
+Note that DAG-JSON and DAG-CBOR are stricter subsets of JSON and CBOR, respectively.
+Therefore they must follow their specification and error if the payload is not
+strict enough:
 
 - [DAG-JSON Spec][dag-json-spec]
 - [DAG-CBOR Spec][dag-cbor-spec]
 
 ### Alternatives
 
-Introducing DAG-JSON, DAG-CBOR, JSON and CBOR in the HTTP Gateway allows for
-a broader usage of the IPLD Data Model. If we do not introduce more IPLD
-response formats in the gateway, the usage of IPFS is constricted to files
-and directories represented by UnixFS (DAG-PB) codec. Therefore, it would keep
-the IPLD potential locked due to an artificial barrier created by the gateways.
+If we do not introduce  DAG-JSON, DAG-CBOR, JSON and CBOR  response formats in
+the gateway, the usage of IPFS is constricted to files and directories represented
+by UnixFS (DAG-PB) codec. Therefore, if a user wants to store JSON and/or CBOR
+in IPFS, they have to wrap it as a UnixFS file in order to be able to fetch it
+through the gateway. That adds size and processing overhead.
 
 In addition, we could introduce only DAG-JSON and DAG-CBOR. However, not
 supporting the generic variants, JSON and CBOR, would lead to poor UX. The
@@ -142,15 +142,9 @@ retrieve an extract from the document.
 However, supporting this raises questions whose answers are not clearly defined
 or agreed upon yet. Right now, pathing is only supported over CID-based Links,
 such as Tag 42 in CBOR. In addition, some HTTP headers regarding caching are based
-on the CID, and adding pathing for other IPLD Kinds would require additional
-refactor. Adding those changes prematurely, before adding support to
-[IPLD Patch](https://ipld.io/specs/patch/), may lead to confusion for both
-the developers and users.
-
-We want to support full IPLD pathing support after introducing IPLD Patch,
-which will be in a future, separate IPIP. Giving users the possibility to retrieve
-JSON, CBOR, DAG-JSON AND DAG-CBOR documents through the gateway is, in itself,
-a progress and will open the doors for new tools and explorations.
+on the CID, and adding extraction pathings would not be clear. Giving users the
+possibility to retrieve JSON, CBOR, DAG-JSON AND DAG-CBOR documents through the
+gateway is, in itself, a progress and will open the doors for new tools and explorations.
 
 ### Copyright
 
@@ -162,7 +156,6 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 [DAG-JSON]: https://ipld.io/docs/codecs/known/dag-json/
 [DAG-CBOR]: https://ipld.io/docs/codecs/known/dag-cbor/
 [CAR]: https://ipld.io/specs/transport/car/
-[ipld-data-model]: https://ipld.io/docs/data-model/
 [ipfs/in-web-browsers/issues/182]: https://github.com/ipfs/in-web-browsers/issues/182
 [ipfs/specs/pull/328]: https://github.com/ipfs/specs/pull/328
 [ipfs/kubo/issues/8823]: https://github.com/ipfs/kubo/issues/8823
