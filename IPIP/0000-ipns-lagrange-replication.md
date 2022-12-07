@@ -74,7 +74,7 @@ IPNS records won't have anything set for the expiration field, this may interfer
 
 ### Security
 
-To prevent old IPNS records from being replicated, the optional 5th step stated in https://github.com/ipfs/specs/blob/main/naming/pubsub.md#protocol should be followed. This should make replay attacks difficult to execute.
+To prevent old IPNS records from being replicated, the optional 5th step stated in [IPNS over PubSub protocol](https://github.com/ipfs/specs/blob/main/ipns/IPNS_PUBSUB.md#protocol) MUST be followed. This makes replay attacks difficult to execute.
 
 IPFS nodes **must** check the current number of record holders before accepting to hold the IPNS record. Without this check, a record holder with a high threshold value could over replicate an IPNS record.
 
