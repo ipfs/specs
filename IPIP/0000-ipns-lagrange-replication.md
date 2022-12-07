@@ -1,4 +1,4 @@
-# IPIP 0000: IPNS Lagrange Replication
+# IPIP-309: IPNS Lagrange Replication
 
 <!-- IPIP number will be assigned by an editor. When opening a pull request to
 submit your IPIP, please use number 0000 and an abbreviated title in the filename,
