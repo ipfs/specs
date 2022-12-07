@@ -43,15 +43,17 @@ Both read and write provider records have a minimal required schema as follows:
 ```json
 {
     "Protocol": "<transfer_protocol_name>",
+    "Schema": "<transfer_protocol_schema>",
     ...
 }
 ```
 
 where:
 
-- `Protocol` is the name of a transfer protocol
-  - these typically map to multicodec codes (such as bitswap => 2304)
-  - these don't use multicodec codes directly to allow for versioning of provider records, e.g. to allow for "bitswap-v2" provider records (which would also map to 2304 code but with different schema/semantics)
+- `Protocol` is the multicodec name of the transfer protocol
+- `Schema` denotes the schema to use for encoding/decoding the record
+  - This is separate from the `Protocol` to allow this HTTP API to evolve independently of the transfer protocol
+  - Implementations should switch on this when parsing records, not on `Protocol`
 - `...` denotes opaque JSON, which may contain information specific to the transfer protocol
 
 Specifications for some transfer protocols are provided in the "Transfer Protocols" section.
@@ -69,6 +71,7 @@ Specifications for some transfer protocols are provided in the "Transfer Protoco
     "Providers": [
         {
             "Protocol": "<protocol_name>",
+            "Schema": "<schema>",
             ...
         }
     ]
@@ -89,10 +92,10 @@ Each object in the `Providers` list is a *read provider record*.
   - Request Body
 ```json
 {
-    "Keys": ["cid1", "cid2"],
     "Providers": [
         {
-            "Protocol": "bitswap",
+            "Protocol": "<protocol_name>",
+            "Schema": "bitswap",
             ...
         }
     ]
@@ -158,14 +161,16 @@ Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS
 ## Known Transfer Protocols
 This section contains a non-exhaustive list of known transfer protocols (by name) that may be supported by clients and servers.
 
-### bitswap
-Multicodec code: 0x0900
+### Bitswap
+Multicodec name: `transport-bitswap`
+Schema: `bitswap`
 
 #### Read Provider Records
 
 ```json
 {
-    "Protocol": "bitswap",
+    "Protocol": "transport-bitswap",
+    "Schema": "bitswap",
     "ID": "12D3K...",
     "Addrs": ["/ip4/..."]
 }
@@ -182,7 +187,8 @@ The server should respect a passed `transport` query parameter by filtering agai
 
 ```json
 {
-    "Protocol": "bitswap",
+    "Protocol": "transport-bitswap",
+    "Schema": "bitswap",
     "Signature": "<signature>",
     "Payload": "<payload>"
 }
@@ -226,14 +232,16 @@ The `Payload` field is a string, not a proper JSON object, to prevent its conten
   - If 0, the server makes no claims about the lifetime of the record
 
 
-### filecoin-graphsync-v1
-Multicodec code: 0x0910
+### Filecoin Graphsync
+Multicodec name: `transport-graphsync-filecoinv1`
+Schema: `graphsync-filecoinv1`
 
 #### Read Provider Records
 
 ```json
 {
     "Protocol": "filecoin-graphsync-v1",
+    "Schema": "graphsync-filecoinv1",
     "ID": "12D3K...",
     "Addrs": ["/ip4/..."],
     "PieceCID": "<cid>",
