@@ -1,14 +1,7 @@
-# Gateway file
-
-![wip](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
-
-**Author(s)**:
-- [Mark Gaiser](https://github.com/markg85/)
-
-**Maintainer(s)**:
-- [Mark Gaiser](https://github.com/markg85/)
-
-* * *
+# IPIP 0180: Gateways file
+- Start Date: 2022-12-08
+- Related Issues:
+  - https://github.com/ipfs/kubo/issues/8847
 
 ## Summary
 
