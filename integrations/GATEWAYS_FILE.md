@@ -1,4 +1,4 @@
-# IPIP 0180: Gateways file
+# IPIP 0280: Gateways file
 - Start Date: 2022-12-08
 - Related Issues:
   - https://github.com/ipfs/kubo/issues/8847
