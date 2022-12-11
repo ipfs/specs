@@ -65,14 +65,15 @@ Users, applications using IPFS, get a defined way to find gateways to use. Witho
 
 ### Compatibility
 
-**This is only applicable to Kubo! Other IPFS implementations are to ignore this**
+This is only applicable to Kubo! Other IPFS implementations are to ignore this
+
 The legacy gateway file (placed in `~/.ipfs/gateway`) was made up as a response to a need to know which gateway an IPFS node would expose. While that file itself was never specced out, it served the need. Some applications are using this file therefore the file has to be maintained for the Kubo reference implemenation. Any other IPFS implementation should ignore this.
 
 The file only contains a single line being the http gateway url. For example: "http://localhost:8080".
 
 The file conditions:
     1. is named "gateway"
-    2. **only** exists when Kubo starts a gateway
+    2. only exists when Kubo starts a gateway
     3. is removed when Kubo shuts down
 
 Future Kubo implemenations will do the above via symlinking the `gateways` file to `gateway` while maintaining the same rules as stated above.
