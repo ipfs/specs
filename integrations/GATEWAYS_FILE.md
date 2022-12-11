@@ -31,14 +31,25 @@ As a reference, [this](https://github.com/cjbassi/platform-dirs-rs#path-list) li
 
 | | with variables | full paths |
 | -------- | -------- | -------- |
-| Windows     | %APPDATA%/ipfs     | C:/Users/%USERNAME%/AppData/Roaming/ipfs     |
-| macOS     | $XDG_CONFIG_HOME/ipfs     | ~/Library/Application Support/ipfs     |
-| Linux     | $XDG_CONFIG_HOME/ipfs     | ~/.config/ipfs     |
+| (user) Windows     | %APPDATA%/ipfs     | C:/Users/%USERNAME%/AppData/Roaming/ipfs     |
+| (global) Windows     | %PROGRAMDATA%/ipfs     | C:/ProgramData/ipfs     |
+| (user) macOS     | $XDG_CONFIG_HOME/ipfs     | ~/Library/Application Support/ipfs     |
+| (global) macOS     | N/A     | /Library/Application Support/ipfs     |
+| (user) Linux     | $XDG_CONFIG_HOME/ipfs     | ~/.config/ipfs     |
+| (global) Linux     | N/A     | /etc/ipfs     |
 
 The `gateways` file must be placed in the folder appropiate for the platform the IPFS implementation instance is running on. For linux that would be `~/.config/ipfs/gateways` or `$XDG_CONFIG_HOME/ipfs/gateways`
 
 The file will be created when it doesn't exist.
 It will never be delated! This means the file will exist and be empty when an IPFS implementation removes it's own gateway from that file and if that gateway was the only line in the file.
+
+Creating and updating the `gateways` file only applies to the `(user)` prefixed file. The `(global)` prefixed file will not be written to by the IPFS implementation!
+
+#### Local file
+The local file is for read-write access for the IPFS implementation.
+
+#### Global file
+If the local file cannot be found or is empty then the IPFS implementation should try to read the global config file and read it's gateway values instead. This global file must not be changed by any IPFS implementation!
 
 ## Test fixtures
 
