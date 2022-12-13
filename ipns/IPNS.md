@@ -132,7 +132,7 @@ A logical IPNS record is a data structure containing the following fields:
   - Implementations MUST support `validityType = 0` and include this value in both `IpnsEntry.validityType` and inside the DAG-CBOR document at `IpnsEntry.data[validityType]`.
 - **Validity** (bytes)
   - When `validityType = 0`
-    - Expiration date of the record with nanoseconds precision.
+    - Expiration date of the record with nanoseconds precision. We suggest this value to follow the expiration window of the publishing medium. For example, records published in the DHT should expire 48 hours after being published.
     - Represented as an ASCII string that follows notation from [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) (`1970-01-01T00:00:00.000000001Z`).
   - Implementations MUST include this value in both `IpnsEntry.validity` and inside the DAG-CBOR document at `IpnsEntry.data[validity]`.
 - **Sequence** (uint64)
