@@ -1,4 +1,4 @@
-# IPIP 0000: Multi gateway client
+# IPIP 0000: IPFSClient API
 
 - Start Date: 2022-12-12
 - Related Issues:
