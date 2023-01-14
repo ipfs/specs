@@ -91,7 +91,7 @@ Note:
 
 - Although private keys are not transmitted over the wire, the `PrivateKey`
   serialization format used to store keys on disk is also included as a
-  reference for IPNS implementors who would like to import existing IPNS key
+  reference for IPNS implementers who would like to import existing IPNS key
   pairs.
 
 - `PublicKey` and `PrivateKey` structures were originally defined in
