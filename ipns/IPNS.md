@@ -242,7 +242,7 @@ legacy logic.
 
 Taking into consideration a p2p network, each peer should be able to publish [IPNS records](#ipns-record) to the network, as well as to resolve the IPNS records published by other peers.
 
-When a node intends to publish a record to the network, an IPNS record needs to be [created](#record-creation) first. The node needs to have a previously generated asymmetric key pair to create the record according to the datastructure previously specified. It is important pointing out that the record needs to be uniquely identified in the network. As a result, the record identifier should be a hash of the public key used to sign the record.
+When a node intends to publish a record to the network, an IPNS record needs to be [created](#record-creation) first. The node needs to have a previously generated asymmetric key pair to create the record according to the data structure previously specified. It is important pointing out that the record needs to be uniquely identified in the network. As a result, the record identifier should be a hash of the public key used to sign the record.
 
 As an IPNS record may be updated during its lifetime, a versioning related logic is needed during the publish process. As a consequence, the record must be stored locally, in order to enable the publisher to understand which is the most recent record published. Accordingly, before creating the record, the node must verify if a previous version of the record exists, and update the sequence value for the new record being created.
 

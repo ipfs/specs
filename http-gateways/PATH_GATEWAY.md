@@ -350,7 +350,7 @@ value must be wrapped by double quotes as noted in [RFC7232#Etag](https://httpwg
 
 In many cases it is not enough to base `Etag` value on requested CID.
 
-To ensure `Etag` is unique enough to avoid issues with caching reverse provies
+To ensure `Etag` is unique enough to avoid issues with caching reverse proxies
 and CDNs, implementations should base it on both CID and response type:
 
 - By default, etag should be based on requested CID. Example: `Etag: "bafy…foo"`

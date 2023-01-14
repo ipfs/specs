@@ -12,7 +12,7 @@
 
 The _ipfs merkledag_ is a directed acyclic graph whose edges are merkle-links. This means that links to objects can authenticate the objects themselves, and that every object contains a secure representation of its children.
 
-This is a powerful primitive for distributed systems computations. The merkledag simplifies distributed protocols by providing an append-only authenticated datastructure. Parties can communicate and exchange secure references (merkle-links) to objects. The references are enough to verify the correctness of the object at a later time, which allows the objects themselves to be served over untrusted channels. Merkledags also allow the branching of a datastructure and subsequent merging, as in the version control system git. More generally, merkledags simplify the construction of Secure [CRDTs](http://en.wikipedia.org/wiki/Conflict-free_replicated_data_type), which enable distributed, convergent, commutative computation in an authenticated, secure way.
+This is a powerful primitive for distributed systems computations. The merkledag simplifies distributed protocols by providing an append-only authenticated data structure. Parties can communicate and exchange secure references (merkle-links) to objects. The references are enough to verify the correctness of the object at a later time, which allows the objects themselves to be served over untrusted channels. Merkledags also allow the branching of a data structure and subsequent merging, as in the version control system git. More generally, merkledags simplify the construction of Secure [CRDTs](http://en.wikipedia.org/wiki/Conflict-free_replicated_data_type), which enable distributed, convergent, commutative computation in an authenticated, secure way.
 
 ## Table of Contents
 
@@ -23,7 +23,7 @@ TODO
 - `hash` - throughout this document, the word `hash` refers specifically to cryptographic hash functions, such as sha3.
 - `dag` - directed acyclic graph
 - `merkle-link` - a link (graph edge) between two objects, which is (a) represented by the hash of the target object, and (b) embedded in the source object. merkle-links construct graphs (dags) whose links are content-addressed, and authenticated.
-- `merkledag` - the merkledag is a directed acyclic graph whose links are merkle-links (hashes of the content). It is a hash tree, and (under a very loose definition) a merkle tree. Alternative names: the merkle-web, the merkle-forest, the merkle-chain.
+- `merkledag` - the merkledag is a directed acyclic graph whose links are merkle-links (hashes of the content). It is a hash tree, and (under a very loose definition) a Merkle tree. Alternative names: the merkle-web, the merkle-forest, the merkle-chain.
 - `multihash` - the [multihash](https://github.com/jbenet/multihash) format / protocol.
 - `ipfs object` - a node in the ipfs merkledag. It represents a singular entity.
 - `merkledag format` - the format that ipfs objects are expressed with.
@@ -83,7 +83,7 @@ The logical representation is serialized into raw bytes using _protocol buffers_
 ### Real World Examples
 
 Many successful distributed systems employ specialized merkledags at their core:
-- merkle trees -- a special case of the merkle dag -- are a well known cryptographic technique used to authenticate large amounts of data. The original use case involved one-time lamport signatures.
+- Merkle trees -- a special case of the merkledag -- are a well known cryptographic technique used to authenticate large amounts of data. The original use case involved one-time lamport signatures.
 - SFS-RO turns a unix filesystem into a merkledag, constructing a secure, distributed filesystem.
 - git uses a merkledag to enable distributed version control and source code management. Other DVCSes, such as mercurial and monotone, also feature a merkledag.
 - plan9 uses a merkledag to construct its snapshotting filesystems -- Fossil and Venti.
@@ -106,7 +106,7 @@ This kind of modularity enables complicated and powerful applications to be buil
 
 ### Web of Data Structures
 
-In a sense, IPFS is a "web of data-structures", with the merkledag as the common denominator. Agreeing upon a format allows linking different authenticated datastructures to each other, enabling sophisticated distributed applications to easily construct, distribute, and link their data.
+In a sense, IPFS is a "web of data-structures", with the merkledag as the common denominator. Agreeing upon a format allows linking different authenticated data structures to each other, enabling sophisticated distributed applications to easily construct, distribute, and link their data.
 
 ### Linked Data
 
@@ -116,7 +116,7 @@ A powerful result of content (and identity) addressing is that linked data defin
 
 ## Merkledag Notation
 
-To facilitate the definition of other data structures and protocols, we define a notation to express merkledag datastructures. This defines their logical representation, and also a format specification (when using the ipfs merkledag format).
+To facilitate the definition of other data structures and protocols, we define a notation to express merkledag data structures. This defines their logical representation, and also a format specification (when using the ipfs merkledag format).
 
 #### ~~ WIP / TODO ~~
 

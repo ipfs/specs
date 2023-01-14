@@ -75,7 +75,7 @@ Proposals that were reviewed as useful, but rejected for now, will be moved into
 1. [Specs Stewards] will do an initial triage of newly opened PRs roughly monthly. They'll try to filter out
 noise, so that community consideration is given only to reasonable proposals; others they'll reject.
 2. Specs Stewards will post to the forums linking to the proposal; directing feedback/discussion to
-take place in Github on the PR
+take place in GitHub on the PR
 3. After a month of discussion, Specs Stewards will review again. If there are no substantive disagreements
 with the proposal, including within Spec Stewards, the proposal will be approved.
 4. If discussion or modification is still underway and appears to be leading to a resolution, it can be held
@@ -85,7 +85,7 @@ consideration at a monthly sync, to be announced at least a week ahead of time o
 6. After discussion, Spec Stewards will make call on whether to approve or reject the proposal.
 7. At this point approved proposals get assigned a number (encoded in the filename),
 and merged into the IPIP folder on `main` branch. Potentially useful (but rejected for now)
-proposals should be also merged to `main`, but in a subfolder called `/IPIP/deferred`. Proposals rejected in intial
+proposals should be also merged to `main`, but in a subfolder called `/IPIP/deferred`. Proposals rejected in initial
 triage will simply have the PR declined.
 8. IPIP author and two approving [Specs Stewards] are added to `CODEOWNERS` file to be
 automatically asked to review any future changes to files added or modified by the IPIP.

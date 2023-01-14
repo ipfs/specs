@@ -154,7 +154,7 @@ Below MUST be implemented **in addition** to the [HTTP Response section from `PA
 ### `Location` (response header)
 
 Below MUST be implemented **in addition** to
-[`Location` reqirements defined in `PATH_GATEWAY.md`](./PATH_GATEWAY.md#location-response-header).
+[`Location` requirements defined in `PATH_GATEWAY.md`](./PATH_GATEWAY.md#location-response-header).
 
 #### Use in interop with Path Gateway
 
