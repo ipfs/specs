@@ -94,7 +94,7 @@ specified content path.
 Downloads data at specified **immutable** content path.
 
 - `cid` – a valid content identifier  ([CID](https://docs.ipfs.io/concepts/glossary#cid))
-- `path` – optional path remainer pointing at a file or a directory under the `cid` content root
+- `path` – optional path parameter pointing at a file or a directory under the `cid` content root
 - `params` – optional query parameters that adjust response behavior
 
 ## `HEAD /ipfs/{cid}[/{path}][?{params}]`
