@@ -86,10 +86,10 @@ Specifications for some transfer protocols are provided in the "Transfer Protoco
 
 Each object in the `Providers` list is a *read provider record*.
 
-- `PUT /routing/v1/providers`
-  - Response Codes
-    - `200`: the server processed the full list of provider records (possibly unsuccessfully, depending on the semantics of the particular records)
-  - Request Body
+### `PUT /routing/v1/providers`
+- Response Codes
+  - `200`: the server processed the full list of provider records (possibly unsuccessfully, depending on the semantics of the particular records)
+- Request Body
 ```json
 {
     "Providers": [
@@ -240,7 +240,7 @@ Schema: `graphsync-filecoinv1`
 
 ```json
 {
-    "Protocol": "filecoin-graphsync-v1",
+    "Protocol": "transport-graphsync-filecoinv1",
     "Schema": "graphsync-filecoinv1",
     "ID": "12D3K...",
     "Addrs": ["/ip4/..."],
