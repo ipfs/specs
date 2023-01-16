@@ -76,7 +76,7 @@ So this API proposal makes the following changes:
 
 The cost of building and operating content routing services will be much lower, as developers will be able to maximally reuse existing industry-standard tooling.
 Users will not need to learn a new RPC protocol and tooling to consume or expose the API.
-This will result in more content routing providers, each providing a better experience for users, driving down content routing latency across the IPFS netowrk
+This will result in more content routing providers, each providing a better experience for users, driving down content routing latency across the IPFS network
 and increasing data availability.
 
 ### Compatibility
