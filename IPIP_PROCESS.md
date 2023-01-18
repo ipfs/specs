@@ -21,7 +21,7 @@ in the decision making process
 
 ## Process design
 
-We adopted an formal change management process for the [ipfs/specs][1] repository, providing a
+We adopted a formal change management process for the [ipfs/specs][1] repository, providing a
 minimal structure for opening, reviewing, and merging specification changes.
 
 [1]: https://github.com/ipfs/specs/
@@ -58,10 +58,10 @@ Changes to IPFS specifications can be proposed by opening a Git pull-request
 (PR) against the `ipfs/specs` repository.
 
 In addition to specification changes, such PR must include a short **IPIP
-document** based on the template in [`ipfs/specs/IPIP/0000-template.md`](./0000-template.md).
+document** based on the template in [`ipfs/specs/IPIP/0000-template.md`](./IPIP/0000-template.md).
 
 When a new specification file is added to the repo, it should be based on
-the template at [`ipfs/specs/template.md`](../template.md).
+the template at [`ipfs/specs/template.md`](./template.md).
 
 When naming a new proposal, don't try to introduce an IPIP number; we will do that only for
 IPIPs that are approved before accepting into `main` branch.
