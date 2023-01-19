@@ -186,8 +186,6 @@ For example:
 - [application/x-tar](https://en.wikipedia.org/wiki/Tar_(computing)) – returns UnixFS tree (files and directories) as a [TAR](https://en.wikipedia.org/wiki/Tar_(computing)) stream. Returned tree starts at a root item which name is the same as the requested CID. Produces 400 Bad Request for content that is not UnixFS.
 - [application/vnd.ipld.dag-json](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-json) – requests [IPLD Data Model](https://ipld.io/docs/data-model/) representation serialized into [DAG-JSON format](https://ipld.io/docs/codecs/known/dag-json/). If the requested CID already has `dag-json` (0x0129) codec, data is validated as DAG-JSON before being returned as-is. Invalid DAG-JSON produces HTTP Error 500.
 - [application/vnd.ipld.dag-cbor](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-cbor) – requests [IPLD Data Model](https://ipld.io/docs/data-model/) representation serialized into [DAG-CBOR format](https://ipld.io/docs/codecs/known/dag-cbor/). If the requested CID already has `dag-cbor` (0x71) codec,  data is validated as DAG-CBOR before being returned as-is. Invalid DAG-CBON produces HTTP Error 500.
-- [application/json](https://www.iana.org/assignments/media-types/application/json) – same as `application/vnd.ipld.dag-json`, unless the CID's codec already is `json` (0x0200). Then, the raw JSON block can be returned.
-- [application/cbor](https://www.iana.org/assignments/media-types/application/cbor) – same as `application/vnd.ipld.dag-cbor`, unless the CID's codec already is `cbor` (0x51). Then, the raw CBOR block can be returned.
 
 ### `Range` (request header)
 
@@ -254,8 +252,6 @@ This is a URL-friendly alternative to sending an [`Accept`](#accept-request-head
 - `format=tar` → `Accept: application/x-tar`
 - `format=dag-json` → `Accept: application/vnd.ipld.dag-json`
 - `format=dag-cbor` → `Accept: application/vnd.ipld.dag-cbor`
-- `format=json` → `Accept: application/json`
-- `format=cbor` → `Accept: application/cbor`
 
 <!-- TODO Planned: https://github.com/ipfs/go-ipfs/issues/8769
 - `selector=<cid>`  can be used for passing a CID with [IPLD selector](https://ipld.io/specs/selectors)
