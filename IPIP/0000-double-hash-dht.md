@@ -7,7 +7,7 @@ submit your IPIP, please use number 0000 and an abbreviated title in the filenam
 - Start Date: 2023-01-18
 - Related Resources:
   - [Specs in Notion](https://pl-strflt.notion.site/Double-Hashing-for-Privacy-ff44e3156ce040579289996fec9af609)
-  - Implementation: https://github.com/ChainSafe/go-libp2p-kad-dht
+  - [WIP Implementation](https://github.com/ChainSafe/go-libp2p-kad-dht)
   - https://github.com/ipfs/specs/pull/334
   - https://github.com/ipfs/specs/issues/345
 
@@ -35,14 +35,15 @@ The changes described in this document introduce a DHT privacy upgrade boosting 
 - **DHT Servers** are nodes running the IPFS public DHT. In this documents, DHT Servers mostly refer to the DHT Servers storing the Provider Records associated with specific `CID`s, and not the DHT Servers helping routing lookup requests to the right keyspace location. 
 - **Client** is an IPFS client looking up a content identified by an already known `CID`.
 - **Publish Process** is the process of the Content Provider communicating to the DHT Servers that it provides some content identified by `CID`.
-- **Lookup Process** is the process of the Client retreiving the content identified by `CID`.
+- **Lookup Process** is the proces
+s of the Client retreiving the content identified by `CID`.
 - **`PeerID`** s define stable [peer identities](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md). The `PeerID` is derived from the node's cryptographic public key.
 - **`multiaddrs`** are the [network addresses](https://github.com/libp2p/specs/tree/master/addressing) associated with a `PeerID`. It represents the location(s) of the peer.
 - **`KeyPrefix`** is defined as a prefix of lenght `l` bits of `HASH2`.
 - **`ServerKey`** is defined as `SHA256(bytes("CR_SERVERKEY") || MH)`. It is derived from the `MH`. The Content Provider communicates `ServerKey` to the DHT Servers during the Publish Process. The DHT Servers use it to encrypt the data sent to the Client during the lookup process.
 - **`TS`** is the Timestamp (unix timestamp) when the Content Provider published the content.
 - **`CPPeerID`** is the `PeerID` of the Content Provider for a specific `CID`.
-- **`EncPeerID`** is the result of the encryption of `CPPeerID` using `MH` as encryption key and a random nonce $AESGCM_{MH}(CPPeerID, RandomNonce)$. `EncPeerID` contains the [varint](https://github.com/multiformats/multicodec) of the encryption algorithm used (AESGCM), the bytes array of the encrypted payload, and the Nonce. <!-- TODO: define draft varint -->
+- **`EncPeerID`** is the result of the encryption of `CPPeerID` using `MH` as encryption key and a random nonce `AESGCM(MH, CPPeerID || RandomNonce)`. `EncPeerID` contains the [varint](https://github.com/multiformats/multicodec) of the encryption algorithm used (AESGCM), the bytes array of the encrypted payload, and the Nonce. <!-- TODO: define draft varint -->
 - **`Signature`** is the signature of the `EncPeerID` encrypted payload (not including the varint nor the nonce) and `TS` using the Content Provider's private key, either with ed25519 or rsa signature algorithm, depending on the keys of the Content Provider.
 - **Provider Record** is defined as a pointer to the storage location of some content identified by `CID` or `HASH2`. A Provider Record consists on the following fields: [`EncPeerID`, `TS`, `Signature`].
 - **Provider Store** is the data structure on the DHT Servers used to store the Provider Records. Its structure is a nested dictionary/map: `HASH2` -> `ServerKey` -> [`CPPeerID`, `EncPeerID`, `TS`, `Signature`]. There is only one single correct `ServerKey` for each `HASH2`. However, any peer can forge a valid Publish request (with invalid `EncPeerID` but valid `Signature`) undetected by the DHT Server. The DHT server isn't able to distinguish which `ServerKey` is correct as it doesn't have the knowledge of `MH`, hence it has to keep both and serve both upon request for `HASH2`.
@@ -74,33 +75,33 @@ The following process describes the event of a client looking up a CID in the IP
 
 **Publish Process**
 1. Content Provider wants to publish some content with identifier `CID`.
-2. Content Provider computes $HASH2\leftarrow{}SHA256(bytes("CR\_DOUBLEHASH") || MH)$ (`MH` is the MultiHash included in the CID).
+2. Content Provider computes `HASH2`$\leftarrow{}$`SHA256(bytes("CR_DOUBLEHASH") || MH)` (`MH` is the MultiHash included in the CID).
 3. Content Provider starts a DHT lookup request for the 20 closest `peerid`s in XOR distance to `HASH2`.
-4. Content Provider encrypts its own `peerid` (`CPPeerID`) with `MH`, using AES-GCM. $EncPeerID\leftarrow{}AESGCM_{MH}(CPPeerID)$
+4. Content Provider encrypts its own `peerid` (`CPPeerID`) with `MH`, using AES-GCM. `EncPeerID = AESGCM(MH, CPPeerID || Nonce)`
 5. Content Provider takes the current timestamp `TS`.
-6. Content Provider signs `EncPeerID` and `TS` using its private key. $Signature\leftarrow{}Sign_{privkey}(EncPeerID || TS)$
-7. Content Provider computes $ServerKey\leftarrow{}SHA256(bytes("CR\_SERVERKEY") || MH)$.
+6. Content Provider signs `EncPeerID` and `TS` using its private key. `Signature = Sign(privkey, EncPeerID || TS)`
+7. Content Provider computes `ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)`.
 8. Once the lookup request has returned the 20 closest peers, Content Provider sends a Publish request to these DHT servers. The Publish request contains [`HASH2`, `EncPeerID`, `TS`, `Signature`, `ServerKey`].<!-- TODO: define exact format -->
-9. Each DHT server verifies `Signature` against the `peerid` of the Content Provider used to open the libp2p connection. $Verify(Signature, CPPeerID, EncPeerID || TS)$. It verifies that `TS` is _recent enough_. If invalid, send an error to the client. <!-- TODO: define error && check TS valid -->
+9. Each DHT server verifies `Signature` against the `peerid` of the Content Provider used to open the libp2p connection. `Verify(CPPeerID, Signature, EncPeerID || TS)`. It verifies that `TS` is _recent enough_. If invalid, send an error to the client. <!-- TODO: define error && check TS valid -->
 10. Each DHT server adds an entry in their Provider Store for `HASH2` -> `ServerKey` -> [`CPPeerID`, `EncPeerID`, `TS`, `Signature`], with `CPPeerID` being the `peerid` of the Content Provider. If there is already an entry including `CPPeerID` for `HASH2` -> `ServerKey`, and if the `TS` of the new valid entry is newer than the existing `TS`, overwrite the entry in the Provider Store. Else drop the new entry.
 11. Each DHT server confirms to Content Provider that the Provider Record has been successfully added.
 12. The proces is over once Content Provider has received 20 confirmations.
 
 **Lookup Process**
-1. Client computes $HASH2=SHA256(bytes("CR\_DOUBLEHASH") || MH)$ (`MH` is the MultiHash included in the CID).
-2. Client selects a prefix of `HASH2`, $KeyPrefix\leftarrow{}HASH2[:l]$ for a defined `l` (see [`l` selection](#prefix-length-selection)).
+1. Client computes `HASH2 = SHA256(bytes("CR_DOUBLEHASH") || MH)` (`MH` is the MultiHash included in the CID).
+2. Client selects a prefix of `HASH2`, `KeyPrefix = HASH2[:l]` for a defined `l` (see [`l` selection](#prefix-length-selection)).
 2. Client finds the closest `peerid`s to `HASH2` in XOR distance in its Routing Table.
 3. Client sends a DHT lookup request for `KeyPrefix` to these DHT servers.
 4. The DHT servers find the 20 closest `peerid`s to `KeyPrefix` in XOR distance (see [algorithm](#closest-keys-to-a-key-prefix)). Add these `peerid`s and their associated multiaddresses (if applicable) to the `message` that will be returned to Client.
 5. The DHT servers search if there are entries matching `KeyPrefix` in their Provider Store.
-6. For all entries `HASH2` of the Provider Store where `HASH2[:len(KeyPrefix)]==KeyPrefix`, add to `message` the following encrypted payload: $Enc_{ServerKey}(EncPeerID, TS, Signature, multiaddrs)$, for `multiaddrs` being the multiaddresses associated with `CPPeerID` (if applicable). DHT Servers can decide to put a maximal limit of returned Provider Record per request. If too many `HASH2` are matching `KeyPrefix`, they select randomly 128 matching provider records per request, and send a flag to Client to signal that the limit was reached. <!-- TODO: define flag-->
+6. For all entries `HASH2` of the Provider Store where `HASH2[:len(KeyPrefix)]==KeyPrefix`, add to `message` the following encrypted payload: `Enc(ServerKey, EncPeerID || TS || Signature || multiaddrs)`, for `multiaddrs` being the multiaddresses associated with `CPPeerID` (if applicable). DHT Servers can decide to put a maximal limit of returned Provider Record per request. If too many `HASH2` are matching `KeyPrefix`, they select randomly 128 matching provider records per request, and send a flag to Client to signal that the limit was reached. <!-- TODO: define flag-->
 7. The DHT servers send `message` to Client.
-8. Client computes $ServerKey\leftarrow{}SHA256(bytes("CR\_SERVERKEY") || MH)$.
+8. Client computes `ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)`.
 9. Client tries to decrypt all returned encrypted payloads using `ServerKey`. If at least one encrypted payload can be decrypted, go to 12.
 10. Client sends a DHT lookup request for `KeyPrefix` to the closest peers in XOR distance to `HASH2` that it received from the DHT servers.
 11. Go to 4.
-12. For each decrypted payload, Client decrypts $CPPeerID\leftarrow{}Dec_{MH}(EncPeerID)$.
-13. Client verifies that `Signature` verifies with `CPPeerID`: $Verify(Signature, CPPeerID, EncPeerID || TS)$
+12. For each decrypted payload, Client decrypts `CPPeerID = Dec(MH, EncPeerID)`.
+13. Client verifies that `Signature` verifies with `CPPeerID`: `Verify(CPPeerID, Signature, EncPeerID || TS)`.
 14. Client checks that `TS` is still valid.
 15. If none of the decrypted payloads is valid, go to 4.
 16. If the decrypted payload doesn't include the `multiaddrs` associated with `CPPeerID`, Client performs a DHT `FindPeer` request to find the `multiaddrs` associated with `CPPeerID`.
@@ -120,9 +121,9 @@ summary of changes. When adding new specification files, list all of them.
 -->
 ### Prefix length selection
 
-The goal of DHT prefix requests is to provide [`k`-anonymity](https://en.wikipedia.org/wiki/K-anonymity) to content lookup, in addition to the pseudonimity gained from double hashing. Each DHT prefix lookup query returns an expected number of `k` Provider Records matching `KeyPrefix`, with `k` being a system parameter. The user should be able to define a custom `k` from the configuration files, according to their privacy needs. The default value is `k = 8`. <!-- TODO: explain this value -->
+The goal of DHT prefix requests is to provide [`k`-anonymity](https://en.wikipedia.org/wiki/K-anonymity) to content lookup, in addition to the pseudonimity gained from double hashing. Each DHT prefix lookup query returns an expected number of `k` Provider Records matching `KeyPrefix`, with `k` being a system parameter. The user should be able to define a custom `k` from the configuration files, according to their privacy needs. The default value `k = 8` is discussed in [Design rationale](#reader-privacy).
 
-The prefix `l` is derived from `k` and the number of CIDs published to the DHT: $l \leftarrow{} log_2(\frac{\#CIDs}{k})$. However, the total number of CIDs published to the DHT can be hard to approximate, and the initial `l` value can be determined by approximation and dichotomy. At the first startup, the node looks up for random keys starting with a `l = 26`. Then, by dichotomy it adapts `l` so that a lookup for a prefix of length `l` matches on average ~`k` Provider Records.
+The prefix `l` is derived from `k` and the number of CIDs published to the DHT: $l \leftarrow{} log_2(\frac{\\#CIDs}{k})$. However, the total number of CIDs published to the DHT can be hard to approximate, and the initial `l` value can be determined by approximation and dichotomy. At the first startup, the node looks up for random keys starting with a `l = 26`. Then, by dichotomy it adapts `l` so that a lookup for a prefix of length `l` matches on average ~`k` Provider Records.
 
 Each node keeps track of the number of `HASH2` matching the last `KeyPrefix` requested in the last 128 lookups. `a` is defined as the average number of matches for the last 128 requests. At any point in time, if $a \gt 2\times k$, then `l` should increase (`l = l + 1`), and if $a \lt \frac{k}{2}$, then `l` should decrease (`l = l - 1`). On node shutdown, `a` is saved on disk, allowing a quick restart with an accurate `l` value.
 
@@ -139,7 +140,7 @@ Note that DHT Servers can set an upperbound on the number of Provider Records th
 
 Computing the XOR distance between two binary bitstrings of different lengths isn't possible. Hence finding the N closest keys to a key prefix in the Kademlia keyspace doesn't make sense. We can however find the keys matching the prefix (e.g `prefix == key[:l]` for $key \in \{0, 1\}^{256}, prefix \in \{0, 1\}^{l}, l \leq 256$), and the keys _close_ from matching the prefix. Randomness is used as tie breaker.
 
-The following pseudo-code defines the algorithm to find `N` keys matching or _close_ from matching a prefix. The main idea is to truncate the leaves of the Kademlia trie to the length of the prefix `l`. If `M` keys match prefix, for $M \ge N$, then `N` keys must be picked at random among the `M` candidates. If `M` keys match prefix, for $M \lt N$, we must still find `Q = N - M` keys. We iterate on the truncated Kademlia leaves of depth `l` ordered by XOR distance to `prefix`, starting from the closest. Supposing there are `P` keys in the truncated Kademlia leaf, and that we are missing `Q` keys, if $P \ge Q$, we select `Q` keys at random among the `P` candidates, otherwise, if $P \lt Q$ we take the `P` keys, set `Q = Q - P` and iterate on the following leaf until we find `N` keys.
+The following pseudo-code defines the algorithm to find `N` keys matching or _close_ from matching a prefix. The main idea is to truncate the leaves of the Kademlia trie to the length of the prefix `l`. If `M` keys match prefix, for $M \ge N$, then `N` keys must be picked at random among the `M` candidates. If `M` keys match prefix, for $M \lt N$, we must still find `Q = N - M` keys. We iterate on the truncated Kademlia leaves of depth `l` ordered by XOR distance to `prefix`, starting from the closest. Supposing there are `P` keys in the current truncated Kademlia leaf, and that we are missing `Q` keys, if $P \ge Q$, we select `Q` keys at random among the `P` candidates, otherwise, if $P \lt Q$ we take the `P` keys, set `Q = Q - P` and iterate on the following leaf until we find `N` keys.
 
 ```
 func closest_to_match(prefix, N, all_keys) {
@@ -149,7 +150,8 @@ func closest_to_match(prefix, N, all_keys) {
 	// iterate on all prefixes of length l from closest to furthest from 'prefix'
 	for counter = 0; len(selected_keys) < N && counter < 2**l; counter += 1 {
 
-		leaf = prefix XOR binary(counter, l)   // binary(x, l) gives the binary representation of a number x, on l bits
+		leaf = prefix XOR binary(counter, l)
+		// binary(x, l) gives the binary representation of a number x, on l bits
 
 		// get all keys matching to the prefix 'leaf'
 		matching_keys = find_matching_keys(leaf, all_keys) 
@@ -207,6 +209,10 @@ How will end users benefit from this work?
 -->
 
 ### Reader Privacy
+
+**`k`-anonymity**
+
+Default parameter selection: `k = 8`
 
 ### Writer Privacy
 
