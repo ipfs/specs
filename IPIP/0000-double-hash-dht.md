@@ -3,7 +3,7 @@
 <!-- IPIP number will be assigned by an editor. When opening a pull request to
 submit your IPIP, please use number 0000 and an abbreviated title in the filename,
 `0000-draft-title-abbrev.md`. -->
-
+![wip](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
 - Start Date: 2023-01-18
 - Related Resources:
   - [Specs in Notion](https://pl-strflt.notion.site/Double-Hashing-for-Privacy-ff44e3156ce040579289996fec9af609)
@@ -15,7 +15,6 @@ submit your IPIP, please use number 0000 and an abbreviated title in the filenam
 
 <!--One paragraph explanation of the IPIP.-->
 /TODO
-This is the suggested template for new IPIPs.
 
 ## Motivation
 
@@ -71,13 +70,13 @@ The following process describes the event of a client looking up a CID in the IP
 12. Client sends a Bitswap request for `CID` to the Content Provider (known `peerid` and `multiaddrs`).
 13. Content Provider sends the requested content back to Client.
 
-### Overall design
+### Double Hash DHT design
 
 **Publish Process**
 1. Content Provider wants to publish some content with identifier `CID`.
 2. Content Provider computes `HASH2`$\leftarrow{}$`SHA256(bytes("CR_DOUBLEHASH") || MH)` (`MH` is the MultiHash included in the CID).
 3. Content Provider starts a DHT lookup request for the 20 closest `peerid`s in XOR distance to `HASH2`.
-4. Content Provider encrypts its own `peerid` (`CPPeerID`) with `MH`, using AES-GCM. `EncPeerID = AESGCM(MH, CPPeerID || Nonce)`
+4. Content Provider encrypts its own `peerid` (`CPPeerID`) with `MH`, using AES-GCM. `EncPeerID = varint || Nonce || AESGCM(MH, CPPeerID || Nonce)`
 5. Content Provider takes the current timestamp `TS`.
 6. Content Provider signs `EncPeerID` and `TS` using its private key. `Signature = Sign(privkey, EncPeerID || TS)`
 7. Content Provider computes `ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)`.
@@ -136,8 +135,6 @@ Note that DHT Servers can set an upperbound on the number of Provider Records th
 
 ### _Closest_ keys to a key prefix
 
-<!-- TODO: reread this -->
-
 Computing the XOR distance between two binary bitstrings of different lengths isn't possible. Hence finding the N closest keys to a key prefix in the Kademlia keyspace doesn't make sense. We can however find the keys matching the prefix (e.g `prefix == key[:l]` for $key \in \{0, 1\}^{256}, prefix \in \{0, 1\}^{l}, l \leq 256$), and the keys _close_ from matching the prefix. Randomness is used as tie breaker.
 
 The following pseudo-code defines the algorithm to find `N` keys matching or _close_ from matching a prefix. The main idea is to truncate the leaves of the Kademlia trie to the length of the prefix `l`. If `M` keys match prefix, for $M \ge N$, then `N` keys must be picked at random among the `M` candidates. If `M` keys match prefix, for $M \lt N$, we must still find `Q = N - M` keys. We iterate on the truncated Kademlia leaves of depth `l` ordered by XOR distance to `prefix`, starting from the closest. Supposing there are `P` keys in the current truncated Kademlia leaf, and that we are missing `Q` keys, if $P \ge Q$, we select `Q` keys at random among the `P` candidates, otherwise, if $P \lt Q$ we take the `P` keys, set `Q = Q - P` and iterate on the following leaf until we find `N` keys.
@@ -181,19 +178,39 @@ file already includes this information.
 
 ## Design rationale
 
-### Provider Store
-
-The data structure of the DHT Servers' Provider Store is a nested dictionary/map whose structure is: `HASH2` -> `ServerKey` -> [`CPPeerID`, `EncPeerID`, `TS`, `Signature`].
-
-The same `HASH2` always produces the same `ServerKey`, as both `HASH2` and `ServerKey` result in a deterministic hash operation on `MH` prepended with a constant prefix. However, a misbehaving node could publish an advertisement for `HASH2` while ignoring `MH`, and forge a random `ServerKey`. The DHT server not knowing `MH` cannot determine which `ServerKey` is the one associated with `HASH2`, and hence need to keep all different `ServerKey`s. However, the number of forged `ServerKey`s is expected to be small as the Client aren't able to decrypt payload encrypted with a forged `ServerKey`, and detect that the Provider Record isn't legitimate. The only reason a misbehaving peer would want to publish forged `ServerKey`s is to exhaust the storage resources of a specific target DHT Server.
-
-Content can be provider by multiple Content Providers, hence `HASH2` -> `ServerKey` points to potentially multiple `CPPeerID`s, each Content Provider having its own Provider Record. As the `CPPeerID` is obtained from the open libp2p connection, we assume that it is impossible to impersonate another `CPPeerID`. Each Content Provider can have a single Provider Record for each `HASH2`. When a Content Provider republishes a Provider Record, the DHT Server only keeps the valid Provider Record whose `TS` is the largest value. DHT Servers drop all Provider Records from published by the same `CPPeerID` with the same `HASH2` but multiple different `ServerKey`s. A well behaving node can compute the right `ServerKey` and doesn't try to exhaust the storage resources of the DHT Server. Only a misbehaving node forges invalid `ServerKey`s, and if multiple `ServerKey`s are associated with the same (`HASH2`, `CPPeerID`) it implies that at least one of the two `ServerKey` is incorrect.
-
 ### Cryptographic algorithms
 
 **SHA256**
 
+SHA256 is the algorithm currently in use in IPFS to generate 256-bits digests used as Kademlia identifiers. Note that SHA256 refers to the algorithm of [SHA2](https://en.wikipedia.org/wiki/SHA-2) algorithm with a 256 bits digest size.
+
+A future change of Cryptographic Hash Function will require a _DHT Migration_ as the Provider Records _location_ in the Kademlia keyspace will change, for they are defined by the Hash Function. It means that all Provider Records must be published using both the new and the old hash function for the transition period. We want to avoid performing theses migrations as much as possible, but we must be ready for it as it is likely to happen in the lifespan of IPFS.
+
+Changing the Hash function used to derive `ServerKey` requires the DHT Server to support multiple Provider Records indexed by a different `ServerKey` for the same `HASH2` for the migration period.
+
 **AESGCM**
+
+[AESGCM](https://en.wikipedia.org/wiki/Galois/Counter_Mode) (Advanced Encryption Standard in Galois/Counter Mode) is a AEAD (Authenticated Encryption with Associated Data) mode of operation for symmetric-key cryptographic block ciphers which is widely adopted for its performance. It takes as input an Initialization Vector (IV) that needs to be unique (Nonce) for each encryption performed with the same key. This algorithm was selected for its securty, its performance and its large industry adoption. 
+
+The nonce size is set to `12` (default for AES GCM). AESGCM is used with encryption keys of 256 bits (SHA256 digests in this context).
+
+A change in the encryption algorithm of the Provider Record implies that the Content Providers must publish 2 Provider Records, one with each encryption scheme. The Client and the DHT Server learn which encryption algorithm has been used by the Content Provider from the `varint` contained in `EncPeerID`. When a new encryption algorithm DHT servers may need to store multiple Provider Records in its Provider Store for the same `HASH2` and the same `CPPeerID`. We restrict the number of Provider Record for each pair (`HASH2`, `CPPeerID`) to `3` (the `varint`s must be distinct), in order to allow some flexibility, while keeping the potential number of _garbage_ Provider Records published by hostile nodes low. 
+
+A change in the encryption algorithm used between the DHT Server and the Client (Lookup step 7.) means that the Client and the DHT Server must negociate the encryption algorithm, as long as it still uses a 256-bits key.
+
+**Signature scheme**
+
+TODO
+
+### Provider Store
+
+The data structure of the DHT Servers' Provider Store is a nested dictionary/map whose structure is: `HASH2` -> `ServerKey` -> `CPPeerID` -> [`EncPeerID`, `TS`, `Signature`].
+
+The same `HASH2` always produces the same `ServerKey` (as long as the same Hashing Algorithm was used), as both `HASH2` and `ServerKey` result in a deterministic hash operation on `MH` prepended with a constant prefix. However, a misbehaving node could publish an advertisement for `HASH2` while not knowing `MH`, and forge a random `ServerKey`. The DHT Server not knowing `MH` cannot determine which `ServerKey` is the one associated with `HASH2`, and hence need to keep all different `ServerKey`s. However, the number of forged `ServerKey`s is expected to be small as the Client aren't able to decrypt payload encrypted with a forged `ServerKey`, and detect that the Provider Record isn't legitimate. The only reason a misbehaving peer would want to publish forged `ServerKey`s is to exhaust the storage resources of a specific target DHT Server.
+
+Content can be provider by multiple Content Providers, hence `HASH2` -> `ServerKey` points to potentially multiple `CPPeerID`s, each Content Provider having its own Provider Record. As the `CPPeerID` is obtained from the open libp2p connection, we assume that it is not possible to impersonate another `CPPeerID`. Each Content Provider can have a single Provider Record for each `HASH2`, and for each available `varint`. During a migration, we expect to have multiple Provider Records for the same pair (`HASH2`, `CPPeerID`), the Provider Store keeps 1 Provider Records for each distinct (`HASH2`, `CPPeerID`, `varint`) with a maximum of `3` per pair (`HASH2`, `CPeerID`). If there are more than 3 candidates, the ones with the lowest `TS` are discarded. 
+When a Content Provider republishes a Provider Record, the DHT Server only keeps the valid Provider Record whose `TS` is the largest value, for the given `varint`. We expect to have a single `varint` in use most of the time. DHT Servers drop all Provider Records from published by the same `CPPeerID` with the same `HASH2` but multiple different `ServerKey`s. A well behaving node can compute the right `ServerKey` and doesn't try to exhaust the storage resources of the DHT Server. Only a misbehaving node forges invalid `ServerKey`s, and if multiple `ServerKey`s are associated with the same (`HASH2`, `CPPeerID`) it implies that at least one of the two `ServerKey` is incorrect, so the Content Provider is misbehaving.
+
 <!--
 The rationale fleshes out the specification by describing what motivated
 the design and why particular design decisions were made.
@@ -259,6 +276,7 @@ Describe alternate designs that were considered and related work.
 
 - Is it wise to encrypt the `CPPeerID` using `MH` directly? It would be possible to derive another identifier from `MH` (such as `Hash("SOME_CONSTANT" || MH)`). `MH` is the master identifier of the content, hence if it is revealed all other identifers can trivially be found. However, it is computationnaly impossible to recover `MH` from `Hash("SOME_CONSTANT" || MH)`.
 - It may be fine to use `TS` as nonce, it spares bytes on the wire. However, if two Content Providers publish the same content at the same time (`TS` either in seconds or milliseconds), then the DHT Server may be able to forge a valid Provider Records for itself.
+- Move to SHA3??
 
 ## Copyright
 
