@@ -86,39 +86,6 @@ Specifications for some transfer protocols are provided in the "Transfer Protoco
 
 Each object in the `Providers` list is a *read provider record*.
 
-### `PUT /routing/v1/providers`
-- Response Codes
-  - `200`: the server processed the full list of provider records (possibly unsuccessfully, depending on the semantics of the particular records)
-- Request Body
-```json
-{
-    "Providers": [
-        {
-            "Protocol": "<protocol_name>",
-            "Schema": "bitswap",
-            ...
-        }
-    ]
-}
-```
-
-Each object in the `Providers` list is a *write provider record*.
-
-  - Response Body
-```json
-{
-    "ProvideResults": [
-        { ... }
-    ]
-}
-```
-- `ProvideResults` is a list of results in the same order as the `Providers` in the request, and the schema of each object is determined by the `Protocol` of the corresponding write object (called "Write Provider Records Response" in the Known Transfer Protocols section)
-  - This may contain output information such as TTLs, errors, etc.
-  - It is undefined whether the server will allow partial results
-- The work for processing each provider record should be idempotent so that it can be retried without excessive cost in the case of full or partial failure of the request
-- Default limit of 100 keys per request
-- Implements pagination according to the Pagination section
-
 ## Pagination
 
 APIs that return collections of results should support pagination as follows:
@@ -155,7 +122,7 @@ limits, allowing every website to query the API for results:
 
 ```plaintext
 Access-Control-Allow-Origin: *
-Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS
+Access-Control-Allow-Methods: GET, OPTIONS
 ```
 
 ## Known Transfer Protocols
@@ -182,56 +149,6 @@ Schema: `bitswap`
 
 The server should respect a passed `transport` query parameter by filtering against the `Addrs` list.
 
-
-#### Write Provider Records
-
-```json
-{
-    "Protocol": "transport-bitswap",
-    "Schema": "bitswap",
-    "Signature": "<signature>",
-    "Payload": "<payload>"
-}
-```
-
-- `Signature`: a multibase-encoded signature of the sha256 hash of the `Payload` field, signed using the private key of the Peer ID specified in the `Payload` JSON
-  - Servers may ignore this field if they do not require signature verification
-- `Payload`: a string containing a serialized JSON object which conforms with the following schema:
-```json
-{
-    "Keys": ["cid1", "cid2"],
-    "Timestamp": 0,
-    "AdvisoryTTL": 0,
-    "ID": "12D3K...",
-    "Addrs": ["/ip4/..."],
-}
-```
-  - `Keys` is a list of the CIDs being provided
-  - `Timestamp` is the current time
-  - `AdvisoryTTL` is the time by which the caller expects the server to keep the record available
-    - If this value is unknown, the caller may use a value of 0
-  - `ID` is the peer ID that was used to sign the record
-  - `Addrs` is a list of string-encoded multiaddrs
-
-A 403 response code should be returned if the signature check fails.
-
-Note that this only supports Peer IDs expressed as identity multihashes. Peer IDs with older key types that exceed 42 bytes are not verifiable since they only contain a hash of the key, not the key itself. Normally, if the Peer ID contains only a hash of the key, then the key is obtained out-of-band (e.g. by fetching the block via IPFS). If support for these Peer IDs is needed in the future, this spec can be updated to allow the client to provide the key and key type out-of-band by adding optional `PublicKey` and `PublicKeyType` fields, and if the Peer ID is a CID, then the server can verify the public key's authenticity against the CID, and then proceed with the rest of the verification scheme.
-
-The `Payload` field is a string, not a proper JSON object, to prevent its contents from being accidentally parsed and re-encoded by intermediaries, which may change the order of JSON fields and thus cause the record to fail validation.
-
-#### Write Provider Records Response
-```json
-{
-    "AdvisoryTTL": 0
-}
-```
-
-- `AdvisoryTTL` is the time at which the server expects itself to drop the record
-  - If less than the `AdvisoryTTL` in the request, then the client should re-issue the request by that point
-  - If greater than the `AdvisoryTTL` in the request, then the server expects the client to be responsible for the content for up to that amount of time (TODO: this is ambiguous)
-  - If 0, the server makes no claims about the lifetime of the record
-
-
 ### Filecoin Graphsync
 Multicodec name: `transport-graphsync-filecoinv1`
 Schema: `graphsync-filecoinv1`
@@ -251,11 +168,7 @@ Schema: `graphsync-filecoinv1`
 ```
 
 - `ID`: the peer ID of the provider
-- `Addrs`: a list of known multiaddrs for the peer
-- `PieceCID`:
-- `VerifiedDeal`:
-- `FastRetrieval`:
-
-#### Write Provider Records
-
-There is currently no specified schema.
+- `Addrs`: a list of known multiaddrs for the provider
+- `PieceCID`: the CID of the [piece](https://spec.filecoin.io/systems/filecoin_files/piece/#section-systems.filecoin_files.piece) within which the data is stored
+- `VerifiedDeal`: whether the deal corresponding to the data is verified
+- `FastRetrieval`: whether the provider claims there is an unsealed copy of the data available for fast retrieval
