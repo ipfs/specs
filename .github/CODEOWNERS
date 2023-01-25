@@ -11,4 +11,3 @@ IPIP/ @ipfs/specs-stewards
 # interest.
 
 http-gateways/  @lidel
-reframe/*HTTP*  @lidel
