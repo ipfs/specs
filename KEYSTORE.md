@@ -208,7 +208,7 @@ does not linger in memory.
 - DagBuilderHelper needs to be able to encrypt blocks
     - Dag Nodes should be generated like normal, then encrypted, and their parents should
         link to the hash of the encrypted node
-- DagBuilderParams should have extra parameters to acommodate creating a DBH that encrypts the blocks
+- DagBuilderParams should have extra parameters to accommodate creating a DBH that encrypts the blocks
 
 #### New 'Encrypt' package
 

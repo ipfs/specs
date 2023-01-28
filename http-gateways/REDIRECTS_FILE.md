@@ -34,7 +34,7 @@ This can be used, for example, to enable URL rewriting for hosting a single-page
   - [No Forced Redirects](#no-forced-redirects)
 - [Error Handling](#error-handling)
 - [Security](#security)
-- [Appendix: notes for implementors](#appendix-notes-for-implementors)
+- [Appendix: notes for implementers](#appendix-notes-for-implementors)
   - [Test fixtures](#test-fixtures)
 
 # File Name and Location
@@ -150,7 +150,7 @@ Parsing of the `_redirects` file should be done safely to prevent any sort of in
 
 The [max file size](#max-file-size) helps to prevent an additional [denial of service attack](https://en.wikipedia.org/wiki/Denial-of-service_attack) vector.
 
-# Appendix: notes for implementors
+# Appendix: notes for implementers
 
 ## Test fixtures
 

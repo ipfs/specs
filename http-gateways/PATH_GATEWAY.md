@@ -94,7 +94,7 @@ specified content path.
 Downloads data at specified **immutable** content path.
 
 - `cid` – a valid content identifier  ([CID](https://docs.ipfs.io/concepts/glossary#cid))
-- `path` – optional path remainer pointing at a file or a directory under the `cid` content root
+- `path` – optional path parameter pointing at a file or a directory under the `cid` content root
 - `params` – optional query parameters that adjust response behavior
 
 ## `HEAD /ipfs/{cid}[/{path}][?{params}]`
@@ -350,7 +350,7 @@ value must be wrapped by double quotes as noted in [RFC7232#Etag](https://httpwg
 
 In many cases it is not enough to base `Etag` value on requested CID.
 
-To ensure `Etag` is unique enough to avoid issues with caching reverse provies
+To ensure `Etag` is unique enough to avoid issues with caching reverse proxies
 and CDNs, implementations should base it on both CID and response type:
 
 - By default, etag should be based on requested CID. Example: `Etag: "bafy…foo"`

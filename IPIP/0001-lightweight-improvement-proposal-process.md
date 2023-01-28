@@ -103,7 +103,7 @@ Guiding principles:
 - Convention over Byzantine process
   - Proposing a new IPIP should have low cognitive overhead, allowing us to
     focus on specs
-  - Reuse existing Github developer accounts and reputation attached to them
+  - Reuse existing GitHub developer accounts and reputation attached to them
   - One should be able to create a valid IPIP without reading a long explainer
     like this one. Looking at past IPIPs, and then copying a template and
     opening a PR with the proposal should be more than enough.
