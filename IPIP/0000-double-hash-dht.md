@@ -62,12 +62,12 @@ The following process describes the event of a client looking up a CID in the IP
 4. Upon receiving the request, the DHT servers search if there is an entry for `MH` in their Provider Store. If yes, go to 10. Else continue.
 5. DHT servers compute `Hash(MH)`.
 6. DHT servers find the 20 closest peers to `Hash(HM)` in XOR distance in their Routing Table.
-7. DHT servers return the 20 `peerids` and `multiaddrs` of these peers to Client.
+7. DHT servers return the 20 `PeerID`s and `multiaddrs` of these peers to Client.
 8. Client sends a DHT lookup request for `CID` to the closest peers in XOR distance to `Hash(MH)` that it received.
 9. Go to 4.
 10. The DHT servers storing the Provider Record(s) associated with `MH` send them to Client. (Currently, if a Provider Record has been published less than 30 min before being requested, the DHT servers also send the `multiaddresses` of the Content Provider to Client).
-11. If the response from the DHT server doesn't include the `multiaddrs` associated with the Content Providers' `peerid`s, Client performs a DHT `FindPeer` request to find the `multiaddrs` of the returned `peerid`s.
-12. Client sends a Bitswap request for `CID` to the Content Provider (known `peerid` and `multiaddrs`).
+11. If the response from the DHT server doesn't include the `multiaddrs` associated with the Content Providers' `PeerID`s, Client performs a DHT `FindPeer` request to find the `multiaddrs` of the returned `PeerID`s.
+12. Client sends a Bitswap request for `CID` to the Content Provider (known `PeerID` and `multiaddrs`).
 13. Content Provider sends the requested content back to Client.
 
 ### Double Hash DHT design
@@ -75,25 +75,25 @@ The following process describes the event of a client looking up a CID in the IP
 **Publish Process**
 1. Content Provider wants to publish some content with identifier `CID`.
 2. Content Provider computes `HASH2`$\leftarrow{}$`SHA256(bytes("CR_DOUBLEHASH") || MH)` (`MH` is the MultiHash included in the CID).
-3. Content Provider starts a DHT lookup request for the 20 closest `peerid`s in XOR distance to `HASH2`.
-4. Content Provider encrypts its own `peerid` (`CPPeerID`) with `MH`, using AES-GCM. `EncPeerID = varint || Nonce || AESGCM(MH, CPPeerID || Nonce)`
+3. Content Provider starts a DHT lookup request for the 20 closest `PeerID`s in XOR distance to `HASH2`.
+4. Content Provider encrypts its own `PeerID` (`CPPeerID`) with `MH`, using AES-GCM. `EncPeerID = varint || Nonce || AESGCM(MH, CPPeerID || Nonce)`
 5. Content Provider takes the current timestamp `TS`.
 6. Content Provider signs `EncPeerID` and `TS` using its private key. `Signature = Sign(privkey, EncPeerID || TS)`
 7. Content Provider computes `ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)`.
 8. Once the lookup request has returned the 20 closest peers, Content Provider sends a Publish request to these DHT servers. The Publish request contains [`HASH2`, `EncPeerID`, `TS`, `Signature`, `ServerKey`].<!-- TODO: define exact format -->
-9. Each DHT server verifies `Signature` against the `peerid` of the Content Provider used to open the libp2p connection. `Verify(CPPeerID, Signature, EncPeerID || TS)`. It verifies that `TS` is _recent enough_. If invalid, send an error to the client. <!-- TODO: define error && check TS valid -->
-10. Each DHT server adds an entry in their Provider Store for `HASH2` -> `ServerKey` -> [`CPPeerID`, `EncPeerID`, `TS`, `Signature`], with `CPPeerID` being the `peerid` of the Content Provider. If there is already an entry including `CPPeerID` for `HASH2` -> `ServerKey`, and if the `TS` of the new valid entry is newer than the existing `TS`, overwrite the entry in the Provider Store. Else drop the new entry.
+9. Each DHT server verifies `Signature` against the `PeerID` of the Content Provider used to open the libp2p connection. `Verify(CPPeerID, Signature, EncPeerID || TS)`. It verifies that `TS` is _recent enough_. If invalid, send an error to the client. <!-- TODO: define error && check TS valid -->
+10. Each DHT server adds an entry in their Provider Store for `HASH2` -> `ServerKey` -> `CPPeerID` -> [`EncPeerID`, `TS`, `Signature`], with `CPPeerID` being the `PeerID` of the Content Provider. If there is already an entry including `CPPeerID` for `HASH2` -> `ServerKey`, and if the `TS` of the new valid entry is newer than the existing `TS`, overwrite the entry in the Provider Store. Else drop the new entry.
 11. Each DHT server confirms to Content Provider that the Provider Record has been successfully added.
 12. The proces is over once Content Provider has received 20 confirmations.
 
 **Lookup Process**
 1. Client computes `HASH2 = SHA256(bytes("CR_DOUBLEHASH") || MH)` (`MH` is the MultiHash included in the CID).
 2. Client selects a prefix of `HASH2`, `KeyPrefix = HASH2[:l]` for a defined `l` (see [`l` selection](#prefix-length-selection)).
-2. Client finds the closest `peerid`s to `HASH2` in XOR distance in its Routing Table.
-3. Client sends a DHT lookup request for `KeyPrefix` to these DHT servers.
-4. The DHT servers find the 20 closest `peerid`s to `KeyPrefix` in XOR distance (see [algorithm](#closest-keys-to-a-key-prefix)). Add these `peerid`s and their associated multiaddresses (if applicable) to the `message` that will be returned to Client.
+2. Client finds the closest `PeerID`s to `HASH2` in XOR distance in its Routing Table.
+3. Client sends a DHT lookup request for `KeyPrefix` to these DHT servers. The request contains a flag to specify whether Client wants the `multiaddrs` associated with the `CPPeerID` or not.
+4. The DHT servers find the 20 closest `PeerID`s to `KeyPrefix` in XOR distance (see [algorithm](#closest-keys-to-a-key-prefix)). Add these `PeerID`s and their associated multiaddresses (if applicable) to the `message` that will be returned to Client.
 5. The DHT servers search if there are entries matching `KeyPrefix` in their Provider Store.
-6. For all entries `HASH2` of the Provider Store where `HASH2[:len(KeyPrefix)]==KeyPrefix`, add to `message` the following encrypted payload: `Enc(ServerKey, EncPeerID || TS || Signature || multiaddrs)`, for `multiaddrs` being the multiaddresses associated with `CPPeerID` (if applicable). DHT Servers can decide to put a maximal limit of returned Provider Record per request. If too many `HASH2` are matching `KeyPrefix`, they select randomly 128 matching provider records per request, and send a flag to Client to signal that the limit was reached. <!-- TODO: define flag-->
+6. For all entries `HASH2` of the Provider Store where `HASH2[:len(KeyPrefix)]==KeyPrefix`, add to `message` the following encrypted payload: `Enc(ServerKey, EncPeerID || TS || Signature || multiaddrs)`, for `multiaddrs` being the multiaddresses associated with `CPPeerID` (if applicable) if the `multiaddrs` were requested by Client. DHT Servers can decide to put a maximal limit of returned Provider Record per request. If too many `HASH2` are matching `KeyPrefix`, they select randomly 128 matching provider records per request, and send a flag to Client to signal that the limit was reached. <!-- TODO: define flag-->
 7. The DHT servers send `message` to Client.
 8. Client computes `ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)`.
 9. Client tries to decrypt all returned encrypted payloads using `ServerKey`. If at least one encrypted payload can be decrypted, go to 12.
@@ -165,17 +165,6 @@ func closest_to_match(prefix, N, all_keys) {
 }
 ```
 
-
-## Test fixtures
-
-
-<!--
-List relevant CIDs. Describe how implementations can use them to determine
-specification compliance. This section can be skipped if IPIP does not deal
-with the way IPFS handles content-addressed data, or the modified specification
-file already includes this information.
--->
-
 ## Design rationale
 
 ### Cryptographic algorithms
@@ -200,7 +189,12 @@ A change in the encryption algorithm used between the DHT Server and the Client 
 
 **Signature scheme**
 
-TODO
+The signature scheme is the default one from libp2p. The available algorithms are available [here](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#key-types) We use the private key, from which the node's `PeerID` is derived to sign `(EncPeerID || TS)`. Every node with the knowledge of the signing `peerid` can verify the signature.
+
+```go
+privKey := host.Peerstore().PrivKey(host.ID())
+signature, err := privKey.Sign(data)
+```
 
 ### Provider Store
 
@@ -211,6 +205,13 @@ The same `HASH2` always produces the same `ServerKey` (as long as the same Hashi
 Content can be provider by multiple Content Providers, hence `HASH2` -> `ServerKey` points to potentially multiple `CPPeerID`s, each Content Provider having its own Provider Record. As the `CPPeerID` is obtained from the open libp2p connection, we assume that it is not possible to impersonate another `CPPeerID`. Each Content Provider can have a single Provider Record for each `HASH2`, and for each available `varint`. During a migration, we expect to have multiple Provider Records for the same pair (`HASH2`, `CPPeerID`), the Provider Store keeps 1 Provider Records for each distinct (`HASH2`, `CPPeerID`, `varint`) with a maximum of `3` per pair (`HASH2`, `CPeerID`). If there are more than 3 candidates, the ones with the lowest `TS` are discarded. 
 When a Content Provider republishes a Provider Record, the DHT Server only keeps the valid Provider Record whose `TS` is the largest value, for the given `varint`. We expect to have a single `varint` in use most of the time. DHT Servers drop all Provider Records from published by the same `CPPeerID` with the same `HASH2` but multiple different `ServerKey`s. A well behaving node can compute the right `ServerKey` and doesn't try to exhaust the storage resources of the DHT Server. Only a misbehaving node forges invalid `ServerKey`s, and if multiple `ServerKey`s are associated with the same (`HASH2`, `CPPeerID`) it implies that at least one of the two `ServerKey` is incorrect, so the Content Provider is misbehaving.
 
+### `k`-anonymity
+
+The `k`-anonymity parameter `k` is user defined, it can be modified in the configuration files. Users requiring a higher level of privacy can increase their value of `k`.
+Default parameter selection: `k = 8`
+
+Maximal number of returned keys
+
 <!--
 The rationale fleshes out the specification by describing what motivated
 the design and why particular design decisions were made.
@@ -219,49 +220,77 @@ Provide evidence of rough consensus and working code within the community,
 and discuss important objections or concerns raised during discussion.
 -->
 
-### User benefit
-
-<!--
-How will end users benefit from this work?
--->
+## User benefits
 
 ### Reader Privacy
 
-**`k`-anonymity**
+**Double Hashing**
 
-Default parameter selection: `k = 8`
+Currently any DHT Server observing a request can associate the Client's `PeerID` with the requested `CID`. If the `CID` is not already known, curious DHT Servers observing a DHT request can replay the request, and retrieve the content that the client is accessing, which is a significant privacy concern. Using `HASH2` as DHT Content Identifier prevents curious DHT Servers not knowing `MH`, the preimage of `HASH2` from retrieving the content associated with `HASH2`. Curious DHT Servers can still replay the DHT request for `HASH2` and find the Content Providers. However, they are not able to make a valid Bitswap request to the Content Providers, for they don't have the knowledge of the Content Identifier used by Bitswap (`CID`) for the content being identified by `HASH2` in the DHT.
+
+Double Hashing is also necessary for Prefix Requests and Provider Record Encryption.
+
+**Prefix Requests**
+
+A Prefix Request consists in requesting a Prefix of a key, instead of a full length Kademlia key. A Prefix corresponds to a branch of the binary tree, and potentially matches multiple existing keys. Prefix Request Routing works exactly like the normal Kademlia Routing, hence a DHT Prefix Request always converges eventually. The goal of Prefix Requests is to match multiple Provider Records for a single request. Insead of requesting `HASH2` the Client now requests `Prefix`, a prefix of `HASH2` of length `l` bits, and the DHT Server storing the Provider Records matching to `Prefix` doesn't know exactly which content is accessed and returns all Provider Records whose `HASH2` matches `Prefix`.
+
+This provides [`k`-anonymity](https://en.wikipedia.org/wiki/K-anonymity) when a curious DHT Server tries to associate the Client's `PeerID` with the requested `HASH2`, with `k` defined as the average number of Provider Records matching a Prefix of length `l`. `k` is a system parameter and defines the `k`-anonymity level, and `l` is derived from `k` (see [Prefix Length Selection](#prefix-length-selection)). Prefix Request also enables [Plausible Deniability](https://en.wikipedia.org/wiki/Deniable_encryption) for the Client. The DHT Server cannot prove that a Client identified by its `PeerID` or `IP Address` tried to access some content identified by its `HASH2`.
+
+However Prefix Requests don't offer [`l`-diversity](https://en.wikipedia.org/wiki/L-diversity) nor [`t`-closeness](https://en.wikipedia.org/wiki/T-closeness), as frequency analysis is still easy to perform. For example, a `Prefix` matches a very popular Provider Records and a few unpopular ones. The DHT Server nodes can take a better-than-random guess when a new request is recieved for this `Prefix` that there is a higher chance that the Client is requesting the popular content's Provider Record compared with an unpopular one. However, the DHT Server cannot prove the the Client has accessed the popular content.
+
+**Provider Record Encryption**
+
+Provider Record Encryption also builds on top of Double Hashing. The Provider Record Encryption prevents curious DHT Servers observing a request for `Prefix` but not storing any Provider Record matching `Prefix`, to replay the request for `Prefix` and get all published keys matching `Prefix` including `HASH2` of the content accessed by the Client. It prevents all curious actors from building a global dictionary of `HASH2` to Content Providers for all content published in the IPFS public DHT. It is necessary to know the `MH` of the content (included in the `CID`) to learn about its Content Providers.
+
+Curious DHT Servers observing a request from `PeerID` for `Prefix` cannot associate the Client's `PeerID` with the Content Provider's `PeerID` because they cannot read the Provider Record.
 
 ### Writer Privacy
 
+Writer Privacy is NOT the goal of this design. However, as a side effect, Write Privacy gets improved in some specific cases.
+- Content Providers do NOT get any additional privacy from the Client fetching the data
+- Content Providers can now hide to the DHT Server peers hosting their Provider Records which data they are serving, as long as the DHT Servers don't know the preimage of `HASH2`: `MH`. The DHT Servers are not able to query the content associated with the Provider Records they are storing. However, they can approximatively monitor the number of requests associated to the content by observing the requests in the keysubspace matching to `Prefix` of `HASH2` of the content. DHT Servers can take an educated guess on the association of `HASH2` with the Content Provider's `PeerID`. The DHT Servers storing the Provider Record are able to share information about the Content Provider with potential accomplices.
+- Content Providers get additional privacy from curious DHT Servers observing a request, but NOT storing the Provider Record. These DHT Servers can still replay the DHT request, but are unable to discover the Content Provider's `PeerID` associated with `Preix` because the Provider Records are encrypted, and the content itself. This holds as long as the DHT Servers don't know the `MH` (or `CID`).
+
 ### Provider Record Authenticity
+
+The Provider Records are now signed by the Content Provider. This prevents a malicious DHT Server from forging a Provider Record for an arbitrary key. The Clients need to verify the Signature against the Content Provider's `PeerID` and send a Bitswap request to the Content Provider only if the Signature is valid. Content Providers can only publish Provider Records for themselves.
 
 ### Provider Records Enumeration
 
-Easier monitoring of the DHT, random key query
+Enumarating the number of Provider Records in the DHT becomes trivial thank to the Double Hashing and Prefix Requests. Knowledge of the preimage of the requested key isn't required anymore for a valid Kademlia request. An easy Provider Records Enumeration, or Approximation if crawling the complete DHT isn't an option enables a better monitoring of the DHT load and activity.
 
 ### Better Kademlia Routing Table Refresh
 
-Get rid of 456 KB in the IPFS source code https://github.com/libp2p/go-libp2p-kbucket/blob/master/bucket_prefixmap.go
+As knowledge of the preimage of the requested key isn't necessary in the Double Hashing DHT, nodes gain the ability to request _truely_ random keys in the DHT.
 
-## Compatibility
+Requesting random keys is necessary for the Kademlia Bucket Refresh Process. On refresh, if a bucket has empty slots, the node will make a request for a random forged key falling in this specific bucket. In the current implementation, as the prefix of a requested key is necessary, Kademlia uses a [list of precomputed preimages](https://github.com/libp2p/go-libp2p-kbucket/blob/master/bucket_prefixmap.go), 1 matching every 15-bits key prefix. Hence, the random forged key, is never random, its definition set is the list of precomputed preimages, and not the full keyspace. This can lead to degraded performance and security vulnerabilities.
 
-Breaking change
-<!--
-Explain the upgrade considerations for existing implementations.
--->
+Double Hashing enables the nodes to select a _truly_ random key from the Kademlia keyspace (limited by the randomness algorithm) matching the appropriate bucket.The 456KB [list of precomputed preimages](https://github.com/libp2p/go-libp2p-kbucket/blob/master/bucket_prefixmap.go) can be removed from the IPFS source code, once the migration to the Double Hashing DHT is complete.
+
+### Simplicity
+
+It is generally less complex to find content in the DHT by requesting its Kademlia identifier (keyspace location), instead of requesting the preimage of its keyspace location.
+
+## Migration
+
+This design is a breaking change and requires a major DHT migration.
+
+**WIP**
 
 ## Security
 
 Threat Model (or it should be in a distinct section)
 
 DOS (sending the multiaddrs of the target peer for every served provider record) can be solved in the future with signed peer records.
+
+Privacy depends on the secrecy of `CID`.
 <!--
 Explain the security implications/considerations relevant to the proposed change.
 -->
 
 ## Alternatives
 
-This approach is a first fix to the DHT (low hanging fruit). Other alternative to add privacy in the DHT include Mixnets and ephemeral peerids.
+This approach is a first fix to the DHT privacy (low hanging fruit). Other alternative to add privacy in the DHT include Mixnets (incl. Tor) and ephemeral PeerIDs.
 
 Alternatives for migration:
 - slow breaking change (give enough time so that only a _small_ number of participants break)
@@ -276,7 +305,7 @@ Describe alternate designs that were considered and related work.
 
 - Is it wise to encrypt the `CPPeerID` using `MH` directly? It would be possible to derive another identifier from `MH` (such as `Hash("SOME_CONSTANT" || MH)`). `MH` is the master identifier of the content, hence if it is revealed all other identifers can trivially be found. However, it is computationnaly impossible to recover `MH` from `Hash("SOME_CONSTANT" || MH)`.
 - It may be fine to use `TS` as nonce, it spares bytes on the wire. However, if two Content Providers publish the same content at the same time (`TS` either in seconds or milliseconds), then the DHT Server may be able to forge a valid Provider Records for itself.
-- Move to SHA3??
+- Move to SHA3?? Now or never (or with the universal DHT)
 
 ## Copyright
 
