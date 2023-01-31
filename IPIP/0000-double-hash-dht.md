@@ -1,8 +1,5 @@
 # IPIP 0000: Double Hash DHT
 
-<!-- IPIP number will be assigned by an editor. When opening a pull request to
-submit your IPIP, please use number 0000 and an abbreviated title in the filename,
-`0000-draft-title-abbrev.md`. -->
 ![wip](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
 - DRI: [Guillaume Michel](https://github.com/guillaumemichel)
 - Start Date: 2023-01-18
@@ -14,8 +11,20 @@ submit your IPIP, please use number 0000 and an abbreviated title in the filenam
 
 ## Summary
 
-<!--One paragraph explanation of the IPIP.-->
-/TODO
+This IPIP contains the up-to-date Spec of the IPFS Double Hash DHT. The Double Hashing DHT aims at providing some Reader Privacy guarantees to the IPFS DHT.
+
+This document is still WIP, all feedback is more than welcome. Make sure to write your thoughts about the [open questions](#open-questions) in the PR.
+
+## Table of Contents
+
+1. [Motivation](#motivation)
+2. [Detailed Design](#detailed-design)
+3. [Design Rationale](#design-rationale)
+4. [User benefits](#user-benefits)
+5. [Migration](#migration)
+6. [Threat Model](#threat-model)
+7. [Alternatives](#alternatives-for-dht-reader-privacy)
+8. [Open Questions](#open-questions)
 
 ## Motivation
 
@@ -23,7 +32,7 @@ IPFS is currently lacking of many privacy protections. One of its principal weak
 
 The changes described in this document introduce a DHT privacy upgrade boosting the reader’s privacy. It will prevent DHT tracking as described above, and add Provider Records Authentication. The proposed modifications also add a slight Writer Privacy improvement as a side effect.
 
-## Detailed design
+## Detailed Design
 
 ### Definitions
 
@@ -108,17 +117,6 @@ The following process describes the event of a client looking up a CID in the IP
 17. Client sends a Bitswap request for `CID` to the Content Provider (known `CPPeerID` and `multiaddrs`).
 18. Content Provider sends the requested content back to Client.
 
-<!--
-AKA Solution Proposal
-
-Describe the proposed solution and list all changes made to the specs repository.
-
-The resulting specification should be detailed enough to allow competing,
-interoperable implementations.
-
-When modifying an existing specification file, this section should provide a
-summary of changes. When adding new specification files, list all of them.
--->
 ### Prefix length selection
 
 The goal of DHT prefix requests is to provide [`k`-anonymity](https://en.wikipedia.org/wiki/K-anonymity) to content lookup, in addition to the pseudonimity gained from double hashing. Each DHT prefix lookup query returns an expected number of `k` Provider Records matching `KeyPrefix`, with `k` being a system parameter. The user should be able to define a custom `k` from the configuration files, according to their privacy needs. The default value `k = 8` is discussed in [Design rationale](#reader-privacy).
