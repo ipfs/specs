@@ -50,7 +50,8 @@ s of the Client retreiving the content identified by `CID`.
 **Magic Values**
 - bytes("CR_DOUBLEHASH")
 - bytes("CR_SERVERKEY")
-- AESGCM varint <!-- TODO: add varint draft -->
+- AESGCM varint: `TODO` <!-- TODO: add varint draft -->
+- Double SHA256 varint: `DBL_SHA2_256 = 86`
 - Max number of Provider Records returned by a DHT Server for a single request: `128` <!-- TODO: define number-->
 
 ### Current DHT
@@ -277,35 +278,63 @@ This design is a breaking change and requires a major DHT migration.
 
 **WIP**
 
-## Security
-
-Threat Model (or it should be in a distinct section)
-
-DOS (sending the multiaddrs of the target peer for every served provider record) can be solved in the future with signed peer records.
-
-Privacy depends on the secrecy of `CID`.
-<!--
-Explain the security implications/considerations relevant to the proposed change.
--->
-
-## Alternatives
-
-This approach is a first fix to the DHT privacy (low hanging fruit). Other alternative to add privacy in the DHT include Mixnets (incl. Tor) and ephemeral PeerIDs.
-
 Alternatives for migration:
 - slow breaking change (give enough time so that only a _small_ number of participants break)
 - DHT duplication
 - Universal DHT (WIP).
 
-<!--
-Describe alternate designs that were considered and related work.
--->
+## Threat Model
+
+### Reader Privacy
+
+The Double Hashing DHT prevents DHT Server nodes to associate a Client's `PeerID` with the Content requested by the Client. DHT Servers no longer know _which Client is accessing which content_. This protection only works as long as the DHT Servers don't know the `CID` requested by the Client. Thus, the privacy of a request depends on the secrecy of the requested `CID`.
+
+A powerful adversary could crawl all discoverable `CID`s, e.g by sniffing Bitswap broadcasts or browsing the Web to discover new `CID`s. From this list of `CID`s, the adversary can compute the `HASH2`s associated with all the `CID`s and get a mapping `HASH2` $\rightarrow$ `CID` for many `CID`s. This adversary can run many DHT Servers, and upon request for some `Prefix`, check which `HASH2` are matching the `Prefix`. Using frequency analysis, the adversary can take an educated guess on which content the client is requesting. If the requested content is unknown to the adversary, but the adversary knows its `CID`, the adversary can trivially resolve the Content Providers from the DHT, and fetch the content over Bitswap.
+
+DHT Servers serving the requested Provider Record to the Client has the ability to associate the Client's `PeerID` with the Content Providers `PeerID`. It can track _from which peer a Client is fetching content_.
+
+The proposed solution makes _association attacks_ (associating the Client's `PeerID` with the requested `CID`) much more expensive for _public content_, but doesn't make them impossible to perform. However, malicious users cannot discover _private content_, and spy on users accessing it. If Alice advertises her holiday pictures to the public IPFS DHT and privately sends the root `CID` to Bob only, no adversary can retrieve the pictures, and no adversary can learn what Bob is accessing. Only the DHT Servers serving the Provider Record to Bob know that Bob is requesting some content from Alice's `PeerID`.
+
+The Client doesn't have any privacy protection from the Content Provider serving Content over Bitswap.
+
+### Signed Provider Records
+
+Provider Records are signed in the Double Hash DHT. This implies that malicious DHT Servers serving a Provider Record can no longer forge an arbitrary Provider Record corresponding to the requested `CID`. The Client can computationally verify that the Provider Record is valid, and was created by the Provider Record that has the knowledge of `CID`.
+
+### DDOS Protection
+
+The Double Hash DHT doesn't improve DDOS (Distributed Denial Of Service) protection. Upon recieving a DHT request from a Client for a valid Provider Record, DHT Servers can decide to return a `multiaddrs` corresponding to the IP address of a `target` host, not providing the requested content. The Client will open a connection to the returned `multiaddrs` and send a Bitswap request for the content. If the `CID` that was initially requested is popular, this will generate a lot of traffic toward the `target` coming from many different Clients.
+
+DDOS protection can be improved in the future on the Double Hash DHT by using signed Peer Records.
+
+### DHT Servers Resource Exhaustion
+
+An adversary user could try to exhaust the DHT resources by advertising garbage Provider Records. The adversary needs to generate random bytes (_garbage_), sign them and ask DHT Server nodes to store the garbage Provider Records. DHT Server nodes cannot computaionally decide whether a Provider Record is garbage or not, thus they must continue storing the Provider Records. Note that the adversary periodically needs to republish every Provider Record, which isn't trivial for a large number of Provider Records at the moment. This issue isn't mitigated in the current DHT.
+
+One possible mitigation could be to identify IP addresses publishing an _excessive_ number of Provider Records that are never accessed, and refusing to store more Provider Records for this IP.
+
+## Alternatives for DHT Reader Privacy
+
+Other approaches to improve Reader Privacy in the DHT mostly include Ephemeral `PeerID`s and [Mixnets](https://en.wikipedia.org/wiki/Mix_network). The first option is to use ephemeral `PeerID`s in order to escape tracking. This solution however doesn’t increase much the privacy level. It is still possible to enumerate the all `PeerID`s in the network and to associate all the `PeerID`s using the same IP addresses. Combining the Ephemeral `PeerID` approach with Double Hashing can help slighlty improve privacy. Having a different `PeerID` for the DHT Client and the DHT Server of the same IPFS node makes association of _which Content Provider requested which Content_ harder. The two `PeerID`s can still be associated as they use the same IP address, but the DHT Client cannot be discovered in a network crawl.
+
+Ephemeral `PeerID`s references:
+- https://github.com/libp2p/libp2p/issues/37
+
+The other alternative to increase the Reader Privacy level in the IPFS DHT is the use of Mixnets such as Tor or I2P. Mixnets usually provide an excellent Reader- and Writer Privacy level, but the latency is expected to increase significantly. Hence the use of Mixnets is generally not good for all use cases, but only when strong privacy guarantees are required. IPFS users willing to remain pseudonymous could use the extisting Tor network to hide their identity. Another alternative could be to create a Mixnet out of the IPFS network, e.g include mixing capabilities in every libp2p host. There has been some ongoing work on IPFS-Tor integration.
+
+Mixnets references:
+- Berty's [go-libp2p-tor-transport](https://github.com/berty/go-libp2p-tor-transport)
+- [Hosting an IPFS Gateway Through a Tor Proxy](https://www.minds.com/raymondsmith98/blog/tutorial-tor-hosting-an-ipfs-gateway-through-a-tor-proxy-857369540936916992)
+- Mixnet and Content Routing ([IPFS Thing 2022 Video](https://www.youtube.com/watch?v=f85U8b5g-Ks), [Notes](https://hackmd.io/@nZ-twauPRISEa6G9zg3XRw/BkrcMOLd9)) by [noot](https://github.com/noot)
+- [Nym Mixnet](https://nymtech.net/)
+- https://github.com/ipfs/notes/issues/37
+
 
 ## Open Questions
 
 - Is it wise to encrypt the `CPPeerID` using `MH` directly? It would be possible to derive another identifier from `MH` (such as `Hash("SOME_CONSTANT" || MH)`). `MH` is the master identifier of the content, hence if it is revealed all other identifers can trivially be found. However, it is computationnaly impossible to recover `MH` from `Hash("SOME_CONSTANT" || MH)`.
 - It may be fine to use `TS` as nonce, it spares bytes on the wire. However, if two Content Providers publish the same content at the same time (`TS` either in seconds or milliseconds), then the DHT Server may be able to forge a valid Provider Records for itself.
-- Move to SHA3?? Now or never (or with the universal DHT)
+- Move to SHA3?? Now or never (or with the universal DHT) https://en.wikipedia.org/wiki/SHA-3#Comparison_of_SHA_functions
 
 ## Copyright
 
