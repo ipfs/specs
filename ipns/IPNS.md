@@ -260,7 +260,7 @@ Finally, the network nodes may also republish their records, so that the records
 
 ### Record Creation
 
-IPNS record MUST be serialized as `IpnsEntry` protobuf, and `IpfsEntry.data` MUST be signed using the private key.
+IPNS record MUST be serialized as `IpnsEntry` protobuf, and `IpnsEntry.data` MUST be signed using the private key.
 Creating a new IPNS record MUST follow the below steps:
 
 1. Create `IpnsEntry` and set `value`, `validity`, `validityType`, `sequence`, and `ttl`
