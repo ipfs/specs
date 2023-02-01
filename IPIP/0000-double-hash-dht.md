@@ -59,7 +59,7 @@ The changes described in this document introduce a DHT privacy upgrade boosting 
 **Magic Values**
 - bytes("CR_DOUBLEHASH")
 - bytes("CR_SERVERKEY")
-- AESGCM varint: `TODO` <!-- TODO: add varint draft -->
+- AESGCM [varint](https://github.com/multiformats/multicodec): `TODO` <!-- TODO: add varint draft -->
 - Double SHA256 varint: `DBL_SHA2_256 = 86`
 - Max number of Provider Records returned by a DHT Server for a single request: `128` <!-- TODO: define number-->
 
@@ -86,7 +86,7 @@ The following process describes the event of a client looking up a CID in the IP
 1. Content Provider wants to publish some content with identifier `CID`.
 2. Content Provider computes `HASH2`$\leftarrow{}$`SHA256(bytes("CR_DOUBLEHASH") || MH)` (`MH` is the MultiHash included in the CID).
 3. Content Provider starts a DHT lookup request for the 20 closest `PeerID`s in XOR distance to `HASH2`.
-4. Content Provider encrypts its own `PeerID` (`CPPeerID`) with `MH`, using AES-GCM. `EncPeerID = varint || Nonce || AESGCM(MH, CPPeerID || Nonce)`
+4. Content Provider encrypts its own `PeerID` (`CPPeerID`) with `MH`, using AES-GCM. `EncPeerID = varint || Nonce || AESGCM(MH, CPPeerID || Nonce)`, with `varint` indicating the encryption algorithm in use, here AESGCM.
 5. Content Provider takes the current timestamp `TS`.
 6. Content Provider signs `EncPeerID` and `TS` using its private key. `Signature = Sign(privkey, EncPeerID || TS)`
 7. Content Provider computes `ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)`.
