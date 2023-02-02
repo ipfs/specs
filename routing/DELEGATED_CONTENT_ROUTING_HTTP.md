@@ -71,36 +71,25 @@ Specifications for some transfer protocols are provided in the "Transfer Protoco
   - `404`: must be returned if no matching records are found
   - `422`: request does not conform to schema or semantic constraints
 - Response Body
-  
-  ```json
-  {
-      "Providers": [
-          {
-              "Protocol": "<protocol_name>",
-              "Schema": "<schema>",
-              ...
-          }
-      ]
-  }
-  ```
-  
-- Default limit: 100 providers
-- Optional query parameters
-  - `transfer` only return providers who support the passed transfer protocols, expressed as a comma-separated list of transfer protocol names such as `transfer=bitswap,filecoin-graphsync-v1`
-  - `transport` for provider records with multiaddrs, only return records with multiaddrs explicitly supporting the passed transport protocols, encoded as decimal multicodec codes such as `transport=460,478` (`/quic` and `/tls/ws` respectively)
-- Implements pagination according to the Pagination section
+```json
+{
+    "Providers": [
+        {
+            "Protocol": "<protocol_name>",
+            "Schema": "<schema>",
+            ...
+        }
+    ]
+}
+```
+
+- Response limit: 100 providers
 
 Each object in the `Providers` list is a *read provider record*.
 
 ## Pagination
 
-APIs that return collections of results should support pagination as follows:
-
-- If there are more results, then a `NextPageToken` field should include an opaque string value, otherwise it should be undefined
-- The value of `NextPageToken` can be specified as the value of a `pageToken` query parameter to fetch the next page
-  - Character set is restricted to the regular expression `[a-zA-Z0-9-_.~]+`, since this is intended to be used in URLs
-- The client continues this process until `NextPageToken` is undefined or doesn't care to continue
-- A `pageLimit` query parameter specifies the maximum size of a single page
+This API does not support pagination, but optional pagination can be added in a backwards-compatible spec update.
 
 ### Implementation Notes
 
@@ -140,6 +129,7 @@ This section contains a non-exhaustive list of known transfer protocols (by name
 
 Multicodec name: `transport-bitswap`
 Schema: `bitswap`
+Specification: [ipfs/specs/BITSWAP.md](https://github.com/ipfs/specs/blob/main/BITSWAP.md)
 
 #### Bitswap Read Provider Records
 
@@ -162,6 +152,7 @@ The server should respect a passed `transport` query parameter by filtering agai
 
 Multicodec name: `transport-graphsync-filecoinv1`
 Schema: `graphsync-filecoinv1`
+Specification: [ipfs/go-graphsync/blob/main/docs/architecture.md](https://github.com/ipfs/go-graphsync/blob/main/docs/architecture.md)
 
 #### Filecoin Graphsync Read Provider Records
 
