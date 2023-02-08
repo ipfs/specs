@@ -51,7 +51,7 @@ The changes described in this document introduce a DHT privacy upgrade boosting 
 - **`ServerKey`** is defined as `SHA256(bytes("CR_SERVERKEY") || MH)`. It is derived from the `MH`. The Content Provider communicates `ServerKey` to the DHT Servers during the Publish Process. The DHT Servers use it to encrypt the data sent to the Client during the lookup process.
 - **`TS`** is the Timestamp (unix timestamp) when the Content Provider published the content.
 - **`CPPeerID`** is the `PeerID` of the Content Provider for a specific `CID`.
-- **`EncPeerID`** is the result of the encryption of `CPPeerID` using `MH` as encryption key and a random nonce `AESGCM(MH, CPPeerID || RandomNonce)`. `EncPeerID` contains the [varint](https://github.com/multiformats/multicodec) of the encryption algorithm used (AESGCM), the bytes array of the encrypted payload, and the Nonce. <!-- TODO: define draft varint -->
+- **`EncPeerID`** is the result of the encryption of `CPPeerID` using `MH` as encryption key and a random nonce `AESGCM(MH, CPPeerID || RandomNonce)`. `EncPeerID` contains the [varint](https://github.com/multiformats/multicodec/blob/master/table.csv#L69) of the encryption algorithm used (AES), the bytes array of the encrypted payload, and the Nonce.
 - **`Signature`** is the signature of the `EncPeerID` encrypted payload (not including the varint nor the nonce) and `TS` using the Content Provider's private key, either with ed25519 or rsa signature algorithm, depending on the keys of the Content Provider.
 - **Provider Record** is defined as a pointer to the storage location of some content identified by `CID` or `HASH2`. A Provider Record consists on the following fields: [`EncPeerID`, `TS`, `Signature`].
 - **Provider Store** is the data structure on the DHT Servers used to store the Provider Records. Its structure is a nested dictionary/map: `HASH2` -> `ServerKey` -> [`CPPeerID`, `EncPeerID`, `TS`, `Signature`]. There is only one single correct `ServerKey` for each `HASH2`. However, any peer can forge a valid Publish request (with invalid `EncPeerID` but valid `Signature`) undetected by the DHT Server. The DHT server isn't able to distinguish which `ServerKey` is correct as it doesn't have the knowledge of `MH`, hence it has to keep both and serve both upon request for `HASH2`.
@@ -59,8 +59,8 @@ The changes described in this document introduce a DHT privacy upgrade boosting 
 **Magic Values**
 - bytes("CR_DOUBLEHASH")
 - bytes("CR_SERVERKEY")
-- AESGCM [varint](https://github.com/multiformats/multicodec): `TODO` <!-- TODO: add varint draft -->
-- Double SHA256 varint: `DBL_SHA2_256 = 86`
+- AES [varint](https://github.com/multiformats/multicodec/blob/master/table.csv#L69): `aes-256 = 0xa2`
+- Double SHA256 [varint](https://github.com/multiformats/multicodec/blob/master/table.csv#L41): `dbl-sha2-256 = 0x56`
 - A DHT Server returns all of the Provider Records matching to at most **`MatchLimit = 64`** distinct `HASH2`. Magic number explanation in [k-anonymity](#k-anonymity).
 
 ### Current DHT
