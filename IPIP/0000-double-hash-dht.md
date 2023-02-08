@@ -61,7 +61,7 @@ The changes described in this document introduce a DHT privacy upgrade boosting 
 - bytes("CR_SERVERKEY")
 - AESGCM [varint](https://github.com/multiformats/multicodec): `TODO` <!-- TODO: add varint draft -->
 - Double SHA256 varint: `DBL_SHA2_256 = 86`
-- Max number of Provider Records returned by a DHT Server for a single request: `128` <!-- TODO: define number-->
+- A DHT Server returns all of the Provider Records matching to at most **`MatchLimit = 64`** distinct `HASH2`. Magic number explanation in [k-anonymity](#k-anonymity).
 
 ### Current DHT
 
@@ -103,11 +103,11 @@ The following process describes the event of a client looking up a CID in the IP
 3. Client sends a DHT lookup request for `KeyPrefix` to these DHT servers. The request contains a flag to specify whether Client wants the `multiaddrs` associated with the `CPPeerID` or not.
 4. The DHT servers find the 20 closest `PeerID`s to `KeyPrefix` in XOR distance (see [algorithm](#closest-keys-to-a-key-prefix)). Add these `PeerID`s and their associated multiaddresses (if applicable) to the `message` that will be returned to Client.
 5. The DHT servers search if there are entries matching `KeyPrefix` in their Provider Store.
-6. For all entries `HASH2` of the Provider Store where `HASH2[:len(KeyPrefix)]==KeyPrefix`, add to `message` the following encrypted payload: `EncPeerID || Enc(ServerKey, TS || Signature || multiaddrs)`, for `multiaddrs` being the multiaddresses associated with `CPPeerID` (if applicable) if the `multiaddrs` were requested by Client. DHT Servers can decide to put a maximal limit of returned Provider Record per request. If too many `HASH2` are matching `KeyPrefix`, they select randomly 128 matching provider records per request, and send a flag to Client to signal that the limit was reached. <!-- TODO: define flag-->
+6. For all entries `HASH2` of the Provider Store where `HASH2[:len(KeyPrefix)]==KeyPrefix`, add to `message` the following encrypted payload: `EncPeerID || Enc(ServerKey, TS || Signature || multiaddrs)`, for `multiaddrs` being the multiaddresses associated with `CPPeerID` (if applicable) if the `multiaddrs` were requested by Client. If more than `MatchLimit` distinct `HASH2`s match the requested `KeyPrefix`, the DHT Server doesn't return any Provider Record, and adds the number of `HASH2` matching `KeyPrefix` along with its own `MatchLimit` to `message`.
 7. The DHT servers send `message` to Client.
 8. Client computes `ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)`.
 9. Client tries to decrypt all returned encrypted payloads using `MH` for `EncPeerID` and `ServerKey` for `Enc(ServerKey, TS || Signature || multiaddrs)`. If at least one encrypted payload can be decrypted, go to 12.
-10. Client sends a DHT lookup request for `KeyPrefix` to the closest peers in XOR distance to `HASH2` that it received from the DHT servers.
+10. If the `MatchLimit` and number of matching `HASH2`s was included in the `message`, Client makes multiple DHT lookup requests for longer prefixes (e.g `KeyPrefix||0` and `KeyPrefix||1`). Else Client sends a DHT lookup request for `KeyPrefix` to the closest peers in XOR distance to `HASH2` that it received from the DHT servers.
 11. Go to 4.
 12. For each decrypted payload, Client decrypts `CPPeerID = Dec(MH, EncPeerID)`.
 13. Client verifies that `Signature` verifies with `CPPeerID`: `Verify(CPPeerID, Signature, EncPeerID || TS)`.
@@ -206,18 +206,12 @@ When a Content Provider republishes a Provider Record, the DHT Server only keeps
 
 ### `k`-anonymity
 
-The `k`-anonymity parameter `k` is user defined, it can be modified in the configuration files. Users requiring a higher level of privacy can increase their value of `k`.
-Default parameter selection: `k = 8`
+Default: `k = 8`.
+Default: `MatchLimit = 64`.
 
-Maximal number of returned keys
+The `k`-anonymity parameter `k` is user defined, it can be modified in the configuration files. Users requiring a higher level of privacy can increase their value of `k`. `8` is deemed to be private enough for standard IPFS users, while limiting the overhead in packet size of the DHT Server response to 8x.
 
-<!--
-The rationale fleshes out the specification by describing what motivated
-the design and why particular design decisions were made.
-
-Provide evidence of rough consensus and working code within the community,
-and discuss important objections or concerns raised during discussion.
--->
+The `MatchLimit` prevents malformed or malicious requests to match all Provider Records that a DHT Server is providing at once. A Client can still fetch all Provider Records matching any `KeyPrefix`, but it must perform multiple DHT lookup requests for enough prefixes to the DHT Server. The `MatchLimit` protects the Server from having to send large amounts of data at once. `64` is already a large value, given that each `HASH2` can be associated with multiple Provider Records, one for each Content Provider, and the multiaddresses of all Content Providers can be sent along. The DHT provides _on average_ at most `64-anonymity` out-of-the-box and a better privacy level can be reached by sending multiple requests.
 
 ## User benefits
 
