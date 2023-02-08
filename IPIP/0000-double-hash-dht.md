@@ -34,28 +34,6 @@ The changes described in this document introduce a DHT privacy upgrade boosting 
 
 ## Detailed Design
 
-### Definitions
-
-<!-- TODO: Define data format for each. e.g byte array of 32 bytes, etc. -->
-- **`CID`** is the IPFS [Content IDentifier](https://github.com/multiformats/cid)
-- **`MH`** is the [Multihash](https://github.com/multiformats/multihash) contained in a `CID`. It corresponds to the digest of a hash function over some content.
-- **`HASH2`** is defined as `SHA256(bytes("CR_DOUBLEHASH") || MH)`. It represents the location of the Kademlia keyspace for the Provider Record associated with `CID`.
-- **Content Provider** is the node storing some content, and advertising it to the DHT.
-- **DHT Servers** are nodes running the IPFS public DHT. In this documents, DHT Servers mostly refer to the DHT Servers storing the Provider Records associated with specific `CID`s, and not the DHT Servers helping routing lookup requests to the right keyspace location. 
-- **Client** is an IPFS client looking up a content identified by an already known `CID`.
-- **Publish Process** is the process of the Content Provider communicating to the DHT Servers that it provides some content identified by `CID`.
-- **Lookup Process** is the process of the Client retrieving the content identified by `CID`.
-- **`PeerID`** s define stable [peer identities](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md). The `PeerID` is derived from the node's cryptographic public key.
-- **`multiaddrs`** are the [network addresses](https://github.com/libp2p/specs/tree/master/addressing) associated with a `PeerID`. It represents the location(s) of the peer.
-- **`KeyPrefix`** is defined as a prefix of length `l` bits of `HASH2`.
-- **`ServerKey`** is defined as `SHA256(bytes("CR_SERVERKEY") || MH)`. It is derived from the `MH`. The Content Provider communicates `ServerKey` to the DHT Servers during the Publish Process. The DHT Servers use it to encrypt the data sent to the Client during the lookup process.
-- **`TS`** is the Timestamp (unix timestamp) when the Content Provider published the content.
-- **`CPPeerID`** is the `PeerID` of the Content Provider for a specific `CID`.
-- **`EncPeerID`** is the result of the encryption of `CPPeerID` using `MH` as encryption key and a random nonce `AESGCM(MH, CPPeerID || RandomNonce)`. `EncPeerID` contains the [varint](https://github.com/multiformats/multicodec/blob/master/table.csv#L69) of the encryption algorithm used (AES), the bytes array of the encrypted payload, and the Nonce.
-- **`Signature`** is the signature of the `EncPeerID` encrypted payload (not including the varint nor the nonce) and `TS` using the Content Provider's private key, either with ed25519 or rsa signature algorithm, depending on the keys of the Content Provider.
-- **Provider Record** is defined as a pointer to the storage location of some content identified by `CID` or `HASH2`. A Provider Record consists on the following fields: [`EncPeerID`, `TS`, `Signature`].
-- **Provider Store** is the data structure on the DHT Servers used to store the Provider Records. Its structure is a nested dictionary/map: `HASH2` -> `ServerKey` -> [`CPPeerID`, `EncPeerID`, `TS`, `Signature`]. There is only one single correct `ServerKey` for each `HASH2`. However, any peer can forge a valid Publish request (with invalid `EncPeerID` but valid `Signature`) undetected by the DHT Server. The DHT server isn't able to distinguish which `ServerKey` is correct as it doesn't have the knowledge of `MH`, hence it has to keep both and serve both upon request for `HASH2`.
-
 **Magic Values**
 - bytes("CR_DOUBLEHASH")
 - bytes("CR_SERVERKEY")
@@ -63,6 +41,27 @@ The changes described in this document introduce a DHT privacy upgrade boosting 
 - Double SHA256 [varint](https://github.com/multiformats/multicodec/blob/master/table.csv#L41): `dbl-sha2-256 = 0x56`
 - A DHT Server returns all of the Provider Records matching to at most **`MatchLimit = 64`** distinct `HASH2`. Magic number explanation in [k-anonymity](#k-anonymity).
 - Provider Record Timestamp (`TS`) validity period: `48h`
+
+### Definitions
+
+- **`CID`** is the IPFS [Content IDentifier](https://github.com/multiformats/cid)
+- **`MH`** is the [Multihash](https://github.com/multiformats/multihash) contained in a `CID`. It corresponds to the digest of a hash function over some content. `MH` is represented as a 32-byte array.
+- **`HASH2`** is defined as `SHA256(bytes("CR_DOUBLEHASH") || MH)`. It represents the location of the Kademlia keyspace for the Provider Record associated with `CID`. `HASH2` is represented as a 32-byte array. `HASH2 = SHA256(bytes("CR_DOUBLEHASH") || MH)`.
+- **Content Provider** is the node storing some content, and advertising it to the DHT.
+- **DHT Servers** are nodes running the IPFS public DHT. In this documents, DHT Servers mostly refer to the DHT Servers storing the Provider Records associated with specific `CID`s, and not the DHT Servers helping routing lookup requests to the right keyspace location. 
+- **Client** is an IPFS client looking up a content identified by an already known `CID`.
+- **Publish Process** is the process of the Content Provider communicating to the DHT Servers that it provides some content identified by `CID`.
+- **Lookup Process** is the process of the Client retrieving the content identified by `CID`.
+- **`PeerID`** s define stable [peer identities](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md). The `PeerID` is derived from the node's cryptographic public key.
+- **`multiaddrs`** are the [network addresses](https://github.com/libp2p/specs/tree/master/addressing) associated with a `PeerID`. It represents the location(s) of the peer.
+- **`KeyPrefix`** is defined as a prefix of length `l` bits of `HASH2`. `KeyPrefix` is represented by a `byte` concatenated with a variable sized array of bytes, containing at most 32 bytes. The leading `byte` represents the binary representation of `l - 1`, making prefixes of length `256` possible, but not prefixes of length `0`. The trailing byte array is of length `ceil(l/8)` bytes, and its content is the bits prefix right padded with zeros.
+- **`ServerKey`** is defined as `SHA256(bytes("CR_SERVERKEY") || MH)`. It is derived from the `MH`. The Content Provider communicates `ServerKey` to the DHT Servers during the Publish Process. The DHT Servers use it to encrypt the data sent to the Client during the lookup process. `ServerKey` is represented as a 32-byte array.
+- **`TS`** is the [Unix Timestamp](https://en.wikipedia.org/wiki/Unix_time) corresponding content publish time. `TS` is represented as a 32-bit **unsigned** Integer, allowing timestamps to range from `1970-01-01T00:00:00Z` to `2106-02-07T06:28:15Z` before reaching the overflow.
+- **`CPPeerID`** is the `PeerID` of the Content Provider for a specific `CID`.
+- **`EncPeerID`** is the result of the encryption of `CPPeerID` using `MH` as encryption key and a random nonce `AESGCM(MH, Nonce, CPPeerID)`. `EncPeerID` contains the [varint](https://github.com/multiformats/multicodec/blob/master/table.csv#L69) of the encryption algorithm used (AES), the bytes array of the encrypted payload, and the `Nonce`. `Nonce` is a randomly generated 12-byte array. The format of `EncPeerID` is [`0xa2`, `Nonce`, `AESGCM(MH, Nonce, CPPeerID)`].
+- **`Signature`** is the signature of the `EncPeerID` encrypted payload (not including the varint nor the nonce) and `TS` using the Content Provider's private key, either with ed25519 or rsa signature algorithm, depending on the keys of the Content Provider.
+- **Provider Record** is defined as a pointer to the storage location of some content identified by `CID` or `HASH2`. A Provider Record consists on the following fields: [`EncPeerID`, `TS`, `Signature`].
+- **Provider Store** is the data structure on the DHT Servers used to store the Provider Records. Its structure is a nested dictionary/map: `HASH2` -> `ServerKey` -> [`CPPeerID`, `EncPeerID`, `TS`, `Signature`]. There is only one single correct `ServerKey` for each `HASH2`. However, any peer can forge a valid Publish request (with invalid `EncPeerID` but valid `Signature`) undetected by the DHT Server. The DHT server isn't able to distinguish which `ServerKey` is correct as it doesn't have the knowledge of `MH`, hence it has to keep both and serve both upon request for `HASH2`.
 
 ### Current DHT
 
@@ -85,13 +84,13 @@ The following process describes the event of a client looking up a CID in the IP
 
 **Publish Process**
 1. Content Provider wants to publish some content with identifier `CID`.
-2. Content Provider computes `HASH2`$\leftarrow{}$`SHA256(bytes("CR_DOUBLEHASH") || MH)` (`MH` is the MultiHash included in the CID).
+2. Content Provider computes `HASH2 = SHA256(bytes("CR_DOUBLEHASH") || MH)` (`MH` is the MultiHash included in the CID).
 3. Content Provider starts a DHT lookup request for the 20 closest `PeerID`s in XOR distance to `HASH2`.
-4. Content Provider encrypts its own `PeerID` (`CPPeerID`) with `MH`, using AES-GCM. `EncPeerID = varint || Nonce || AESGCM(MH, CPPeerID || Nonce)`, with `varint` indicating the encryption algorithm in use, here AESGCM.
+4. Content Provider encrypts its own `PeerID` (`CPPeerID`) with `MH`, using AES-GCM. `EncPeerID = [0xa2, Nonce, AESGCM(MH, Nonce, CPPeerID)]`
 5. Content Provider takes the current timestamp `TS`.
 6. Content Provider signs `EncPeerID` and `TS` using its private key. `Signature = Sign(privkey, EncPeerID || TS)`
 7. Content Provider computes `ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)`.
-8. Once the lookup request has returned the 20 closest peers, Content Provider sends a Publish request to these DHT servers. The Publish request contains [`HASH2`, `EncPeerID`, `TS`, `Signature`, `ServerKey`].<!-- TODO: define exact format -->
+8. Once the lookup request has returned the 20 closest peers, Content Provider sends a Publish request to these DHT servers. The Publish request contains [`HASH2`, `EncPeerID`, `TS`, `Signature`, `ServerKey`].
 9. Each DHT server verifies `Signature` against the `PeerID` of the Content Provider used to open the libp2p connection. `Verify(CPPeerID, Signature, EncPeerID || TS)`. It verifies that `TS` is younger than `48h` and isn't in the future. If invalid, send an error to the client. <!-- TODO: define error -->
 10. Each DHT server adds an entry in their Provider Store for `HASH2` -> `ServerKey` -> `CPPeerID` -> [`EncPeerID`, `TS`, `Signature`], with `CPPeerID` being the `PeerID` of the Content Provider. If there is already an entry including `CPPeerID` for `HASH2` -> `ServerKey`, and if the `TS` of the new valid entry is newer than the existing `TS`, overwrite the entry in the Provider Store. Else drop the new entry.
 11. Each DHT server confirms to Content Provider that the Provider Record has been successfully added.
@@ -104,11 +103,11 @@ The following process describes the event of a client looking up a CID in the IP
 3. Client sends a DHT lookup request for `KeyPrefix` to these DHT servers. The request contains a flag to specify whether Client wants the `multiaddrs` associated with the `CPPeerID` or not.
 4. The DHT servers find the 20 closest `PeerID`s to `KeyPrefix` in XOR distance (see [algorithm](#closest-keys-to-a-key-prefix)). Add these `PeerID`s and their associated multiaddresses (if applicable) to the `message` that will be returned to Client.
 5. The DHT servers search if there are entries matching `KeyPrefix` in their Provider Store.
-6. For all entries `HASH2` of the Provider Store where `HASH2[:len(KeyPrefix)]==KeyPrefix`, add to `message` the following encrypted payload: `EncPeerID || Enc(ServerKey, TS || Signature || multiaddrs)`, for `multiaddrs` being the multiaddresses associated with `CPPeerID` (if applicable) if the `multiaddrs` were requested by Client. If more than `MatchLimit` distinct `HASH2`s match the requested `KeyPrefix`, the DHT Server doesn't return any Provider Record, and adds the number of `HASH2` matching `KeyPrefix` along with its own `MatchLimit` to `message`.
+6. For all entries `HASH2` of the Provider Store where `HASH2[:len(KeyPrefix)]==KeyPrefix`, add to `message` the following encrypted payload: `EncPeerID || SERVERNONCE || AESGCM(ServerKey, SERVERNONCE, TS || Signature || multiaddrs)`, `SERVERNONCE` being a randomly generated 12-byte array, for `multiaddrs` being the multiaddresses associated with `CPPeerID` (if applicable) if the `multiaddrs` were requested by Client. If more than `MatchLimit` distinct `HASH2`s match the requested `KeyPrefix`, the DHT Server doesn't return any Provider Record, and adds the number of `HASH2` matching `KeyPrefix` along with its own `MatchLimit` to `message`.
 7. The DHT servers send `message` to Client.
 8. Client computes `ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)`.
 9. Client tries to decrypt all returned encrypted payloads using `MH` for `EncPeerID` and `ServerKey` for `Enc(ServerKey, TS || Signature || multiaddrs)`. If at least one encrypted payload can be decrypted, go to 12.
-10. If the `MatchLimit` and number of matching `HASH2`s was included in the `message`, Client makes multiple DHT lookup requests for longer prefixes (e.g `KeyPrefix||0` and `KeyPrefix||1`). Else Client sends a DHT lookup request for `KeyPrefix` to the closest peers in XOR distance to `HASH2` that it received from the DHT servers.
+10. If the DHT Server's `MatchLimit` and number of matching `HASH2`s was included in the `message`, Client makes multiple DHT lookup requests for longer prefixes (e.g `KeyPrefix||0` and `KeyPrefix||1`). Else Client sends a DHT lookup request for `KeyPrefix` to the closest peers in XOR distance to `HASH2` that it received from the DHT servers.
 11. Go to 4.
 12. For each decrypted payload, Client decrypts `CPPeerID = Dec(MH, EncPeerID)`.
 13. Client verifies that `Signature` verifies with `CPPeerID`: `Verify(CPPeerID, Signature, EncPeerID || TS)`.
