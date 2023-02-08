@@ -62,6 +62,7 @@ The changes described in this document introduce a DHT privacy upgrade boosting 
 - AES [varint](https://github.com/multiformats/multicodec/blob/master/table.csv#L69): `aes-256 = 0xa2`
 - Double SHA256 [varint](https://github.com/multiformats/multicodec/blob/master/table.csv#L41): `dbl-sha2-256 = 0x56`
 - A DHT Server returns all of the Provider Records matching to at most **`MatchLimit = 64`** distinct `HASH2`. Magic number explanation in [k-anonymity](#k-anonymity).
+- Provider Record Timestamp (`TS`) validity period: `48h`
 
 ### Current DHT
 
@@ -91,7 +92,7 @@ The following process describes the event of a client looking up a CID in the IP
 6. Content Provider signs `EncPeerID` and `TS` using its private key. `Signature = Sign(privkey, EncPeerID || TS)`
 7. Content Provider computes `ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)`.
 8. Once the lookup request has returned the 20 closest peers, Content Provider sends a Publish request to these DHT servers. The Publish request contains [`HASH2`, `EncPeerID`, `TS`, `Signature`, `ServerKey`].<!-- TODO: define exact format -->
-9. Each DHT server verifies `Signature` against the `PeerID` of the Content Provider used to open the libp2p connection. `Verify(CPPeerID, Signature, EncPeerID || TS)`. It verifies that `TS` is _recent enough_. If invalid, send an error to the client. <!-- TODO: define error && check TS valid -->
+9. Each DHT server verifies `Signature` against the `PeerID` of the Content Provider used to open the libp2p connection. `Verify(CPPeerID, Signature, EncPeerID || TS)`. It verifies that `TS` is younger than `48h` and isn't in the future. If invalid, send an error to the client. <!-- TODO: define error -->
 10. Each DHT server adds an entry in their Provider Store for `HASH2` -> `ServerKey` -> `CPPeerID` -> [`EncPeerID`, `TS`, `Signature`], with `CPPeerID` being the `PeerID` of the Content Provider. If there is already an entry including `CPPeerID` for `HASH2` -> `ServerKey`, and if the `TS` of the new valid entry is newer than the existing `TS`, overwrite the entry in the Provider Store. Else drop the new entry.
 11. Each DHT server confirms to Content Provider that the Provider Record has been successfully added.
 12. The proces is over once Content Provider has received 20 confirmations.
@@ -111,7 +112,7 @@ The following process describes the event of a client looking up a CID in the IP
 11. Go to 4.
 12. For each decrypted payload, Client decrypts `CPPeerID = Dec(MH, EncPeerID)`.
 13. Client verifies that `Signature` verifies with `CPPeerID`: `Verify(CPPeerID, Signature, EncPeerID || TS)`.
-14. Client checks that `TS` is still valid.
+14. Client checks that `TS` is younger than `48h`.
 15. If none of the decrypted payloads is valid, go to 4.
 16. If the decrypted payload doesn't include the `multiaddrs` associated with `CPPeerID`, Client performs a DHT `FindPeer` request to find the `multiaddrs` associated with `CPPeerID`.
 17. Client sends a Bitswap request for `CID` to the Content Provider (known `CPPeerID` and `multiaddrs`).
