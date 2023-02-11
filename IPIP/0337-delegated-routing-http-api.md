@@ -15,14 +15,14 @@ and supporting large content providers is a key strategy for driving down IPFS c
 These providers must handle high volumes of traffic and support many users, so leveraging industry-standard tools and services
 such as HTTP load balancers, CDNs, reverse proxies, etc. is a requirement.
 To maximize compatibility with standard tools, IPFS needs an HTTP API specification that uses standard HTTP idioms and payload encoding.
-The [Reframe spec](https://github.com/ipfs/specs/blob/main/reframe/REFRAME_PROTOCOL.md) for delegated content routing is an experimental attempt at this, 
+The [Reframe spec](https://github.com/ipfs/specs/blob/main/reframe/REFRAME_PROTOCOL.md) for delegated content routing is an experimental attempt at this,
 but it has resulted in a very unidiomatic HTTP API which is difficult to implement and is incompatible with many existing tools.
 The cost of a proper redesign, implementation, and maintenance of Reframe and its implementation is too high relative to the urgency of having a delegated content routing HTTP API.
 
 Note that this does not supplant nor deprecate Reframe. Ideally in the future, Reframe and its implementation would receive the resources needed to map the IDL to idiomatic HTTP,
 and implementations of this spec could then be rewritten in the IDL, maintaining backwards compatibility.
 
-We expect this API to be extended beyond "content routing" in the future, so additional IPIPs may rename this to something more general such as "Delegated Routing HTTP API". 
+We expect this API to be extended beyond "content routing" in the future, so additional IPIPs may rename this to something more general such as "Delegated Routing HTTP API".
 
 ## Detailed design
 
@@ -62,7 +62,7 @@ So this API proposal makes the following changes:
 - The Delegated Content Routing API is defined using HTTP semantics, and can be implemented without introducing Reframe concepts nor IPLD
 - There is a clear distinction between the RPC protocol (HTTP) and the API (Deleged Content Routing)
 - "Method names" and cache-relevant parameters are pushed into the URL path
-- Streaming support is removed, and default response size limits are added along with an optional `pageLimit` parameter for clients to specify response sizes
+- Streaming support is removed, and default response size limits are added.
   - We will add streaming support in a subsequent IPIP, but we are trying to minimize the scope of this IPIP to what is immediately useful
 - Bodies are encoded using idiomatic JSON, instead of using IPLD codecs, and are compatible with OpenAPI specifications
 - The JSON uses human-readable string encodings of common data types
@@ -84,13 +84,14 @@ and increasing data availability.
 #### Backwards Compatibility
 
 IPFS Stewards will implement this API in [go-delegated-routing](https://github.com/ipfs/go-delegated-routing), using breaking changes in a new minor version.
-Because the existing Reframe spec can't be safely used in JavaScript and we won't be investing time and resources into changing the wire format implemented in edelweiss to fix it, 
-the experimental support for Reframe in Kubo will be deprecated in the next release and delegated content routing will subsequently use this HTTP API. 
+Because the existing Reframe spec can't be safely used in JavaScript and we won't be investing time and resources into changing the wire format implemented in edelweiss to fix it,
+the experimental support for Reframe in Kubo will be deprecated in the next release and delegated content routing will subsequently use this HTTP API.
 We may decide to re-add Reframe support in the future once these issues have been resolved.-
 
 #### Forwards Compatibility
 
 Standard HTTP mechanisms for forward compatibility are used:
+
 - The API is versioned using a version number prefix in the path
 - The `Accept` and `Content-Type` headers are used for content type negotiation, allowing for backwards-compatible additions of new MIME types, hypothetically such as:
   - `application/cbor` for binary-encoded responses
@@ -104,8 +105,9 @@ As a proof-of-concept, the tests for the initial implementation of this HTTP API
 
 ### Security
 
-- TODO: cover user privacy
-- TODO: parsing best practices: what are limits (e.g., per message / field)?
+- All CID requests are sent to a central HTTPS endpoint as plain text, with TLS being the only protection against third-party observation.
+- While privacy is not a concern in the current version, plans are underway to add a separate endpoint that prioritizes lookup privacy. Follow the progress in related pre-work in  [IPIP-272 (double hashed DHT)](https://github.com/ipfs/specs/pull/373/) and [ipni#5 (reader privacy in indexers)](https://github.com/ipni/specs/pull/5).
+- The usual JSON parsing rules apply. To prevent potential Denial of Service (DoS) attack, clients should ignore responses larger than 100 providers and introduce a byte size limit that is applicable to their use case.
 
 ### Alternatives
 

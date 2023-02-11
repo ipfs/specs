@@ -1,6 +1,6 @@
 # Delegated Content Routing HTTP API
 
-![wip](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Delegated Content Routing HTTP API
+![reliable](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square) Delegated Content Routing HTTP API
 
 **Author(s)**:
 
@@ -54,7 +54,7 @@ Both read and write provider records have a minimal required schema as follows:
 
 Where:
 
-- `Protocol` is the multicodec name of the transfer protocol
+- `Protocol` is the multicodec name of the transfer protocol or an opaque string (for experimenting with novel protocols without a multicodec)
 - `Schema` denotes the schema to use for encoding/decoding the record
   - This is separate from the `Protocol` to allow this HTTP API to evolve independently of the transfer protocol
   - Implementations should switch on this when parsing records, not on `Protocol`
@@ -66,11 +66,14 @@ Specifications for some transfer protocols are provided in the "Transfer Protoco
 
 ### `GET /routing/v1/providers/{CID}`
 
-- Response codes
-  - `200`: the response body contains 0 or more records
-  - `404`: must be returned if no matching records are found
-  - `422`: request does not conform to schema or semantic constraints
-- Response Body
+#### Response codes
+
+- `200` (OK): the response body contains 0 or more records
+- `404` (Not Found): must be returned if no matching records are found
+- `422` (Unprocessable Entity): request does not conform to schema or semantic constraints
+
+#### Response Body
+
 ```json
 {
     "Providers": [
@@ -83,7 +86,7 @@ Specifications for some transfer protocols are provided in the "Transfer Protoco
 }
 ```
 
-- Response limit: 100 providers
+Response limit: 100 providers
 
 Each object in the `Providers` list is a *read provider record*.
 
@@ -91,18 +94,15 @@ Each object in the `Providers` list is a *read provider record*.
 
 This API does not support pagination, but optional pagination can be added in a backwards-compatible spec update.
 
-### Implementation Notes
+## Streaming
 
-Servers are required to return *at most* `pageLimit` results in a page. It is recommended for pages to be as dense as possible, but it is acceptable for them to return any number of items in the closed interval [0, pageLimit]. This is dependent on the capabilities of the backing database implementation.
-For example, a query specifying a `transfer` filter for a rare transfer protocol should not *require* the server to perform a very expensive database query for a single request. Instead, this is left to the server implementation to decide based on the constraints of the database.
-
-Implementations should encode into the token whatever information is necessary for fetching the next page. This could be a base32-encoded JSON object like `{"offset":3,"limit":10}`, an object ID of the last scanned item, etc.
+This API does not currently support streaming, however it can be added in the future through a backwards-compatible update by using a content type other than `application/json`.
 
 ## Error Codes
 
-- `501`: must be returned if a method/path is not supported
-- `429`: may be returned to indicate to the caller that it is issuing requests too quickly
-- `400`: must be returned if an unknown path is requested
+- `501` (Not Implemented): must be returned if a method/path is not supported
+- `429` (Too Many Requests): may be returned along with optional [Retry-After](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After) header to indicate to the caller that it is issuing requests too quickly
+- `400` (Bad Request): must be returned if an unknown path is requested
 
 ## CORS and Web Browsers
 
