@@ -79,6 +79,8 @@ where client prefers to perform all validation locally.
   - [Content resolution](#content-resolution)
     - [Finding the content root](#finding-the-content-root)
     - [Traversing remaining path](#traversing-remaining-path)
+    - [Traversing through UnixFS](#traversing-through-unixfs)
+    - [Traversing through DAG-JSON and DAG-CBOR](#traversing-through-dag-json-and-dag-cbor)
     - [Handling traversal errors](#handling-traversal-errors)
   - [Best practices for HTTP caching](#best-practices-for-http-caching)
   - [Denylists](#denylists)
@@ -182,10 +184,10 @@ For example:
 - [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw) – disables [IPLD codec deserialization](https://ipld.io/docs/codecs/), requests a verifiable raw [block](https://docs.ipfs.io/concepts/glossary/#block) to be returned
 - [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car) – disables [IPLD codec deserialization](https://ipld.io/docs/codecs/), requests a verifiable [CAR](https://docs.ipfs.io/concepts/glossary/#car) stream to be returned
 - [application/x-tar](https://en.wikipedia.org/wiki/Tar_(computing)) – returns UnixFS tree (files and directories) as a [TAR](https://en.wikipedia.org/wiki/Tar_(computing)) stream. Returned tree starts at a root item which name is the same as the requested CID. Produces 400 Bad Request for content that is not UnixFS.
-<!-- TODO: https://github.com/ipfs/go-ipfs/issues/8823
-- application/vnd.ipld.dag-json OR application/json – requests IPLD Data Model representation serialized into [DAG-JSON format](https://ipld.io/docs/codecs/known/dag-json/)
-- application/vnd.ipld.dag-cbor OR application/cbor - requests IPLD Data Model representation serialized into [DAG-CBOR format](https://ipld.io/docs/codecs/known/dag-cbor/)
--->
+- [application/vnd.ipld.dag-json](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-json) – requests [IPLD Data Model](https://ipld.io/docs/data-model/) representation serialized into [DAG-JSON format](https://ipld.io/docs/codecs/known/dag-json/). If the requested CID already has `dag-json` (0x0129) codec, data is validated as DAG-JSON before being returned as-is. Invalid DAG-JSON produces HTTP Error 500.
+- [application/vnd.ipld.dag-cbor](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-cbor) – requests [IPLD Data Model](https://ipld.io/docs/data-model/) representation serialized into [DAG-CBOR format](https://ipld.io/docs/codecs/known/dag-cbor/). If the requested CID already has `dag-cbor` (0x71) codec,  data is validated as DAG-CBOR before being returned as-is. Invalid DAG-CBON produces HTTP Error 500.
+- [application/json](https://www.iana.org/assignments/media-types/application/json) – same as `application/vnd.ipld.dag-json`, unless the CID's codec already is `json` (0x0200). Then, the raw JSON block can be returned as-is without any conversion.
+- [application/cbor](https://www.iana.org/assignments/media-types/application/cbor) – same as `application/vnd.ipld.dag-cbor`, unless the CID's codec already is `cbor` (0x51). Then, the raw CBOR block can be returned as-is without any conversion.
 
 ### `Range` (request header)
 
@@ -246,11 +248,14 @@ parameter, if present)
 
 Optional, `format=<format>` can be used to request specific response format.
 
-This is a URL-friendly alternative to sending
-`Accept: application/vnd.ipld.<format>` header, see [`Accept`](#accept-request-header)
-for more details.
-
-In case of `Accept: application/x-tar`, the `?format=` equivalent is `tar`.
+This is a URL-friendly alternative to sending an [`Accept`](#accept-request-header) header. These are the equivalents:
+- `format=raw` → `Accept: application/vnd.ipld.raw`
+- `format=car` → `Accept: application/vnd.ipld.car`
+- `format=tar` → `Accept: application/x-tar`
+- `format=dag-json` → `Accept: application/vnd.ipld.dag-json`
+- `format=dag-cbor` → `Accept: application/vnd.ipld.dag-cbor`
+- `format=json` → `Accept: application/json`
+- `format=cbor` → `Accept: application/cbor`
 
 <!-- TODO Planned: https://github.com/ipfs/go-ipfs/issues/8769
 - `selector=<cid>`  can be used for passing a CID with [IPLD selector](https://ipld.io/specs/selectors)
@@ -584,24 +589,38 @@ A good practice is to always return it with HTTP error [status codes](#response-
 
 ## Response Payload
 
-Data sent with HTTP response depends on the type of requested IPFS resource:
+Data sent with HTTP response depends on the type of the requested IPFS resource, and the requested response type.
 
-- UnixFS (implicit default)
-  - File
-    - Bytes representing file contents
+By default, implicit deserialized response type is based on `Accept` header and the codec of the resolved CID:
+
+- UnixFS, either `dag-pb` (0x70) or `raw` (0x55)
+  - File or `raw` block
+    - Bytes representing file/block contents
+    - When `Range` is present, only the requested byte range is returned.
   - Directory
     - Generated HTML with directory index (see [additional notes here](#generated-html-with-directory-index))
-    - When `index.html` is present, gateway can skip generating directory index and return it instead
-- Raw block
-  - Opaque bytes, see [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw)
-- CAR
-  - Arbitrary DAG as a verifiable CAR file or a stream, see [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car)
-- TAR
-  - Deserialized UnixFS files and directories as a TAR file or a stream, see [application/x-tar](https://en.wikipedia.org/wiki/Tar_(computing))
-<!-- TODO: https://github.com/ipfs/go-ipfs/issues/8823
-- dag-json / dag-cbor
-  - See [https://github.com/ipfs/go-ipfs/issues/8823](https://github.com/ipfs/go-ipfs/issues/8823)
--->
+    - When `index.html` is present, gateway MUST skip generating directory index and return content from `index.html` instead.
+- JSON (0x0200)
+  - Bytes representing a JSON file, see [application/json](https://www.iana.org/assignments/media-types/application/json).
+  - Works exactly the same as `raw`, but returned `Content-Type` is `application/json`
+- CBOR (0x51)
+  - Bytes representing a CBOR file, see [application/cbor](https://www.iana.org/assignments/media-types/application/cbor)
+  - Works exactly the same as `raw`, but returned `Content-Type` is `application/cbor`
+- DAG-JSON (0x0129)
+  - If the `Accept` header includes `text/html`, implementation should return a generated HTML with options to download DAG-JSON as-is, or converted to DAG-CBOR.
+  - Otherwise, response works exactly the same as `raw` block, but returned `Content-Type` is [application/vnd.ipld.dag-json](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-json)
+- DAG-CBOR (0x71)
+  - If the `Accept` header includes `text/html`: implementation should return a generated HTML with options to download DAG-CBOR as-is, or converted to DAG-JSON.
+  - Otherwise, response works exactly the same as `raw` block, but returned `Content-Type` is [application/vnd.ipld.dag-cbor](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-cbor)
+
+The following response types require an explicit opt-in, can only be requested with [`format`](#format-request-query-parameter) query parameter or [`Accept`](#accept-request-header) header:
+
+- Raw Block (`?format=raw`)
+  - Opaque bytes, see [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw).
+- CAR (`?format=car`)
+  - Arbitrary DAG as a verifiable CAR file or a stream, see [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car).
+- TAR (`?format=tar`)
+  - Deserialized UnixFS files and directories as a TAR file or a stream, see [IPIP-288](https://github.com/ipfs/specs/pull/288)
 
 # Appendix: notes for implementers
 
@@ -627,12 +646,31 @@ and [DNSLINK_GATEWAY.md](./DNSLINK_GATEWAY.md)).
 
 ### Traversing remaining path
 
-UnixFS pathing over files and directories is the implicit default used for
-resolving content paths that start with `/ipfs/` and `/ipns/`. It allows for
-traversal based on link names,  which provides a better user experience than
-low level logical pathing from IPLD:
+After the content root CID is found, the remaining of the path should be traversed
+and resolved. Depending on the data type, that may occur through UnixFS pathing,
+or DAG-JSON, and DAG-CBOR pathing.
+
+### Traversing through UnixFS
+
+UnixFS is an abstraction over the low level [logical DAG-PB pathing][dag-pb-format]
+from IPLD, providing a better user experience:
 
 - Example of UnixFS pathing: `/ipfs/cid/dir-name/file-name.txt`
+
+For more details regarding DAG-PB pathing, please read the "Path Resolution" section
+of [this document](https://ipld.io/design/tricky-choices/dag-pb-forms-impl-and-use/#path-resolution).
+
+### Traversing through DAG-JSON and DAG-CBOR
+
+Traversing through [DAG-JSON][dag-json] and [DAG-CBOR][dag-cbor] is possible
+through fields that encode a link:
+
+- DAG-JSON: link are represented as a base encoded CID under the `/` reserved
+namespace, see [specification](https://ipld.io/specs/codecs/dag-json/spec/#links).
+- DAG-CBOR: links are tagged with CBOR tag 42, indicating that they encode a CID,
+see [specification](https://ipld.io/specs/codecs/dag-cbor/spec/#links).
+
+Note: pathing into [IPLD Kind](https://ipld.io/docs/data-model/kinds/) other than Link (CID) is not supported at the moment. Implementations should return HTTP 501 Not Implemented when fully resolved content path has any remainder left.  This feature may be specified in a future [IPIP that introduces data onboarding](https://github.com/ipfs/in-web-browsers/issues/189)  and [IPLD Patch](https://ipld.io/specs/patch/) semantics.
 
 ### Handling traversal errors
 
@@ -693,11 +731,16 @@ It should be always fast, even when a directory has 10k of items.
 The usual optimizations involve:
 
 - Skipping size and type resolution for child UnixFS items, and using `Tsize`
-  from [logical format](https://ipld.io/specs/codecs/dag-pb/spec/#logical-format)
-  instead, allows gateway to respond much faster, as it no longer need to fetch
-  root nodes of child items.
-  - Additional information about child nodes can be fetched lazily
-    with JS, but only for items in the browser's viewport.
+  from [logical format][dag-pb-format] instead, allows gateway to respond much
+  faster, as it no longer need to fetch root nodes of child items.
+  - Instead of showing "file size" GUIs should show "IPFS DAG size". This
+    remains useful for quick inspection, but does not require fetching child
+    blocks, making directory listing fast, even with tens of thousands of
+    blocks.  Example with 10k items:
+    `bafybeiggvykl7skb2ndlmacg2k5modvudocffxjesexlod2pfvg5yhwrqm`.
+  - Additional information about child nodes, such as exact file size without
+    DAG overhead, can be fetched lazily with JS, but only for items in the
+    browser's viewport.
 
 - Alternative approach is resolving child items, but providing pagination UI.
   - Opening a big directory can return HTTP 302 to the current URL with
@@ -705,3 +748,7 @@ The usual optimizations involve:
     limiting the cost of a single page load.
   - The downside of this approach is that it will always be slower than
     skipping child block resolution.
+
+[dag-pb-format]: https://ipld.io/specs/codecs/dag-pb/spec/#logical-format
+[dag-json]: https://ipld.io/specs/codecs/dag-json/spec/
+[dag-cbor]: https://ipld.io/specs/codecs/dag-cbor/spec/
