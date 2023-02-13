@@ -19,8 +19,8 @@ Currently, the gateway supports requesting data in the [DAG-PB], RAW, [CAR] and
 TAR formats. In addition, it allows for traversing of links encoded through CBOR
 Tag 42, as long as they are intermediate links, and not the final document.
 It works on both DAG-CBOR, and its JSON representation, DAG-JSON. However, it
-should be possible to download deserialized versions of data other than UnixFS,
-such as JSON and CBOR.
+should be possible to download deserialized versions of the final JSON/CBOR document
+in raw format (not wrapped in UnixFS).
 
 The main functional gap in the IPFS ecosystem is the lack of support for
 non-UnixFS DAGs on HTTP gateways. Users are able to create custom DAGs based on
@@ -28,7 +28,7 @@ traversable DAG-CBOR thanks to [CBOR tag 42 being reserved for CIDs][cbor-42]
 and DAG-JSON documents, but they are unable to load deserialized documents from
 a local gateway, which is severely decreasing the utility of non-UnixFS DAGs.
 
-Adding new responses types will also benefit UnixFS. DAG-PB has a
+Adding JSON and CBOR response types will also benefit UnixFS. DAG-PB has a
 [logical format][dag-pb-format] which makes it possible to represent a DAG-PB
 directory as a [DAG-JSON] document. This means that, if we support DAG-JSON in
 the gateway, then we would support
@@ -59,12 +59,12 @@ failing with `node type unknown`.
 
 The current gateway already supports different response formats via the
 `Accept` HTTP header and the `format` URL query. This IPIP proposes adding
-more supported formats to that list.
+JSON and CBOR formats to that list.
 
 In addition, the current gateway already supports traversing through DAG-CBOR
 and DAG-JSON links if they are intermediary documents. With this IPIP, we aim
 to be able to download the DAG-CBOR, DAG-JSON, JSON and CBOR documents
-themselves.
+themselves, with correct `Content-Type` headers.
 
 ### User benefit
 
@@ -72,9 +72,9 @@ The user benefits from this change as they will now be able to retrieve
 content encoded in the traversable DAG-JSON and DAG-CBOR formats. This is
 something that has been [requested before][ipfs/go-ipfs/issues/7552].
 
-In addition, both UX and DX are significantly improved, since every block can
+In addition, both UX and DX are significantly improved, since every UnixFS directory can
 now be inspected in a regular web browser via `?format=json`. This can remove the
-need for additional tools, decoders, and/or libraries.
+need for parsing HTML with directory listing.
 
 ### Compatibility
 
@@ -99,6 +99,8 @@ strict enough:
 
 ### Alternatives
 
+#### Why four content types?
+
 If we do not introduce  DAG-JSON, DAG-CBOR, JSON and CBOR  response formats in
 the gateway, the usage of IPFS is constricted to files and directories represented
 by UnixFS (DAG-PB) codec. Therefore, if a user wants to store JSON and/or CBOR
@@ -110,7 +112,10 @@ supporting the generic variants, JSON and CBOR, would lead to poor UX. The
 ability to retrieve DAG-JSON as `application/json` is an important step
 for the interoperability of the HTTP Gateway with web browsers and other tools
 that expect specific Content Types. Namely, `Content-Type: application/json` with
-`Content-Disposition: inline` allows for JSON preview to be rendered in a web browser.
+`Content-Disposition: inline` allows for JSON preview to be rendered in a web browser
+and webdev tools.
+
+#### Why JSON/CBOR pathing is limited to full blocks?
 
 Finally, we considered supporting pathing within both DAG and non-DAG variants
 of the JSON and CBOR codecs. Pathing within these documents could lead to responses
