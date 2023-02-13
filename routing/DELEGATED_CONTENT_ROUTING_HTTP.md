@@ -130,7 +130,6 @@ Each object in the `Providers` list is a *write provider record*.
   - It is undefined whether the server will allow partial results
 - The work for processing each provider record should be idempotent so that it can be retried without excessive cost in the case of full or partial failure of the request
 - Default limit of 100 keys per request
-- Implements pagination according to the Pagination section
 
 ## Pagination
 
