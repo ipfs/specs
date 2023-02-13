@@ -1,7 +1,7 @@
-# IPIP 0000: InterPlanetary Improvement Proposal Template
+# IPIP-0: InterPlanetary Improvement Proposal Template
 
-<!-- IPIP number will be assigned by an editor. When opening a pull request to
-submit your IPIP, please use number 0000 and an abbreviated title in the filename,
+<!-- IPIP number should  match its pull request number. After you open a PR,
+please update title and include anqabbreviated title in the filename too:
 `0000-draft-title-abbrev.md`. -->
 
 - Start Date: YYYY-MM-DD
