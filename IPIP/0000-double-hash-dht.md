@@ -209,7 +209,7 @@ When a Content Provider republishes a Provider Record, the DHT Server only keeps
 Default: `k = 8`.
 Default: `MatchLimit = 64`.
 
-The `k`-anonymity parameter `k` is user defined, it can be modified in the configuration files. Users requiring a higher level of privacy can increase their value of `k`. `8` is deemed to be private enough for standard IPFS users, while limiting the overhead in packet size of the DHT Server response to 8x.
+The `k`-anonymity parameter `k` is user defined, it can be modified in the configuration files. Users requiring a higher level of privacy can increase their value of `k`. `k=8` is deemed to be private enough for standard IPFS users, while limiting the overhead in packet size of the DHT Server response to 8x.
 
 The `MatchLimit` prevents malformed or malicious requests to match all Provider Records that a DHT Server is providing at once. A Client can still fetch all Provider Records matching any `KeyPrefix`, but it must perform multiple DHT lookup requests for enough prefixes to the DHT Server. The `MatchLimit` protects the Server from having to send large amounts of data at once. `64` is already a large value, given that each `HASH2` can be associated with multiple Provider Records, one for each Content Provider, and the multiaddresses of all Content Providers can be sent along. The DHT provides _on average_ at most `64-anonymity` out-of-the-box and a better privacy level can be reached by sending multiple requests.
 
