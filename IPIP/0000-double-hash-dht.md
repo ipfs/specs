@@ -233,7 +233,7 @@ However Prefix Requests don't offer [`l`-diversity](https://en.wikipedia.org/wik
 
 **Provider Record Encryption**
 
-Provider Record Encryption also builds on top of Double Hashing. The Provider Record Encryption prevents curious DHT Servers observing a request for `Prefix` but not storing any Provider Record matching `Prefix`, to replay the request for `Prefix` and get all published keys matching `Prefix` including `HASH2` of the content accessed by the Client. It prevents all curious actors from building a global dictionary of `HASH2` to Content Providers for all content published in the IPFS public DHT. It is necessary to know the `MH` of the content (included in the `CID`) to learn about its Content Providers.
+Provider Record Encryption also builds on top of Double Hashing. The Provider Record Encryption prevents curious DHT Servers observing a request for `Prefix` (but not storing any Provider Record matching `Prefix`), to replay the request for `Prefix` and get all published keys matching `Prefix` including `HASH2` of the content accessed by the Client. It prevents all curious actors from building a global dictionary of `HASH2` to Content Providers for all content published in the IPFS public DHT. It is necessary to know the `MH` of the content (included in the `CID`) to learn about its Content Providers.
 
 Curious DHT Servers observing a request from `PeerID` for `Prefix` cannot associate the Client's `PeerID` with the Content Provider's `PeerID` because they cannot read the Provider Record.
 
