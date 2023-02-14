@@ -330,6 +330,7 @@ Mixnets references:
 - If we plan to move to using SHA3 instead of SHA2 to generate 256-bits digests, this migration is the perfect opportunity, as we will be breaking everything anyways. SHA3 was proved to be more secure against Length Extension Attacks. It has not be proven whether SHA2 or SHA3 is more collision resistant and secure against preimage attacks. See this [comparison](https://en.wikipedia.org/wiki/SHA-3#Comparison_of_SHA_functions).
 - Is it wise to encrypt the `CPPeerID` using `MH` directly? It would be possible to derive another identifier from `MH` (such as `Hash("SOME_CONSTANT" || MH)`). `MH` is the master identifier of the content, hence if it is revealed all other identifiers can trivially be found. However, it is computationally impossible to recover `MH` from `Hash("SOME_CONSTANT" || MH)`.
 - It may be fine to use `TS` as nonce, it spares bytes on the wire. However, if two Content Providers publish the same content at the same time (`TS` either in seconds or milliseconds), then the DHT Server may be able to forge a valid Provider Records for itself.
+- As multiple `HASH2` match each `Prefix` and the Client is only interested in a single one, should we send the `HASH2` along with each encrypted provider record (network load overhead) or let the Client try to decrypt all payloads and see for themselves which one opens (cpu overhead)?
 
 ## Copyright
 
