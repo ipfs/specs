@@ -125,7 +125,7 @@ The prefix `l` is derived from `k` and the number of CIDs published to the DHT: 
 
 Each node keeps track of the number of `HASH2` matching the last `KeyPrefix` requested in the last 128 lookups. `a` is defined as the average number of matches for the last 128 requests. At any point in time, if $a \gt 2\times k$, then `l` should increase (`l = l + 1`), and if $a \lt \frac{k}{2}$, then `l` should decrease (`l = l - 1`). On node shutdown, `a` is saved on disk, allowing a quick restart with an accurate `l` value.
 
-Note that DHT Servers can set an upperbound on the number of Provider Records they serve for each lookup request. So a too small `l` may result in not discovering the target Provider Record.
+Note that DHT Servers can set an upperbound on the number of Provider Records they serve for each lookup request. So a very small value for `l` may result in not discovering the target Provider Record.
 
 **Prefix magic numbers**
 - `k`-anonymity privacy parameter, by default `k = 8`
