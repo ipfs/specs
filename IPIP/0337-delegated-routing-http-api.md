@@ -86,7 +86,7 @@ and increasing data availability.
 IPFS Stewards will implement this API in [go-delegated-routing](https://github.com/ipfs/go-delegated-routing), using breaking changes in a new minor version.
 Because the existing Reframe spec can't be safely used in JavaScript and we won't be investing time and resources into changing the wire format implemented in edelweiss to fix it,
 the experimental support for Reframe in Kubo will be deprecated in the next release and delegated content routing will subsequently use this HTTP API.
-We may decide to re-add Reframe support in the future once these issues have been resolved.-
+We may decide to re-add Reframe support in the future once these issues have been resolved.
 
 #### Forwards Compatibility
 
