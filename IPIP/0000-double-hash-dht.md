@@ -48,7 +48,7 @@ The changes described in this document introduce a DHT privacy upgrade boosting 
 - **`MH`** is the [Multihash](https://github.com/multiformats/multihash) contained in a `CID`. It corresponds to the digest of a hash function over some content. `MH` is represented as a 32-byte array.
 - **`HASH2`** is defined as `SHA256(bytes("CR_DOUBLEHASH") || MH)`. It represents the location of the Kademlia keyspace for the Provider Record associated with `CID`. `HASH2` is represented as a 32-byte array. `HASH2 = SHA256(bytes("CR_DOUBLEHASH") || MH)`.
 - **Content Provider** is the node storing some content, and advertising it to the DHT.
-- **DHT Servers** are nodes running the IPFS public DHT. In this documents, DHT Servers mostly refer to the DHT Servers storing the Provider Records associated with specific `CID`s, and not the DHT Servers helping routing lookup requests to the right keyspace location. 
+- **DHT Servers** are nodes running the IPFS public DHT. In this document, DHT Servers mostly refer to the DHT Servers storing the Provider Records associated with specific `CID`s, and not the DHT Servers helping routing lookup requests to the right keyspace location. 
 - **Client** is an IPFS client looking up a content identified by an already known `CID`.
 - **Publish Process** is the process of the Content Provider communicating to the DHT Servers that it provides some content identified by `CID`.
 - **Lookup Process** is the process of the Client retrieving the content identified by `CID`.
