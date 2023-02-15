@@ -96,6 +96,33 @@ The following process describes the event of a client looking up a CID in the IP
 11. Each DHT server confirms to Content Provider that the Provider Record has been successfully added.
 12. The proces is over once Content Provider has received 20 confirmations.
 
+```mermaid
+sequenceDiagram
+    participant CP as Content Provider
+    participant DHT
+    participant Server as DHT Server
+
+    Note left of CP: HASH2 = SHA256(bytes("CR_DOUBLEHASH") || MH)
+
+    CP->>DHT: FIND_PEERS(HASH2)
+    DHT->>CP: [PeerID0, PeerID1, ... PeerID19]
+
+    Note left of CP: EncPeerID = 0xa501 || Nonce || payload_len || AESGCM(MH, Nonce, CPPeerID)
+    Note left of CP: Signature = Sign(privkey, EncPeerID || TS)
+    Note left of CP: ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)
+
+    par Content Provider to the 20 closest DHT Servers to HASH2
+        CP->>Server: HASH2 || EncPeerID || TS || Signature || ServerKey
+    
+    Note right of Server: Verify(pubkey, Signature, EncPeerID) &&<br>TS - time.now() < 48h
+    Note right of Server: On success, add to Provider Store:<br>HASH2 -> ServerKey -> CPPeerID -> [EncPeerID, TS, Signature]
+
+    Server->>CP: Success / Error
+    end
+
+    Note left of CP: Wait for 20 Successes
+```
+
 **Lookup Process**
 1. Client computes `HASH2 = SHA256(bytes("CR_DOUBLEHASH") || MH)` (`MH` is the MultiHash included in the CID).
 2. Client selects a prefix of `HASH2`, `KeyPrefix = HASH2[:l]` for a defined `l` (see [`l` selection](#prefix-length-selection)).
@@ -116,6 +143,46 @@ The following process describes the event of a client looking up a CID in the IP
 16. If the decrypted payload doesn't include the `multiaddrs` associated with `CPPeerID`, Client performs a DHT `FindPeer` request to find the `multiaddrs` associated with `CPPeerID`.
 17. Client sends a Bitswap request for `CID` to the Content Provider (known `CPPeerID` and `multiaddrs`).
 18. Content Provider sends the requested content back to Client.
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Server as DHT Server
+    participant CP as Content Provider
+
+    Note left of Client: HASH2 = SHA256(bytes("CR_DOUBLEHASH") || MH)
+    Note left of Client: ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)
+
+    loop in parallel until valid Provider Record found
+        Note left of Client: KeyPrefix = HASH2[:l]
+        Client->>Server: FIND_CONTENT(KeyPrefix)<br>Optional flags: multiaddrs, metadata
+        Note right of Server: message = []
+        loop for each of the 20 closest PeerIDs to KeyPrefix in the Routing Table
+            Note right of Server: message += PeerID
+        end
+        loop for each entry matching KeyPrefix in the Provider Store
+            Note right of Server: EncMetadata = 0xa501 || SERVERNONCE || payload_len ||<br> AESGCM(ServerKey, SERVERNONCE, TS || Signature || multiaddrs)
+            Note right of Server: Aggregate records per HASH2:<br>message += HASH2 || nb_records || EncPeerID0 || EncMetadata0 || ... || EncMetadataN
+            Note right of Server: Note: don't add multiaddrs nor metadata if not requested with flags
+        end
+        Note right of Server: Note: If there are more than MatchLimit entries matching KeyPrefix, drop all records and<br>message += "MatchLimit = MatchLimit"
+        Server->>Client: message
+        loop for all records matching HASH2
+            Note left of Client: CPPeerID = Dec(MH, EncPeerID)
+            Note left of Client: TS || Signature || multiaddrs = Dec(ServerKey, EncMetadata)
+            Note left of Client: Verify(CPPeerID, Signature, EncPeerID)
+        end
+        Note left of Client: If at least 1 record is valid exit the loop
+    end
+    opt if no valid record contains multiaddrs
+        Client->>Server: FIND_PEER(CPPeerID)
+        Server->>Client: multiaddrs of CPPeerID
+    end
+
+
+    Client->>CP: Bitswap request for CID
+    CP->>Client: Content
+```
 
 ### Prefix length selection
 
