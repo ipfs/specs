@@ -71,7 +71,7 @@ The following process describes the event of a client looking up a CID in the IP
 3. Client sends a DHT lookup request for `CID` to these DHT servers.
 4. Upon receiving the request, the DHT servers search if there is an entry for `MH` in their Provider Store. If yes, go to 10. Else continue.
 5. DHT servers compute `Hash(MH)`.
-6. DHT servers find the 20 closest peers to `Hash(HM)` in XOR distance in their Routing Table.
+6. DHT servers find the 20 closest peers to `Hash(MH)` in XOR distance in their Routing Table.
 7. DHT servers return the 20 `PeerID`s and `multiaddrs` of these peers to Client.
 8. Client sends a DHT lookup request for `CID` to the closest peers in XOR distance to `Hash(MH)` that it received.
 9. Go to 4.
