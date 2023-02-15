@@ -1,4 +1,4 @@
-# IPIP-338: Delegated Content Routing HTTP Provide Records API
+# IPIP-378: Delegated Content Routing HTTP Provide Records API
 
 - Start Date: 2023-02-14
 - Related Issues:
@@ -28,6 +28,7 @@ The rationale for the design of `PUT` operations closely follows the reasoning l
 The design uses a human-readable request/response structure with extensibility in mind.
 The specification imposes no restrictions on the schema nor the protocol advertised in provider records.
 The hope is that such extensibility will encourage and inspire innovation for better transfer protocols.
+In order to reduce barrier for adoption, the existing
 
 ### User benefit
 
