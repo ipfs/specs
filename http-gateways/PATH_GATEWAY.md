@@ -679,7 +679,8 @@ Gateway MUST respond with HTTP error when it is not possible to traverse the req
 - [`404 Not Found`](#404-not-found) should be returned when the root CID is valid and traversable, but
 the DAG it represents does not include content path remainder.
   - Error response body should indicate which part of immutable content path (`/ipfs/{cid}/path/to/file`) is missing
-- [`400 Bad Request`](#400-bad-request) can be used for remaining traversal errors caused by invalid or unsupported DAG types.
+- [`500 Internal Server Error`](#500-internal-server-error) can be used for remaining traversal errors,
+such as invalid CIDs, domains that cannot be resolved, or IPNS keys that cannot be resolved.
 
 ## Best practices for HTTP caching
 
