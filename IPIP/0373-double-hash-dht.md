@@ -37,7 +37,7 @@ The changes described in this document introduce a DHT privacy upgrade boosting 
 **Magic Values**
 - bytes("CR_DOUBLEHASH")
 - bytes("CR_SERVERKEY")
-- AES-GCM [varint](https://github.com/multiformats/multicodec/pull/314): `aes-gcm-256 = 0xa501`
+- AES-GCM [varint](https://github.com/multiformats/multicodec/pull/314): `aes-gcm-256 = 0x8040`
 - Double SHA256 [varint](https://github.com/multiformats/multicodec/blob/master/table.csv#L41): `dbl-sha2-256 = 0x5601`
 - A DHT Server returns all of the Provider Records matching to at most **`MatchLimit = 64`** distinct `HASH2`. Magic number explanation in [k-anonymity](#k-anonymity).
 - Provider Record Timestamp (`TS`) validity period: `48h`
@@ -58,7 +58,7 @@ The changes described in this document introduce a DHT privacy upgrade boosting 
 - **`ServerKey`** is defined as `SHA256(bytes("CR_SERVERKEY") || MH)`. It is derived from the `MH`. The Content Provider communicates `ServerKey` to the DHT Servers during the Publish Process. The DHT Servers use `ServerKey` to encrypt `TS`, `Signature` and Content Providers `multiaddrs` sent to the Client when some Provider Records match the requested `Prefix`. `ServerKey` is represented as a 32-byte array.
 - **`TS`** is the [Unix Timestamp](https://en.wikipedia.org/wiki/Unix_time) corresponding content publish time. `TS` is represented as a 32-bit **unsigned** Integer, allowing timestamps to range from `1970-01-01T00:00:00Z` to `2106-02-07T06:28:15Z` before reaching the overflow.
 - **`CPPeerID`** is the `PeerID` of the Content Provider for a specific `CID`.
-- **`EncPeerID`** is the result of the encryption of `CPPeerID` using `MH` as encryption key and a random nonce `AESGCM(MH, Nonce, CPPeerID)`. `EncPeerID` contains the [varint](https://github.com/multiformats/multicodec/pull/314) of the encryption algorithm used (AES), the bytes array of the encrypted payload, and the `Nonce`. `Nonce` is a randomly generated 12-byte array. The format of `EncPeerID` is [`0xa501`, `Nonce`, `payload_len`, `AESGCM(MH, Nonce, CPPeerID)`].
+- **`EncPeerID`** is the result of the encryption of `CPPeerID` using `MH` as encryption key and a random nonce `AESGCM(MH, Nonce, CPPeerID)`. `EncPeerID` contains the [varint](https://github.com/multiformats/multicodec/pull/314) of the encryption algorithm used (AES), the bytes array of the encrypted payload, and the `Nonce`. `Nonce` is a randomly generated 12-byte array. The format of `EncPeerID` is [`0x8040`, `Nonce`, `payload_len`, `AESGCM(MH, Nonce, CPPeerID)`].
 - **`Signature`** is the signature of the `EncPeerID` encrypted payload (not including the varint nor the nonce) and `TS` using the Content Provider's private key, either with ed25519 or rsa signature algorithm, depending on the keys of the Content Provider.
 - **Provider Record** is defined as a pointer to the storage location of some content identified by `CID` or `HASH2`. A Provider Record consists on the following fields: [`EncPeerID`, `TS`, `Signature`].
 - **Provider Store** is the data structure on the DHT Servers used to store the Provider Records. Its structure is a nested dictionary/map: `HASH2` -> `ServerKey` -> [`CPPeerID`, `EncPeerID`, `TS`, `Signature`]. There is only one single correct `ServerKey` for each `HASH2`. However, any peer can forge a valid Publish request (with invalid `EncPeerID` but valid `Signature`) undetected by the DHT Server. The DHT server isn't able to distinguish which `ServerKey` is correct as it doesn't have the knowledge of `MH`, hence it has to keep both and serve both upon request for `HASH2`.
@@ -86,7 +86,7 @@ The following process describes the event of a client looking up a CID in the IP
 1. Content Provider wants to publish some content with identifier `CID`.
 2. Content Provider computes `HASH2 = SHA256(bytes("CR_DOUBLEHASH") || MH)` (`MH` is the MultiHash included in the CID).
 3. Content Provider starts a DHT lookup request for the 20 closest `PeerID`s in XOR distance to `HASH2`.
-4. Content Provider encrypts its own `PeerID` (`CPPeerID`) with `MH`, using AES-GCM. `EncPeerID = [0xa501, Nonce, payload_len, AESGCM(MH, Nonce, CPPeerID)]`
+4. Content Provider encrypts its own `PeerID` (`CPPeerID`) with `MH`, using AES-GCM. `EncPeerID = [0x8040, Nonce, payload_len, AESGCM(MH, Nonce, CPPeerID)]`
 5. Content Provider takes the current timestamp `TS`.
 6. Content Provider signs `EncPeerID` and `TS` using its private key. `Signature = Sign(privkey, EncPeerID || TS)`
 7. Content Provider computes `ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)`.
@@ -107,7 +107,7 @@ sequenceDiagram
     CP->>DHT: FIND_PEERS(HASH2)
     DHT->>CP: [PeerID0, PeerID1, ... PeerID19]
 
-    Note left of CP: EncPeerID = 0xa501 || Nonce || payload_len || AESGCM(MH, Nonce, CPPeerID)
+    Note left of CP: EncPeerID = 0x8040 || Nonce || payload_len || AESGCM(MH, Nonce, CPPeerID)
     Note left of CP: Signature = Sign(privkey, EncPeerID || TS)
     Note left of CP: ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)
 
@@ -130,7 +130,7 @@ sequenceDiagram
 3. Client sends a DHT lookup request for `KeyPrefix` to these DHT servers. The request contains a flag to specify whether Client wants the `multiaddrs` associated with the `CPPeerID` or not. <!-- TODO: add multiaddrs request flag -->
 4. The DHT servers find the 20 closest `PeerID`s to `KeyPrefix` in XOR distance (see [algorithm](#closest-keys-to-a-key-prefix)). Add these `PeerID`s and their associated multiaddresses (if applicable) to the `message` that will be returned to Client.
 5. The DHT servers search if there are entries matching `KeyPrefix` in their Provider Store.
-6. For all entries `HASH2` of the Provider Store where `HASH2[:len(KeyPrefix)]==KeyPrefix`, add to `message` the following encrypted payload: `EncPeerID || 0xa501 || SERVERNONCE || payload_len || AESGCM(ServerKey, SERVERNONCE, TS || Signature || multiaddrs)`, `SERVERNONCE` being a randomly generated 12-byte array, for `multiaddrs` being the multiaddresses associated with `CPPeerID` (if applicable) if the `multiaddrs` were requested by Client. If more than `MatchLimit` distinct `HASH2`s match the requested `KeyPrefix`, the DHT Server doesn't return any Provider Record, and adds the number of `HASH2` matching `KeyPrefix` along with its own `MatchLimit` to `message`.
+6. For all entries `HASH2` of the Provider Store where `HASH2[:len(KeyPrefix)]==KeyPrefix`, add to `message` the following encrypted payload: `EncPeerID || 0x8040 || SERVERNONCE || payload_len || AESGCM(ServerKey, SERVERNONCE, TS || Signature || multiaddrs)`, `SERVERNONCE` being a randomly generated 12-byte array, for `multiaddrs` being the multiaddresses associated with `CPPeerID` (if applicable) if the `multiaddrs` were requested by Client. The `multiaddrs` are taken from the DHT Server's lib2p2 peerstore, and may be stale. If more than `MatchLimit` distinct `HASH2`s match the requested `KeyPrefix`, the DHT Server doesn't return any Provider Record, and adds the number of `HASH2` matching `KeyPrefix` along with its own `MatchLimit` to `message`.
 7. The DHT servers send `message` to Client.
 8. Client computes `ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)`.
 9. Client tries to decrypt all returned encrypted payloads using `MH` for `EncPeerID` and `ServerKey` for `Enc(ServerKey, TS || Signature || multiaddrs)`. If at least one encrypted payload can be decrypted, go to 12.
@@ -161,7 +161,7 @@ sequenceDiagram
             Note right of Server: message += PeerID
         end
         loop for each entry matching KeyPrefix in the Provider Store
-            Note right of Server: EncMetadata = 0xa501 || SERVERNONCE || payload_len ||<br> AESGCM(ServerKey, SERVERNONCE, TS || Signature || multiaddrs)
+            Note right of Server: EncMetadata = 0x8040 || SERVERNONCE || payload_len ||<br> AESGCM(ServerKey, SERVERNONCE, TS || Signature || multiaddrs)
             Note right of Server: Aggregate records per HASH2:<br>message += HASH2 || nb_records || EncPeerID0 || EncMetadata0 || ... || EncMetadataN
             Note right of Server: Note: don't add multiaddrs nor metadata if not requested with flags
         end
