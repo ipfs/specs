@@ -84,7 +84,7 @@ The following process describes the event of a client looking up a CID in the IP
 
 **Publish Process**
 1. Content Provider wants to publish some content with identifier `CID`.
-2. Content Provider computes `HASH2 = SHA256(bytes("CR_DOUBLEHASH") || MH)` (`MH` is the MultiHash included in the CID).
+2. Content Provider computes `HASH2 = SHA256(SALT_DOUBLEHASH || MH)` (`MH` is the MultiHash included in the CID).
 3. Content Provider starts a DHT lookup request for the 20 closest `PeerID`s in XOR distance to `HASH2`.
 4. Content Provider encrypts its own `PeerID` (`CPPeerID`) with `MH`, using AES-GCM. `EncPeerID = [0x8040, Nonce, payload_len, AESGCM(MH, Nonce, CPPeerID)]`
 5. Content Provider takes the current timestamp `TS`.
