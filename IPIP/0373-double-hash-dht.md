@@ -109,7 +109,7 @@ sequenceDiagram
 
     Note left of CP: EncPeerID = 0x8040 || Nonce || payload_len || AESGCM(MH, Nonce, CPPeerID)
     Note left of CP: Signature = Sign(privkey, EncPeerID || TS)
-    Note left of CP: ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)
+    Note left of CP: ServerKey = SHA256(SALT_SERVERKEY || MH)
 
     par Content Provider to the 20 closest DHT Servers to HASH2
         CP->>Server: HASH2 || EncPeerID || TS || Signature || ServerKey
