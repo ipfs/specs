@@ -132,7 +132,7 @@ sequenceDiagram
 5. The DHT servers search if there are entries matching `KeyPrefix` in their Provider Store.
 6. For all entries `HASH2` of the Provider Store where `HASH2[:len(KeyPrefix)]==KeyPrefix`, add to `message` the following encrypted payload: `EncPeerID || 0x8040 || SERVERNONCE || payload_len || AESGCM(ServerKey, SERVERNONCE, TS || Signature || multiaddrs)`, `SERVERNONCE` being a randomly generated 12-byte array, for `multiaddrs` being the multiaddresses associated with `CPPeerID` (if applicable) if the `multiaddrs` were requested by Client. The `multiaddrs` are taken from the DHT Server's lib2p2 peerstore, and may be stale. If more than `MatchLimit` distinct `HASH2`s match the requested `KeyPrefix`, the DHT Server doesn't return any Provider Record, and adds the number of `HASH2` matching `KeyPrefix` along with its own `MatchLimit` to `message`.
 7. The DHT servers send `message` to Client.
-8. Client computes `ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)`.
+8. Client computes `ServerKey = SHA256(SALT_SERVERKEY || MH)`.
 9. Client tries to decrypt all returned encrypted payloads using `MH` for `EncPeerID` and `ServerKey` for `Enc(ServerKey, TS || Signature || multiaddrs)`. If at least one encrypted payload can be decrypted, go to 12.
 10. If the DHT Server's `MatchLimit` and number of matching `HASH2`s was included in the `message`, Client makes multiple DHT lookup requests for longer prefixes (e.g `KeyPrefix||0` and `KeyPrefix||1`). Else Client sends a DHT lookup request for `KeyPrefix` to the closest peers in XOR distance to `HASH2` that it received from the DHT servers.
 11. Go to 4.
