@@ -150,8 +150,8 @@ sequenceDiagram
     participant Server as DHT Server
     participant CP as Content Provider
 
-    Note left of Client: HASH2 = SHA256(bytes("CR_DOUBLEHASH") || MH)
-    Note left of Client: ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)
+    Note left of Client: HASH2 = SHA256(SALT_DOUBLEHASH || MH)
+    Note left of Client: ServerKey = SHA256(SALT_SERVERKEY || MH)
 
     loop in parallel until valid Provider Record found
         Note left of Client: KeyPrefix = HASH2[:l]
