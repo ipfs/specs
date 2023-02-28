@@ -94,7 +94,7 @@ The following process describes the event of a client looking up a CID in the IP
 9. Each DHT server verifies `Signature` against the `PeerID` of the Content Provider used to open the libp2p connection. `Verify(CPPeerID, Signature, EncPeerID || TS)`. It verifies that `TS` is younger than `48h` and isn't in the future. If invalid, send an error to the client. <!-- TODO: define error -->
 10. Each DHT server adds an entry in their Provider Store for `HASH2` -> `ServerKey` -> `CPPeerID` -> [`EncPeerID`, `TS`, `Signature`], with `CPPeerID` being the `PeerID` of the Content Provider (see [provider store](#provider-store)). If there is already an entry including `CPPeerID` for `HASH2` -> `ServerKey`, and if the `TS` of the new valid entry is newer than the existing `TS`, overwrite the entry in the Provider Store. Else drop the new entry.
 11. Each DHT server confirms to Content Provider that the Provider Record has been successfully added.
-12. The proces is over once Content Provider has received 20 confirmations.
+12. The process is over once Content Provider has received 20 confirmations.
 
 ```mermaid
 sequenceDiagram
