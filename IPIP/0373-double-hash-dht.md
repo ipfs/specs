@@ -328,7 +328,7 @@ As knowledge of the preimage of the requested key isn't necessary in the Double 
 
 Requesting random keys is necessary for the Kademlia Bucket Refresh Process. On refresh, if a bucket has empty slots, the node will make a request for a random forged key falling in this specific bucket. In the current implementation, as the prefix of a requested key is necessary, Kademlia uses a [list of precomputed preimages](https://github.com/libp2p/go-libp2p-kbucket/blob/master/bucket_prefixmap.go), 1 matching every 15-bits key prefix. Hence, the random forged key, is never random, its definition set is the list of precomputed preimages, and not the full keyspace. This can lead to degraded performance and security vulnerabilities.
 
-Double Hashing enables the nodes to select a _truly_ random key from the Kademlia keyspace (limited by the randomness algorithm) matching the appropriate bucket.The 456KB [list of precomputed preimages](https://github.com/libp2p/go-libp2p-kbucket/blob/master/bucket_prefixmap.go) can be removed from the IPFS source code, once the migration to the Double Hashing DHT is complete.
+Double Hashing enables the nodes to select a _truly_ random key from the Kademlia keyspace (limited by the randomness algorithm) matching the appropriate bucket.The 456KB [list of precomputed preimages](https://github.com/libp2p/go-libp2p-kbucket/blob/2e310782ef7bc42d9af3e948fcf21d92b97e56ea/bucket_prefixmap.go) can be removed from the IPFS source code, once the migration to the Double Hashing DHT is complete.
 
 ### Simplicity
 
