@@ -89,7 +89,7 @@ The following process describes the event of a client looking up a CID in the IP
 4. Content Provider encrypts its own `PeerID` (`CPPeerID`) with `MH`, using AES-GCM. `EncPeerID = [0x8040, Nonce, payload_len, AESGCM(MH, Nonce, CPPeerID)]`
 5. Content Provider takes the current timestamp `TS`.
 6. Content Provider signs `EncPeerID` and `TS` using its private key. `Signature = Sign(privkey, EncPeerID || TS)`
-7. Content Provider computes `ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)`.
+7. Content Provider computes `ServerKey = SHA256(SALT_SERVERKEY || MH)`.
 8. Once the lookup request has returned the 20 closest peers, Content Provider sends a Publish request to these DHT servers. The Publish request contains [`HASH2`, `EncPeerID`, `TS`, `Signature`, `ServerKey`].
 9. Each DHT server verifies `Signature` against the `PeerID` of the Content Provider used to open the libp2p connection. `Verify(CPPeerID, Signature, EncPeerID || TS)`. It verifies that `TS` is younger than `48h` and isn't in the future. If invalid, send an error to the client. <!-- TODO: define error -->
 10. Each DHT server adds an entry in their Provider Store for `HASH2` -> `ServerKey` -> `CPPeerID` -> [`EncPeerID`, `TS`, `Signature`], with `CPPeerID` being the `PeerID` of the Content Provider (see [provider store](#provider-store)). If there is already an entry including `CPPeerID` for `HASH2` -> `ServerKey`, and if the `TS` of the new valid entry is newer than the existing `TS`, overwrite the entry in the Provider Store. Else drop the new entry.
