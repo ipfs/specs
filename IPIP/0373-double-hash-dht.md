@@ -102,7 +102,7 @@ sequenceDiagram
     participant DHT
     participant Server as DHT Server
 
-    Note left of CP: HASH2 = SHA256(bytes("CR_DOUBLEHASH") || MH)
+    Note left of CP: HASH2 = SHA256(SALT_DOUBLEHASH || MH)
 
     CP->>DHT: FIND_PEERS(HASH2)
     DHT->>CP: [PeerID0, PeerID1, ... PeerID19]
