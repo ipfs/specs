@@ -124,7 +124,7 @@ sequenceDiagram
 ```
 
 **Lookup Process**
-1. Client computes `HASH2 = SHA256(bytes("CR_DOUBLEHASH") || MH)` (`MH` is the MultiHash included in the CID).
+1. Client computes `HASH2 = SHA256(SALT_DOUBLEHASH || MH)` (`MH` is the MultiHash included in the CID).
 2. Client selects a prefix of `HASH2`, `KeyPrefix = HASH2[:l]` for a defined `l` (see [`l` selection](#prefix-length-selection)).
 2. Client finds the closest `PeerID`s to `HASH2` in XOR distance in its Routing Table.
 3. Client sends a DHT lookup request for `KeyPrefix` to these DHT servers. The request contains a flag to specify whether Client wants the `multiaddrs` associated with the `CPPeerID` or not. <!-- TODO: add multiaddrs request flag -->
