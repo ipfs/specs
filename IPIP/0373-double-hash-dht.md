@@ -77,8 +77,6 @@ The following process describes the event of a client looking up a CID in the IP
 9. Go to 4.
 10. The DHT servers storing the Provider Record(s) associated with `MH` send them to Client. (Currently, if a Provider Record has been published less than 30 min before being requested, the DHT servers also send the `multiaddresses` of the Content Provider to Client).
 11. If the response from the DHT server doesn't include the `multiaddrs` associated with the Content Providers' `PeerID`s, Client performs a DHT `FindPeer` request to find the `multiaddrs` of the returned `PeerID`s.
-12. Client sends a Bitswap request for `CID` to the Content Provider (known `PeerID` and `multiaddrs`).
-13. Content Provider sends the requested content back to Client.
 
 ### Double Hash DHT design
 
@@ -126,23 +124,23 @@ sequenceDiagram
 **Lookup Process**
 1. Client computes `HASH2 = SHA256(bytes("CR_DOUBLEHASH") || MH)` (`MH` is the MultiHash included in the CID).
 2. Client selects a prefix of `HASH2`, `KeyPrefix = HASH2[:l]` for a defined `l` (see [`l` selection](#prefix-length-selection)).
-2. Client finds the closest `PeerID`s to `HASH2` in XOR distance in its Routing Table.
-3. Client sends a DHT lookup request for `KeyPrefix` to these DHT servers. The request contains a flag to specify whether Client wants the `multiaddrs` associated with the `CPPeerID` or not. <!-- TODO: add multiaddrs request flag -->
-4. The DHT servers find the 20 closest `PeerID`s to `KeyPrefix` in XOR distance (see [algorithm](#closest-keys-to-a-key-prefix)). Add these `PeerID`s and their associated multiaddresses (if applicable) to the `message` that will be returned to Client.
-5. The DHT servers search if there are entries matching `KeyPrefix` in their Provider Store.
-6. For all entries `HASH2` of the Provider Store where `HASH2[:len(KeyPrefix)]==KeyPrefix`, add to `message` the following encrypted payload: `EncPeerID || 0x8040 || SERVERNONCE || payload_len || AESGCM(ServerKey, SERVERNONCE, TS || Signature || multiaddrs)`, `SERVERNONCE` being a randomly generated 12-byte array, for `multiaddrs` being the multiaddresses associated with `CPPeerID` (if applicable) if the `multiaddrs` were requested by Client. The `multiaddrs` are taken from the DHT Server's lib2p2 peerstore, and may be stale. If more than `MatchLimit` distinct `HASH2`s match the requested `KeyPrefix`, the DHT Server doesn't return any Provider Record, and adds the number of `HASH2` matching `KeyPrefix` along with its own `MatchLimit` to `message`.
-7. The DHT servers send `message` to Client.
-8. Client computes `ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)`.
-9. Client tries to decrypt all returned encrypted payloads using `MH` for `EncPeerID` and `ServerKey` for `Enc(ServerKey, TS || Signature || multiaddrs)`. If at least one encrypted payload can be decrypted, go to 12.
-10. If the DHT Server's `MatchLimit` and number of matching `HASH2`s was included in the `message`, Client makes multiple DHT lookup requests for longer prefixes (e.g `KeyPrefix||0` and `KeyPrefix||1`). Else Client sends a DHT lookup request for `KeyPrefix` to the closest peers in XOR distance to `HASH2` that it received from the DHT servers.
-11. Go to 4.
-12. For each decrypted payload, Client decrypts `CPPeerID = Dec(MH, EncPeerID)`.
-13. Client verifies that `Signature` verifies with `CPPeerID`: `Verify(CPPeerID, Signature, EncPeerID || TS)`.
-14. Client checks that `TS` is younger than `48h`.
-15. If none of the decrypted payloads is valid, go to 4.
-16. If the decrypted payload doesn't include the `multiaddrs` associated with `CPPeerID`, Client performs a DHT `FindPeer` request to find the `multiaddrs` associated with `CPPeerID`.
-17. Client sends a Bitswap request for `CID` to the Content Provider (known `CPPeerID` and `multiaddrs`).
-18. Content Provider sends the requested content back to Client.
+3. Client finds the closest `PeerID`s to `HASH2` in XOR distance in its Routing Table.
+4. Client sends a DHT lookup request for `KeyPrefix` to these DHT servers. The request contains a flag to specify whether Client wants the `multiaddrs` associated with the `CPPeerID` or not. <!-- TODO: add multiaddrs request flag -->
+5. The DHT servers find the 20 closest `PeerID`s to `KeyPrefix` in XOR distance (see [algorithm](#closest-keys-to-a-key-prefix)). Add these `PeerID`s and their associated multiaddresses (if applicable) to the `message` that will be returned to Client.
+6. The DHT servers search if there are entries matching `KeyPrefix` in their Provider Store.
+7. For all entries `HASH2` of the Provider Store where `HASH2[:len(KeyPrefix)]==KeyPrefix`, add to `message` the following encrypted payload: `EncPeerID || 0x8040 || SERVERNONCE || payload_len || AESGCM(ServerKey, SERVERNONCE, TS || Signature || multiaddrs)`, `SERVERNONCE` being a randomly generated 12-byte array, for `multiaddrs` being the multiaddresses associated with `CPPeerID` (if applicable) if the `multiaddrs` were requested by Client. The `multiaddrs` are taken from the DHT Server's lib2p2 peerstore, and may be stale. If more than `MatchLimit` distinct `HASH2`s match the requested `KeyPrefix`, the DHT Server doesn't return any Provider Record, and adds the number of `HASH2` matching `KeyPrefix` along with its own `MatchLimit` to `message`.
+8. The DHT servers send `message` to Client.
+9. Client computes `ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)`.
+10. Client tries to decrypt all returned encrypted payloads using `MH` for `EncPeerID` and `ServerKey` for `Enc(ServerKey, TS || Signature || multiaddrs)`. If at least one encrypted payload can be decrypted, go to 13.
+11. If the DHT Server's `MatchLimit` and number of matching `HASH2`s was included in the `message`, Client makes multiple DHT lookup requests for longer prefixes (e.g `KeyPrefix||0` and `KeyPrefix||1`). Else Client sends a DHT lookup request for `KeyPrefix` to the closest peers in XOR distance to `HASH2` that it received from the DHT servers.
+12. Go to 5.
+13. For each decrypted payload, Client decrypts `CPPeerID = Dec(MH, EncPeerID)`.
+14. Client verifies that `Signature` verifies with `CPPeerID`: `Verify(CPPeerID, Signature, EncPeerID || TS)`.
+15. Client checks that `TS` is younger than `48h`.
+16. If none of the decrypted payloads is valid, go to 5.
+17. If the decrypted payload doesn't include the `multiaddrs` associated with `CPPeerID`, Client performs a DHT `FindPeer` request to find the `multiaddrs` associated with `CPPeerID`.
+18. Client requests `CID` or another content identifier to the Content Provider (known `CPPeerID` and `multiaddrs`) and can exchange data (the DHT may be consumed by various different protocols).
+
 
 ```mermaid
 sequenceDiagram
