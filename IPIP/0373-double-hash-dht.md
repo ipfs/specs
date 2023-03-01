@@ -35,8 +35,8 @@ The changes described in this document introduce a DHT privacy upgrade boosting 
 ## Detailed Design
 
 **Magic Values**
-- bytes("CR_DOUBLEHASH")
-- bytes("CR_SERVERKEY")
+- `SALT_DOUBLEHASH = bytes("CR_DOUBLEHASH\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00")`
+- `SALT_SERVERKEY = bytes("CR_SERVERKEY\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00")`
 - AES-GCM [varint](https://github.com/multiformats/multicodec/pull/314): `aes-gcm-256 = 0x8040`
 - Double SHA256 [varint](https://github.com/multiformats/multicodec/blob/master/table.csv#L41): `dbl-sha2-256 = 0x5601`
 - A DHT Server returns all of the Provider Records matching to at most **`MatchLimit = 64`** distinct `HASH2`. Magic number explanation in [k-anonymity](#k-anonymity).
@@ -46,7 +46,7 @@ The changes described in this document introduce a DHT privacy upgrade boosting 
 
 - **`CID`** is the IPFS [Content IDentifier](https://github.com/multiformats/cid)
 - **`MH`** is the [Multihash](https://github.com/multiformats/multihash) contained in a `CID`. It corresponds to the digest of a hash function over some content. `MH` is represented as a 32-byte array.
-- **`HASH2`** is defined as `SHA256(bytes("CR_DOUBLEHASH") || MH)`. It represents the location of the Kademlia keyspace for the Provider Record associated with `CID`. `HASH2` is represented as a 32-byte array. `HASH2 = SHA256(bytes("CR_DOUBLEHASH") || MH)`.
+- **`HASH2`** is defined as `SHA256(SALT_DOUBLEHASH || MH)`. It represents the location of the Kademlia keyspace for the Provider Record associated with `CID`. `HASH2` is represented as a 32-byte array. `HASH2 = SHA256(SALT_DOUBLEHASH || MH)`.
 - **Content Provider** is the node storing some content, and advertising it to the DHT.
 - **DHT Servers** are nodes running the IPFS public DHT. In this documents, DHT Servers mostly refer to the DHT Servers storing the Provider Records associated with specific `CID`s, and not the DHT Servers helping routing lookup requests to the right keyspace location. 
 - **Client** is an IPFS client looking up a content identified by an already known `CID`.
@@ -55,7 +55,7 @@ The changes described in this document introduce a DHT privacy upgrade boosting 
 - **`PeerID`** s define stable [peer identities](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md). The `PeerID` is derived from the node's cryptographic public key.
 - **`multiaddrs`** are the [network addresses](https://github.com/libp2p/specs/tree/master/addressing) associated with a `PeerID`. It represents the location(s) of the peer.
 - **`KeyPrefix`** is defined as a prefix of length `l` bits of `HASH2`. `KeyPrefix` is represented by a `byte` concatenated with a variable sized array of bytes, containing at most 32 bytes. The leading `byte` represents the binary representation of `l - 1`, making prefixes of length `256` possible, but not prefixes of length `0`. The trailing byte array is of length `ceil(l/8)` bytes, and its content is the bits prefix right padded with zeros.
-- **`ServerKey`** is defined as `SHA256(bytes("CR_SERVERKEY") || MH)`. It is derived from the `MH`. The Content Provider communicates `ServerKey` to the DHT Servers during the Publish Process. The DHT Servers use `ServerKey` to encrypt `TS`, `Signature` and Content Providers `multiaddrs` sent to the Client when some Provider Records match the requested `Prefix`. `ServerKey` is represented as a 32-byte array.
+- **`ServerKey`** is defined as `SHA256(SALT_SERVERKEY || MH)`. It is derived from the `MH`. The Content Provider communicates `ServerKey` to the DHT Servers during the Publish Process. The DHT Servers use `ServerKey` to encrypt `TS`, `Signature` and Content Providers `multiaddrs` sent to the Client when some Provider Records match the requested `Prefix`. `ServerKey` is represented as a 32-byte array.
 - **`TS`** is the [Unix Timestamp](https://en.wikipedia.org/wiki/Unix_time) corresponding content publish time. `TS` is represented as a 32-bit **unsigned** Integer, allowing timestamps to range from `1970-01-01T00:00:00Z` to `2106-02-07T06:28:15Z` before reaching the overflow.
 - **`CPPeerID`** is the `PeerID` of the Content Provider for a specific `CID`.
 - **`EncPeerID`** is the result of the encryption of `CPPeerID` using `MH` as encryption key and a random nonce `AESGCM(MH, Nonce, CPPeerID)`. `EncPeerID` contains the [varint](https://github.com/multiformats/multicodec/pull/314) of the encryption algorithm used (AES), the bytes array of the encrypted payload, and the `Nonce`. `Nonce` is a randomly generated 12-byte array. The format of `EncPeerID` is [`0x8040`, `Nonce`, `payload_len`, `AESGCM(MH, Nonce, CPPeerID)`].
@@ -82,17 +82,17 @@ The following process describes the event of a client looking up a CID in the IP
 
 **Publish Process**
 1. Content Provider wants to publish some content with identifier `CID`.
-2. Content Provider computes `HASH2 = SHA256(bytes("CR_DOUBLEHASH") || MH)` (`MH` is the MultiHash included in the CID).
+2. Content Provider computes `HASH2 = SHA256(SALT_DOUBLEHASH || MH)` (`MH` is the MultiHash included in the CID).
 3. Content Provider starts a DHT lookup request for the 20 closest `PeerID`s in XOR distance to `HASH2`.
 4. Content Provider encrypts its own `PeerID` (`CPPeerID`) with `MH`, using AES-GCM. `EncPeerID = [0x8040, Nonce, payload_len, AESGCM(MH, Nonce, CPPeerID)]`
 5. Content Provider takes the current timestamp `TS`.
 6. Content Provider signs `EncPeerID` and `TS` using its private key. `Signature = Sign(privkey, EncPeerID || TS)`
-7. Content Provider computes `ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)`.
+7. Content Provider computes `ServerKey = SHA256(SALT_SERVERKEY || MH)`.
 8. Once the lookup request has returned the 20 closest peers, Content Provider sends a Publish request to these DHT servers. The Publish request contains [`HASH2`, `EncPeerID`, `TS`, `Signature`, `ServerKey`].
 9. Each DHT server verifies `Signature` against the `PeerID` of the Content Provider used to open the libp2p connection. `Verify(CPPeerID, Signature, EncPeerID || TS)`. It verifies that `TS` is younger than `48h` and isn't in the future. If invalid, send an error to the client. <!-- TODO: define error -->
 10. Each DHT server adds an entry in their Provider Store for `HASH2` -> `ServerKey` -> `CPPeerID` -> [`EncPeerID`, `TS`, `Signature`], with `CPPeerID` being the `PeerID` of the Content Provider (see [provider store](#provider-store)). If there is already an entry including `CPPeerID` for `HASH2` -> `ServerKey`, and if the `TS` of the new valid entry is newer than the existing `TS`, overwrite the entry in the Provider Store. Else drop the new entry.
 11. Each DHT server confirms to Content Provider that the Provider Record has been successfully added.
-12. The proces is over once Content Provider has received 20 confirmations.
+12. The process is over once Content Provider has received 20 confirmations.
 
 ```mermaid
 sequenceDiagram
@@ -100,14 +100,14 @@ sequenceDiagram
     participant DHT
     participant Server as DHT Server
 
-    Note left of CP: HASH2 = SHA256(bytes("CR_DOUBLEHASH") || MH)
+    Note left of CP: HASH2 = SHA256(SALT_DOUBLEHASH || MH)
 
     CP->>DHT: FIND_PEERS(HASH2)
     DHT->>CP: [PeerID0, PeerID1, ... PeerID19]
 
     Note left of CP: EncPeerID = 0x8040 || Nonce || payload_len || AESGCM(MH, Nonce, CPPeerID)
     Note left of CP: Signature = Sign(privkey, EncPeerID || TS)
-    Note left of CP: ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)
+    Note left of CP: ServerKey = SHA256(SALT_SERVERKEY || MH)
 
     par Content Provider to the 20 closest DHT Servers to HASH2
         CP->>Server: HASH2 || EncPeerID || TS || Signature || ServerKey
@@ -122,15 +122,16 @@ sequenceDiagram
 ```
 
 **Lookup Process**
-1. Client computes `HASH2 = SHA256(bytes("CR_DOUBLEHASH") || MH)` (`MH` is the MultiHash included in the CID).
+1. Client computes `HASH2 = SHA256(SALT_DOUBLEHASH || MH)` (`MH` is the MultiHash included in the CID).
 2. Client selects a prefix of `HASH2`, `KeyPrefix = HASH2[:l]` for a defined `l` (see [`l` selection](#prefix-length-selection)).
+<<<<<<< HEAD
 3. Client finds the closest `PeerID`s to `HASH2` in XOR distance in its Routing Table.
 4. Client sends a DHT lookup request for `KeyPrefix` to these DHT servers. The request contains a flag to specify whether Client wants the `multiaddrs` associated with the `CPPeerID` or not. <!-- TODO: add multiaddrs request flag -->
 5. The DHT servers find the 20 closest `PeerID`s to `KeyPrefix` in XOR distance (see [algorithm](#closest-keys-to-a-key-prefix)). Add these `PeerID`s and their associated multiaddresses (if applicable) to the `message` that will be returned to Client.
 6. The DHT servers search if there are entries matching `KeyPrefix` in their Provider Store.
 7. For all entries `HASH2` of the Provider Store where `HASH2[:len(KeyPrefix)]==KeyPrefix`, add to `message` the following encrypted payload: `EncPeerID || 0x8040 || SERVERNONCE || payload_len || AESGCM(ServerKey, SERVERNONCE, TS || Signature || multiaddrs)`, `SERVERNONCE` being a randomly generated 12-byte array, for `multiaddrs` being the multiaddresses associated with `CPPeerID` (if applicable) if the `multiaddrs` were requested by Client. The `multiaddrs` are taken from the DHT Server's lib2p2 peerstore, and may be stale. If more than `MatchLimit` distinct `HASH2`s match the requested `KeyPrefix`, the DHT Server doesn't return any Provider Record, and adds the number of `HASH2` matching `KeyPrefix` along with its own `MatchLimit` to `message`.
 8. The DHT servers send `message` to Client.
-9. Client computes `ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)`.
+9. Client computes `ServerKey = SHA256(SALT_SERVERKEY || MH)`.
 10. Client tries to decrypt all returned encrypted payloads using `MH` for `EncPeerID` and `ServerKey` for `Enc(ServerKey, TS || Signature || multiaddrs)`. If at least one encrypted payload can be decrypted, go to 13.
 11. If the DHT Server's `MatchLimit` and number of matching `HASH2`s was included in the `message`, Client makes multiple DHT lookup requests for longer prefixes (e.g `KeyPrefix||0` and `KeyPrefix||1`). Else Client sends a DHT lookup request for `KeyPrefix` to the closest peers in XOR distance to `HASH2` that it received from the DHT servers.
 12. Go to 5.
@@ -141,6 +142,25 @@ sequenceDiagram
 17. If the decrypted payload doesn't include the `multiaddrs` associated with `CPPeerID`, Client performs a DHT `FindPeer` request to find the `multiaddrs` associated with `CPPeerID`.
 18. Client requests `CID` or another content identifier to the Content Provider (known `CPPeerID` and `multiaddrs`) and can exchange data (the DHT may be consumed by various different protocols).
 
+=======
+2. Client finds the closest `PeerID`s to `HASH2` in XOR distance in its Routing Table.
+3. Client sends a DHT lookup request for `KeyPrefix` to these DHT servers. The request contains a flag to specify whether Client wants the `multiaddrs` associated with the `CPPeerID` or not. <!-- TODO: add multiaddrs request flag -->
+4. The DHT servers find the 20 closest `PeerID`s to `KeyPrefix` in XOR distance (see [algorithm](#closest-keys-to-a-key-prefix)). Add these `PeerID`s and their associated multiaddresses (if applicable) to the `message` that will be returned to Client.
+5. The DHT servers search if there are entries matching `KeyPrefix` in their Provider Store.
+6. For all entries `HASH2` of the Provider Store where `HASH2[:len(KeyPrefix)]==KeyPrefix`, add to `message` the following encrypted payload: `EncPeerID || 0x8040 || SERVERNONCE || payload_len || AESGCM(ServerKey, SERVERNONCE, TS || Signature || multiaddrs)`, `SERVERNONCE` being a randomly generated 12-byte array, for `multiaddrs` being the multiaddresses associated with `CPPeerID` (if applicable) if the `multiaddrs` were requested by Client. The `multiaddrs` are taken from the DHT Server's lib2p2 peerstore, and may be stale. If more than `MatchLimit` distinct `HASH2`s match the requested `KeyPrefix`, the DHT Server doesn't return any Provider Record, and adds the number of `HASH2` matching `KeyPrefix` along with its own `MatchLimit` to `message`.
+7. The DHT servers send `message` to Client.
+8. Client computes `ServerKey = SHA256(SALT_SERVERKEY || MH)`.
+9. Client tries to decrypt all returned encrypted payloads using `MH` for `EncPeerID` and `ServerKey` for `Enc(ServerKey, TS || Signature || multiaddrs)`. If at least one encrypted payload can be decrypted, go to 12.
+10. If the DHT Server's `MatchLimit` and number of matching `HASH2`s was included in the `message`, Client makes multiple DHT lookup requests for longer prefixes (e.g `KeyPrefix||0` and `KeyPrefix||1`). Else Client sends a DHT lookup request for `KeyPrefix` to the closest peers in XOR distance to `HASH2` that it received from the DHT servers.
+11. Go to 4.
+12. For each decrypted payload, Client decrypts `CPPeerID = Dec(MH, EncPeerID)`.
+13. Client verifies that `Signature` verifies with `CPPeerID`: `Verify(CPPeerID, Signature, EncPeerID || TS)`.
+14. Client checks that `TS` is younger than `48h`.
+15. If none of the decrypted payloads is valid, go to 4.
+16. If the decrypted payload doesn't include the `multiaddrs` associated with `CPPeerID`, Client performs a DHT `FindPeer` request to find the `multiaddrs` associated with `CPPeerID`.
+17. Client sends a Bitswap request for `CID` to the Content Provider (known `CPPeerID` and `multiaddrs`).
+18. Content Provider sends the requested content back to Client.
+>>>>>>> 0da90106a2ac73045f1b6d033ac8a6f486e243e0
 
 ```mermaid
 sequenceDiagram
@@ -148,8 +168,8 @@ sequenceDiagram
     participant Server as DHT Server
     participant CP as Content Provider
 
-    Note left of Client: HASH2 = SHA256(bytes("CR_DOUBLEHASH") || MH)
-    Note left of Client: ServerKey = SHA256(bytes("CR_SERVERKEY") || MH)
+    Note left of Client: HASH2 = SHA256(SALT_DOUBLEHASH || MH)
+    Note left of Client: ServerKey = SHA256(SALT_SERVERKEY || MH)
 
     loop in parallel until valid Provider Record found
         Note left of Client: KeyPrefix = HASH2[:l]
@@ -326,7 +346,7 @@ As knowledge of the preimage of the requested key isn't necessary in the Double 
 
 Requesting random keys is necessary for the Kademlia Bucket Refresh Process. On refresh, if a bucket has empty slots, the node will make a request for a random forged key falling in this specific bucket. In the current implementation, as the prefix of a requested key is necessary, Kademlia uses a [list of precomputed preimages](https://github.com/libp2p/go-libp2p-kbucket/blob/master/bucket_prefixmap.go), 1 matching every 15-bits key prefix. Hence, the random forged key, is never random, its definition set is the list of precomputed preimages, and not the full keyspace. This can lead to degraded performance and security vulnerabilities.
 
-Double Hashing enables the nodes to select a _truly_ random key from the Kademlia keyspace (limited by the randomness algorithm) matching the appropriate bucket.The 456KB [list of precomputed preimages](https://github.com/libp2p/go-libp2p-kbucket/blob/master/bucket_prefixmap.go) can be removed from the IPFS source code, once the migration to the Double Hashing DHT is complete.
+Double Hashing enables the nodes to select a _truly_ random key from the Kademlia keyspace (limited by the randomness algorithm) matching the appropriate bucket.The 456KB [list of precomputed preimages](https://github.com/libp2p/go-libp2p-kbucket/blob/2e310782ef7bc42d9af3e948fcf21d92b97e56ea/bucket_prefixmap.go) can be removed from the IPFS source code, once the migration to the Double Hashing DHT is complete.
 
 ### Simplicity
 
