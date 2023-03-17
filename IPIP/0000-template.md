@@ -1,0 +1,1 @@
+Moved to [../ipip-template.md].
