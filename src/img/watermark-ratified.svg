@@ -1,0 +1,8 @@
+<svg class="watermark ipip-ratified-watermark" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+  <defs>
+    <pattern id="textstripe" patternUnits="userSpaceOnUse" width="300" height="200" patternTransform="rotate(-45)">
+      <text y="30" font-family="system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif" font-size="40" fill="rgba(0,0,0,0.05)">Ratified</text>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#textstripe)"></rect>
+</svg>

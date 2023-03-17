@@ -94,6 +94,15 @@ title: Home
         </p>
         {% include 'list.html', posts: collections.ipns %}
       </section>
+      <section>
+        <h3><a href="/ipips/">InterPlanetary Improvement Proposals</a></h3>
+        <p>
+          InterPlanetary Improvement Proposals (IPIP) are an <a href="/meta/ipip-process">orderly mechanism</a> to consider
+          changes to the IPFS specification. They are not changes to the specification itself,
+          but their approval leads to a change in the specification.
+        </p>
+        {% include 'ipips-list.html' %}
+      </section>
     </div>
   </section>
 </main>

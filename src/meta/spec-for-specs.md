@@ -19,7 +19,7 @@ xref:
   - dom
   - test-methodology
 tags: ['meta']
-order: 1
+order: 2
 ---
 
 This document specifies the format and system used to create and maintain specifications for

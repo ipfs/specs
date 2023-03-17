@@ -1,13 +1,18 @@
-# IPIP: Improvement Process for IPFS Specifications
-
-- [Introduction](#introduction)
-- [Process design](#process-design)
-  - [What is an IPIP?](#what-is-an-ipip)
-  - [What changes need the IPIP process?](#what-changes-need-the-ipip-process)
-- [Improvement lifecycle](#improvement-lifecycle)
-  - [Opening an improvement proposal (IPIP)](#opening-an-improvement-proposal-ipip)
-  - [Reviewing IPIPs](#reviewing-ipips)
-  - [Things not covered by this document](#things-not-covered-by-this-document)
+---
+title: "IPIP: Improvement Process for IPFS Specifications"
+description: >
+  The specification documenting the process through which a new IPIP should be proposed.
+date: 2023-02-23
+editors:
+  - name: Marcin Rataj
+    github: lidel
+  - name: Guillaume Michel
+    github: guillaumemichel
+  - name: Henrique Dias
+    github: hacdias
+    url: https://hacdias.com/
+order: 1
+---
 
 ## Introduction
 
@@ -35,10 +40,10 @@ a specification.**
 To illustrate:
 
 - In order to understand how (hypothetical) WebDAV Gateway works, one would
-  read contents of specs in `ipfs/specs/WEBDAV_GATEWAY.md`.
-- IPIP in `ipfs/specs/IPIP/000N-webdav-gateway.md` would only include
+  read contents of specs in `ipfs/specs/src/webdav-gateway.md`.
+- IPIP in `ipfs/specs/src/ipips/ipip-000N.md` would only include
   **Motivation** and explainer why certain design decisions were made at a
-  certain point in time. Initial `IPIP/000N-webdav-gateway.md` would explain
+  certain point in time. Initial `ipip-000N.md` would explain
   why we added WebDAV spec in the first place.
 
 ### What changes need the IPIP process?
@@ -47,7 +52,7 @@ To illustrate:
 - **Does Not need IPIP**: Adding more details, test vectors, and editorials/cosmetic changes
 - **Needs IPIP**: An addition to the protocol
 - **Needs IPIP**:Things that could cause an interop issues require a PR with fix and IPIP in
-  `ipfs/specs/IPIP/000M-webdav-fix-for-foo.md` explaining why we make the
+  `ipfs/specs/src/ipips/ipip-000M.md` explaining why we make the
   breaking spec change, compatibility/migration considerations etc.
 
 ## Improvement lifecycle
@@ -58,10 +63,10 @@ Changes to IPFS specifications can be proposed by opening a Git pull-request
 (PR) against the `ipfs/specs` repository.
 
 In addition to specification changes, such PR must include a short **IPIP
-document** based on the template in [`ipfs/specs/IPIP/0000-template.md`](./IPIP/0000-template.md).
+document** based on the template in [`ipfs/specs/ipip-template.md`](https://github.com/ipfs/specs/blob/main/ipip-template.md).
 
 When a new specification file is added to the repo, it should be based on
-the template at [`ipfs/specs/template.md`](./template.md).
+the template at [`ipfs/specs/template.md`](https://github.com/ipfs/specs/blob/main/template.md).
 
 When naming a new proposal, don't try to introduce an IPIP number; we will do that only for
 IPIPs that are approved before accepting into `main` branch.
