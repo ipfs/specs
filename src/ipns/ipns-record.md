@@ -15,7 +15,7 @@ editors:
     github: guseggert 
 ---
 
-# InterPlanetary Naming System
+# IPNS Record and Protocol
 
 The InterPlanetary File System (IPFS) is powered by content-addressed data, which by nature is immutable: changing an object would change its hash, and consequently its address, making it a different object altogether. However, there are several use cases where we benefit from having mutable data. This is where the InterPlanetary Naming System (IPNS) gets into the equation. IPNS records provide cryptographically verifiable, mutable pointers to objects.
 

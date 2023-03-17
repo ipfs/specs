@@ -1,0 +1,131 @@
+
+
+:root {
+  --size-mono: 0.9em;
+}
+
+body {
+  max-width: var(--max-readable-width);
+  margin: 0 auto;
+  padding: 0 0 0 0;
+  line-height: 1.5;
+}
+
+#ipseity-back-to-root {
+  margin-bottom: 2rem;
+  background: var(--standard-gradient);
+  padding-left: 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+#ipseity-back-to-root a {
+  color: var(--ipfs-off-white);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+#ipseity-back-to-root a:hover {
+  color: var(--ipfs-yellow);
+}
+
+header {
+  background-image: url(/img/ipfs-standards.svg);
+  background-repeat: no-repeat;
+  background-size: 100px;
+  background-position-x: right;
+  margin-bottom: 3rem;
+  border-bottom: 0.25rem solid var(--ipfs-turquoise);
+  padding-bottom: 2rem;
+}
+
+header dt {
+  font-weight: var(--weight-regular);
+  text-decoration: underline;
+}
+
+header dd img {
+  opacity: 0.5;
+  transition: opacity .5s;
+  background: var(--contrast-bg);
+  border-radius: 2px;
+  vertical-align: sub;
+}
+
+header dd img:hover {
+  opacity: 1;
+}
+
+header dd a {
+  text-decoration: none;
+}
+
+h1 {
+  max-width: calc(100% - (100px + 1rem));
+  font-weight: var(--weight-semi-bold);
+  line-height: 1;
+  margin: 0.15rem 0 0 0;
+}
+
+h2, h3, h4, h5, h6 {
+  margin: 3rem 0 0 0;
+  font-weight: var(--weight-semi-bold);
+}
+
+:is(h2, h3, h4, h5, h6) bdi.secno {
+  color: var(--ipfs-ash-grey);
+}
+
+p#last-modified {
+  color: var(--ipfs-ash-grey);
+  margin-top: 0rem;
+  font-size: 1.6rem;
+}
+
+p {
+  margin: 1rem 0;
+}
+
+.header-wrapper {
+  display: flex;
+  align-items: baseline;
+}
+
+.header-wrapper + section > .header-wrapper > :is(h3, h4, h5, h6) {
+  margin-top: 1rem;
+}
+
+.self-link::after {
+  color: var(--ipfs-ash-grey);
+}
+
+.self-link:hover::after {
+  color: var(--ipfs-yellow);
+}
+
+@media only screen and (max-width: 816px) {
+  body {
+    margin-left: 1rem;
+    margin-right: 1rem;
+    font-size: 1rem;
+  }
+
+  #ipseity-back-to-root {
+    margin: 0 -1rem 2rem -1rem;
+  }
+
+  header {
+    background-size: 50px;
+  }
+
+  p#last-modified {
+    margin-top: -0.8rem;
+    font-size: 1.2rem;
+  }
+}
+
+@media print {
+  body {
+    font-size: 1rem;
+  }
+}
