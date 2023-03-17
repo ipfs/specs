@@ -1,20 +1,19 @@
+---
+maturity: reliable
+date: 2022-11-09
+editors:
+  - name: Marcin Rataj
+    github: lidel
+  - name: Thibault Meunier
+    github: thibmeu
+---
+
 # DNSLink Gateway Specification
 
-![reliable](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square)
+DNSLink Gateway is an extension of :cite[path-gateway] that enables hosting a
+specific content path under a specific DNS name.
 
-**Authors**:
-
-- Marcin Rataj ([@lidel](https://github.com/lidel))
-
-----
-
-**Abstract**
-
-DNSLink Gateway is an extension of
-[PATH_GATEWAY.md](./PATH_GATEWAY.md)
-that enables hosting a specific content path under a specific DNS name.
-
-This document describes the delta between [PATH_GATEWAY.md](./PATH_GATEWAY.md) and this gateway type.
+This document describes the delta between :cite[path-gateway] and this gateway type.
 
 In short:
 
@@ -22,21 +21,6 @@ In short:
 - gateway decides if DNSlink name is allowed
 - gateway resolves DNSLink to an immutable content root identified by a CID
 - HTTP response includes the data for the CID
-
-# Table of Contents
-
-- [DNSLink Gateway Specification](#dnslink-gateway-specification)
-- [Table of Contents](#table-of-contents)
-- [HTTP API](#http-api)
-  - [`GET /[{path}][?{params}]`](#get-pathparams)
-  - [`HEAD /[{path}][?{params}]`](#head-pathparams)
-- [HTTP Request](#http-request)
-  - [Request headers](#request-headers)
-    - [`Host` (request header)](#host-request-header)
-- [HTTP Response](#http-response)
-- [Appendix: notes for implementers](#appendix-notes-for-implementers)
-  - [Leveraging DNS for content routing](#leveraging-dns-for-content-routing)
-  - [Redirects, single-page applications, and custom 404s](#redirects-single-page-applications-and-custom-404s)
 
 # HTTP API
 
@@ -53,7 +37,7 @@ Same as GET, but does not return any payload.
 
 # HTTP Request
 
-Below MUST be implemented **in addition** to the [HTTP Request section from `PATH_GATEWAY.md`](./PATH_GATEWAY.md#http-request).
+Below MUST be implemented **in addition** to "HTTP Request" of :cite[path-gateway].
 
 ## Request headers
 
@@ -89,7 +73,7 @@ content path:
 
 # HTTP Response
 
-Same as [HTTP Response section in `PATH_GATEWAY.md`](./PATH_GATEWAY.md#http-response).
+Same as "HTTP Response" of :cite[path-gateway].
 
 # Appendix: notes for implementers
 
@@ -103,4 +87,5 @@ Same as [HTTP Response section in `PATH_GATEWAY.md`](./PATH_GATEWAY.md#http-resp
 
 ## Redirects, single-page applications, and custom 404s
 
-DNSLink Gateway implementations are free to include `_redirects` file support defined in [`REDIRECTS_FILE.md`](./REDIRECTS_FILE.md).
+DNSLink Gateway implementations are free to include `_redirects` file support
+defined in :cite[gateway-redirects-file].

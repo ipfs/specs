@@ -1,41 +1,20 @@
-# `_redirects` File Specification
+---
+maturity: reliable
+date: 2023-01-28
+editors:
+  - name: Justin Johnson
+    github: justincjohnson
+  - name: Marcin Rataj
+    github: lidel
+---
 
-![reliable](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square)
-
-**Authors**:
-
-- Justin Johnson ([@justincjohnson](https://github.com/justincjohnson))
-
-----
-
-**Abstract**
+# _redirects File Specification
 
 The Redirects File specification is an extension of the Subdomain Gateway and DNSLink Gateway specifications.
 
 Developers can enable URL redirects or rewrites by adding redirect rules to a file named `_redirects` stored underneath the root CID of their web site.
 
 This can be used, for example, to enable URL rewriting for hosting a single-page application, to redirect invalid URLs to a pretty 404 page, or to avoid  [link rot](https://en.wikipedia.org/wiki/Link_rot) when moving to IPFS-based website hosting.
-
-# Table of Contents
-
-- [File Name and Location](#file-name-and-location)
-- [File Format](#file-format)
-  - [From](#from)
-  - [To](#to)
-  - [Status](#status)
-  - [Placeholders](#placeholders)
-  - [Splat](#splat)
-  - [Comments](#comments)
-  - [Line Termination](#line-termination)
-  - [Max File Size](#max-file-size)
-- [Evaluation](#evaluation)
-  - [Subdomain or DNSLink Gateways](#subdomain-or-dnslink-gateways)
-  - [Order](#order)
-  - [No Forced Redirects](#no-forced-redirects)
-- [Error Handling](#error-handling)
-- [Security](#security)
-- [Appendix: notes for implementers](#appendix-notes-for-implementors)
-  - [Test fixtures](#test-fixtures)
 
 # File Name and Location
 

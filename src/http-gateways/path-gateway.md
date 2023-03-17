@@ -1,14 +1,23 @@
+---
+maturity: reliable
+date: 2023-02-27
+editors:
+  - name: Marcin Rataj
+    github: lidel
+  - name: Adrian Lanzafame
+    github: lanzafame
+  - name: Vasco Santos
+    github: vasco-santos
+  - name: Oli Evans
+    github: olizilla
+  - name: Henrique Dias
+    github: hacdias
+    url: https://hacdias.com/
+xref:
+  - url
+---
+
 # Path Gateway Specification
-
-![reliable](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square)
-
-**Authors**:
-
-- Marcin Rataj ([@lidel](https://github.com/lidel))
-
-----
-
-**Abstract**
 
 The most versatile form of IPFS Gateway is a Path Gateway.
 
@@ -17,74 +26,9 @@ provides basic primitives for integrating IPFS resources within existing HTTP
 stack.
 
 **Note:** additional Web Gateways aimed for website hosting and web browsers
-extend the below spec and are defined in
-[SUBDOMAIN_GATEWAY.md](./SUBDOMAIN_GATEWAY.md) and
-[DNSLINK_GATEWAY.md](./DNSLINK_GATEWAY.md). There is also a minimal
-[TRUSTLESS_GATEWAY.md](./TRUSTLESS_GATEWAY.md) specification for use cases
-where client prefers to perform all validation locally.
-
-# Table of Contents
-
-- [Path Gateway Specification](#path-gateway-specification)
-- [Table of Contents](#table-of-contents)
-- [HTTP API](#http-api)
-  - [`GET /ipfs/{cid}[/{path}][?{params}]`](#get-ipfscidpathparams)
-  - [`HEAD /ipfs/{cid}[/{path}][?{params}]`](#head-ipfscidpathparams)
-    - [only-if-cached HEAD behavior](#only-if-cached-head-behavior)
-  - [`GET /ipns/{name}[/{path}][?{params}]`](#get-ipnsnamepathparams)
-  - [`HEAD /ipns/{name}[/{path}][?{params}]`](#head-ipnsnamepathparams)
-- [HTTP Request](#http-request)
-  - [Request Headers](#request-headers)
-    - [`If-None-Match` (request header)](#if-none-match-request-header)
-    - [`Cache-Control` (request header)](#cache-control-request-header)
-      - [`only-if-cached`](#only-if-cached)
-    - [`Accept` (request header)](#accept-request-header)
-    - [`Range` (request header)](#range-request-header)
-    - [`Service-Worker` (request header)](#service-worker-request-header)
-  - [Request Query Parameters](#request-query-parameters)
-    - [`filename` (request query parameter)](#filename-request-query-parameter)
-    - [`download` (request query parameter)](#download-request-query-parameter)
-    - [`format` (request query parameter)](#format-request-query-parameter)
-- [HTTP Response](#http-response)
-  - [Response Status Codes](#response-status-codes)
-    - [`200` OK](#200-ok)
-    - [`206` Partial Content](#206-partial-content)
-    - [`301` Moved Permanently](#301-moved-permanently)
-    - [`400` Bad Request](#400-bad-request)
-    - [`404` Not Found](#404-not-found)
-    - [`410` Gone](#410-gone)
-    - [`412` Precondition Failed](#412-precondition-failed)
-      - [Use with only-if-cached](#use-with-only-if-cached)
-    - [`429` Too Many Requests](#429-too-many-requests)
-    - [`451` Unavailable For Legal Reasons](#451-unavailable-for-legal-reasons)
-    - [`500` Internal Server Error](#500-internal-server-error)
-    - [`504` Gateway Timeout](#504-gateway-timeout)
-  - [Response Headers](#response-headers)
-    - [`Etag` (response header)](#etag-response-header)
-    - [`Cache-Control` (response header)](#cache-control-response-header)
-    - [`Last-Modified` (response header)](#last-modified-response-header)
-    - [`Content-Type` (response header)](#content-type-response-header)
-    - [`Content-Disposition` (response header)](#content-disposition-response-header)
-    - [`Content-Length` (response header)](#content-length-response-header)
-    - [`Content-Range` (response header)](#content-range-response-header)
-    - [`Accept-Ranges` (response header)](#accept-ranges-response-header)
-    - [`Location` (response header)](#location-response-header)
-      - [Use in directory URL normalization](#use-in-directory-url-normalization)
-    - [`X-Ipfs-Path` (response header)](#x-ipfs-path-response-header)
-    - [`X-Ipfs-Roots` (response header)](#x-ipfs-roots-response-header)
-    - [`X-Content-Type-Options` (response header)](#x-content-type-options-response-header)
-    - [`X-Trace-Id` (response header)](#x-trace-id-response-header)
-  - [Response Payload](#response-payload)
-- [Appendix: notes for implementers](#appendix-notes-for-implementers)
-  - [Content resolution](#content-resolution)
-    - [Finding the content root](#finding-the-content-root)
-    - [Traversing remaining path](#traversing-remaining-path)
-    - [Traversing through UnixFS](#traversing-through-unixfs)
-    - [Traversing through DAG-JSON and DAG-CBOR](#traversing-through-dag-json-and-dag-cbor)
-    - [Handling traversal errors](#handling-traversal-errors)
-  - [Best practices for HTTP caching](#best-practices-for-http-caching)
-  - [Denylists](#denylists)
-  - [Generated HTML with directory index](#generated-html-with-directory-index)
+extend the below spec and are defined in :cite[subdomain-gateway] and
+:cite[dnslink-gateway]. There is also a minimal :cite[trustless-gateway]
+specification for use cases where client prefers to perform all validation locally.
 
 # HTTP API
 
@@ -230,7 +174,11 @@ Optional, can be used for overriding the filename.
 When set, gateway will include it in `Content-Disposition` header and may use
 it for `Content-Type` calculation.
 
-Example: `https://ipfs.io/ipfs/QmfM2r8seH2GiRaC4esTjeraXEachRt8ZsSeGaWTPLyMoG?filename=hello_world.txt`
+Example:
+
+```
+https://ipfs.io/ipfs/QmfM2r8seH2GiRaC4esTjeraXEachRt8ZsSeGaWTPLyMoG?filename=hello_world.txt
+```
 
 ### `download` (request query parameter)
 
@@ -331,8 +279,7 @@ making a new request.
 
 Error to indicate that request was formally correct, but this specific Gateway
 is unable to return requested data due to legal reasons. Response SHOULD
-include an explanation, as noted in
-[RFC7725.html#n-451-unavailable-for-legal-reasons](https://httpwg.org/specs/rfc7725.html#n-451-unavailable-for-legal-reasons).
+include an explanation, as noted in Section 3 of :cite[rfc7725].
 
 See: [Denylists](#denylists)
 
@@ -351,7 +298,7 @@ Returned when Gateway was not able to produce response under set limits.
 Used for HTTP caching.
 
 An opaque identifier for a specific version of the returned payload. The unique
-value must be wrapped by double quotes as noted in [RFC7232#Etag](https://httpwg.org/specs/rfc7232.html#header.etag).
+value must be wrapped by double quotes as noted in Section 8.8.3 of :cite[rfc9110].
 
 In many cases it is not enough to base `Etag` value on requested CID.
 
@@ -399,7 +346,7 @@ Returned directive depends on requested content path and format:
   indicate remaining TTL of the mutable pointer such as IPNS record or DNSLink
   TXT record.
   - Implementations are free to place an upper bound on any TTL received, as
-    noted in [RFC 2131 Section 8](https://datatracker.ietf.org/doc/html/rfc2181#section-8).
+    noted in Section 8 of :cite[rfc2131].
   - If TTL value is unknown, implementations are free to set it to a static
     value, but it should not be lower than 60 seconds.
 
@@ -419,7 +366,7 @@ Returning this header depends on the information available:
 - Legacy implementations set this header to the current timestamp when reading
   TTL on  `/ipns/` content paths was not available. This hint was used by web
   browsers in a process called  "Calculating Heuristic Freshness"
-  ([RFC7234](https://tools.ietf.org/html/rfc7234#section-4.2.2)). Each browser
+  (Section 4.2.2 of :cite[rfc9111]). Each browser
   uses different heuristic, making this an inferior, non-deterministic caching
   strategy.
 
@@ -436,8 +383,7 @@ Example: `Content-Type: application/vnd.ipld.car; version=1`
 When no explicit response format is provided with the request, and the
 requested data itself has no built-in content type metadata, implementations
 are free to perform content type sniffing based on file name
-(from [URL path](https://datatracker.ietf.org/doc/html/rfc3986#section-3.3),
-or optional [`filename`](#filename-request-query-parameter) parameter)
+(from :ref[url] path, or optional [`filename`](#filename-request-query-parameter) parameter)
 and magic bytes to improve the utility of produced responses.
 
 For example:
@@ -473,8 +419,8 @@ To illustrate, `?filename=testтест.pdf` should produce:
 `Content-Disposition inline; filename="test____.jpg"; filename*=UTF-8''test%D1%82%D0%B5%D1%81%D1%82.jpg`
 
 - ASCII representation must have non-ASCII characters replaced with `_`
-- UTF-8 representation must be wrapped in Percent Encoding ([RFC 3986, Section 2.1](https://www.rfc-editor.org/rfc/rfc3986.html#section-2.1)).
-  - NOTE: `UTF-8''` is not a typo – see [Examples in RFC5987](https://datatracker.ietf.org/doc/html/rfc5987#section-3.2.2)
+- UTF-8 representation must be wrapped in Percent Encoding (Section 2.1 of :cite[rfc3986]).
+  - NOTE: `UTF-8''` is not a typo – see Section 3.2.3 of :cite[rfc8187].
 
 `Content-Disposition` must be also set when a binary response format was requested:
 
@@ -499,7 +445,7 @@ NOTE: the value may differ from the real size of requested data if compression o
 
 Returned only when request was a [`Range`](#range-request-header) request.
 
-See [RFC7233#header.content-range](https://httpwg.org/specs/rfc7233.html#header.content-range).
+See Section 14.4 of :cite[rfc9110].
 
 ### `Accept-Ranges` (response header)
 
@@ -554,7 +500,10 @@ This header only cares about logical roots (one per URL path segment):
 3. `/ipns/en.wikipedia-on-ipfs.org/wiki/Block_of_Wikipedia_in_Turkey` → `bafkreibn6euazfvoghepcm4efzqx5l3hieof2frhp254hio5y7n3hv5rma`
 
 Final array of roots:
-`X-Ipfs-Roots: bafybeiaysi4s6lnjev27ln5icwm6tueaw2vdykrtjkwiphwekaywqhcjze,bafybeihn2f7lhumh4grizksi2fl233cyszqadkn424ptjajfenykpsaiw4,bafkreibn6euazfvoghepcm4efzqx5l3hieof2frhp254hio5y7n3hv5rma`
+
+```
+X-Ipfs-Roots: bafybeiaysi4s6lnjev27ln5icwm6tueaw2vdykrtjkwiphwekaywqhcjze,bafybeihn2f7lhumh4grizksi2fl233cyszqadkn424ptjajfenykpsaiw4,bafkreibn6euazfvoghepcm4efzqx5l3hieof2frhp254hio5y7n3hv5rma
+```
 
 NOTE: while the first CID will change every time any article is changed,
 the last root (responsible for specific article or a subdirectory) may not

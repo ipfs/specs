@@ -1,29 +1,25 @@
-# ![reliable](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square) IPNS PubSub Router
+---
+maturity: reliable
+date: 2022-11-09
+editors:
+  - name: Adin Schmahmann
+    github: aschmahmann
+  - name: Marcin Rataj
+    github: lidel
+xref:
+  - ipns-record
+---
 
-Authors:
+# IPNS PubSub Router
 
-- Adin Schmahmann ([@aschmahmann](https://github.com/aschmahmann))
 
-Reviewers:
-
------
-
-# Abstract
-
-[Inter-Planetary Naming System (IPNS)](./IPNS.md) is a naming system responsible for the creating, reading and updating of mutable pointers to data.
+:ref[InterPlanetary Naming System (IPNS)]  is a naming system responsible for the creating, reading and updating of mutable pointers to data.
 IPNS consists of a public/private asymmetric cryptographic key pair, a record type and a protocol.
 Part of the protocol involves a routing layer that is used for the distribution and discovery of new or updated IPNS records.
 
 The IPNS PubSub router uses [libp2p PubSub](https://github.com/libp2p/specs/tree/master/pubsub) as a base, and adds persistence on top of it to ensure IPNS updates are always available to a connected network.
 An inherent property of the IPNS PubSub Router is that IPNS records are republishable by peers other than the peer that originated the record.
 This implies that as long as a peer on the network has an IPNS record it can be made available to other peers (although the records may be ignored if they are received after the IPNS record's End-of-Life/EOL).
-
-# Organization of this document
-
-- [Introduction](#introduction)
-- [Protocol Overview](#pubsub-protocol-overview)
-- [Protocol](#protocol)
-- [Implementations](#implementations)
 
 # Introduction
 
@@ -36,7 +32,7 @@ In this spec we address building a router based on a PubSub system, particularly
 
 The protocol has four components:
 
-- [IPNS Records and Validation](./IPNS.md)
+- IPNS Records and Validation (:cite[ipns-record])
 - [libp2p PubSub](https://github.com/libp2p/specs/tree/master/pubsub)
 - Translating an IPNS record name to/from a PubSub topic
 - Layering persistence onto libp2p PubSub
@@ -47,7 +43,7 @@ For a given IPNS local record key described in the IPNS Specification the PubSub
 
 **Topic format:** `/record/base64url-unpadded(key)`
 
-where base64url-unpadded is an unpadded base64url as specified in [IETF RFC 4648](https://tools.ietf.org/html/rfc4648)
+where base64url-unpadded is an unpadded base64url as specified in :cite[rfc4648].
 
 # Layering persistence onto libp2p PubSub
 

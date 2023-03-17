@@ -1,48 +1,35 @@
-# ![reliable](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square) IPNS - Inter-Planetary Naming System
+---
+maturity: reliable
+date: 2023-02-13
+editors:
+  - name: Vasco Santos
+    github: vasco-santos
+  - name: Steve Allen
+    github: Stebalien
+  - name: Marcin Rataj
+    github: lidel
+  - name: Henrique Dias
+    github: hacdias
+    url: https://hacdias.com/
+  - name: Gus Eggert
+    github: guseggert 
+---
 
-**Authors(s)**:
+# InterPlanetary Naming System
 
-- Vasco Santos ([@vasco-santos](https://github.com/vasco-santos))
-- Steven Allen ([@Stebalien](https://github.com/Stebalien))
-- Marcin Rataj ([@lidel](https://github.com/lidel))
-
------
-
-**Abstract**
-
-IPFS is powered by content-addressed data, which by nature is immutable: changing an object would change its hash, and consequently its address, making it a different object altogether. However, there are several use cases where we benefit from having mutable data. This is where IPNS gets into the equation.
-
-IPNS records provide cryptographically verifiable, mutable pointers to objects.
-
-## Organization of this document
-
-- [Introduction](#introduction)
-- [IPNS Keys](#ipns-name)
-  - [Key Types](#key-types)
-  - [Key Serialization Format](#key-serialization-format)
-- [IPNS Name](#ipns-name)
-  - [String Representation](#string-representation)
-- [IPNS Record](#ipns-record)
-  - [Record Serialization Format](#record-serialization-format)
-  - [Record Size Limit](#record-size-limit)
-  - [Backward Compatibility](#backward-compatibility)
-- [Protocol](#protocol)
-  - [Overview](#overview)
-  - [Record Creation](#record-creation)
-  - [Record Verification](#record-verification)
-- [Integration with IPFS](#integration-with-ipfs)
+The InterPlanetary File System (IPFS) is powered by content-addressed data, which by nature is immutable: changing an object would change its hash, and consequently its address, making it a different object altogether. However, there are several use cases where we benefit from having mutable data. This is where the InterPlanetary Naming System (IPNS) gets into the equation. IPNS records provide cryptographically verifiable, mutable pointers to objects.
 
 ## Introduction
 
 Each time a file is modified, its content address changes. As a consequence, the address previously used for getting that file needs to be updated by who is using it. As this is not practical, IPNS was created to solve the problem.
 
-IPNS is based on [SFS](http://en.wikipedia.org/wiki/Self-certifying_File_System). It consists of a PKI namespace, where a name is simply the hash of a public key. As a result, whoever controls the private key has full control over the name. Accordingly, records are signed by the private key and then distributed across the network (in IPFS, via the routing system). This is an egalitarian way to assign mutable names on the Internet at large, without any centralization whatsoever, or certificate authorities.
+:dfn[InterPlanetary Naming System (IPNS)] is based on [Self-certifying File System (SFS)](http://en.wikipedia.org/wiki/Self-certifying_File_System). It consists of a PKI namespace, where a name is simply the hash of a public key. As a result, whoever controls the private key has full control over the name. Accordingly, records are signed by the private key and then distributed across the network (in IPFS, via the routing system). This is an egalitarian way to assign mutable names on the Internet at large, without any centralization whatsoever, or certificate authorities.
 
 ## IPNS Keys
 
 ### Key Types
 
-Implementations MUST support Ed25519 with signatures defined in [RFC8032](https://www.rfc-editor.org/rfc/rfc8032#section-5.1).
+Implementations MUST support Ed25519 with signatures defined in :cite[rfc8032].
 Ed25519 is the current default key type.
 
 Implementations SHOULD support RSA if they wish to interoperate with legacy
@@ -134,7 +121,7 @@ A logical IPNS record is a data structure containing the following fields:
   - When `validityType = 0`
     - Expiration date of the record with nanoseconds precision.  Expiration time should match the publishing medium's window.
       - For example, IPNS records published on the DHT should have an expiration time set to within 48 hours after publication. Setting the expiration time to longer than 48 hours will not have any effect, as DHT peers only keep records for up to 48 hours.
-    - Represented as an ASCII string that follows notation from [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) (`1970-01-01T00:00:00.000000001Z`).
+    - Represented as an ASCII string that follows notation from :cite[rfc3339] (`1970-01-01T00:00:00.000000001Z`).
   - Implementations MUST include this value in both `IpnsEntry.validity` and inside the DAG-CBOR document at `IpnsEntry.data[validity]`.
 - **Sequence** (uint64)
   - Represents the current version of the record (starts at 0).
@@ -251,7 +238,7 @@ Once the record is created, it is ready to be spread through the network. This w
 
 The means of distribution are left unspecified. Implementations MAY choose to
 publish signed record using multiple routing systems, such as
-[libp2p Kademlia DHT](https://github.com/libp2p/specs/tree/master/kad-dht) or [PubSub](./IPNS_PUBSUB.md) (see [Routing record](#routing-record)).
+[libp2p Kademlia DHT](https://github.com/libp2p/specs/tree/master/kad-dht) or :cite[ipns-pubsub-router] (see [Routing record](#routing-record)).
 
 On the other side, each peer must be able to get a record published by another node. It only needs to have the unique identifier used to publish the record to the network. Taking into account the routing system being used, we may obtain a set of occurrences of the record from the network. In this case, records can be compared using the sequence number, in order to obtain the most recent one.
 
@@ -270,7 +257,7 @@ Creating a new IPNS record MUST follow the below steps:
    - This is paramount: this CBOR will be used for signing.
 3. Store DAG-CBOR in `IpnsEntry.data`.
    - If you want to store additional metadata in the record, add it under unique keys at `IpnsEntry.data`.
-   - The order of fields impacts signature verification. If you are using an alternative CBOR implementation, make sure the CBOR field order follows [RFC7049](https://www.rfc-editor.org/rfc/rfc7049) sorting rules: length and then bytewise. The order of fields impacts signature verification.
+   - The order of fields impacts signature verification. If you are using an alternative CBOR implementation, make sure the CBOR field order follows :cite[rfc7049] sorting rules: length and then bytewise. The order of fields impacts signature verification.
 4. If your public key can't be inlined inside the IPNS Name, include a serialized copy in `IpnsEntry.pubKey`
    - This step SHOULD be skipped for Ed25519, and any other key types that are inlined inside of [IPNS Name](#ipns-name) itself.
 5. Create `IpnsEntry.signatureV2`
@@ -317,12 +304,12 @@ A legacy convention that implementers MAY want to follow is to store serialized 
 
 **Key format:** `/ipns/base32(<HASH>)`
 
-Note: Base32 according to the [RFC4648](https://tools.ietf.org/html/rfc4648).
+Note: Base32 according to the :cite[rfc4648].
 
 ### Routing Record
 
 The routing record is spread across the network according to the available routing systems.
-The two routing systems currently available in IPFS are the [libp2p Kademlia DHT](https://github.com/libp2p/specs/tree/master/kad-dht) and [IPNS over PubSub](./IPNS_PUBSUB.md).
+The two routing systems currently available in IPFS are the [libp2p Kademlia DHT](https://github.com/libp2p/specs/tree/master/kad-dht) and :cite[ipns-pubsub-router].
 
 **Key format:** `/ipns/BINARY_ID`
 

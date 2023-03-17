@@ -1,16 +1,27 @@
+---
+maturity: reliable
+date: 2023-01-28
+editors:
+  - name: Marcin Rataj
+    github: lidel
+  - name: Adrian Lanzafame
+    github: lanzafame
+  - name: Vasco Santos
+    github: vasco-santos
+  - name: Oli Evans
+    github: olizilla
+  - name: Thibault Meunier
+    github: thibmeu
+  - name: Steve Loeppky
+    github: BigLep
+xref:
+  - url
+  - html
+---
+
 # Subdomain Gateway Specification
 
-![reliable](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square)
-
-**Authors**:
-
-- Marcin Rataj ([@lidel](https://github.com/lidel))
-
-----
-
-**Abstract**
-
-Subdomain Gateway is an extension of  [PATH_GATEWAY.md](./PATH_GATEWAY.md) that
+Subdomain Gateway is an extension of :cite[path-gateway] that
 enables website hosting isolated per CID/name, while remaining compatible with
 web browsers relative pathing and security model of the web.
 Below should be read as a delta on top of that spec.
@@ -25,36 +36,9 @@ Summary:
 - Data is retrieved from IPFS in a way that is compatible with URL-based addressing
   - URL’s path `/` points at the content root identified by the CID
 
-# Table of Contents
-
-- [Subdomain Gateway Specification](#subdomain-gateway-specification)
-- [Table of Contents](#table-of-contents)
-- [HTTP API](#http-api)
-  - [`GET /[{path}][?{params}]`](#get-pathparams)
-  - [`HEAD /[{path}][?{params}]`](#head-pathparams)
-- [HTTP Request](#http-request)
-  - [Request Headers](#request-headers)
-    - [`Host` (request header)](#host-request-header)
-    - [`X-Forwarded-Proto` (request header)](#x-forwarded-proto-request-header)
-    - [`X-Forwarded-Host` (request header)](#x-forwarded-host-request-header)
-  - [Request Query Parameters](#request-query-parameters)
-    - [`uri` (request query parameter)](#uri-request-query-parameter)
-- [HTTP Response](#http-response)
-  - [Response Headers](#response-headers)
-    - [`Location` (response header)](#location-response-header)
-      - [Use in interop with Path Gateway](#use-in-interop-with-path-gateway)
-      - [Use in URI router](#use-in-uri-router)
-- [Appendix: notes for implementers](#appendix-notes-for-implementers)
-  - [Migrating from Path to Subdomain Gateway](#migrating-from-path-to-subdomain-gateway)
-  - [DNS label limits](#dns-label-limits)
-  - [Security considerations](#security-considerations)
-  - [URI router](#uri-router)
-  - [Redirects, single-page applications, and custom 404s](#redirects-single-page-applications-and-custom-404s)
-
 # HTTP API
 
-The API is a superset of [PATH_GATEWAY.md](./PATH_GATEWAY.md), the differences
-are documented below.
+The API is a superset of :cite[path-gateway], the differences are documented below.
 
 The main one is that Subdomain Gateway expects CID to be present in the `Host` header.
 
@@ -70,7 +54,7 @@ Same as GET, but does not return any payload.
 
 # HTTP Request
 
-Below MUST be implemented **in addition** to the [HTTP Request section from `PATH_GATEWAY.md`](./PATH_GATEWAY.md#http-request).
+Below MUST be implemented **in addition** to "HTTP Request" of :cite[path-gateway].
 
 ## Request Headers
 
@@ -107,7 +91,7 @@ Converting `Host` into a content path depends on the nature of requested resourc
   valid content path, gateway MUST attempt to
   [migrate from Path to Subdomain Gateway](#migrating-from-path-to-subdomain-gateway).
 - Finally, if it is impossible to construct a content path from `Host`,
-  return HTTP Error [`400` Bad Request](./PATH_GATEWAY.md#400-bad-request).
+  return HTTP Error `400` Bad Request, as seen in :cite[path-gateway].
 
 ### `X-Forwarded-Proto` (request header)
 
@@ -147,18 +131,17 @@ See [URI router](#uri-router) section for usage and implementation details.
 
 # HTTP Response
 
-Below MUST be implemented **in addition** to the [HTTP Response section from `PATH_GATEWAY.md`](./PATH_GATEWAY.md#http-response).
+Below MUST be implemented **in addition** to "HTTP Response" of :cite[path-gateway].
 
 ## Response Headers
 
 ### `Location` (response header)
 
-Below MUST be implemented **in addition** to
-[`Location` requirements defined in `PATH_GATEWAY.md`](./PATH_GATEWAY.md#location-response-header).
+Below MUST be implemented **in addition** to `Location` requirements defined in :cite[path-gateway].
 
 #### Use in interop with Path Gateway
 
-Returned with [`301` Moved Permanently](./PATH_GATEWAY.md#301-moved-permanently) when `Host` header does
+Returned with `301` Moved Permanently (:cite[path-gateway]) when `Host` header does
 not follow the subdomain naming convention, but the requested URL path happens
 to be a valid `/ipfs/{cid}` or `/ipfs/{name}` content path.
 
@@ -185,7 +168,7 @@ See: [URI router](#uri-router)
 
 ## Migrating from Path to Subdomain Gateway
 
-Subdomain Gateway MUST implement a redirect on paths defined in [`PATH_GATEWAY.md`](./PATH_GATEWAY.md).
+Subdomain Gateway MUST implement a redirect on paths defined in :cite[path-gateway].
 
 HTTP redirect will route path requests to correct subdomains on the same domain
 name, unless [`X-Forwarded-Host`](#x-forwarded-host-request-header) is present.
@@ -203,8 +186,8 @@ breaking legacy clients that are unable to follow HTTP 301 redirects.
 ## DNS label limits
 
 DNS labels, must be case-insensitive, and up to a maximum of 63 characters
-[per label](https://datatracker.ietf.org/doc/html/rfc2181#section-11).
-Representing CIDs within these limits requires some care.
+per label (Section 11 of :cite[rfc2181]). Representing CIDs within these limits
+requires some care.
 
 Base32 multibase encoding is used for CIDs to ensure case-insensitve,
 URL safe characters are used.
@@ -246,10 +229,8 @@ Subdomain gateway implementations MUST provide URI router for `ipfs://` and
 `ipns://` protocol schemes, allowing external apps to resolve these native
 addresses on a gateway.
 
-The `/ipfs/?uri=%s` endpoint MUST be compatible with
-[`registerProtocolHandler`](https://html.spec.whatwg.org/multipage/system-state.html#custom-handlers),
-present in web browsers. The value passed in `%s` should be
-[percent-encoded](https://url.spec.whatwg.org/#string-utf-8-percent-encode).
+The `/ipfs/?uri=%s` endpoint MUST be compatible with :ref[registerProtocolHandler(scheme, url)],
+present in web browsers. The value passed in `%s` should be :ref[UTF-8 percent-encode].
 
 **Example**
 
@@ -270,4 +251,5 @@ From there, regular subdomain gateway logic applies.
 
 ## Redirects, single-page applications, and custom 404s
 
-Subdomain Gateway implementations are free to include `_redirects` file support defined in [`REDIRECTS_FILE.md`](./REDIRECTS_FILE.md).
+Subdomain Gateway implementations are free to include `_redirects` file
+support defined in :cite[gateway-redirects-file].
