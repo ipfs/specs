@@ -1,0 +1,161 @@
+# IPIP-386: Subdomain Gateway interop with _redirects
+
+<!-- IPIP number should  match its pull request number. After you open a PR,
+please update title and include anqabbreviated title in the filename too:
+`0000-draft-title-abbrev.md`. -->
+
+- Start Date: 2023-03-18
+- Related Issues:
+  - IPIP-2 _redirects file
+
+## Summary
+
+<!--One paragraph explanation of the IPIP.-->
+This IPIP suggests a tweak in the Path and Subdomain Gateway interop to
+leverage the `_redirects` file.
+
+## Motivation
+
+When hosting a modern Single Page Application on IPFS, one wants to use native
+URLs to share the app with other users, e.g. `ipns://example.org/cool/feature`.
+On traditional hosting, deep links are redirected or rewritten to a single
+entry point, e.g. `/index.html`, and the router on the client side evaluates
+the path segments to render the correct content.
+
+The `_redirects` file, defined in [`REDIRECTS_FILE.md`](../REDIRECTS_FILE.md),
+supports such applications when a Subdomain Gateway is used directly. However,
+the current resolution of native URLs uses a Path Gateway link scheme and
+subsequently fails to resolve the URL correctly.
+
+For example:
+
+- `ipns://example.org/some/path` is resolved as
+- `http://{gateway}/ipns/example.org/some/path`
+- this request fails with 404 as the resource `/some/path` does not exist.
+
+NOTE: The `kubo` gateway returns a 404 including a new `Location` header
+already pointing to the correct subdomain URL. But browsers do not follow the
+header as the status is 404, and the response contains a `text/plain` body
+string.
+
+When using a Subdomain Gateway on the proper host, the path can be resolved
+using the `_redirects` file:
+
+- `http://example-org.ipns.{gateway}/some/path` is redirected (301) to
+- `http://example-org.ipns.{gateway}/correct/path` as defined in
+  `_redirects`file
+
+
+## Detailed design
+
+This IPIP suggests the following resolution steps for DNSLink names, CIDs
+should be resolved similarly:
+
+- `ipns://example.org/some/path` is resolved as
+- `http://{gateway}/ipns/example.org/some/path` is redirected (301) to the
+  Subdomain Gateway
+- `http://example-org.ipns.{gateway}/some/path` is redirected (301) to
+- `http://example-org.ipns.{gateway}/correct/path` as defined in `_redirects`.
+
+A Subdomain Gateway that provides interoperability with Path-Gateway-style URLs
+should redirect to a Subdomain-Gateway-style URL first and then try to resolve
+a given path. This allows the usage of a potential `_redirects` file in the
+root.
+
+This change subsequently fixes the resolution of native URLs in browsers using
+the companion extension and browsers like Brave.
+
+A paragraph is added to the [`SUBDOMAIN_GATEWAY.md`](../SUBDOMAIN_GATEWAY.md)
+spec that describes the preservation of path segments and query parameters
+during the interop redirect. Furthermore, it specifies that gateway
+implementations should redirect to subdomain URLs if a resource is initially
+not found in the directory identified by the CID or DNSLink name.
+
+## Test fixtures
+
+The example from the [REDIRECTS_FILE.md](../REDIRECTS_FILE.md) can be re-used,
+`QmYBhLYDwVFvxos9h8CGU2ibaY66QNgv8hpfewxaQrPiZj`.
+
+```
+$ ipfs ls /ipfs/QmYBhLYDwVFvxos9h8CGU2ibaY66QNgv8hpfewxaQrPiZj
+Qmd9GD7Bauh6N2ZLfNnYS3b7QVAijbud83b8GE8LPMNBBP 7   404.html
+QmSmR9NShZ89VEBrn9SBy7Xxvjw8Qe6XArD5GqtHvbtBM3 7   410.html
+QmVQqj9oZig9tH3ENHo4bxV5pNgssUwFCXUjAJAVcZVbJG 7   451.html
+QmZU3kboiyi9jV59D8Mw8wzuvsr3HmvskqhYRRhdFA8wRq 317 _redirects
+QmaWDLb4gnJcJbT1Df5X3j91ysiwkkyxw6329NLiC1KMDR -   articles/
+QmS6ZNKE9s8fsHoEnArsZXnzMWijKddhXXDsAev8LdTT5z 9   index.html
+QmNwEgMrExwSsE8DCjZjahYfHUfkSWRhtqSkQUh4Fk3udD 7   one.html
+QmVe2GcTbEPZkMbjVoQ9YieVGKCHmuHMcJ2kbSCzuBKh2s -   redirected-splat/
+QmUGVnZaofnd5nEDvT2bxcFck7rHyJRbpXkh9znjrJNV92 7   two.html
+```
+
+The `_redirects` file is as follows.
+
+```
+$ ipfs cat /ipfs/QmYBhLYDwVFvxos9h8CGU2ibaY66QNgv8hpfewxaQrPiZj/_redirects
+/redirect-one /one.html
+/301-redirect-one /one.html 301
+/302-redirect-two /two.html 302
+/200-index /index.html 200
+/posts/:year/:month/:day/:title /articles/:year/:month/:day/:title 301
+/splat/* /redirected-splat/:splat 301
+/not-found/* /404.html 404
+/gone/* /410.html 410
+/unavail/* /451.html 451
+/* /index.html 200
+```
+
+Following redirects should occur:
+
+```
+$ curl -v http://{gateway}/ipfs/QmYBhLYDwVFvxos9h8CGU2ibaY66QNgv8hpfewxaQrPiZj/redirect-one
+...
+< HTTP/1.1 301 Moved Permanently
+< Location: http://bafybeiesjgoros75o5meijhfvnxmy7kzkynhqijlzmypw3nry6nvsjqkzy.ipfs.{gateway}/redirect-one
+...
+```
+
+Subsequent requests should comply with IPIP-2.
+
+## Design rationale
+
+Gateways like `kubo` already support the suggested redirect but block the
+redirect chain by returning a 404 when a resource is not found on the Path
+Gateway. By removing the 404, users get another chance to find the resources
+they are looking for.
+
+### User benefit
+
+Currently, users are presented with an error message when they request a
+resource on a Path Gateway intended for a Subdomain Gateway. Since a given
+gateway would redirect on a valid resource anyway, redirecting to the subdomain
+URL on a potentially invalid resource would improve usability and
+compatibility.
+
+### Compatibility
+
+This proposal improves the reach of `_redirects` files.
+
+The current behavior is defined in [PATH_GATEWAY.md](../PATH_GATEWAY.md). The
+404 return code indicates that a resource does not exist. Changing this to a
+301 redirect that is subsequently answered with a 404 from the subdomain URL
+might break clients.
+
+However, requesting an existing resource on the Path Gateway URL in `kubo`
+already returns a 301 redirect while also providing the content in the body.
+
+### Security
+
+Security should not be compromised as the resource is not delivered from the
+Path Gateway URL but from the subsequent subdomain URL that offers improved
+security due to host separation.
+
+### Alternatives
+
+Gateways could continue to return a 404 response for the non-existing resource,
+but also include an HTML body containing a redirect link. This would help users
+to find the requested site.
+
+### Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).

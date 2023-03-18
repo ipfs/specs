@@ -160,10 +160,19 @@ Below MUST be implemented **in addition** to
 
 Returned with [`301` Moved Permanently](./PATH_GATEWAY.md#301-moved-permanently) when `Host` header does
 not follow the subdomain naming convention, but the requested URL path happens
-to be a valid `/ipfs/{cid}` or `/ipfs/{name}` content path.
+to be a valid `/ipfs/{cid}(/{path})` or `/ipns/{name}(/{path})` content path.
 
 This redirect allows subdomain gateway to be used as a drop-in
 replacement compatible with regular path gateways.
+
+Redirects MUST preserve the path segments (`path`) following the CID or DNSLink
+name and all query parameters. Implementations may choose to look up the CID or
+DNSLink name before redirecting, but they MUST still redirect if the requested
+`path` in the directory is not found and a `_redirects` file is present in the
+root. Alternatively, the implementation may blindly redirect solely based on
+the information in the requested URL. Eventually, the Subdomain Gateway may use
+the `_redirects` file from [`REDIRECTS_FILE.md`](./REDIRECTS_FILE.md) to
+resolve the requested resource.
 
 NOTE: the content root identifier must be converted to case-insensitive/inlined
 form if necessary. For example:
