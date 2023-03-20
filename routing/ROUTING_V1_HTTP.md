@@ -64,7 +64,7 @@ Specifications for some transfer protocols are provided in the "Transfer Protoco
 
 ## API
 
-### `GET /routing/v1/providers/{CID}`
+### `GET /routing/v1/providers/{CID}[?routers=<list-of-routers>]`
 
 #### Response codes
 
@@ -89,6 +89,18 @@ Specifications for some transfer protocols are provided in the "Transfer Protoco
 Response limit: 100 providers
 
 Each object in the `Providers` list is a *read provider record*.
+
+#### List of Routers
+
+A list of routers that should be consulted for responses. The specification imposes no constraints on the order by which the results are returned. Implementers are free to return results as they are found.
+
+If none are provided the backend may decide which ones to use. For a list of known routers see below.
+
+To select all routers use `?routers=*`. To determine the list of available routers see the `OPTIONS` API below
+
+### `OPTIONS /routing/v1/providers`
+
+If supported the server should include a `SUPPORTED_ROUTERS` header key, with the value as the comma separated list of the routing systems supported.
 
 ## Pagination
 
@@ -173,3 +185,9 @@ Specification: [ipfs/go-graphsync/blob/main/docs/architecture.md](https://github
 - `PieceCID`: the CID of the [piece](https://spec.filecoin.io/systems/filecoin_files/piece/#section-systems.filecoin_files.piece) within which the data is stored
 - `VerifiedDeal`: whether the deal corresponding to the data is verified
 - `FastRetrieval`: whether the provider claims there is an unsealed copy of the data available for fast retrieval
+
+## Known Routers
+
+This section contains a non-exhaustive list of known routers that may be supported by clients and servers.
+
+- "ipfs-public-dht" - The IPFS Public DHT corresponding to the libp2p protocol ID `/ipfs/kad/1.0.0`
