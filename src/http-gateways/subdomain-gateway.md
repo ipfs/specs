@@ -252,4 +252,4 @@ From there, regular subdomain gateway logic applies.
 ## Redirects, single-page applications, and custom 404s
 
 Subdomain Gateway implementations are free to include `_redirects` file
-support defined in :cite[gateway-redirects-file].
+support defined in :cite[web-redirects-file].

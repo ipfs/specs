@@ -8,9 +8,9 @@ editors:
     github: lidel
 ---
 
-# _redirects File Specification
+# Web _redirects File Specification
 
-The Redirects File specification is an extension of the Subdomain Gateway and DNSLink Gateway specifications.
+The Web Redirects File specification is an extension of the Subdomain Gateway and DNSLink Gateway specifications.
 
 Developers can enable URL redirects or rewrites by adding redirect rules to a file named `_redirects` stored underneath the root CID of their web site.
 
@@ -115,11 +115,11 @@ Rules MUST be evaluated in order, redirecting or rewriting using the first match
 
 ## No Forced Redirects
 
-All redirect logic MUST only be evaluated if the requested path is not present in the DAG.  This means that any performance impact associated with checking for the existence of a Redirects File or evaluating redirect rules will only be incurred for non-existent paths.
+All redirect logic MUST only be evaluated if the requested path is not present in the DAG.  This means that any performance impact associated with checking for the existence of a `_redirects` file or evaluating redirect rules will only be incurred for non-existent paths.
 
 # Error Handling
 
-If the Redirects File exists but there is an error reading or parsing it, the errors MUST be returned to the user with a 500 HTTP status code.
+If the `_redirects` file exists but there is an error reading or parsing it, the errors MUST be returned to the user with a 500 HTTP status code.
 
 # Security
 
