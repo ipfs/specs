@@ -124,6 +124,7 @@ Please see our [Code of Conduct Events Addendum](https://github.com/ipfs/communi
 This is a living document and may be updated from time to time. Please refer to the git history for this document to view the changes.
 
 ## Credit and License
+
 This Code of Conduct is based on the [npm Code of Conduct](https://www.npmjs.com/policies/conduct) and the [CodeOfConduct4Lib](https://github.com/code4lib/code-of-conduct/blob/master/code_of_conduct.md), which itself is based on the [example policy](http://geekfeminism.wikia.com/wiki/Conference_anti-harassment) from the [Geek Feminism wiki](http://geekfeminism.wikia.com/), created by the Ada Initiative and other volunteers.
 
 This document may be reused under a [Creative Commons Attribution-ShareAlike License](http://creativecommons.org/licenses/by-sa/4.0/).

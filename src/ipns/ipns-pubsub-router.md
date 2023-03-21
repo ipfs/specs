@@ -12,7 +12,6 @@ xref:
 
 # IPNS PubSub Router
 
-
 :ref[InterPlanetary Naming System (IPNS)]  is a naming system responsible for the creating, reading and updating of mutable pointers to data.
 IPNS consists of a public/private asymmetric cryptographic key pair, a record type and a protocol.
 Part of the protocol involves a routing layer that is used for the distribution and discovery of new or updated IPNS records.
