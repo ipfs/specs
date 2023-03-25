@@ -1,4 +1,4 @@
-SPEC_GENERATOR_VER=v1.1.3
+SPEC_GENERATOR_VER=v1.1.4
 
 all: website
 
