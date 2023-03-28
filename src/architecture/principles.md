@@ -154,7 +154,6 @@ The simplicity with which one can expose these existing system over IPFS by simp
 existing addresses to mint CIDs enables radical interoperability with other content-addressable
 systems.
 
-
 ### Verification Matters
 
 The requirements above state that an implementation may forgo verification when "*it is
