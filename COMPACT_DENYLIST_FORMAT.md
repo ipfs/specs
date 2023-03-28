@@ -37,22 +37,21 @@ the application runs, that will be shared and distributed around using IPFS
 itself and that users should have the power to edit and adjust very easily.
 
 The presented denylist format is the result of careful reflection on such
-terms. Our list format starts by including a **header**, which provides basic
-information about the list itself, and can be used to set list-wide options
-(*hints*, as we call them). We choose YAML for simplicity, readability, ease of
-use and parser support.
+terms. Our list format starts by including an optional **header**, which
+provides basic information about the list itself, and can be used to set
+list-wide options (*hints*, as we call them). We choose YAML for simplicity,
+readability, ease of use and parser support.
 
 In our lists, *hints* are a way of providing additional, optional information,
 relative to the items in the list that can be processed by machines. For
 example, a hint can tell implementations about HTTP return codes for blocked
-items, when they are requested through the gateway. A hint can provide a
-reason, or specify deviations from defaults. While there will be a minimal
-number of specified hints, users can include custom ones and parsers can
-implement functionality accordingly even when not part of the base specification.
+items, when they are requested through the gateway. In this original
+specification we do not define any mandatory or optional hint, but this may be
+done in the future to support specific features.
 
 The denylist itself, after the header, is a collection of **block items** and
 block-item-specific hints. There are different flavours of block items,
-depending on whether we are blocking by CID, CID+path, IPNS, using
+depending on whether we are blocking by CID, CID+path, Path, IPNS, using
 double-hashing etc. but the idea is that whether an item is blocked or not can
 be decided directly and ideally, prior to retrieval.
 
@@ -63,7 +62,8 @@ ultimately need a full restart of the application. We want to avoid that by
 providing operators and implementors with the possiblity of just watching
 denylists for new items without then need to restart anything while new items
 are added. This also gives the possiblity of storing an offset and seeking
-directly to it after application restarts.
+directly to it after application restarts. *negative block items* can also be
+used to make exceptions to otherwise more general rules.
 
 Another aspect that we have maintained in the back of our minds is the
 possiblity of sharing lists using IPFS. The append-mostly aspect also plays a
@@ -78,24 +78,24 @@ users and facilitating integrations using scripts and with other applications
 (unrelated to the implementation of the parsing/blocking inside IPFS). We
 conciously avoid JSON and other machine formats and opt for text and for
 space-delimited items in a grep/sed/cut-friendly way. For example, we expect
-that the following should just work accross implementations for blocking
-something new:
+that the following should just work accross implementations for adding and
+blocking something new:
 
 ```
-echo /ipfs/Qmcid >> ~/.config/ipfs/custom.deny
+echo /ipfs/QmecDgNqCRirkc3Cjz9eoRBNwXGckJ9WvTdmY16HP88768 >> ~/.config/ipfs/custom.deny
 ```
 
 We conciously avoid defining any other API other than expecting
 implementations to honor blocking what is on the denylist and act accordingly
-when it is updated. Thus, we do not require implementations to provide an HTTP
-endpoint to modify list items etc. that is outside the scope of this spec, and
-entirely dependent on what each implementation wants to do and how they want
-to do it.
+when it is updated. CLI commands or API endpoint to modify list items etc. are
+outside the scope of this spec. Implementations how much information to
+provide to users when a request for an IPFS object is blocked.
 
 As a last note, if we take Kubo and the go-ipfs stack as the reference IPFS
 implementation, we expect the blocking-layer (that is, the introduction of the
 logic that decides whether an item is blocked or not), to happen cleanly at
-the `Resolver` and `BlockService` interfaces.
+the `NameSystem`, `path.Resolver` and `BlockService` interfaces (IPNS, IPFS
+Path and CID blocks respectively).
 
 This specification corresponds to V1 of the compact list format. We have
 limited the number of features and extensions to a minimum to start working
@@ -104,13 +104,15 @@ in future versions.
 
 ## Specification
 
-### Denylist file extension and locations
+### Denylist file extension, locations and order
 
 While not pertaining to the denylist format itself, we introduce the following conventions about denylist files when they are stored in the local filesystem:
 
 - Denylist files are named with the extension `.deny`.
-- Implementations should look in `/etc/ipfs/denylists/` and `$XDG_CONFIG_HOME/ipfs/denylists/` for denylist files.
-- Denylist files are processed in alphabetical order so that rules from later denylists override rules from earlier denylists on conflict.
+- Implementations should look in `/etc/ipfs/denylists/` and
+  `$XDG_CONFIG_HOME/ipfs/denylists/` for denylist files.
+- Denylist files are processed in alphabetical order so that rules from later
+  denylists override rules from earlier denylists on conflict.
 
 ### Denylist format
 
@@ -120,13 +122,12 @@ The following example showcases the features and syntax of a compact denylist:
 
 ```
 version: 1
-name: IPFSorp blocking list
+name: IPFSCorp blocking list
 description: A collection of bad things we have found in the universe
 author: abuse-ipfscorp@example.com
 hints:
   gateway_status: 410
-  double_hash_fn: sha256
-  double_hash_enc: hex
+  enable_legacy_doublehash: true
 ---
 /ipfs/QmYvggjprWhRYiDhyZ57gtkadEBhcfPScGyx1AofkgAk3Q reason:DCMA
 /ipfs/bafkreigtnn3j24rs5q2qhx3kleisjngot5w2lgd32armqbv2upeaqesrna
@@ -162,7 +163,7 @@ The list header is a YAML block:
 - 1KB maximum size
 - Delimited by a line containing `---` at the end (document separator)
 
-Known-fields:
+Known-fields (they must be lowercase):
 
 - `version`: the denylist format version. Defaults to 1 when not specified.
 - `name`
@@ -174,100 +175,153 @@ Known-fields:
 
 A *hint* is a key-value duple associated to the denylist as a whole (part of the header), or to a specific \<block_item\>.
 
-Known hints:
-
-- `double_hash_fn`: the multicodec string for the hashing function used for double-hashing. **Default**: `sha2-256`
-- `double_hash_base`: the multibase string for the encoding if the double-hashing function result. **Default**: `base16`.
+Header hints can be used to set denylist-wide options or information that
+implementations can choose to interpret or not.
 
 #### List body
 
 A denylist is made of lines which are made by a *block items* followed by zero or more space-separated hints.
 
-Lines should not contain more than 2MiB of data.
+Lines should not be longer than 2MiB including the "\n" delimiter.
 
 #### Block item
 
 A block item represents a rule to enable content-blocking:
-- `<path>` elements are expected to be %-encoded, per [RFC 3986, section 2.1](https://developer.mozilla.org/en-US/docs/Glossary/percent-encoding).
 
-##### `/ipfs/\<cid\>`
+- `PATH` elements are expected to be %-encoded, per [RFC 3986, section 2.1](https://developer.mozilla.org/en-US/docs/Glossary/percent-encoding).
+- `CID` elements represent a CID (either V0 or V1).
+- `CIDv0` are for us equivalent to baseb58btc-encoded sha256 multihashes although they are not the same thing (a CIDV0 carries implicit codec (dag-pb) and multibase information (b58btc). When we say a b58-encoded multihash needs to be extracted from the CID, this usually is a no-op in case of CIDv0s.
 
-Blocks a specific multihash. If the CID is a CIDv1, it blocks the
-multihash. Blocking directly by multihash must be done using CIDv0s (that is,
-base58btc-encoded multihashes). This does not prevent resolution of sub-paths starting at this CID.
+##### `/ipfs/CID`
+
+CID-rule: Blocks a specific multihash. If the CID is a V1, it blocks the
+multihash contained in it (CIDv0s are multihashes already).
+
+When users want to block by multihash directly, they must base58btc-encoded
+multihashes. This rule does not block subpaths that start at this CID, only
+the CID itself.
 
 Blocking layer recommendation: BlockService.
 
-##### `/ipfs/\<cid\>/\<path\>`
+##### `/ipfs/CID/PATH`
 
-Blocks the exact ipfs path that is referenced from the multihash embedded the
-CID before attempting to resolve it. It does not block the CID that the path resolves to.
+IPFS-Path-Rule: Blocks the exact ipfs path that is referenced from the
+multihash embedded the CID before attempting to resolve it. It does not block
+the CID that the path resolves to.
 
-Blocking layer recommendation: Resolver.
+Note `/ipfs/CID/path` and `/ipfs/CID/path/` are equivalent rules.
 
-##### `/ipfs/\<cid\>/*` `/ipfs/\<cid\>/\<path\>*
+Blocking layer recommendation: PathResolver.
 
-Blocks any multihash-path combination starting with the the given path prefix. `/*` includes the empty path. Thus `/ipfs/<cid>/*` blocks the CID itself, and any paths. Examples:
+##### `/ipfs/CID/*` `/ipfs/CID/P/A/T/H*`
 
-- `/ipfs/<cid>/*` : blocks CID (by multihash) and any path before resolving.
-- `/ipfs/<cid>/ab*`: blocks any path derived from the CID (multihash) and starting with "ab", including "ab"
-- `/ipfs/<cid>/ab/*`: equivalent to the above.
+IPFS-Path-Prefix-Rule: Blocks any multihash-path combination starting with the
+the given path prefix. `/*` includes the empty path. Thus `/ipfs/CID/*`
+blocks the CID itself, and any paths. Examples:
 
-Blocking layer recommendation: Resolver + (BlockService if the CID itself is blocked too).
+- `/ipfs/CID/*` : blocks CID (by multihash) and any path before resolving.
+- `/ipfs/CID/ab*`: blocks any path derived from the CID (multihash) and starting with "ab", including "ab"
+- `/ipfs/CID/ab/*`: equivalent to the above.
 
-##### `/ipns/\<ipns_domain_or_hash\>`
+Blocking layer recommendation: PathResolver + (BlockService if the CID itself is blocked too).
 
-Blocks the given IPNS before resolving. It does not block the CID that it resolves to.
+##### `/ipns/IPNS`
 
-Blocking layer recommendation: Resolver.
+IPNS-rule: Blocks the given IPNS name before resolving. It does not block the CID that it
+resolves to.
 
-##### `/ipns/\<ipns_name\>/\<path\>`
+If the IPNS name is a domain name, it is blocked directy.
 
-Blocks specifically the IPNS path, before resolving.
+If the IPNS name is a CIDv1 (libp2p-key) or b58-encoded-multihash (CIDV0),
+then the blocking affects the underlying Multihash.
 
-Blocking layer recommendation: Resolver.
+Blocking layer recommendation: NameSystem.
 
-##### `/ipns/\<ipns_name\>/*` `/ipns/\<ipns_name\>/\<path\>*`
+##### `/ipns/IPNS/PATH`
 
-Same as with the `/ipfs/` rule, blocks IPNS paths starting with the given path prefix. `/*` is equivalent to the empty string, so `/abc/*` == `/abc*`.
+IPNS-Path-rule: Blocks specifically the IPNS path, before resolving. Equivalent to `/ipfs/CID/PATH`.
 
-Blocking layer recommendation: Resolver.
+Blocking layer recommendation: There is no good place to implement this rule
+as the NameSystem only handles IPNS names (without paths), and the
+path.Resolver only handles already-resolved Paths.
 
-##### `/\<path\>` `/\<path\>/*` `/\<path\>*`
+##### `/ipns/NAME/*` `/ipns/NAME/PATH*`
 
-Block solely by looking at the path component, and ignoring the CID/IPNS parts, before resolving.
+IPNS-Path-Prefix-Rule: Same as with the IPFS-Path-Prefix-Rule.
 
-This blocks all the paths matching exactly or having the same prefix as the one in the rule:
+Blocking layer recommendation:  There is no good place to implement this rule
+as the NameSystem only handles IPNS names (without paths), and the
+path.Resolver only handles already-resolved Paths.
+
+##### `/PATH` `/PATH/*` `/PATH*`
+
+Subpath-Rule: Block solely by looking at the subpath component of an IPFS path. Examples:
 
 - `/my/path`: blocks any item that tries to resolve `/my/path`, regardless of the CID used.
 - `/my/path*` and `/my/path/*`: blocks any paths that contain the prefix `/my/path`.
 
-Blocking layer recommendation: Resolver.
+Blocking layer recommendation: PathResolver.
 
-##### `//\<double_hash\>`
+##### `//DOUBLE_HASH`
 
-Blocks a double-hashed item, which can be:
+Doublehash-Rule: Blocks using double-hashed item, which can be:
 
-- The hash of a CIDv1base32[+path]: legacy badbits, block-by-cid format
-- The hash of an IPNS path `/ipns/*`.
-- The hash of a CIDv0[+path]
+- The sha256-hex-encoded hash of `CIDV1_BASE32/PATH`: this is the legacy
+  badbits block anchor format. It can only block by CID and not by
+  multihash. When no path present, the trailing slash must be kept
+  (`CIDV1_BASE32/`).
+- A b58-encoded multihash (a.k.a CIDV0), corresponding to the Sum() of:
+  - An IPNS-Path:
+    - `/ipns/IPNS` when the IPNS name is NOT a CID.
+    - The b58-encoded-multihash extracted from an IPNS key when the IPNS key
+      is a CID.
+  - An IPFS-Path: `b58-encoded-multihash/P/A/T/H` where the multihash is
+    extracted from the CID in `/ipfs/CID/P/A/T/H` (The multihash and the CID
+    are the same in the case of CIDV0). The `/P/A/T/H` component is optional
+    and should not have a trailing `/`.
 
-Blocking layer recommendation: Resolver + BlockService.
+The latter form allows blocking by double-hash using any hashing function of
+choice. Implementations will have to hash requests using all the hashing functions
+used in the denylist, so we recommend sticking to one.
 
-In order to check for a matching rule, the Resolver should:
+Conveniently, the latter form allows using a b58-encoded sha256 multihashes
+(usual form of CIDv0 - `Qmxxx...`), so that double-hashes can be like:
 
-- IPFS path: convert the CID to v1base32 and hash the path without the `/ipfs/` prefix.
-- IPFS path: convert the CID to v0 and hash the path without the `/ipfs/` prefix.
-- IPNS path: hash the path "as is".
+```
+$ printf "QmecDgNqCRirkc3Cjz9eoRBNwXGckJ9WvTdmY16HP88768/my/path" | ipfs add --raw-leaves --only-hash --quiet | ipfs cid format -f '%M' -b base58btc
+QmSju6XPmYLG611rmK7rEeCMFVuL6EHpqyvmEU6oGx3GR8
+```
 
-The Blockservice should, in turn do the following to check for matches:
+The rule `//QmSju6XPmYLG611rmK7rEeCMFVuL6EHpqyvmEU6oGx3GR8` will block `/ipfs/bafybeihrw75yfhdx5qsqgesdnxejtjybscwuclpusvxkuttep6h7pkgmze/my/path`, with `QmSju6XPmYLG611rmK7rEeCMFVuL6EHpqyvmEU6oGx3GR8` being the base58-encoded multihash contained in `bafybeihrw75yfhdx5qsqgesdnxejtjybscwuclpusvxkuttep6h7pkgmze`.
 
-- Convert the CID to v1base32 (keeping the codec) and hash the CID string
-- Convert the CID to v0 and hash the CID string
+We can convert any CID to its multihash with:
 
-When blocking by double-hashing the recommendation is to use the result of hasing `<cidv0_to_block>[/<optional_path>]`. This ensures that blocking by multihash happens.
+```
+$ ipfs cid format -f '%M' -b base58btc bafybeihrw75yfhdx5qsqgesdnxejtjybscwuclpusvxkuttep6h7pkgmze
+QmecDgNqCRirkc3Cjz9eoRBNwXGckJ9WvTdmY16HP88768
+```
 
-##### `/mime/\<mimetype\>` `/mime/*`
+Blocking layer recommendation: NameSystem + PathResolver + BlockService.
+
+In order to check for a matching rule, the PathResolver should:
+
+- IPFS path: convert the CID to v1base32 and hash `CIDV1BASE32/PATH` with the
+  hashing functions used in the denylist. Match against declared double-hashes.
+- IPFS path: convert the CID to CIDv0 and hash `CIDV0/PATH` without trailing `/` with the hashing functions used in the denylist. Match against declared double-hashes.
+- IPNS path:
+
+The NameSystem should:
+
+- If NAME is a domain name: Hash `/ipns/NAME` with the hashing functions used in the denylist. Match against declared double-hashes.
+- If NAME is a CID, extract the multihash, encoded with baseb58btc and hash it with the hashing functions used in the denylist. Match against declared double-hashes.
+
+The BlockService should:
+
+- Convert the CID to `CIDV1BASE32/` (keeping the CID codec and adding a slash at the end) and hash it with the hashing functions used in the denylist. Match against declared double-hashes.
+
+- Convert the CID to b58-encoded-multihash (that is CIDv0) and hash the CID string.
+
+##### `/mime/MIMETYPE` `/mime/*`
 
 Blocks content detected to be of the given type. `/mime/*` blocks all the mimetypes and is meant to work with allow rules (all mimetypes blocked except specific ones).
 
@@ -278,24 +332,31 @@ Our recommendation is that /mime/ rules automatically set IPFS clients into a
 BlockService layer, and content type is checked at the Unixfs layer, as the
 blocks get assembled into an actual files. That should cover gateway usage.
 
-#### Allow block items
+#### Allow (or negated) rules
 
-Block items can be prepended by `+`, signaling that they are to be allowed and
-triumphing over other negative entries. Implementations should check first if
-items have been allowed, before processing blocking rules. Examples:
+Block items can be prepended by `+`, that items matching the rule are to be allowed
+rather than blocked.
+
+This can be used to undo existing rules, but also to add concrete exceptions to wider rules. Order matters, and Allow rules must come AFTER other existing rules.
+
+Implementations should parse rules in general, and match them in inverse order
+as they appear in the denylist, so an explicit Allow rule will be evaluated
+before previously defined Deny rules, and can return non-blocked status for an
+item before further processing.
+
+Examples:
 
 ```
+/ipfs/QmecDgNqCRirkc3Cjz9eoRBNwXGckJ9WvTdmY16HP88768/photo*
++/ipfs/QmecDgNqCRirkc3Cjz9eoRBNwXGckJ9WvTdmY16HP88768/photo123.jpg
 /mime/*
 +/mime/text/plain
-/ipfs/<cid>/photo*
-+/ipfs/<cid>/photo123.jpg
++/ipns/my.domain
+/ipns/my.domain
 ```
 
-#### Negative block items
-
-Block items can be prepended `-`, signaling that they undo a block item found
-previously on the list. This allows to remove entries from a list by just
-negating them in an append-only fashion.
+In this example, `/ipns/my.domain` stays blocked because the deny rule happens
+after the allow one.
 
 #### Hint list
 
@@ -304,6 +365,9 @@ A hint list is an optional space-separated list of hints associated with specifi
 ```
 <block_item> hintA:v1 hintB:v2 hintC:v3
 ```
+
+Block items and hints are separated by one or more consecutive instances of
+the "space" character.
 
 ### Test fixtures
 
