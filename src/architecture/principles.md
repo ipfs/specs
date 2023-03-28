@@ -283,6 +283,5 @@ biglep,
 Dietrich Ayala,
 Juan Benet,
 lidel,
-Molly Mackinlay,
-mosh, and
-Nala.
+Molly Mackinlay, and
+mosh.
