@@ -20,6 +20,8 @@ Denylists provide a way to indicate what content should be blocked by IPFS.
 
 - [Introduction](#introduction)
 - [Specification](#specification)
+  - [Denylist File extension, locations and order](#denylist-file-extension-locations-and-order)
+  - [Denylist format](#denylist-format)
   - [Test fixtures](#test-fixtures)
   - [Security](#security)
   - [Privacy and User Control](#privacy-and-user-control)
@@ -415,7 +417,12 @@ the "space" character.
 
 ### Test fixtures
 
-TODO
+Denylist parsing and correct behaviour can be tested using the
+[test.deny](https://github.com/ipfs-shipyard/nopfs/blob/master/tester/test.deny)
+denylist, which provides example rules and describes the expected behaviour in
+detail.
+
+In particular, a [Blocker implementation validator](https://github.com/ipfs-shipyard/nopfs/tree/master/tester) is provided in Go, and can be adapted to other languages if needed.
 
 ### Security
 
