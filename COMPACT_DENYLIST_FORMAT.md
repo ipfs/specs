@@ -1,4 +1,4 @@
-# Specification Template
+# Compact Denylist Format specification
 
 ![wip](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
 
