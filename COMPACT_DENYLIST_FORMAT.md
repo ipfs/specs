@@ -25,6 +25,7 @@ Denylists provide a way to indicate what content should be blocked by IPFS.
   - [Test fixtures](#test-fixtures)
   - [Security](#security)
   - [Privacy and User Control](#privacy-and-user-control)
+- [Implementations](#implementations)
 
 ## Introduction
 
@@ -447,6 +448,10 @@ Double-hashing is particularly useful when the denylist is meant to be shared. D
 - Double-hashing does not exclude adding additional context via comments or hints
 - The presence of a single double-hashed block item makes necessary that the implementation hashes every CID and CID+path that needs to be checked, which has a performance impact.
 - In general, it is good that users can inspect the nature of the content blocked if they wish to, so we recommend not using double-hashing by default as it helps transparency (i.e. blocking due to copyright claims).
+
+## Implementations
+
+- [NoPFS](https://github.com/ipfs-shipyard/nopfs): An implementation of IPIP-383 which add supports for content blocking to the go-ipfs stack and particularly to Kubo.
 
 ## Copyright
 

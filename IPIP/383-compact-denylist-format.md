@@ -7,7 +7,9 @@
 ## Summary
 
 This IPIP introduces a line-based denylist format for content blocking on IPFS
-focused on simplicity, scalability and ease-of-use,
+focused on simplicity, scalability and ease-of-use.
+
+A reference Go implementation of a denylist parser and Blocker component for the Go-IPFS stack exists at https://github.com/ipfs-shipyard/nopfs.
 
 ## Motivation
 
@@ -96,7 +98,7 @@ Users and developers will benefit from a list format that is easy to work with b
 
 The current Protocol Labs denylist format
 https://badbits.dwebops.pub/denylist.json can be easily converted into the
-proposed compact format.
+proposed compact format. This is shown at https://badbits.dwebops.pub/denylist.json.
 
 
 ### Alternatives
