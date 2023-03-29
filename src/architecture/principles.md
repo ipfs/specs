@@ -9,7 +9,7 @@ editors:
     affiliation:
         name: Protocol Labs
         url: https://protocol.ai/
-maturity: stable
+maturity: reliable
 date: 2023-03-28
 ---
 
@@ -17,11 +17,11 @@ date: 2023-03-28
 
 The IPFS stack is a suite of specifications and tools that share two key characteristics:
 
-1. Data is addressed by its contents using a strict but extensible mechanism, and
+1. Data is addressed by its contents using an extensible verifiability mechanism, and
 2. Data is moved in ways that are tolerant of arbitrary transport methods.
 
-This document provides context and details about these claims. In doing so it defines what
-implementations are part of the IPFS ecosystem.
+This document provides context and details about these characteristics. In doing so it defines
+what is or is not an IPFS implementation.
 
 ## Addressing
 
@@ -61,7 +61,7 @@ over arbitrary transports using a CID*. As Juan Benet once put it,
 "[*That's it!*](https://github.com/multiformats/cid/commit/ece08b40a6b1e9eeafc224e2757d8d1ef3317163#diff-b335630551682c19a781afebcf4d07bf978fb1f8ac04c6bf87428ed5106870f5R43)"
 
 Conversely, any system that exposes interactions with resources based on CIDs is
-an IPFS system. There are
+an IPFS implementation. There are
 [many contexts in which CIDs can be used for addressing](https://docs.ipfs.tech/how-to/address-ipfs-on-web/)
 and [content routing delegation](https://github.com/ipfs/specs/blob/main/routing/DELEGATED_CONTENT_ROUTING_HTTP.md) can support a wealth of interaction options by resolving
 CIDs.
@@ -83,63 +83,61 @@ implementations that silently accept faulty input can lead to interoperability d
 accumulating over time, leading the overall protocol ecosystem to decay.
 
 There are two equilibrium points for protocol ecosystems: when deployed implementations
-are strict, new implementations will be encouraged to be strict as well, leading to a
+are strict, new implementations, out of necessity, are required to be strict as well, leading to a
 strict ecosystem; conversely, when deployed implementations are tolerant, new
 implementations will have a strong incentive to tolerate non-compliance so as to
 interoperate. Tolerance is highly desirable for extensibility and adaptability to new
 environments, but strictness is highly desirable to prevent a protocol ecosystem from
 decaying into a complex collection of corner cases with poor or difficult
-interoperability (what the IETF refers to as "virtuous intolerance").
+interoperability (what the IETF refers to as
+"[virtuous intolerance](https://datatracker.ietf.org/doc/html/draft-iab-protocol-maintenance#name-virtuous-intolerance)").
 
 IPFS approaches this problem space with a new iteration on the robustness principle:
 
 > Be strict about the outcomes, be tolerant about the methods.
 
-<!--
-Also considered:
-- be strict in mapping intent (addresses) to outcome (content), be tolerant (open-ended, flexible, adaptable, extensible) in how you implement that mapping
-- be strict about the goal, be tolerant about the path
--->
-
 CIDs enforce strict outcomes because the mapping from address to content is verified;
 there is no room for outcomes that deviate from the intent expressed in an address.
 This strictness is complemented by a design that proactively expects change thanks to
-a self-describing format (CIDs are a [multiformat](https://multiformats.io/) and support
-an open-ended list of hashes, codecs, etc. ). The endpoints being enforceably strict means
+a self-describing format (CIDs are a [multiformat](https://multiformats.io/) implementation and support
+an open-ended list of hashes, codecs, etc.). The endpoints being enforceably strict means
 that everything else, notably transport, can be tolerant. Being tolerant about methods
 enables adaptability in how the protocol works, notably in how it can adapt to specific
 environments, and in how intelligence can be applied at the endpoints in novel ways, while
 being strict with outcomes guarantees that the result will be correct and interoperable.
 
 Note that this approach to robustness also covers the
-[End-to-end Principle](https://en.wikipedia.org/wiki/End-to-end_principle).
+[End-to-end Principle](https://en.wikipedia.org/wiki/End-to-end_principle). The end-to-end
+principle states that the reliability properties of a protocol have to be
+supported at its endpoints and not in intermediary nodes. For instance, you can best guarantee
+the confidentiality or authenticity of a message by encrypting or signing at one endpoint and
+decrypting or verifying at the other rather than asking relaying nodes to implement local
+protections. IPFS's aproach to robustness, via CIDs, is well aligned with that principle.
 
 ## IPFS Implementation Requirements
 
 An :dfn[IPFS Implementation]:
-* MUST support addressability using CIDs.
-* MUST expose operations (eg. retrieval, provision, indexing) on resources using CIDs. The operations
-  that an implementation may support is an open-ended set, but this covers any interaction which the
-  implementation exposes to agents.
-* MUST verify that the CIDs it manipulates match the resources they address, at least when it
+- MUST support addressability using CIDs.
+- MUST expose operations (eg. retrieval, provision, indexing) on resources using CIDs. The operations
+  that an implementation may support is an open-ended set, but this requirement should cover any interaction
+  which the implementation exposes to other IPFS implementations.
+- MUST verify that the CIDs it resolves match the resources they address, at least when it
   has access to the resources' bytes. Implementations MAY relax this requirement in
   controlled environments in which it is possible to ascertain that verification has happened
   elsewhere in a trusted part of the system.
-* SHOULD name all the important resources it exposes using CIDs. Determining which resources are
+- SHOULD name all the important resources it exposes using CIDs. Determining which resources are
   important is a matter of judgment, but anything that another agent might legitimately wish to
   access is in scope, and it is best to err on the side of inclusion.
-* SHOULD expose the logical units of data that structure a resource (eg. a CBOR document, a file or
+- SHOULD expose the logical units of data that structure a resource (eg. a CBOR document, a file or
   directory, a branch of a B-tree search index) using CIDs.
-* SHOULD support incremental verifiability, for practical reasons.
-* MAY rely on any transport layer. The transport layer cannot dictate or constrain what IPFS is.
-
-The :dfn[IPFS space] is the set of all CIDs and transport-agnostic operations that can be carried
-out on CIDs.
+- SHOULD support incremental verifiability, notably so that it may process content of arbitrary sizes.
+- MAY rely on any transport layer. The transport layer cannot dictate or constrain the way in which
+  CIDs map to content.
 
 ## Boundary Examples
 
-These IPFS principles are broad. This is by design because IPFS supports a wide family of
-use cases and is adaptable to a broad array of operating conditions. Considering a few cases
+These IPFS principles are broad. This is by design because, like HTTP, IPFS supports an open-ended set of
+use cases and is adaptable to a broad array of operating conditions. Considering cases
 at the boundary may help develop an intuition for the limits that these principles draw.
 
 ### Other Content-Addressing Systems
@@ -158,7 +156,7 @@ systems.
 
 The requirements above state that an implementation may forgo verification when "*it is
 possible to ascertain that verification has happened elsewhere in a trusted part of the system.*"
-This is intended as a strict requirement in which implements take trust seriously. The point is
+This is intended as a strict requirement in which implementors take trustlessness seriously, an indication
 that it's okay to not constantly spend cycles verifying hashes in an internal setup which you
 have reasons to believe is trustworthy. This is *not* a licence to trust an arbitrary data
 source just because you like them.
@@ -167,14 +165,14 @@ For instance:
 
 - A JS code snippet that fetches data from an IPFS HTTP gateway without verifying it is not an
   IPFS implementation.
-- An IPFS HTTP gateway that verifies the data that it is pulling from arbitrary IPFS nodes
+- An IPFS HTTP gateway that verifies the data that it is pulling from other IPFS implementations
   before serving it over HTTP is an IPFS implementation.
 - That JS piece of code in the first bullet can be turned into an IPFS implementation if it
   fetches from a :cite[trustless-gateway] and verifies what it gets.
 
 ## Self-Certifying Addressability
 
-:dfn[Authority] is control over a given domain of competence and :dfn[naming authority] is
+:dfn[Authority] is control over a given domain of competence. :dfn[Naming authority] is
 control over what resources are called.
 
 :dfn[Addressability] is the property of a naming system such that its names are sufficient
@@ -192,7 +190,7 @@ addressability is a key component of a
 and it supports capture-resistance which can help mitigate against centralization.
 
 CIDs support :ref[self-certifying addressability]. With CIDs, the authority to name a resource
-resides only with that resource and derives directly from that resource's most intrinsic
+resides only with that resource and derives directly from that resource's intrinsic
 property: its content. This frees interactions with CID-named resources from the power
 relation implicit in a client-server architecture. CIDs are the trust model of IPFS.
 
@@ -200,8 +198,8 @@ An implementation may retrieve a CID without verifying that the resource matches
 loses the resource's naming authority. Such an implementation would be comparable to an HTTP
 client looking DNS records up from a random person's resolver: it cannot guarantee that the
 addressing is authoritative. Implementers may make informed decisions as to where in their
-systems they support verification, but they should ensure that CIDs are verified whenever
-they also have access to the resource that the CID maps to.
+systems they support verification, but they should ensure that the mapping between CID and resource
+is verified whenever they have access to both the resource and the CID that maps to it.
 
 ## Appendix: Historical Notes
 
