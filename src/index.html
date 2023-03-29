@@ -1,0 +1,156 @@
+---
+title: Home
+---
+
+{% include 'head.html' %}
+
+<header>
+  <div>
+    <img src="/img/ipfs-standards.svg" alt="Interplanetary Standards Logo" width="60" height="60" class="logo">
+    <h1>IPFS Standards</h1>
+    <p>
+      The purpose of <em>IPFS Standards</em> is to foster interoperability between independent implementations of
+      the IPFS stack by producing Internet-grade specifications and test suites.
+    </p>
+  </div>
+</header>
+
+<main>
+  <h2 class="pitch-title">Specifying IPFS and the Interplanetary stack.</h2>
+  <p class="pitch-subtitle">
+    The technology that powers the content-addressable web is being standardized here.
+  </p>
+  <!--
+  <div class="basic-grid">
+    <div class="pitch">
+      <h3>High-quality open standards</h3>
+      <p>
+        We aim to fully define implementation behaviour and to empower anyone to build their
+        own system that fits into the interplanetary ecosystem without needing to reverse-engineer
+        the behavior of other implementations.
+      </p>
+    </div>
+    <div class="pitch">
+      <h3>Comprehensive test suites</h3>
+      <p>
+        A specification is only as useful as it is both testable and tested. We are building extensive
+        test suites that allow specifications to prove their interoperability and implementations to demonstrate
+        their correctness.
+        </p>
+    </div>
+    <div class="pitch">
+      <h3>Testing infrastructure</h3>
+      <p>
+        We build tools to support detecting interoperability issues early and often as part of CI/CD pipelines
+        and to report on implementation maturity as the stack evolves so that people who build on top of the
+        interplanetary stack can know what they can use in production.
+      </p>
+    </div>
+    <div class="pitch">
+      <h3>An open governance model</h3>
+      <p>
+        We guarantee community ownership of the standards, of the standards-production process, and of
+        the infrastructure to operate it, in collective pursuit of efficient, transformative, ethical
+        technology.
+      </p>
+    </div>
+  </div>
+  -->
+
+  <section>
+    <h2>Specifications</h2>
+    <p>
+      The specifications are broken up into multiple areas that cover the stack.
+    </p>
+    <div class="basic-grid">
+      <section>
+        <h3><a href="/http-gateways/">HTTP Gateways</a></h3>
+        <p>
+          IPFS Gateway acts as a bridge between traditional HTTP clients and IPFS. Through the gateway, users can download files,
+          directories and other IPLD data stored in IPFS as if they were stored in a traditional web server.
+        </p>
+        <dl>
+          <dt><a href="/http-gateways/path-gateway/">Path Gateways</a></dt>
+          <dd>
+            The most versatile form of IPFS Gateway is a Path Gateway. It exposes namespaces like <code>/ipfs/</code> and
+            <code>/ipns/</code> under an HTTP server root and provides basic primitives for integrating IPFS resources
+            within the existing HTTP stack.
+          </dd>
+          <dt><a href="/http-gateways/trustless-gateway/">Trustless Gateways</a></dt>
+          <dd>
+            Trustless Gateways are a minimal <em>subset</em> of <a href="/http-gateways/path-gateway/">Path Gateways</a>
+            that allow light IPFS clients to retrieve data behind a CID and verify its integrity without delegating any
+            trust to the gateway itself.
+          </dd>
+          <dt><a href="/http-gateways/dnslink-gateway/">DNSLink Gateways</a></dt>
+          <dd>
+            DNSLink Gateways are an extension of <a href="/http-gateways/path-gateway/">Path Gateways</a> that enable hosting a
+            specific content path under a specific DNS name.
+          </dd>
+          <dt><a href="/http-gateways/subdomain-gateway/">Subdomain Gateways</a></dt>
+          <dd>
+            Subdomain Gateways are an extension of <a href="/http-gateways/path-gateway/">Path Gateways</a> that
+            enable website hosting isolated per CID/name, while remaining compatible with web browsers relative pathing and
+            the security model of the web.
+          </dd>
+          <dt><a href="/http-gateways/web-redirects-file/">Redirects File</a></dt>
+          <dd>
+            The Redirects File specification is an extension of the Subdomain Gateway and DNSLink Gateway specifications that
+            enables URL redirects or rewrites by adding redirect rules to a0 file stored underneath the root CID of a web
+            site.
+          </dd>
+        </dl>
+      </section>
+      <section>
+        <h3><a href="/ipns/">InterPlanetary Naming System</a></h3>
+        <p>
+          The InterPlanetary Naming System (IPNS) is a naming system responsible for creating, reading and updating mutable pointers to data.
+        </p>
+
+        <dl>
+          <dt><a href="/ipns/ipns-record/">IPNS Record and Protocol</a></dt>
+          <dd>
+            Specifies the IPNS protocol in a language-agnostic manner, allowing everyone to create a compatible IPNS Record Publisher
+            or Resolver.
+          </dd>
+          <dt><a href="/ipns/ipns-pubsub-router/">IPNS PubSub Router</a></dt>
+          <dd>
+            Specifies how to publish and retrieve IPNS records using libp2p PubSub router.
+          </dd>
+        </dl>
+
+      </section>
+      <section>
+        <h3><a href="/meta/">Meta</a></h3>
+        <p>
+          <em>Meta</em> contains all the non-technical documents that conspire to make the standards
+          project work: what the core values are, what the governance model is, how to produce documents,
+          etc.
+        </p>
+        <dl>
+          <dt><a href="/meta/code-of-conduct/">Code of Conduct</a></dt>
+          <dd>
+            The code of conduct that all community participants are held to.
+          </dd>
+          <dt><a href="/meta/spec-for-specs/">Spec for Specs</a></dt>
+          <dd>
+            Specifies the format and system used to create and maintain specifications for
+            the interplanetary stack.
+          </dd>
+          <!-- <dt><a href="/meta/license/">Document License</a></dt>
+          <dt>Document License</dt>
+          <dd>
+            tk
+              WHATWG:
+              Copyright © WHATWG (Apple, Google, Mozilla, Microsoft). This work is licensed under a Creative Commons Attribution 4.0 International License. To the extent portions of it are incorporated into source code, such portions in the source code are licensed under the BSD 3-Clause License instead.
+              W3C:
+              Copyright © 2022 W3C® (MIT, ERCIM, Keio, Beihang). W3C liability, trademark and permissive document license rules apply.
+          </dd>
+              -->
+        </dl>
+      </section>
+    </div>
+  </section>
+</main>
+
+{% include 'footer.html' %}
