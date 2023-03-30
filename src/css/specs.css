@@ -1,5 +1,3 @@
-
-
 :root {
   --size-mono: 0.9em;
 }
@@ -123,7 +121,6 @@ img {
   }
 
   p#last-modified {
-    margin-top: -0.8rem;
     font-size: 1.2rem;
   }
 }
