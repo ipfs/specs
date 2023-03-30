@@ -148,7 +148,7 @@ CIDs are readily made compatible with other content-addressable systems, but thi
 entail that all content-addressable systems are part of IPFS. Git's SHA1 hashes aren't CIDs
 but can be converted into CIDs by prefixing them with `f01781114`. Likewise, BitTorrent v2
 uses multihashes in the `btmh:` scheme. BitTorrent addresses aren't CIDs, but can be
-converted to CIDs by replacing `btmh:` with `f017c`.
+converted to CIDs by replacing `btmh:` with `f017b`.
 
 The simplicity with which one can expose these existing system over IPFS by simply prefixing
 existing addresses to mint CIDs enables radical interoperability with other content-addressable
