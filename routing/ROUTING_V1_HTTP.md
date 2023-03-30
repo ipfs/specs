@@ -1,4 +1,4 @@
-# Delegated Content Routing HTTP API
+# Routing v1 HTTP API
 
 ![reliable](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square) Delegated Content Routing HTTP API
 
