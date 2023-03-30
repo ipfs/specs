@@ -21,7 +21,7 @@ The IPFS stack is a suite of specifications and tools that share two key charact
 2. Data is moved in ways that are tolerant of arbitrary transport methods.
 
 This document provides context and details about these characteristics. In doing so it defines
-what is or is not an IPFS implementation. This is a **living document**, it is expected to
+what is or is not an IPFS implementation. This is a **living document**; it is expected to
 change over time as we define more of the principles that guide the architecture of IPFS or
 find clearer ways of describing those we have already defined.
 
