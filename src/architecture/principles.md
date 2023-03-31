@@ -52,7 +52,7 @@ maintaining universal addressability while eliminating the attack vectors inhere
 hierarchical authority. Content addressability derives identifiers from the content of
 an information resource, such that any party can both mint the identifier and verify
 that it maps to the right resource. This eliminates the need for any authority outside
-of the resource itself to certity its content. It makes CIDs the universal
+of the resource itself to certify its content. It makes CIDs the universal
 self-certifying addressability component of the web.
 
 Addressing data using [CIDs](https://github.com/multiformats/cid) is the first defining
@@ -65,8 +65,8 @@ over arbitrary transports using a CID*. As Juan Benet once put it,
 Conversely, any system that exposes interactions with resources based on CIDs is
 an IPFS implementation. There are
 [many contexts in which CIDs can be used for addressing](https://docs.ipfs.tech/how-to/address-ipfs-on-web/)
-and [content routing delegation](https://github.com/ipfs/specs/blob/main/routing/DELEGATED_CONTENT_ROUTING_HTTP.md) can support a wealth of interaction options by resolving
-CIDs.
+and [content routing delegation](https://github.com/ipfs/specs/blob/main/routing/ROUTING_V1_HTTP.md)
+can support a wealth of interaction options by resolving CIDs.
 
 ## Robustness
 
