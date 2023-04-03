@@ -17,9 +17,9 @@ such as HTTP load balancers, CDNs, reverse proxies, etc. is a requirement.
 To maximize compatibility with standard tools, IPFS needs an HTTP API specification that uses standard HTTP idioms and payload encoding.
 
 Previously the Reframe spec for delegated content routing was an experimental attempt at this, but has been deprecated for two Kubo releases(v0.17,v0.18). Reframe had resulted in a very unidiomatic HTTP API which was difficult to implement and was incompatible with many existing tools.
-The cost of a proper redesign, implementation, maintenance of Reframe, and its implementation were too high relative to the urgency of having a delegated content routing HTTP API. All refererences to Reframe in code and specs were removed in Kubo release v0.19 with [Reframe cleanup](https://github.com/ipfs/kubo/issues/9479) to avoid any user confusion and are being renamed as "Routing v1" in specs.
+The cost of a proper redesign, implementation, maintenance of Reframe, and its implementation were too high relative to the urgency of having a delegated content routing HTTP API. All refererences to Reframe in code and specs were removed in Kubo release v0.19 with [Reframe cleanup](https://github.com/ipfs/kubo/issues/9479).
 
-We expect this API to be extended beyond "content routing" in the future, so additional IPIPs may rename this to something more general such as "Delegated Routing HTTP API".
+We expect this API to be extended beyond "content routing" in the future, so additional IPIPs may rename this to something more general such as "Routing V1".
 
 ## Detailed design
 
