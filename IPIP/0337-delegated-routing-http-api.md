@@ -15,12 +15,9 @@ and supporting large content providers is a key strategy for driving down IPFS c
 These providers must handle high volumes of traffic and support many users, so leveraging industry-standard tools and services
 such as HTTP load balancers, CDNs, reverse proxies, etc. is a requirement.
 To maximize compatibility with standard tools, IPFS needs an HTTP API specification that uses standard HTTP idioms and payload encoding.
-The [Reframe spec](https://github.com/ipfs/specs/blob/main/reframe/REFRAME_PROTOCOL.md) for delegated content routing is an experimental attempt at this,
-but it has resulted in a very unidiomatic HTTP API which is difficult to implement and is incompatible with many existing tools.
-The cost of a proper redesign, implementation, and maintenance of Reframe and its implementation is too high relative to the urgency of having a delegated content routing HTTP API.
 
-Note that this does not supplant nor deprecate Reframe. Ideally in the future, Reframe and its implementation would receive the resources needed to map the IDL to idiomatic HTTP,
-and implementations of this spec could then be rewritten in the IDL, maintaining backwards compatibility.
+Previously the Reframe spec for delegated content routing was an experimental attempt at this, but has been deprecated for two Kubo releases(v0.17,v0.18). Reframe had resulted in a very unidiomatic HTTP API which was difficult to implement and was incompatible with many existing tools.
+The cost of a proper redesign, implementation, maintenance of Reframe, and its implementation were too high relative to the urgency of having a delegated content routing HTTP API. All refererences to Reframe in code and specs were removed in Kubo release v0.19 with [Reframe cleanup](https://github.com/ipfs/kubo/issues/9479) to avoid any user confusion and are being renamed as "Routing v1" in specs.
 
 We expect this API to be extended beyond "content routing" in the future, so additional IPIPs may rename this to something more general such as "Delegated Routing HTTP API".
 
