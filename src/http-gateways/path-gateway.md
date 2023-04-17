@@ -224,10 +224,10 @@ Optional, `car-scope=(block|file|all)` with default value 'all', describes the s
 Optional, `bytes=x:y` with default value `0:*`. When the entity at the end of the end of the specified path can be intepreted as a contingous array of bytes (such as a UnixFS file), returns only the blocks required to verify the specified byte range of said entity. Put another way, the `bytes` parameters can serve as a trustless form of an HTTP range request. If the entity at the end of the path cannot be interpreted as a continguous array of bytes (such as a CBOR/JSON map), this parameter has no effect. Allowed values for `x` and `y` are positive integers where y >= x, which limit the return blocks to needed to satify the range [x, y]. In addition the following additional values are permitted:
 
 - `*` can be substituted for end-of-file
-    - `?bytes=0:*` is the entire file (i.e. to fulfill HTTP Range Request `x-` requests)
+  - `?bytes=0:*` is the entire file (i.e. to fulfill HTTP Range Request `x-` requests)
 - Negative numbers can be used for referring to bytes from the end of a file
-    - `?bytes=-1024:*` is the last 1024 bytes of a file (i.e. to fulfill HTTP Range Request `-y` requests)
-    - It is also permissible (unlike with HTTP Range Requests) to ask for the range of 500 bytes from the beginning of the file to 1000 bytes from the end by `?bytes=499:-1000`
+  - `?bytes=-1024:*` is the last 1024 bytes of a file (i.e. to fulfill HTTP Range Request `-y` requests)
+  - It is also permissible (unlike with HTTP Range Requests) to ask for the range of 500 bytes from the beginning of the file to 1000 bytes from the end by `?bytes=499:-1000`
 
 <!-- TODO Planned: https://github.com/ipfs/go-ipfs/issues/8769
 - `selector=<cid>`  can be used for passing a CID with [IPLD selector](https://ipld.io/specs/selectors)

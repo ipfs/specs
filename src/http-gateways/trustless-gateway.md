@@ -17,10 +17,10 @@ The minimal implementation means:
 - response type is always fully verifiable: client can decide between a raw block or a CAR stream
 - no UnixFS/IPLD decoding server-side
 - for CAR files:
-   - the behavior is identical to :cite[path-gateway]
+  - the behavior is identical to :cite[path-gateway]
 - for raw blocks:
-   - data is requested by CID, only supported path is `/ipfs/{cid}`
-   - no path traversal or recursive resolution, 
+  - data is requested by CID, only supported path is `/ipfs/{cid}`
+  - no path traversal or recursive resolution
 
 # HTTP API
 
