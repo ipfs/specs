@@ -8,27 +8,35 @@ editors:
 
 # Trustless Gateway Specification
 
-Trustless Gateway is a minimal _subset_ of :cite[path-gateway]
+Trustless Gateway is a _subset_ of :cite[path-gateway]
 that allows light IPFS clients to retrieve data behind a CID and verify its
 integrity without delegating any trust to the gateway itself.
 
 The minimal implementation means:
 
-- data is requested by CID, only supported path is `/ipfs/{cid}`
-- no path traversal or recursive resolution, no UnixFS/IPLD decoding server-side
 - response type is always fully verifiable: client can decide between a raw block or a CAR stream
+- no UnixFS/IPLD decoding server-side
+- for CAR files:
+   - the behavior is identical to :cite[path-gateway]
+- for raw blocks:
+   - data is requested by CID, only supported path is `/ipfs/{cid}`
+   - no path traversal or recursive resolution, 
 
 # HTTP API
 
 A subset of "HTTP API" of :cite[path-gateway].
 
-## `GET /ipfs/{cid}[?{params}]`
+## `GET /ipfs/{cid}[/{path}][?{params}]`
 
-Downloads data at specified CID.
+Downloads data at specified **immutable** content path.
 
-## `HEAD /ipfs/{cid}[?{params}]`
+Path parameters are only permitted for requests that specify CAR format. For RAW requests, only `GET /ipfs/{cid}[?{params}]` is supported
+
+## `HEAD /ipfs/{cid}[/{path}][?{params}]`
 
 Same as GET, but does not return any payload.
+
+Path parameters are only permitted for requests that specify CAR format. For RAW requests, only `HEAD /ipfs/{cid}[?{params}]` is supported
 
 # HTTP Request
 

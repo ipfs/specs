@@ -205,6 +205,30 @@ This is a URL-friendly alternative to sending an [`Accept`](#accept-request-head
 - `format=json` → `Accept: application/json`
 - `format=cbor` → `Accept: application/cbor`
 
+## Query Parameters for CAR Requests
+
+The following query parameters are only available for requests made with either a `format=car` query parameter or an `Accept: application/vnd.ipld.car` request header. These parameters modify shape of the IPLD graph returned within the car file
+
+### `car-scope` (request query parameter)
+
+Optional, `car-scope=(block|file|all)` with default value 'all', describes the shape of the dag fetched the terminus of the specified path whose blocks are included in the returned CAR file after the blocks required to traverse path segments.
+
+`block` - Only the root block at the end of the path is returned After blocks required to verify the specified path segments.
+
+`file` - For queries that traverse UnixFS data, `file` roughly means return blocks needed to verify the end of the path as a filesystem entity. In other words, all the blocks needed 'cat' a UnixFS file at the end of the specified path, or to 'ls' a UnixFS directory at the end of the specified path. For all queries that do not reference non-UnixFS data, `file` is equivalent to `block`
+
+`all` - Transmit the entire contiguous DAG that begins at the end of the path query, after blocks required to verify path segments
+
+### `bytes` (request query parameter)
+
+Optional, `bytes=x:y` with default value `0:*`. When the entity at the end of the end of the specified path can be intepreted as a contingous array of bytes (such as a UnixFS file), returns only the blocks required to verify the specified byte range of said entity. Put another way, the `bytes` parameters can serve as a trustless form of an HTTP range request. If the entity at the end of the path cannot be interpreted as a continguous array of bytes (such as a CBOR/JSON map), this parameter has no effect. Allowed values for `x` and `y` are positive integers where y >= x, which limit the return blocks to needed to satify the range [x, y]. In addition the following additional values are permitted:
+
+- `*` can be substituted for end-of-file
+    - `?bytes=0:*` is the entire file (i.e. to fulfill HTTP Range Request `x-` requests)
+- Negative numbers can be used for referring to bytes from the end of a file
+    - `?bytes=-1024:*` is the last 1024 bytes of a file (i.e. to fulfill HTTP Range Request `-y` requests)
+    - It is also permissible (unlike with HTTP Range Requests) to ask for the range of 500 bytes from the beginning of the file to 1000 bytes from the end by `?bytes=499:-1000`
+
 <!-- TODO Planned: https://github.com/ipfs/go-ipfs/issues/8769
 - `selector=<cid>`  can be used for passing a CID with [IPLD selector](https://ipld.io/specs/selectors)
     - Selector should be in dag-json or dag-cbor format
@@ -567,7 +591,10 @@ The following response types require an explicit opt-in, can only be requested w
 - Raw Block (`?format=raw`)
   - Opaque bytes, see [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw).
 - CAR (`?format=car`)
-  - Arbitrary DAG as a verifiable CAR file or a stream, see [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car).
+  - A CAR file or a stream that contains all blocks required to trustless verify the expressed query, see [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car).
+    - Must contain, as the very first block, the block that hashes to the content root CID
+    - Must contain, immediately following the root block, all blocks encountered while traversing the expressed path in the order they were traversed
+    - Must contain, immediately following traversed path blocks, appropriate blocks in depth first traversal order required to verify the query expressed at the terminus of the path in [query parameters](#query-parameters-for-car-requests)
 - TAR (`?format=tar`)
   - Deserialized UnixFS files and directories as a TAR file or a stream, see [IPIP-288](https://github.com/ipfs/specs/pull/288)
 
