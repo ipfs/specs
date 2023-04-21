@@ -54,7 +54,9 @@ Both read and write provider records have a minimal required schema as follows:
 
 Where:
 
-- `Protocol` is the multicodec name of the transfer protocol or an opaque string (for experimenting with novel protocols without a multicodec)
+- `Protocol` is a globlly unique opaque string that represents the transfer protocol used by a content provider.
+  - If a multicodec has been registered for the protocol, it can be referred to by either its `name` or `code` in `0xHEX` notation. Using the `code` is preferred since it is what is sent on the wire and won't break if the plain text `name` label is ever changed.
+  - For protocols without a dedicated multicodec, it is recommended to use a globally unique enough identifier to prevent collisions.
 - `Schema` denotes the schema to use for encoding/decoding the record
   - This is separate from the `Protocol` to allow this HTTP API to evolve independently of the transfer protocol
   - Implementations should switch on this when parsing records, not on `Protocol`
@@ -127,7 +129,7 @@ This section contains a non-exhaustive list of known transfer protocols (by name
 
 ### Bitswap
 
-Multicodec name: `transport-bitswap`
+Protocol: `transport-bitswap` multicodec name or code in hex `0x0900`
 Schema: `bitswap`
 Specification: [ipfs/specs/BITSWAP.md](https://github.com/ipfs/specs/blob/main/BITSWAP.md)
 
@@ -150,7 +152,7 @@ The server should respect a passed `transport` query parameter by filtering agai
 
 ### Filecoin Graphsync
 
-Multicodec name: `transport-graphsync-filecoinv1`
+Protocol: `transport-graphsync-filecoinv1` multicodec name or code in hex `0x0910`
 Schema: `graphsync-filecoinv1`
 Specification: [ipfs/go-graphsync/blob/main/docs/architecture.md](https://github.com/ipfs/go-graphsync/blob/main/docs/architecture.md)
 
