@@ -60,6 +60,7 @@ Where:
 - `Schema` denotes the schema to use for encoding/decoding the record
   - This is separate from the `Protocol` to allow this HTTP API to evolve independently of the transfer protocol
   - Implementations should switch on this when parsing records, not on `Protocol`
+  - Protocols without an explicit schema or multiple versions, can use the same opaque string as in `Protocol`
 - `...` denotes opaque JSON, which may contain information specific to the transfer protocol
 
 Specifications for some transfer protocols are provided in the "Transfer Protocols" section.
