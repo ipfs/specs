@@ -112,23 +112,23 @@ A logical IPNS record is a data structure containing the following fields:
 
 - **Value** (bytes)
   - It can be any path, such as a `/ipns/{ipns-key}` path to another IPNS record, a [DNSLink](https://dnslink.dev/) path (`/ipns/example.com`) or an immutable IPFS path (`/ipfs/baf...`).
-  - Implementations MUST include this value in both `IpnsEntry.value` and inside the DAG-CBOR document in `IpnsEntry.data[value]`.
+  - Implementations MUST include this value in both `IpnsEntry.value` and inside the DAG-CBOR document in `IpnsEntry.data[Value]`.
 - **Validity Type** (uint64)
   - Defines the conditions under which the record is valid.
   - The only supported value is `0`, which indicates the `validity` field contains the expiration date after which the IPNS record becomes invalid.
-  - Implementations MUST support `validityType = 0` and include this value in both `IpnsEntry.validityType` and inside the DAG-CBOR document at `IpnsEntry.data[validityType]`.
+  - Implementations MUST support `validityType = 0` and include this value in both `IpnsEntry.validityType` and inside the DAG-CBOR document at `IpnsEntry.data[ValidityType]`.
 - **Validity** (bytes)
   - When `validityType = 0`
     - Expiration date of the record with nanoseconds precision.  Expiration time should match the publishing medium's window.
       - For example, IPNS records published on the DHT should have an expiration time set to within 48 hours after publication. Setting the expiration time to longer than 48 hours will not have any effect, as DHT peers only keep records for up to 48 hours.
     - Represented as an ASCII string that follows notation from :cite[rfc3339] (`1970-01-01T00:00:00.000000001Z`).
-  - Implementations MUST include this value in both `IpnsEntry.validity` and inside the DAG-CBOR document at `IpnsEntry.data[validity]`.
+  - Implementations MUST include this value in both `IpnsEntry.validity` and inside the DAG-CBOR document at `IpnsEntry.data[Validity]`.
 - **Sequence** (uint64)
   - Represents the current version of the record (starts at 0).
-  - Implementations MUST include this value in both `IpnsEntry.sequence` and inside the DAG-CBOR document at `IpnsEntry.data[sequence]`.
+  - Implementations MUST include this value in both `IpnsEntry.sequence` and inside the DAG-CBOR document at `IpnsEntry.data[Sequence]`.
 - **TTL** (uint64)
   - A hint for how long the record should be cached before going back to, for instance the DHT, in order to check if it has been updated.
-  - Implementations MUST include this value in both `IpnsEntry.ttl` and inside the DAG-CBOR document at `IpnsEntry.data[ttl]`.
+  - Implementations MUST include this value in both `IpnsEntry.ttl` and inside the DAG-CBOR document at `IpnsEntry.data[TTL]`.
 - **Public Key** (bytes)
   - Public key used to sign this record.
     - If public key is small enough to fit in IPNS name (e.g., Ed25519 keys inlined using `identity` multihash), `IpnsEntry.pubKey` field is redundant and MAY be skipped to save space.
@@ -161,20 +161,20 @@ message IpnsEntry {
   EOL = 0;
  }
 
- // deserialized copy of data[value]
+ // deserialized copy of data[Value]
  optional bytes value = 1;
 
  // legacy field, verify 'signatureV2' instead
  optional bytes signatureV1 = 2;
 
- // deserialized copies of data[validityType] and data[validity]
+ // deserialized copies of data[ValidityType] and data[Validity]
  optional ValidityType validityType = 3;
  optional bytes validity = 4;
 
- // deserialized copy of data[sequence]
+ // deserialized copy of data[Sequence]
  optional uint64 sequence = 5;
 
- // record TTL in nanoseconds, a deserialized copy of data[ttl]
+ // record TTL in nanoseconds, a deserialized copy of data[TTL]
  optional uint64 ttl = 6;
 
  // in order for nodes to properly validate a record upon receipt, they need the public
@@ -253,7 +253,7 @@ Creating a new IPNS record MUST follow the below steps:
 
 1. Create `IpnsEntry` and set `value`, `validity`, `validityType`, `sequence`, and `ttl`
    - If you are updating an existing record, remember to increase values in `sequence` and `validity`
-2. Create a DAG-CBOR document with the same values for `value`, `validity`, `validityType`, `sequence`, and `ttl`
+2. Create a DAG-CBOR document with the same values for `Value`, `Validity`, `ValidityType`, `Sequence`, and `TTL`
    - This is paramount: this CBOR will be used for signing.
 3. Store DAG-CBOR in `IpnsEntry.data`.
    - If you want to store additional metadata in the record, add it under unique keys at `IpnsEntry.data`.
@@ -283,11 +283,11 @@ Record's data and signature verification MUST be implemented as outlined below, 
      - Unmarshall public key from Multihash digest
 4. Deserialize `IpnsEntry.data` as a DAG-CBOR document
 5. Confirm values in `IpnsEntry` protobuf match deserialized ones from `IpnsEntry.data`:
-   - `IpnsEntry.value` must match `IpnsEntry.data[value]`
-   - `IpnsEntry.validity` must match `IpnsEntry.data[validity]`
-   - `IpnsEntry.validityType` must match `IpnsEntry.data[validityType]`
-   - `IpnsEntry.sequence` must match `IpnsEntry.data[sequence]`
-   - `IpnsEntry.ttl` must match `IpnsEntry.data[ttl]`
+   - `IpnsEntry.value` must match `IpnsEntry.data[Value]`
+   - `IpnsEntry.validity` must match `IpnsEntry.data[Validity]`
+   - `IpnsEntry.validityType` must match `IpnsEntry.data[ValidityType]`
+   - `IpnsEntry.sequence` must match `IpnsEntry.data[Sequence]`
+   - `IpnsEntry.ttl` must match `IpnsEntry.data[TTL]`
 6. Create bytes for signature verification by concatenating `ipns-signature:` prefix (bytes in hex: `69706e732d7369676e61747572653a`) with raw CBOR bytes from `IpnsEntry.data`
 7. Verify signature in `IpnsEntry.signatureV2` against concatenation result from the previous step.
 
