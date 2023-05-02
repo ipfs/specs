@@ -54,7 +54,7 @@ Both read and write provider records have a minimal required schema as follows:
 
 Where:
 
-- `Protocol` is a globlly unique opaque string that represents the transfer protocol used by a content provider.
+- `Protocol` is a globally unique opaque string that represents the transfer protocol used by a content provider.
   - If a multicodec has been registered for the protocol, it can be referred to by either its `name` or `code` in `0xHEX` notation. Using the `code` is preferred since it is what is sent on the wire and won't break if the plain text `name` label is ever changed.
   - For protocols without a dedicated multicodec, it is recommended to use a globally unique enough identifier to prevent collisions.
 - `Schema` denotes the schema to use for encoding/decoding the record
