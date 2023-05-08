@@ -17,6 +17,7 @@ editors:
         name: Protocol Labs
         url: https://protocol.ai/
 tags: ['architecture']
+order: 0
 ---
 
 The IPFS stack is a suite of specifications and tools that share two key characteristics:

@@ -23,6 +23,7 @@ xref:
   - url
   - html
 tags: ['httpGateways', 'webHttpGateways']
+order: 3
 ---
 
 Subdomain Gateway is an extension of :cite[path-gateway] that

@@ -19,6 +19,7 @@ editors:
     - name: Jim Garrison
       github: garrison
 tags: ['meta']
+order: 0
 ---
 
 We believe that our mission is best served in an environment that is friendly, safe, and accepting, and free from

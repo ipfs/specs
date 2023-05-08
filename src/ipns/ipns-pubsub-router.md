@@ -11,6 +11,7 @@ editors:
 xref:
   - ipns-record
 tags: ['ipns']
+order: 1
 ---
 
 :ref[InterPlanetary Naming System (IPNS)]  is a naming system responsible for the creating, reading and updating of mutable pointers to data.

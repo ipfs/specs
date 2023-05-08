@@ -21,6 +21,7 @@ editors:
 xref:
   - url
 tags: ['httpGateways', 'lowLevelHttpGateways']
+order: 0
 ---
 
 # Path Gateway Specification

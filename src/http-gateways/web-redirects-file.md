@@ -12,6 +12,7 @@ editors:
   - name: Marcin Rataj
     github: lidel
 tags: ['httpGateways', 'webHttpGateways']
+order: 4
 ---
 
 The Web Redirects File specification is an extension of the Subdomain Gateway and DNSLink Gateway specifications.

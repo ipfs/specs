@@ -10,6 +10,7 @@ editors:
   - name: Marcin Rataj
     github: lidel
 tags: ['httpGateways', 'lowLevelHttpGateways']
+order: 1
 ---
 
 Trustless Gateway is a minimal _subset_ of :cite[path-gateway]

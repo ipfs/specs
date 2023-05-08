@@ -11,6 +11,7 @@ editors:
   - name: Thibault Meunier
     github: thibmeu
 tags: ['httpGateways', 'webHttpGateways']
+order: 2
 ---
 
 DNSLink Gateway is an extension of :cite[path-gateway] that enables hosting a
