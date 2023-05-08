@@ -1,6 +1,8 @@
 ---
-maturity: reliable
+title: IPNS PubSub Router
+description: Specifies how to publish and retrieve IPNS records using libp2p PubSub router.
 date: 2022-11-09
+maturity: reliable
 editors:
   - name: Adin Schmahmann
     github: aschmahmann
@@ -8,9 +10,9 @@ editors:
     github: lidel
 xref:
   - ipns-record
+tags: ['ipns']
+order: 1
 ---
-
-# IPNS PubSub Router
 
 :ref[InterPlanetary Naming System (IPNS)]  is a naming system responsible for the creating, reading and updating of mutable pointers to data.
 IPNS consists of a public/private asymmetric cryptographic key pair, a record type and a protocol.

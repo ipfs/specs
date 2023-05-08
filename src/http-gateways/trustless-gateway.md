@@ -1,12 +1,17 @@
 ---
-maturity: reliable
+title: Trustless Gateway Specification
+description: >
+  Trustless Gateways are a minimal subset of Path Gateways that allow light IPFS
+  clients to retrieve data behind a CID and verify its integrity without delegating any
+  trust to the gateway itself.
 date: 2022-11-09
+maturity: reliable
 editors:
   - name: Marcin Rataj
     github: lidel
+tags: ['httpGateways', 'lowLevelHttpGateways']
+order: 1
 ---
-
-# Trustless Gateway Specification
 
 Trustless Gateway is a minimal _subset_ of :cite[path-gateway]
 that allows light IPFS clients to retrieve data behind a CID and verify its

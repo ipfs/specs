@@ -1,5 +1,10 @@
 ---
+title: Spec for Specs
+description: >
+  Specifies the format and system used to create and maintain specifications for
+  the interplanetary stack.
 date: 2023-03-14
+maturity: stable
 editors:
   - name: Robin Berjon
     email: robin@berjon.com
@@ -10,13 +15,12 @@ editors:
     affiliation:
         name: Protocol Labs
         url: https://protocol.ai/
-maturity: stable
 xref:
   - dom
   - test-methodology
+tags: ['meta']
+order: 1
 ---
-
-# Spec for Specs
 
 This document specifies the format and system used to create and maintain specifications for
 the interplanetary stack.

@@ -1,5 +1,8 @@
 ---
+title: Code of Conduct
+description: The code of conduct that all community participants are held to.
 date: 2015-03-19
+maturity: stable
 editors:
     - name: Juan Benet
       github: jbenet
@@ -15,9 +18,9 @@ editors:
       github: hsanjuan
     - name: Jim Garrison
       github: garrison
+tags: ['meta']
+order: 0
 ---
-
-# IPFS Community Code of Conduct
 
 We believe that our mission is best served in an environment that is friendly, safe, and accepting, and free from
 intimidation or harassment. Towards this end, certain behaviors and practices will not be tolerated.

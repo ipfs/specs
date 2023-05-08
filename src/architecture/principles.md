@@ -1,4 +1,11 @@
 ---
+title: IPFS Principles
+description: >
+  IPFS is a suite of specifications and tools that are defined by two key characteristics: content-addressing and
+  transport-agnosticity. This document provides context and details about these characteristics. In doing so it defines what
+  is or is not an IPFS implementation.
+date: 2023-03-28
+maturity: reliable
 editors:
   - name: Robin Berjon
     email: robin@berjon.com
@@ -9,11 +16,9 @@ editors:
     affiliation:
         name: Protocol Labs
         url: https://protocol.ai/
-maturity: reliable
-date: 2023-03-28
+tags: ['architecture']
+order: 0
 ---
-
-# IPFS Principles
 
 The IPFS stack is a suite of specifications and tools that share two key characteristics:
 

@@ -1,6 +1,11 @@
 ---
-maturity: reliable
+title: Subdomain Gateway Specification
+description: >
+  Subdomain Gateways are an extension of Path Gateways that enable website hosting
+  isolated per CID/name, while remaining compatible with web browsers relative pathing and
+  the security model of the web.
 date: 2023-01-28
+maturity: reliable
 editors:
   - name: Marcin Rataj
     github: lidel
@@ -17,9 +22,9 @@ editors:
 xref:
   - url
   - html
+tags: ['httpGateways', 'webHttpGateways']
+order: 3
 ---
-
-# Subdomain Gateway Specification
 
 Subdomain Gateway is an extension of :cite[path-gateway] that
 enables website hosting isolated per CID/name, while remaining compatible with
