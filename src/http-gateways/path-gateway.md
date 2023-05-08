@@ -1,6 +1,11 @@
 ---
-maturity: reliable
+title: Path Gateway Specification
+description: >
+  The most versatile form of IPFS Gateway is a Path Gateway. It exposes namespaces, such
+  as /ipfs/ and /ipns/ under an HTTP server root and provides basic primitives for integrating
+  IPFS resources within the existing HTTP stack.
 date: 2023-02-27
+maturity: reliable
 editors:
   - name: Marcin Rataj
     github: lidel
@@ -15,6 +20,7 @@ editors:
     url: https://hacdias.com/
 xref:
   - url
+tags: ['httpGateways', 'lowLevelHttpGateways']
 ---
 
 # Path Gateway Specification

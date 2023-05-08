@@ -1,14 +1,17 @@
 ---
-maturity: reliable
+title: DNSLink Gateway Specification
+description: >
+  DNSLink Gateways are an extension of Path Gateways that enable hosting a
+  specific content path under a specific DNS name.
 date: 2022-11-09
+maturity: reliable
 editors:
   - name: Marcin Rataj
     github: lidel
   - name: Thibault Meunier
     github: thibmeu
+tags: ['httpGateways', 'webHttpGateways']
 ---
-
-# DNSLink Gateway Specification
 
 DNSLink Gateway is an extension of :cite[path-gateway] that enables hosting a
 specific content path under a specific DNS name.
