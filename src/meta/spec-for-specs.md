@@ -15,6 +15,9 @@ editors:
     affiliation:
         name: Protocol Labs
         url: https://protocol.ai/
+  - name: Henrique Dias
+    url: https://hacdias.com/
+    github: hacdias
 xref:
   - dom
   - test-methodology
@@ -50,6 +53,8 @@ for this :ref[spec] looks like this:
 
 ```yaml
 ---
+title: Specification Title
+description: A short description for this specification.
 date: 1977-03-15
 editors:
     - name: Robin Berjon
@@ -65,10 +70,15 @@ maturity: stable
 xref:
   - dom
   - test-methodology
+tags: ['meta']
+order: 0
 ---
 ```
 
-The :ref[frontmatter] MUST contain an `editors` field, which is an array of objects describing people
+The :ref[frontmatter] MUST contain a `title` field, which is the title of the specification. In addition,
+it SHOULD include a `description` field with the description of the specification.
+
+The :ref[frontmatter] MUST also contain an `editors` field, which is an array of objects describing people
 who are responsible for editing this given :ref[spec]. The `editors` field MUST contain at least one
 person. The fields that describe a person are `name`, `email`, `url`, `github`, `twitter`, `mastodon`,
 and `affiliation` which is in turn an object with fields `name` and `url`. Each person as well as the
@@ -86,6 +96,14 @@ maturity levels currently supported are:
 - ![deprecated](https://img.shields.io/badge/status-deprecated-red.svg?style=flat-square)
 
 The `date` field is a `YYYY-MM-DD` specification of the last dated change to the spec.
+
+The `tags` field is an array with strings that indicate which group of specifications this particular
+specification is part of. For example, the specification you are currently reading, Specs for Specs,
+is part of the "meta" group of specifications.
+
+The `order` field is a numeric field that includes the order by which the specification will be displayed
+in the lists of specifications in the homepage and group pages. For this, `0` is the highest order, and `999`
+is the default value.
 
 ### Title & Sections
 
