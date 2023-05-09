@@ -1,6 +1,7 @@
 ---
 # IPIP number should  match its pull request number. After you open a PR,
 # please update title and update the filename to `ipip0000`.
+title: "IPIP-0000: InterPlanetary Improvement Proposal Template"
 date: YYYY-MM-DD
 ipip: proposal
 editors:
@@ -10,8 +11,6 @@ relatedIssues:
 order: 0000
 tags: ['ipips']
 ---
-
-# IPIP-0000: InterPlanetary Improvement Proposal Template
 
 ## Summary
 
