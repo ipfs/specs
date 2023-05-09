@@ -4,7 +4,7 @@ description: >
   The most versatile form of IPFS Gateway is a Path Gateway. It exposes namespaces, such
   as /ipfs/ and /ipns/ under an HTTP server root and provides basic primitives for integrating
   IPFS resources within the existing HTTP stack.
-date: 2023-02-27
+date: 2023-03-30
 maturity: reliable
 editors:
   - name: Marcin Rataj
@@ -138,6 +138,7 @@ For example:
 - [application/vnd.ipld.dag-cbor](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-cbor) – requests [IPLD Data Model](https://ipld.io/docs/data-model/) representation serialized into [DAG-CBOR format](https://ipld.io/docs/codecs/known/dag-cbor/). If the requested CID already has `dag-cbor` (0x71) codec,  data is validated as DAG-CBOR before being returned as-is. Invalid DAG-CBON produces HTTP Error 500.
 - [application/json](https://www.iana.org/assignments/media-types/application/json) – same as `application/vnd.ipld.dag-json`, unless the CID's codec already is `json` (0x0200). Then, the raw JSON block can be returned as-is without any conversion.
 - [application/cbor](https://www.iana.org/assignments/media-types/application/cbor) – same as `application/vnd.ipld.dag-cbor`, unless the CID's codec already is `cbor` (0x51). Then, the raw CBOR block can be returned as-is without any conversion.
+- [application/vnd.ipfs.ipns-record](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record) – requests a verifiable [IPNS Record](../ipns/IPNS.md#ipns-record) to be returned. Produces 400 Bad Request if the content is not under the IPNS namespace, or contains a path.
 
 ### `Range` (request header)
 
@@ -202,7 +203,8 @@ parameter, if present)
 
 Optional, `format=<format>` can be used to request specific response format.
 
-This is a URL-friendly alternative to sending an [`Accept`](#accept-request-header) header. These are the equivalents:
+This is a URL-friendly alternative to sending an [`Accept`](#accept-request-header) header.
+These are the equivalents:
 - `format=raw` → `Accept: application/vnd.ipld.raw`
 - `format=car` → `Accept: application/vnd.ipld.car`
 - `format=tar` → `Accept: application/x-tar`
@@ -210,6 +212,7 @@ This is a URL-friendly alternative to sending an [`Accept`](#accept-request-head
 - `format=dag-cbor` → `Accept: application/vnd.ipld.dag-cbor`
 - `format=json` → `Accept: application/json`
 - `format=cbor` → `Accept: application/cbor`
+- `format=ipns-record` → `Accept: application/vnd.ipfs.ipns-record`
 
 <!-- TODO Planned: https://github.com/ipfs/go-ipfs/issues/8769
 - `selector=<cid>`  can be used for passing a CID with [IPLD selector](https://ipld.io/specs/selectors)
@@ -575,7 +578,9 @@ The following response types require an explicit opt-in, can only be requested w
 - CAR (`?format=car`)
   - Arbitrary DAG as a verifiable CAR file or a stream, see [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car).
 - TAR (`?format=tar`)
-  - Deserialized UnixFS files and directories as a TAR file or a stream, see [IPIP-288](https://github.com/ipfs/specs/pull/288)
+  - Deserialized UnixFS files and directories as a TAR file or a stream, see :cite[ipip-0288].
+- IPNS Record
+  - Protobuf bytes representing a verifiable :cite[ipns-record] (multicodec `0x0300`)
 
 # Appendix: notes for implementers
 
