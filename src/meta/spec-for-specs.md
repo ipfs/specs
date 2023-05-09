@@ -89,8 +89,8 @@ The `date` field is a `YYYY-MM-DD` specification of the last dated change to the
 
 ### Title & Sections
 
-A :ref[spec] MUST have a title, which is to say an `h1` heading (`# Some Title` in Markdown). It also
-SHOULD have only one such title (every other heading should be `h2` or more) and have the title right
+A :ref[spec] MUST have a title, which is to say an `h1` heading (`title` field in the :ref[frontmatter]). It
+also SHOULD have only one such title (every other heading should be `h2` or more) and have the title right
 after the :ref[frontmatter]. The behaviour of multiple titles or titles positioned at random places in
 the :ref[spec] is undefined and has been shown to disappoint kittens under experimental conditions.
 
