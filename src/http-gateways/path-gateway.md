@@ -578,7 +578,7 @@ The following response types require an explicit opt-in, can only be requested w
 - CAR (`?format=car`)
   - Arbitrary DAG as a verifiable CAR file or a stream, see [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car).
 - TAR (`?format=tar`)
-  - Deserialized UnixFS files and directories as a TAR file or a stream, see [IPIP-288](https://github.com/ipfs/specs/pull/288)
+  - Deserialized UnixFS files and directories as a TAR file or a stream, see :cite[ipip-0288].
 - IPNS Record
   - Protobuf bytes representing a verifiable :cite[ipns-record] (multicodec `0x0300`)
 
