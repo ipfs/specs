@@ -6,6 +6,7 @@ date: 2023-02-23
 editors:
   - name: Marcin Rataj
     github: lidel
+    url: https://lidel.org/
   - name: Guillaume Michel
     github: guillaumemichel
   - name: Henrique Dias

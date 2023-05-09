@@ -9,6 +9,7 @@ maturity: reliable
 editors:
   - name: Marcin Rataj
     github: lidel
+    url: https://lidel.org/
   - name: Adrian Lanzafame
     github: lanzafame
   - name: Vasco Santos

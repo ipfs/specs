@@ -8,6 +8,7 @@ editors:
     github: aschmahmann
   - name: Marcin Rataj
     github: lidel
+    url: https://lidel.org/
 xref:
   - ipns-record
 tags: ['ipns']

@@ -9,6 +9,7 @@ maturity: reliable
 editors:
   - name: Marcin Rataj
     github: lidel
+    url: https://lidel.org/
 tags: ['httpGateways', 'lowLevelHttpGateways']
 order: 1
 ---

@@ -11,6 +11,7 @@ editors:
     github: justincjohnson
   - name: Marcin Rataj
     github: lidel
+    url: https://lidel.org/
 tags: ['httpGateways', 'webHttpGateways']
 order: 4
 ---

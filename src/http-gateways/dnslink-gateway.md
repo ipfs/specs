@@ -8,6 +8,7 @@ maturity: reliable
 editors:
   - name: Marcin Rataj
     github: lidel
+    url: https://lidel.org/
   - name: Thibault Meunier
     github: thibmeu
 tags: ['httpGateways', 'webHttpGateways']

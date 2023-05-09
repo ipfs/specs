@@ -12,6 +12,7 @@ editors:
     github: Stebalien
   - name: Marcin Rataj
     github: lidel
+    url: https://lidel.org/
   - name: Henrique Dias
     github: hacdias
     url: https://hacdias.com/
