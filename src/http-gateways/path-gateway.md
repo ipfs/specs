@@ -24,8 +24,6 @@ tags: ['httpGateways', 'lowLevelHttpGateways']
 order: 0
 ---
 
-# Path Gateway Specification
-
 The most versatile form of IPFS Gateway is a Path Gateway.
 
 It exposes namespaces like  `/ipfs/` and `/ipns/`  under HTTP server root and
