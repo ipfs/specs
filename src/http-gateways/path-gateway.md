@@ -580,7 +580,7 @@ The following response types require an explicit opt-in, can only be requested w
 - TAR (`?format=tar`)
   - Deserialized UnixFS files and directories as a TAR file or a stream, see [IPIP-288](https://github.com/ipfs/specs/pull/288)
 - IPNS Record
-  - Protobuf bytes representing a verifiable [IPNS Record](../ipns/IPNS.md#record-serialization-format) (multicodec `0x0300`)
+  - Protobuf bytes representing a verifiable :cite[ipns-record] (multicodec `0x0300`)
 
 # Appendix: notes for implementers
 
