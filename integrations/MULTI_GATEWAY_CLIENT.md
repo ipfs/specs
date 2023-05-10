@@ -1,8 +1,8 @@
-# IPIP 0000: Multi gateway client
+# IPIP-359: Multi gateway client
 
 - Start Date: 2022-12-16
 - Related Issues:
-  - None
+  - https://github.com/ipfs/specs/pull/359
 - Relies on specs:
   - IPIP-0280
 
