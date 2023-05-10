@@ -1,14 +1,20 @@
 ---
-maturity: reliable
+title: Web _redirects File Specification
+description: >
+  The Redirects File specification is an extension of the Subdomain Gateway and DNSLink Gateway specifications that
+  enables URL redirects or rewrites by adding redirect rules to a0 file stored underneath the root CID of a web
+  site.
 date: 2023-01-28
+maturity: reliable
 editors:
   - name: Justin Johnson
     github: justincjohnson
   - name: Marcin Rataj
     github: lidel
+    url: https://lidel.org/
+tags: ['httpGateways', 'webHttpGateways']
+order: 4
 ---
-
-# Web _redirects File Specification
 
 The Web Redirects File specification is an extension of the Subdomain Gateway and DNSLink Gateway specifications.
 

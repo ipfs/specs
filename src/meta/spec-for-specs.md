@@ -1,5 +1,10 @@
 ---
+title: Spec for Specs
+description: >
+  Specifies the format and system used to create and maintain specifications for
+  the interplanetary stack.
 date: 2023-03-14
+maturity: stable
 editors:
   - name: Robin Berjon
     email: robin@berjon.com
@@ -10,13 +15,15 @@ editors:
     affiliation:
         name: Protocol Labs
         url: https://protocol.ai/
-maturity: stable
+  - name: Henrique Dias
+    url: https://hacdias.com/
+    github: hacdias
 xref:
   - dom
   - test-methodology
+tags: ['meta']
+order: 2
 ---
-
-# Spec for Specs
 
 This document specifies the format and system used to create and maintain specifications for
 the interplanetary stack.
@@ -46,6 +53,8 @@ for this :ref[spec] looks like this:
 
 ```yaml
 ---
+title: Specification Title
+description: A short description for this specification.
 date: 1977-03-15
 editors:
     - name: Robin Berjon
@@ -61,10 +70,15 @@ maturity: stable
 xref:
   - dom
   - test-methodology
+tags: ['meta']
+order: 0
 ---
 ```
 
-The :ref[frontmatter] MUST contain an `editors` field, which is an array of objects describing people
+The :ref[frontmatter] MUST contain a `title` field, which is the title of the specification. In addition,
+it SHOULD include a `description` field with the description of the specification.
+
+The :ref[frontmatter] MUST also contain an `editors` field, which is an array of objects describing people
 who are responsible for editing this given :ref[spec]. The `editors` field MUST contain at least one
 person. The fields that describe a person are `name`, `email`, `url`, `github`, `twitter`, `mastodon`,
 and `affiliation` which is in turn an object with fields `name` and `url`. Each person as well as the
@@ -83,10 +97,18 @@ maturity levels currently supported are:
 
 The `date` field is a `YYYY-MM-DD` specification of the last dated change to the spec.
 
+The `tags` field is an array with strings that indicate which group of specifications this particular
+specification is part of. For example, the specification you are currently reading, Specs for Specs,
+is part of the "meta" group of specifications.
+
+The `order` field is a numeric field that includes the order by which the specification will be displayed
+in the lists of specifications in the homepage and group pages. For this, `0` is the highest order, and `999`
+is the default value.
+
 ### Title & Sections
 
-A :ref[spec] MUST have a title, which is to say an `h1` heading (`# Some Title` in Markdown). It also
-SHOULD have only one such title (every other heading should be `h2` or more) and have the title right
+A :ref[spec] MUST have a title, which is to say an `h1` heading (`title` field in the :ref[frontmatter]). It
+also SHOULD have only one such title (every other heading should be `h2` or more) and have the title right
 after the :ref[frontmatter]. The behaviour of multiple titles or titles positioned at random places in
 the :ref[spec] is undefined and has been shown to disappoint kittens under experimental conditions.
 

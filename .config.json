@@ -2,5 +2,8 @@
   "input": "src",
   "output": "out",
   "template": "template.html",
-  "baseURL": "https://specs.ipfs.tech"
+  "baseURL": "https://specs.ipfs.tech",
+  "github": {
+    "repository": "ipfs/specs"
+  }
 }

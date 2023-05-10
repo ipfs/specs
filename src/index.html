@@ -68,7 +68,7 @@ title: Home
           These documents define the architectural principles that IPFS is built upon, and can be used as tools to evaluate
           implementations and applications of IPFS.
         </p>
-        {% include 'specs/architecture.html' %}
+        {% include 'list.html', posts: collections.architecture %}
       </section>
       <section>
         <h3><a href="/meta/">Meta</a></h3>
@@ -77,7 +77,7 @@ title: Home
           project work: what the core values are, what the governance model is, how to produce documents,
           etc.
         </p>
-        {% include 'specs/meta.html' %}
+        {% include 'list.html', posts: collections.meta %}
       </section>
       <section>
         <h3><a href="/http-gateways/">HTTP Gateways</a></h3>
@@ -85,15 +85,23 @@ title: Home
           IPFS Gateway acts as a bridge between traditional HTTP clients and IPFS. Through the gateway, users can download files,
           directories and other IPLD data stored in IPFS as if they were stored in a traditional web server.
         </p>
-        {% include 'specs/http-gateways/http.html' %}
-        {% include 'specs/http-gateways/web.html' %}
+        {% include 'list.html', posts: collections.httpGateways %}
       </section>
       <section>
         <h3><a href="/ipns/">InterPlanetary Naming System</a></h3>
         <p>
           The InterPlanetary Naming System (IPNS) is a naming system responsible for creating, reading and updating mutable pointers to data.
         </p>
-        {% include 'specs/ipns.html' %}
+        {% include 'list.html', posts: collections.ipns %}
+      </section>
+      <section>
+        <h3><a href="/ipips/">InterPlanetary Improvement Proposals</a></h3>
+        <p>
+          InterPlanetary Improvement Proposals (IPIP) are an <a href="/meta/ipip-process">orderly mechanism</a> to consider
+          changes to the IPFS specification. They are not changes to the specification itself,
+          but their approval leads to a change in the specification.
+        </p>
+        {% include 'ipips-list.html' %}
       </section>
     </div>
   </section>
