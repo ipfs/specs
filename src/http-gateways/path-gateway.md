@@ -578,10 +578,11 @@ The following response types require an explicit opt-in, can only be requested w
 - Raw Block (`?format=raw`)
   - Opaque bytes, see [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw).
 - CAR (`?format=car`)
-  - A CAR file or a stream that contains all blocks required to trustless verify the expressed query, see [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car).
-    - Must contain, as the very first block, the block that hashes to the content root CID
-    - Must contain, immediately following the root block, all blocks encountered while traversing the expressed path in the order they were traversed
-    - Must contain, immediately following traversed path blocks, appropriate blocks in depth first traversal order required to verify the query expressed at the terminus of the path in [query parameters](#query-parameters-for-car-requests)
+  - A CAR file or a stream that contains all blocks required to trustlessly verify the requested content path query, see [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car) and :cite[trustless-gateway].
+  - **Note:** by default, block order in CAR response is not deterministic,
+    blocks can be returned in different order, depending on implementation
+    choices (traversal, speed at which blocks arrive from the network, etc).
+    An opt-in ordered CAR responses MAY be introduced in a future IPIP.
 - TAR (`?format=tar`)
   - Deserialized UnixFS files and directories as a TAR file or a stream, see :cite[ipip-0288].
 - IPNS Record
