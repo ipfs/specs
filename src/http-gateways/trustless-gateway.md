@@ -59,7 +59,7 @@ Same as GET, but does not return any payload.
 
 Same as in :cite[path-gateway], but with limited number of supported response types.
 
-## HTTP Request Headers
+## Request Headers
 
 ### `Accept` (request header)
 
@@ -73,6 +73,63 @@ Below response types MUST to be supported:
 - [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw) – requests a single, verifiable raw block to be returned
 - [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car) – disables IPLD/IPFS deserialization, requests a verifiable CAR stream to be returned
 - [application/vnd.ipfs.ipns-record](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record) – requests a verifiable :cite[ipns-record] (multicodec `0x0300`).
+
+## Request Query Parameters
+
+### :dfn[dag-scope] (request query parameter)
+
+Optional, `dag-scope=(block|entity|all)` with default value `all`, only available for CAR requests.
+
+Describes the shape of the DAG fetched the terminus of the specified path whose blocks
+are included in the returned CAR file after the blocks required to traverse
+path segments.
+
+- `block` - Only the root block at the end of the path is returned after blocks
+  required to verify the specified path segments.
+
+- `entity` - For queries that traverse UnixFS data, `entity` roughly means return
+  blocks needed to verify the terminating element of the requested content path.
+  For UnixFS, all the blocks needed to read an entire UnixFS file, or enumerate a UnixFS directory.
+  For all queries that reference non-UnixFS data, `entity` is equivalent to `block`
+
+- `all` - Transmit the entire contiguous DAG that begins at the end of the path
+  query, after blocks required to verify path segments
+
+When present, returned `Etag` must include unique prefix based on the passed scope type.
+
+### :dfn[entity-bytes] (request query parameter)
+
+Optional, `entity-bytes=from:to` with the default value `0:*`, only available for CAR requests.
+Serves as a trustless form of an HTTP Range Request.
+
+When the terminating entity at the end of the specified content path can be
+interpreted as a continuous array of bytes (such as a UnixFS file), returns
+only the minimal set of blocks required to verify the specified byte range of
+said entity.
+
+Allowed values for `from` and `to` are positive integers where `to` >= `from`, which
+limit the return blocks to needed to satisfy the range `[from,to]`:
+
+- `from` value gives the byte-offset of the first byte in a range.
+- `to` value gives the byte-offset of the last byte in the range; that is,
+the byte positions specified are inclusive.  Byte offsets start at zero.
+
+If the entity at the end of the path cannot be interpreted as a continuous
+array of bytes (such as a DAG-CBOR/JSON map, or UnixFS directory), this
+parameter has no effect.
+
+The following additional values are supported:
+
+- `*` can be substituted for end-of-file
+  - `entity-bytes=0:*` is the entire file (a verifiable version of HTTP request for `Range: 0-`)
+- Negative numbers can be used for referring to bytes from the end of a file
+  - `entity-bytes=-1024:*` is the last 1024 bytes of a file
+    (verifiable version of HTTP request for `Range: -1024`)
+  - It is also permissible (unlike with HTTP Range Requests) to ask for the
+    range of 500 bytes from the beginning of the file to 1000 bytes from the
+    end: `entity-bytes=499:-1000`
+
+When present, returned `Etag` must include unique prefix based on the passed range.
 
 # HTTP Response
 
