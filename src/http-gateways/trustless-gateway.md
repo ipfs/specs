@@ -4,7 +4,7 @@ description: >
   Trustless Gateways are a minimal subset of Path Gateways that allow light IPFS
   clients to retrieve data behind a CID and verify its integrity without delegating any
   trust to the gateway itself.
-date: 2023-03-30
+date: 2023-04-17
 maturity: reliable
 editors:
   - name: Marcin Rataj
