@@ -1,16 +1,17 @@
-# Routing v1 HTTP API
-
-![reliable](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square) Delegated Content Routing HTTP API
-
-**Author(s)**:
-
-- Gus Eggert
-
-**Maintainer(s)**:
-
-* * *
-
-**Abstract**
+---
+title: Routing V1 HTTP API
+description: >
+  Delegated content routing is a mechanism for IPFS implementations to use for
+  offloading content routing to another process. This specification describes
+  an HTTP API for delegated content routing.
+date: 2023-03-22
+maturity: reliable
+editors:
+  - name: Gus Eggert
+    github: guseggert 
+order: 0
+tags: ['routing']
+---
 
 "Delegated content routing" is a mechanism for IPFS implementations to use for offloading content routing to another process/server. This spec describes an HTTP API for delegated content routing.
 

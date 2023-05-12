@@ -70,7 +70,7 @@ over arbitrary transports using a CID*. As Juan Benet once put it,
 Conversely, any system that exposes interactions with resources based on CIDs is
 an IPFS implementation. There are
 [many contexts in which CIDs can be used for addressing](https://docs.ipfs.tech/how-to/address-ipfs-on-web/)
-and [content routing delegation](https://github.com/ipfs/specs/blob/main/routing/ROUTING_V1_HTTP.md)
+and content routing delegation (:cite[http-routing-v1])
 can support a wealth of interaction options by resolving CIDs.
 
 ## Robustness
