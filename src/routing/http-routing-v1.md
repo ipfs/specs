@@ -11,6 +11,9 @@ editors:
     github: guseggert
   - name: Masih H. Derkani
     github: masih
+  - name: Henrique Dias
+    url: https://hacdias.com/
+    github: hacdias
 xref:
   - ipns-record
 order: 0
@@ -144,7 +147,23 @@ This API does not support pagination, but optional pagination can be added in a 
 
 ## Streaming
 
-This API does not currently support streaming, however it can be added in the future through a backwards-compatible update by using a content type other than `application/json`.
+JSON-based endpoints support streaming requests made by sending an `Accept` HTTP Header containing
+`application/x-ndjson`. The response will be formatted as [Newline Delimited JSON (ndjson)](https://github.com/ndjson/ndjson-spec),
+with one *read provider record* per line:
+
+
+```json
+{"Protocol": "<protocol_name>", "Schema": "<schema>", ...}
+{"Protocol": "<protocol_name>", "Schema": "<schema>", ...}
+{"Protocol": "<protocol_name>", "Schema": "<schema>", ...}
+...
+```
+
+Streaming is backwards-compatible with clients that do not support streaming. Please note the following:
+
+- Requests without an `Accept` header MUST default to regular, non-streaming, responses.
+- The server MAY respond with non-streaming response even if the client requests streaming.
+- The server MUST NOT respond with streaming response if the client did not request so.
 
 ## Error Codes
 
