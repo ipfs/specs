@@ -95,6 +95,14 @@ title: Home
         {% include 'list.html', posts: collections.ipns %}
       </section>
       <section>
+        <h3><a href="/routing/">Routing</a></h3>
+        <p>
+          Content routing is the way to determine where to find a given CID on the network;
+          specifically, which network peers provide specific CIDs. 
+        </p>
+        {% include 'list.html', posts: collections.routing %}
+      </section>
+      <section>
         <h3><a href="/ipips/">InterPlanetary Improvement Proposals</a></h3>
         <p>
           InterPlanetary Improvement Proposals (IPIP) are an <a href="/meta/ipip-process">orderly mechanism</a> to consider

@@ -34,8 +34,8 @@ Nothing in this spec repository is `permanent` or even `stable` yet. Most of the
 The specs contained in this and related repositories are:
 
 - **IPFS Protocol:**
+  - [IPFS Guide](https://docs.ipfs.tech/) - to start your IPFS journey
   - [Protocol Architecture Overview](./ARCHITECTURE.md) - the top-level spec and the stack
-  - [Other IPFS Overviews](/overviews) - quick overviews of the various parts of IPFS
 - **User Interface (aka Public APIs):**
   - [HTTP Gateways](./http-gateways/) - implementation agnostic interfaces for accessing content-addressed data over HTTP
   - IPFS implementations may provide additional interfaces, for example:
