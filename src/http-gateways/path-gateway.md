@@ -21,6 +21,7 @@ editors:
     url: https://hacdias.com/
 xref:
   - url
+  - trustless-gateway
 tags: ['httpGateways', 'lowLevelHttpGateways']
 order: 0
 ---
@@ -216,11 +217,11 @@ These are the equivalents:
 
 ### `dag-scope` (request query parameter)
 
-Only used on CAR requests, same as [dag-scope](/http-gateways/trustless-gateway/#dag-scope-request-query-parameter) from :cite[trustless-gateway]
+Only used on CAR requests, same as :ref[dag-scope] from :cite[trustless-gateway].
 
 ### `entity-bytes` (request query parameter)
 
-Only used on CAR requests, same as [entity-bytes](/http-gateways/trustless-gateway/#entity-bytes-request-query-parameter) from :cite[trustless-gateway]
+Only used on CAR requests, same as :ref[entity-bytes] from :cite[trustless-gateway].
 
 # HTTP Response
 
