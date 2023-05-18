@@ -1,23 +1,27 @@
 ---
 title: Routing V1 HTTP API
 description: >
-  Delegated content routing is a mechanism for IPFS implementations to use for
-  offloading content routing to another process. This specification describes
+  Delegated routing is a mechanism for IPFS implementations to use for offloading
+  content routing and naming to another process/server. This specification describes
   an HTTP API for delegated content routing.
 date: 2023-03-22
 maturity: reliable
 editors:
   - name: Gus Eggert
-    github: guseggert 
+    github: guseggert
+  - name: Masih H. Derkani
+    github: masih
+xref:
+  - ipns-record
 order: 0
 tags: ['routing']
 ---
 
-"Delegated content routing" is a mechanism for IPFS implementations to use for offloading content routing to another process/server. This specification describes an HTTP API for delegated content routing.
+Delegated routing is a mechanism for IPFS implementations to use for offloading content routing and naming to another process/server. This specification describes an HTTP API for delegated content routing.
 
 ## API Specification
 
-The Delegated Content Routing Routing HTTP API uses the `application/json` content type by default.
+The Routing HTTP API uses the `application/json` content type by default. For :ref[IPNS Names], the verifiable [`application/vnd.ipfs.ipns-record`][application/vnd.ipfs.ipns-record] content type is used.
 
 As such, human-readable encodings of types are preferred. This specification may be updated in the future with a compact `application/cbor` encoding, in which case compact encodings of the various types would be used.
 
@@ -63,33 +67,71 @@ Where:
 
 Specifications for some transfer protocols are provided in the "Transfer Protocols" section.
 
+### IPNS Records
+
+:ref[IPNS Records] are serialized using the verifiable [`application/vnd.ipfs.ipns-record`](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record) format. For more details, read the specification :cite[ipns-record].
+
 ## API
 
-### `GET /routing/v1/providers/{CID}`
+### `GET /routing/v1/providers/{cid}`
 
-#### Response codes
+#### Path Parameters
 
-- `200` (OK): the response body contains 0 or more records
-- `404` (Not Found): must be returned if no matching records are found
-- `422` (Unprocessable Entity): request does not conform to schema or semantic constraints
+- `cid` is the [CID](https://github.com/multiformats/cid) to fetch provider records for.
+
+#### Response Status Codes
+
+- `200` (OK): the response body contains 0 or more records.
+- `404` (Not Found): must be returned if no matching records are found.
+- `422` (Unprocessable Entity): request does not conform to schema or semantic constraints.
 
 #### Response Body
 
 ```json
 {
-    "Providers": [
-        {
-            "Protocol": "<protocol_name>",
-            "Schema": "<schema>",
-            ...
-        }
-    ]
+  "Providers": [
+    {
+      "Protocol": "<protocol_name>",
+      "Schema": "<schema>",
+      ...
+    }
+  ]
 }
 ```
 
 Response limit: 100 providers
 
 Each object in the `Providers` list is a *read provider record*.
+
+### `GET /routing/v1/ipns/{name}`
+
+#### Path Parameters
+
+- `name` is the :ref[IPNS Name] to resolve.
+
+#### Response Status Codes
+
+- `200` (OK): the response body contains the :ref[IPNS Record] for the given :ref[IPNS Name].
+- `404` (Not Found): must be returned if no matching records are found.
+
+#### Response Body
+
+The response body contains a [`application/vnd.ipfs.ipns-record`][application/vnd.ipfs.ipns-record] serialized :ref[IPNS Record].
+
+### `PUT /routing/v1/ipns/{name}`
+
+#### Path Parameters
+
+- `name` is the :ref[IPNS Name] to publish.
+
+#### Request Body
+
+The content body must be a [`application/vnd.ipfs.ipns-record`][application/vnd.ipfs.ipns-record] serialized :ref[IPNS Record], which matches the `name` path parameter.
+
+#### Response Status Codes
+
+- `200` (OK): the provided :ref[IPNS Record] was published.
+- `400` (Bad Request): the provided :ref[IPNS Record] or :ref[IPNS Name] are not valid.
 
 ## Pagination
 
@@ -101,9 +143,9 @@ This API does not currently support streaming, however it can be added in the fu
 
 ## Error Codes
 
-- `501` (Not Implemented): must be returned if a method/path is not supported
-- `429` (Too Many Requests): may be returned along with optional [Retry-After](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After) header to indicate to the caller that it is issuing requests too quickly
-- `400` (Bad Request): must be returned if an unknown path is requested
+- `400` (Bad Request): must be returned if an unknown path is requested.
+- `429` (Too Many Requests): may be returned along with optional [Retry-After](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After) header to indicate to the caller that it is issuing requests too quickly.
+- `501` (Not Implemented): must be returned if a method/path is not supported.
 
 ## CORS and Web Browsers
 
@@ -136,10 +178,10 @@ Specification: [ipfs/specs/BITSWAP.md](https://github.com/ipfs/specs/blob/main/B
 
 ```json
 {
-    "Protocol": "transport-bitswap",
-    "Schema": "bitswap",
-    "ID": "12D3K...",
-    "Addrs": ["/ip4/..."]
+  "Protocol": "transport-bitswap",
+  "Schema": "bitswap",
+  "ID": "12D3K...",
+  "Addrs": ["/ip4/..."]
 }
 ```
 
@@ -159,13 +201,13 @@ Specification: [ipfs/go-graphsync/blob/main/docs/architecture.md](https://github
 
 ```json
 {
-    "Protocol": "transport-graphsync-filecoinv1",
-    "Schema": "graphsync-filecoinv1",
-    "ID": "12D3K...",
-    "Addrs": ["/ip4/..."],
-    "PieceCID": "<cid>",
-    "VerifiedDeal": true,
-    "FastRetrieval": true
+  "Protocol": "transport-graphsync-filecoinv1",
+  "Schema": "graphsync-filecoinv1",
+  "ID": "12D3K...",
+  "Addrs": ["/ip4/..."],
+  "PieceCID": "<cid>",
+  "VerifiedDeal": true,
+  "FastRetrieval": true
 }
 ```
 
@@ -180,3 +222,4 @@ Specification: [ipfs/go-graphsync/blob/main/docs/architecture.md](https://github
 [multiaddr]: https://github.com/multiformats/multiaddr#specification
 [peer-id]: https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md
 [peer-id-representation]: https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#string-representation
+[application/vnd.ipfs.ipns-record]: https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record
