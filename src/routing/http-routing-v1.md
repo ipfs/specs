@@ -102,6 +102,25 @@ Response limit: 100 providers
 
 Each object in the `Providers` list is a *read provider record*.
 
+## Peers API
+
+### `GET /routing/v1/peers/{peer-id}`
+
+#### Path Parameters
+
+- `peer-id` is the [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md) to fetch peer records for,
+represented as a CIDv1 encoded with `libp2p-key` codec.
+
+#### Response Status Codes
+
+- `200` (OK): the response body contains the peer record.
+- `404` (Not Found): must be returned if no matching records are found.
+- `422` (Unprocessable Entity): request does not conform to schema or semantic constraints.
+
+#### Response Body
+
+A [`peer` schema record](#peer).
+
 ## IPNS API
 
 ### `GET /routing/v1/ipns/{name}`
@@ -198,6 +217,28 @@ limits, allowing every site to query the API for results:
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: GET, OPTIONS
 ```
+
+## Known Schemas
+
+This section contains a non-exhaustive list of known schemas that MAY be supported by clients and servers.
+
+### Peer
+
+The `peer` schema represents an arbitrary peer.
+
+```json
+{
+  "Schema": "peer",
+  "ID": "12D3K...",
+  "Addrs": ["/ip4/..."],
+  "Protocols": ["transport-bitswap", ...]
+}
+```
+
+- `ID`: the [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md).
+- `Addrs`: a list of known [multiaddrs][multiaddr] for this peer. This list MAY be incomplete.
+- `Protocols`: a list of protocols known to be supported by this peer. 
+  - If empty, it means the server is missing protocol information, and the client should use `ID` and `Addrs` to connect to the peer and use the [libp2p identify protocol](https://github.com/libp2p/specs/tree/master/identify) to learn about supported ones.
 
 ## Known Transfer Protocols
 
