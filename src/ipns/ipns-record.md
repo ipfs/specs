@@ -94,7 +94,7 @@ Note:
 
 ## IPNS Name
 
-IPNS Name is a [Multihash](https://docs.ipfs.io/concepts/glossary/#multihash)
+:dfn[IPNS Name] is a [Multihash](https://docs.ipfs.io/concepts/glossary/#multihash)
 of a serialized `PublicKey`.
 
 If a `PublicKey` is small, it can be inlined inside of a multihash using the `identity` function.
@@ -113,7 +113,7 @@ and refer to IPNS addresses as `/ipns/{ipns-name}` (or `/ipns/{libp2p-key}`).
 
 ## IPNS Record
 
-A logical IPNS record is a data structure containing the following fields:
+A logical :dfn[IPNS Record] is a data structure containing the following fields:
 
 - **Value** (bytes)
   - It can be any path, such as a `/ipns/{ipns-key}` path to another IPNS record, a [DNSLink](https://dnslink.dev/) path (`/ipns/example.com`) or an immutable IPFS path (`/ipfs/baf...`).
