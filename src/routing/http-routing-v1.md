@@ -13,21 +13,21 @@ order: 0
 tags: ['routing']
 ---
 
-"Delegated content routing" is a mechanism for IPFS implementations to use for offloading content routing to another process/server. This spec describes an HTTP API for delegated content routing.
+"Delegated content routing" is a mechanism for IPFS implementations to use for offloading content routing to another process/server. This specification describes an HTTP API for delegated content routing.
 
 ## API Specification
 
 The Delegated Content Routing Routing HTTP API uses the `application/json` content type by default.
 
-As such, human-readable encodings of types are preferred. This spec may be updated in the future with a compact `application/cbor` encoding, in which case compact encodings of the various types would be used.
+As such, human-readable encodings of types are preferred. This specification may be updated in the future with a compact `application/cbor` encoding, in which case compact encodings of the various types would be used.
 
 ## Common Data Types
 
-- CIDs are always string-encoded using a [multibase](https://github.com/multiformats/multibase)-encoded [CIDv1](https://github.com/multiformats/cid#cidv1).
-- Multiaddrs are string-encoded according to the [human-readable multiaddr specification](https://github.com/multiformats/multiaddr#specification)
-- Peer IDs are string-encoded according [PeerID string representation specification](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#string-representation)
-- Multibase bytes are string-encoded according to [the Multibase spec](https://github.com/multiformats/multibase), and *should* use base64.
-- Timestamps are Unix millisecond epoch timestamps
+- CIDs are always string-encoded using a [multibase]-encoded [CIDv1].
+- Multiaddrs are string-encoded according to the [human-readable multiaddr specification][multiaddr].
+- Peer IDs are string-encoded according [PeerID string representation specification][peer-id-representation].
+- Multibase bytes are string-encoded according to [the Multibase spec][multibase], and SHOULD use base64.
+- Timestamps are Unix millisecond epoch timestamps.
 
 Until required for business logic, servers should treat these types as opaque strings, and should preserve unknown JSON fields.
 
@@ -143,7 +143,7 @@ Specification: [ipfs/specs/BITSWAP.md](https://github.com/ipfs/specs/blob/main/B
 }
 ```
 
-- `ID`: the [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md) to contact
+- `ID`: the [Peer ID][peer-id] to contact
 - `Addrs`: a list of known multiaddrs for the peer
   - This list may be incomplete or incorrect and should only be treated as *hints* to improve performance by avoiding extra peer lookups
 
@@ -169,8 +169,14 @@ Specification: [ipfs/go-graphsync/blob/main/docs/architecture.md](https://github
 }
 ```
 
-- `ID`: the peer ID of the provider
+- `ID`: the [Peer ID][peer-id] of the provider
 - `Addrs`: a list of known multiaddrs for the provider
 - `PieceCID`: the CID of the [piece](https://spec.filecoin.io/systems/filecoin_files/piece/#section-systems.filecoin_files.piece) within which the data is stored
 - `VerifiedDeal`: whether the deal corresponding to the data is verified
 - `FastRetrieval`: whether the provider claims there is an unsealed copy of the data available for fast retrieval
+
+[multibase]: https://github.com/multiformats/multibase
+[CIDv1]: https://github.com/multiformats/cid#cidv1
+[multiaddr]: https://github.com/multiformats/multiaddr#specification
+[peer-id]: https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md
+[peer-id-representation]: https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#string-representation
