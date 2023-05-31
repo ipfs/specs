@@ -20,7 +20,7 @@ order: 0
 tags: ['routing']
 ---
 
-Delegated routing is a mechanism for IPFS implementations to use for offloading content routing and naming to another process/server. This specification describes an HTTP API for delegated content routing.
+Delegated routing is a mechanism for IPFS implementations to use for offloading content routing and naming to another process/server. This specification describes a vendor-agnostic HTTP API for delegated content routing.
 
 ## API Specification
 
@@ -147,23 +147,34 @@ This API does not support pagination, but optional pagination can be added in a 
 
 ## Streaming
 
-JSON-based endpoints support streaming requests made by sending an `Accept` HTTP Header containing
-`application/x-ndjson`. The response will be formatted as [Newline Delimited JSON (ndjson)](https://github.com/ndjson/ndjson-spec),
-with one *read provider record* per line:
+JSON-based endpoints support streaming requests made
+with `Accept: application/x-ndjson` HTTP Header.
 
+Steaming responses are formatted as
+[Newline Delimited JSON (ndjson)](https://github.com/ndjson/ndjson-spec),
+with one result per line:
 
 ```json
-{"Protocol": "<protocol_name>", "Schema": "<schema>", ...}
-{"Protocol": "<protocol_name>", "Schema": "<schema>", ...}
-{"Protocol": "<protocol_name>", "Schema": "<schema>", ...}
+{"Schema": "<schema>", ...}
+{"Schema": "<schema>", ...}
+{"Schema": "<schema>", ...}
 ...
 ```
 
-Streaming is backwards-compatible with clients that do not support streaming. Please note the following:
+:::note
 
-- Requests without an `Accept` header MUST default to regular, non-streaming, responses.
-- The server MAY respond with non-streaming response even if the client requests streaming.
-- The server MUST NOT respond with streaming response if the client did not request so.
+Streaming is opt-in and backwards-compatibile with clients and servers that do
+not support streaming:
+
+- Requests without the `Accept: application/x-ndjson` header MUST default to
+  regular, non-streaming, JSON responses.
+- Legacy server MAY respond with non-streaming `application/json` response even
+  if the client requested streaming. It is up to the client to inspect
+  the `Content-Type` header before parsing the response.
+- The server MUST NOT respond with streaming response if the client did not
+  explicitly request so.
+
+:::
 
 ## Error Codes
 
