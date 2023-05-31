@@ -159,6 +159,8 @@ IPNS records are stored locally, as well as spread across the network, in order 
 For storing this structured data at rest and on the wire, we use `IpnsEntry` encoded as [protobuf](https://github.com/google/protobuf), which is a language-neutral, platform neutral extensible mechanism for serializing structured data.
 The extensible part of IPNS Record is placed in `IpnsEntry.data` field, which itself is encoded using a strict and deterministic subset of CBOR named [DAG-CBOR](https://ipld.io/specs/codecs/dag-cbor/spec/).
 
+This canonical serialization format uses the [`application/vnd.ipfs.ipns-record`](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record) content type.
+
 ```protobuf
 message IpnsEntry {
  enum ValidityType {
@@ -196,10 +198,14 @@ message IpnsEntry {
 }
 ```
 
-Notes:
+:::issue
 
-- For legacy reasons, some values must be stored in both `IpnsEntry` protobuf and `IpnsEntry.data` CBOR.
-  This should not be ignored, as it impacts interoperability with old software.
+For legacy reasons, some values must be stored in both `IpnsEntry` protobuf **and** `IpnsEntry.data` CBOR.
+This should not be ignored, as it impacts interoperability with old software.
+
+Opt-in lean IPNS Records are discussed in [ipfs/specs#376](https://github.com/ipfs/specs/issues/376).
+
+:::
 
 ### Record Size Limit
 
