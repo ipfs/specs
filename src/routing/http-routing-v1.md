@@ -67,11 +67,7 @@ Where:
 
 Specifications for some transfer protocols are provided in the "Transfer Protocols" section.
 
-### IPNS Records
-
-:ref[IPNS Records] are serialized using the verifiable [`application/vnd.ipfs.ipns-record`](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record) format. For more details, read the specification :cite[ipns-record].
-
-## API
+## Content Providers API
 
 ### `GET /routing/v1/providers/{cid}`
 
@@ -103,35 +99,44 @@ Response limit: 100 providers
 
 Each object in the `Providers` list is a *read provider record*.
 
+## IPNS API
+
 ### `GET /routing/v1/ipns/{name}`
 
 #### Path Parameters
 
-- `name` is the :ref[IPNS Name] to resolve.
+- `name` is the :ref[IPNS Name] to resolve, encoded as CIDv1.
 
 #### Response Status Codes
 
 - `200` (OK): the response body contains the :ref[IPNS Record] for the given :ref[IPNS Name].
 - `404` (Not Found): must be returned if no matching records are found.
+- `406` (Not Acceptable): requested content type is missing or not supported. Error message returned in body should inform the user to retry with `Accept: application/vnd.ipfs.ipns-record`.
+
+#### Response Headers
+
+- `Etag`: a globally unique opaque string used for HTTP caching. MUST be derived from the protobuf record returned in the body.
+- `Cache-Control: max-age={TTL}`: cache TTL returned with :ref[IPNS Record] that has `IpnsEntry.data[TTL] > 0`. When present, SHOULD match the TTL value from the record. When record was not found (HTTP 404) or has no TTL (value is `0`), implementation SHOULD default to `max-age=60`.
 
 #### Response Body
 
-The response body contains a [`application/vnd.ipfs.ipns-record`][application/vnd.ipfs.ipns-record] serialized :ref[IPNS Record].
+The response body contains a  :ref[IPNS Record] serialized using the verifiable [`application/vnd.ipfs.ipns-record`](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record) protobuf format.
 
 ### `PUT /routing/v1/ipns/{name}`
 
 #### Path Parameters
 
-- `name` is the :ref[IPNS Name] to publish.
+- `name` is the :ref[IPNS Name] to publish, encoded as CIDv1.
 
 #### Request Body
 
-The content body must be a [`application/vnd.ipfs.ipns-record`][application/vnd.ipfs.ipns-record] serialized :ref[IPNS Record], which matches the `name` path parameter.
+The content body must be a [`application/vnd.ipfs.ipns-record`][application/vnd.ipfs.ipns-record] serialized :ref[IPNS Record], with a valid signature matching the `name` path parameter.
 
 #### Response Status Codes
 
 - `200` (OK): the provided :ref[IPNS Record] was published.
 - `400` (Bad Request): the provided :ref[IPNS Record] or :ref[IPNS Name] are not valid.
+- `406` (Not Acceptable): submitted content type is not supported. Error message returned in body should inform the user to retry with `Content-Type: application/vnd.ipfs.ipns-record`.
 
 ## Pagination
 
