@@ -1,12 +1,25 @@
-# IPIP 0342: Content Router Ambient Discovery
-
-- Start Date: 2022-11-11
-- Related Issues:
+---
+title: "IPIP-0342: Content Router Ambient Discovery"
+date: 2022-11-11
+ipip: proposal
+editors:
+  - name: Will Scott
+    github: willscott
+  - name: Masih Derkani
+    github: masih
+relatedIssues:
   - https://hackmd.io/bh4-SCWfTBG2vfClG0NUFg
   - https://github.com/ipfs/kubo/issues/9150
   - https://github.com/filecoin-project/storetheindex/issues/823
+order: 342
+tags: ['ipips']
+---
 
 ## Summary
+
+Design discovery and ranking of public contnet routers on the network.
+
+## Motivation
 
 The Interplanetary stack has slowly opened itself to support extensibility of
 the content routing subsystem. This extensibility is used today by network
@@ -25,9 +38,7 @@ other systems in the (protocol design)[#1-content-routing-as-a-libp2p-protocol],
 but otherwise leave the concrete design for other systems to subsequent
 IPIPs.
 
-## Motivation
-
-There is currently not a process by which IPFS nodes can discover alernative
+There is currently not a process by which IPFS nodes can use alernative
 content routing systems automatically. This has led to a reliance on
 centralized systems, like the hydra boosters, to fill the gap and offer
 content only available in network indexers to current IPFS nodes. This strategy
@@ -213,9 +224,12 @@ table of content  routers.
 
 ## Test fixtures
 
-TK is a CID currently only available through the content routing system,
-and not through the IPFS DHT. This is a piece of content that can be queried
-to validate the presence of alternative content routing systems.
+A random CID should be generated that is only available through a
+non-DHT content routing system. This is a piece of content can then be 
+queried to validate the presence of alternative content routing systems.
+
+An example service that can be used as part of testing is at
+https://github.com/willscott/ipni-minimal-publisher
 
 ## Design rationale
 
@@ -261,7 +275,7 @@ queries limited to the IPFS DHT
 
 ### Compatibility
 
-Nodes which do not upgrade to support this IPIP will be limited to the sub-set of
+Nodes which do not implment this IPIP will be limited to the sub-set of
 content available in the DHT. this will potentially degrade over time as more
 large providers limit their publishing per the [IPNI](https://github.com/ipni)
 ingestion protocol.
