@@ -34,11 +34,10 @@ Nothing in this spec repository is `permanent` or even `stable` yet. Most of the
 The specs contained in this and related repositories are:
 
 - **IPFS Protocol:**
+  - [IPFS Guide](https://docs.ipfs.tech/) - to start your IPFS journey
   - [Protocol Architecture Overview](./ARCHITECTURE.md) - the top-level spec and the stack
-  - [Other IPFS Overviews](/overviews) - quick overviews of the various parts of IPFS
 - **User Interface (aka Public APIs):**
   - [HTTP Gateways](./http-gateways/) - implementation agnostic interfaces for accessing content-addressed data over HTTP
-  - [REFRAME](./reframe/) - protocol designed for request-response messages that is sufficiently generic and extensible to evolve over time as new needs for it arise
   - IPFS implementations may provide additional interfaces, for example:
     - [Legacy HTTP RPC API exposed by Kubo (go-ipfs)](https://docs.ipfs.io/reference/http/api/)
     - [Programmatic Core API for JavaScript](https://github.com/ipfs/js-ipfs/tree/master/docs/core-api#readme)

@@ -21,7 +21,7 @@ Note, this document is not meant to be an introduction of the concepts in IPFS a
 - 1. IPFS and the Merkle DAG
 - 2. Nodes and Network Model
 - 3. The Stack
-- 4. Applications and Datastructures -- on top of IPFS
+- 4. Applications and data structures -- on top of IPFS
 - 5. Lifetime of fetching an object
 - 6. IPFS User Interfaces
 
@@ -31,7 +31,7 @@ At the heart of IPFS is the MerkleDAG, a directed acyclic graph whose links are 
 
 - authenticated: content can be hashed and verified against the link
 - permanent: once fetched, objects can be cached forever
-- universal: any datastructure can be represented as a merkledag
+- universal: any data structure can be represented as a merkledag
 - decentralized: objects can be created by anyone, without centralized writers
 
 In turn, these yield properties for the system as a whole:
@@ -41,7 +41,7 @@ In turn, these yield properties for the system as a whole:
 - objects can be cached permanently
 - objects can be created and used offline
 - networks can be partitioned and merged
-- any datastructure can be modelled and distributed
+- any data structure can be modelled and distributed
 - (todo: list more)
 
 IPFS is a stack of network protocols that organize agent networks to create, publish, distribute, serve, and download merkledags. It is the authenticated, decentralized, permanent web.
@@ -78,7 +78,7 @@ IPFS has a stack of modular protocols. Each layer may have multiple implementati
 IPFS has five layers:
 
 - **naming** - a self-certifying PKI namespace (IPNS)
-- **merkledag** - datastructure format (thin waist)
+- **merkledag** - data structure format (thin waist)
 - **exchange** - block transport and replication
 - **routing** - locating peers and objects
 - **network** - establishing connections between peers
@@ -103,7 +103,7 @@ The IPFS **Routing** layer serves two important purposes:
 - **peer routing** -- to find other nodes
 - **content routing** -- to find data published to ipfs
 
-The Routing Sytem is an interface that is satisfied by various kinds of implementations. For example:
+The Routing System is an interface that is satisfied by various kinds of implementations. For example:
 
 - **DHTs:** perhaps the most common, DHTs can be used to create a semi-persistent routing record distributed cache in the network.
 - **mdns:** used to find services advertised locally. `mdns` (or `dnssd`) is a local discovery service. We will be using it.
@@ -119,12 +119,12 @@ The IPFS **Block Exchange** takes care of negotiating bulk data transfers. Once 
 The Block Exchange is an interface that is satisfied by various kinds of implementations. For example:
 
 - **Bitswap:** our main protocol for exchanging data. It is a generalization
-  of BitTorrent to work with arbitrary (and not known apriori) DAGs.
+  of BitTorrent to work with arbitrary (and not known a priori) DAGs.
 - **HTTP:** a simple exchange can be implemented with HTTP clients and servers.
 
 ## 3.4. Merkledag -- making sense of data
 
-[As discussed above](#IPFS-and-the-Merkle-DAG), the IPFS **merkledag** (also known as IPLD - InterPlanetary Linked Data) is the datastructure at the heart of IPFS. It is an [acyclic directed graph](http://en.wikipedia.org/wiki/Directed_acyclic_graph) whose edges are hashes. Another name for it is the merkleweb.
+[As discussed above](#IPFS-and-the-Merkle-DAG), the IPFS **merkledag** (also known as IPLD - InterPlanetary Linked Data) is the data structure at the heart of IPFS. It is an [acyclic directed graph](http://en.wikipedia.org/wiki/Directed_acyclic_graph) whose edges are hashes. Another name for it is the merkleweb.
 
 The merkledag data structure is:
 
@@ -141,7 +141,7 @@ message MDagNode {
 }
 ```
 
-The merkledag is the "thin waist" of authenticated datastructures. It is a minimal set of information needed to represent + transfer arbitrary authenticated datastructures. More complex datastructures are implemented on top of the merkledag, such as:
+The merkledag is the "thin waist" of authenticated data structures. It is a minimal set of information needed to represent + transfer arbitrary authenticated data structures. More complex data structures are implemented on top of the merkledag, such as:
 
 - **git** and other version control systems
 - **bitcoin** and other blockchains
@@ -177,17 +177,17 @@ IPNS is based on [SFS](http://en.wikipedia.org/wiki/Self-certifying_File_System)
 
 See more in the [IPNS spec](https://github.com/ipfs/specs/blob/master/IPNS.md).
 
-# 4. Applications and Datastructures -- on top of IPFS
+# 4. Applications and Data Structures -- on top of IPFS
 
-The stack described so far is enough to represent arbitrary datastructures and replicate them across the internet. It is also enough to build and deploy decentralized websites.
+The stack described so far is enough to represent arbitrary data structures and replicate them across the internet. It is also enough to build and deploy decentralized websites.
 
-Applications and datastructures on top of IPFS are represented as merkledags. Users can create arbitrary datastructures that extend the merkledag and deploy them to the rest of the world using any of the tools that understand IPFS.
+Applications and data structures on top of IPFS are represented as merkledags. Users can create arbitrary data structures that extend the merkledag and deploy them to the rest of the world using any of the tools that understand IPFS.
 
-See more in the [IPLD datastructures specs](https://github.com/ipld/specs/tree/master/data-structures).
+See more in the [IPLD data structures specs](https://github.com/ipld/specs/tree/master/data-structures).
 
 ## 4.1 unixfs -- representing traditional files
 
-The unix filesystem abstractions -- files and directories -- are the main way people conceive of files in the internet. In IPFS, `unixfs` is a datastructure that represents unix files on top of IPFS. We need a separate datastructure to carry over information like:
+The unix filesystem abstractions -- files and directories -- are the main way people conceive of files in the internet. In IPFS, `unixfs` is a data structure that represents unix files on top of IPFS. We need a separate data structure to carry over information like:
 
 - whether the object represents a file or directory.
 - total sizes, minus indexing overhead
