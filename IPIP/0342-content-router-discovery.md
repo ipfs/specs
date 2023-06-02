@@ -34,7 +34,7 @@ The mechanism proposed by this IPIP, where nodes gossip preferred routers
 to their connected peers, can also have broader applications. The same
 mechanism could be used for external IPNS, peer routers, relays, or DNS
 resolvers. We point out the label allowing re-use of this mechanism for
-other systems in the (protocol design)[#1-content-routing-as-a-libp2p-protocol],
+other systems in the [protocol design](#1-content-routing-as-a-libp2p-protocol),
 but otherwise leave the concrete design for other systems to subsequent
 IPIPs.
 
@@ -47,7 +47,6 @@ is also insufficient long term because:
 2. It is insufficient for providing content in applications where content grows
     super-linearly to peers, such that the burden on a traditional DHT would
     become unsustainable.
-
 
 ## Detailed design
 
@@ -126,6 +125,7 @@ Protocol messages are encoded using *cbor*. The following protocol examples demo
 the schemas of requests and responses if they were to be encoded with JSON.
 
 A query on the "/ipfs/router-discovery/1.0.0" protocol will look like:
+
 ```json
 {
   "router": "string",
@@ -134,6 +134,7 @@ A query on the "/ipfs/router-discovery/1.0.0" protocol will look like:
 ```
 
 A concrete example would be:
+
 ```json
 {
   "router": "content-routing",
@@ -142,6 +143,7 @@ A concrete example would be:
 ```
 
 A response is a list of entries, which looks like:
+
 ```json
 [
   {
@@ -152,6 +154,7 @@ A response is a list of entries, which looks like:
 ```
 
 A concrete example would be:
+
 ```json
 [
   {
@@ -225,7 +228,7 @@ table of content  routers.
 ## Test fixtures
 
 A random CID should be generated that is only available through a
-non-DHT content routing system. This is a piece of content can then be 
+non-DHT content routing system. This is a piece of content can then be
 queried to validate the presence of alternative content routing systems.
 
 An example service that can be used as part of testing is at
@@ -266,12 +269,11 @@ where sharded latency observations may be relevant. For example:
 - Users will benefit from faster discovery of content providers.
 - Users will also benefit from access to more CIDs than they currently do through
 queries limited to the IPFS DHT
-- Router discovery and reputation mechanism improves relisience. 
+- Router discovery and reputation mechanism improves relisience.
 - IPFS user agents will not be tied to static set of hard-coded HTTP endpoints
   that may stop working at any time.
 - Users will benefit from replacing misbehaving (censorship, DoS, hardware
   failure) routers with useful ones without having to upgrade their software.
-
 
 ### Compatibility
 
@@ -282,7 +284,7 @@ ingestion protocol.
 
 Nodes may limit their complexity through a hard-coded list of known content
 routers, essentially limiting their implementation to design section 3 of this
-IPIP. This comes at a price: (1) hard-coded routers become easy targets 
+IPIP. This comes at a price: (1) hard-coded routers become easy targets
 for denial of service attacks, decreasing the resilliency of the entire setup;
 (2) nodes risk being out of date and to offer sub-optimal performance through their
 failure to discover additional near-by content routing instances.
@@ -295,6 +297,7 @@ comments and suggestions of other security considerations that should be
 included as this draft develops.
 
 #### 1. Malicious Content Routers
+
 ##### a. Providing Bad Content Routing Records
 
 * records under double hashing are signed, so can't provide a record for a real peer
@@ -341,7 +344,6 @@ Pros:
 
 Cons:
 * Nodes cannot drop use of the DHT / other content routing options always are 'second tier'.
-
 
 #### Static list of known routers distributed with IPFS clients
 
