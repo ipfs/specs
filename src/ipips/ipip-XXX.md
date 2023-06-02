@@ -12,7 +12,7 @@ editors:
   - name: Will Scott
     github: willscott
 order: XXX
-tags: ['ipips']
+tags: ['ipips', 'routing', 'privacy', 'double hashing']
 ---
 
 ## Summary
