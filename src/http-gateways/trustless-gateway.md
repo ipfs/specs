@@ -135,7 +135,7 @@ When present, returned `Etag` must include unique prefix based on the passed ran
 
 Below MUST be implemented **in addition** to "HTTP Response" of :cite[path-gateway].
 
-## HTTP Response Headers
+## Response Headers
 
 ### `Content-Type` (response header)
 
@@ -148,7 +148,7 @@ For example: `Content-Type: application/vnd.ipld.car; version=1`
 
 MUST be returned and set to `attachment` to ensure requested bytes are not rendered by a web browser.
 
-## HTTP Response Payload
+## Response Payload
 
 ### Block Response
 
@@ -174,46 +174,13 @@ responses MAY be introduced in a future, see [IPIP-412](https://github.com/ipfs/
 
 #### CAR version
 
-Value returned in `CarV1Header.version` struct  MUST match the `version`
-parameter returned in `Content-Type` header
+Value returned in
+[`CarV1Header.version`](https://ipld.io/specs/transport/car/carv1/#header)
+field MUST match the `version` parameter returned in `Content-Type` header.
 
 #### CAR roots
 
-:::issue
-
-TODO: we need to specify expectations about what should be returned in
-[`CarV1Header.roots`](https://ipld.io/specs/transport/car/carv1/#header).
-
-##### Option A: always empty
-
 If the response uses version 1 or 2 of the CAR spec, the
-[`CarV1Header.roots`](https://ipld.io/specs/transport/car/carv1/#header) struct
-MUST be empty.
+[`CarV1Header.roots`](https://ipld.io/specs/transport/car/carv1/#header) field
+MUST contain the CID of the terminating entity.
 
-##### Option B: only CID of the terminating element
-
-If the response uses version 1 or 2 of the CAR spec, the
-[`CarV1Header.roots`](https://ipld.io/specs/transport/car/carv1/#header) struct
-MUST contain CID of the terminating entity.
-
-##### Option C: only CIDs of fully returned DAGs
-
-If the response uses version 1 or 2 of the CAR spec, the
-[`CarV1Header.roots`](https://ipld.io/specs/transport/car/carv1/#header) struct
-MUST be either empty, or only contain CIDs of complete DAGs present in the response.
-
-CIDs from partial DAGs, such as parent nodes on the path, or terminating
-element returned with `dag-scope=block`, or UnixFS directory returned with
-`dag-scope=entity` MUST never be returned in the `CarV1Header.roots` list, as
-they may cause overfetching on systems that perform recursive pinning of DAGs
-listed in `CarV1Header.roots`.
-
-##### Option D: CIDs for all logical path segments (same as X-Ipfs-Roots)
-
-If the response uses version 1 or 2 of the CAR spec, the
-[`CarV1Header.roots`](https://ipld.io/specs/transport/car/carv1/#header) struct
-MUST contain all the logical roots related to the requested content path.
-
-The CIDs here MUST be the same as ones in `X-Ipfs-Roots` header.
-
-:::
