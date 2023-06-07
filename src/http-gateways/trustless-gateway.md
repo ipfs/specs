@@ -182,5 +182,7 @@ field MUST match the `version` parameter returned in `Content-Type` header.
 
 If the response uses version 1 or 2 of the CAR spec, the
 [`CarV1Header.roots`](https://ipld.io/specs/transport/car/carv1/#header) field
-MUST contain the CID of the terminating entity.
+MAY contain the CID of the terminus of the content path.
 
+If implementation prefers to avoid buffering blocks, and return them as soon as
+possible, the field MAY be left empty.
