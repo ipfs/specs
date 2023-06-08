@@ -28,8 +28,11 @@ This specification describes a new HTTP API for Privacy Preserving Delegated Con
  All salts below are 64-bytes long, and represent a string padded with `\x00`.
 
  - `SALT_DOUBLEHASH = bytes("CR_DOUBLEHASH\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00")`
- - `SALT_ENCRYPTIONKEY = bytes("CR_ENCRYPTIONKEY\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00")`
- - `SALT_NONCE = bytes("CR_NONCE\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00")`
+ - `SALT_DOUBLEHASH = bytes("CR_ENCRYPTIONKEY\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00")`
+
+ Magic values are needed to calculate different digests from the same value for different purposes. For example a hash of a Multihash that is used for lookups should be different from the one that is used for
+ key derivation, even though both are calculated from the same original value. In order to do that the Multihash is concatenated with different magic values before applying the hash funciton - `SALT_DOUBLEHASH`
+ for lookups and `SALT_DOUBLEHASH` for key derivation as described in the `Glossary`.
 
 ### Glossary
 
@@ -37,36 +40,28 @@ This specification describes a new HTTP API for Privacy Preserving Delegated Con
 - **`hash`** is [SHA256](https://en.wikipedia.org/wiki/SHA-2) hashing.
 - **`||`** is concatenation of two values.
 - **`deriveKey`** is deriving a 32-byte encryption key from a passphrase that is done as `hash(SALT_ENCRYPTIONKEY || passphrase)`.
-- **`Nonce`** is a 12-byte nonce used as Initialization Vector (IV) for the AESGCM encryption. IPNI expects an explicit instruction to delete a record (comparing to the DHT where records expire).
-Hence the IPNI server needs to be able to compare encrypted values without having to decrypt them as that would require a key that it is unaware of.
-That means that the nonce has to be deterministically chosen so that `enc(passphrase, nonce, payload)` produces the same output for the same 
-`passpharase` + `payload` pair. Nonce must be calculated as `hash(SALT_NONCE || passphrase || len(payload) || payload)[:12]`, where `len(payload)` is 
-an 8-byte length of the `payload` encoded in Little Endian format. Choice of nonce is not enforced by the IPNI specification. The described approach will 
-be used while IPNI encrypts Advertisements on behaf of Publishers. However once Writer Privacy is implemented, the choice of nonce will be left up to the Publisher. 
 - **`CID`** is the [Content IDentifier](https://github.com/multiformats/cid).
 - **`MH`** is the [Multihash](https://github.com/multiformats/multihash) contained in a `CID`. It corresponds to the 
-digest of a hash function over some content. `MH` is represented as a 32-byte array.
+digest of a hash function over some content.
 - **`HASH2`** is a second hash over the multihash. Second Hashes must be of `Multihash` format with `DBL_SHA_256` codec. 
 The digest must be calculated as `hash(SALT_DOUBLEHASH || MH)`.
 - **`ProviderRecord`** is a JSON with Provider Record as described in the [HTTP Delegated Routing Specification](http-routing-v1.md).
 - **`ProviderRecordKey`** is a concatentation of `peerID || contextID`. There is no need for explicitly encoding lengths as they are
-already encoded as a part of the multihash format. 
-- **`EncProviderRecordKey`** is `Nonce || enc(deriveKey(multihash), Nonce, ProviderRecordKey)`.
+already encoded as a part of the multihash format. Max `contextID` length is 64 bytes.
+- **`EncProviderRecordKey`** is `Nonce || enc(deriveKey(multihash), Nonce, ProviderRecordKey)`. Max `EncProviderRecordKey` is 200 bytes. 
 - **`HashProviderRecordKey`**  is a hash over `ProviderRecordKey` that must be calculated as `hash(SALT_DOUBLEHASH || ProviderRecordKey)`.
-- **`Metadata`** is free form bytes that can represent such information such as IPNI metadata.
-- **`EncMetadata`** is `Nonce || enc(deriveKey(ProviderRecordKey), Nonce, Metadata)`.
+- **`Metadata`** is free form bytes that can represent such information such as IPNI metadata. Max `Metadata` length is 1024 bytes. 
+- **`EncMetadata`** is `Nonce || enc(deriveKey(ProviderRecordKey), Nonce, Metadata)`. Max `EncMetadata` length is 2000 bytes.
+
+Note: maximum allowed lengths might change without incrementing the API version. Such fields as `contextID` or `Metadata` are free-form bytes and
+their maximum lengths can be changed in the underlying protocols. 
 
 ### API
-
-Assembling a full `ProviderRecord` from the encrypted data will require multiple roundtrips to the server. The first one to fetch a list of `EncProviderRecordKey`s and then one per  
-`EncProviderRecordKey` to fetch `EncMetadata`. In order to reduce the number of roundtrips to one the client implementation should use the local libp2p peerstore for multiaddress discovery
-and [libp2p multistream select](https://github.com/multiformats/multistream-select) for protocol negotiation.
-
 #### `GET /routing/v1/encrypted/providers/{HASH2}`
 
 ##### Response codes
 
-- `200` (OK): the response body contains 0 or more records
+- `200` (OK): the response body contains 1 or more records
 - `404` (Not Found): must be returned if no matching records are found
 - `422` (Unprocessable Entity): request does not conform to schema or semantic constraints
 
@@ -83,7 +78,7 @@ and [libp2p multistream select](https://github.com/multiformats/multistream-sele
 
 Where:
 
-- `EncProviderRecordKeys` a list of base58 encoded `EncProviderRecordKey`;
+- `EncProviderRecordKeys` a list of base64 encoded `EncProviderRecordKey`;
 
 #### `GET /routing/v1/encrypted/metadata/{HashProviderRecordKey}`
 
@@ -103,5 +98,10 @@ Where:
 
 Where:
 
-- `EncMetadatas` is base58 encoded `EncMetadata`;
+- `EncMetadatas` is base64 encoded `EncMetadata`;
 
+### Notes
+
+Assembling a full `ProviderRecord` from the encrypted data will require multiple roundtrips to the server. The first one to fetch a list of `EncProviderRecordKey`s and then one per  
+`EncProviderRecordKey` to fetch `EncMetadata`. In order to reduce the number of roundtrips to one the client implementation should use the local libp2p peerstore for multiaddress discovery
+and [libp2p multistream select](https://github.com/multiformats/multistream-select) for protocol negotiation.
