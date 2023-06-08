@@ -48,7 +48,7 @@ be used while IPNI encrypts Advertisements on behaf of Publishers. However once 
 digest of a hash function over some content. `MH` is represented as a 32-byte array.
 - **`HASH2`** is a second hash over the multihash. Second Hashes must be of `Multihash` format with `DBL_SHA_256` codec. 
 The digest must be calculated as `hash(SALT_DOUBLEHASH || MH)`.
-- **`ProviderRecord`** is a Provider Record as described in the [HTTP Delegated Routing Specification](http-routing-v1.md).
+- **`ProviderRecord`** is a JSON with Provider Record as described in the [HTTP Delegated Routing Specification](http-routing-v1.md).
 - **`ProviderRecordKey`** is a concatentation of `peerID || contextID`. There is no need for explicitly encoding lengths as they are
 already encoded as a part of the multihash format. 
 - **`EncProviderRecordKey`** is `Nonce || enc(deriveKey(multihash), Nonce, ProviderRecordKey)`.
