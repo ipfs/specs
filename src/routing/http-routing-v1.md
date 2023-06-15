@@ -11,13 +11,16 @@ editors:
     github: guseggert
   - name: Masih H. Derkani
     github: masih
+  - name: Henrique Dias
+    url: https://hacdias.com/
+    github: hacdias
 xref:
   - ipns-record
 order: 0
 tags: ['routing']
 ---
 
-Delegated routing is a mechanism for IPFS implementations to use for offloading content routing and naming to another process/server. This specification describes an HTTP API for delegated content routing.
+Delegated routing is a mechanism for IPFS implementations to use for offloading content routing and naming to another process/server. This specification describes a vendor-agnostic HTTP API for delegated content routing.
 
 ## API Specification
 
@@ -144,7 +147,34 @@ This API does not support pagination, but optional pagination can be added in a 
 
 ## Streaming
 
-This API does not currently support streaming, however it can be added in the future through a backwards-compatible update by using a content type other than `application/json`.
+JSON-based endpoints support streaming requests made
+with `Accept: application/x-ndjson` HTTP Header.
+
+Steaming responses are formatted as
+[Newline Delimited JSON (ndjson)](https://github.com/ndjson/ndjson-spec),
+with one result per line:
+
+```json
+{"Schema": "<schema>", ...}
+{"Schema": "<schema>", ...}
+{"Schema": "<schema>", ...}
+...
+```
+
+:::note
+
+Streaming is opt-in and backwards-compatibile with clients and servers that do
+not support streaming:
+
+- Requests without the `Accept: application/x-ndjson` header MUST default to
+  regular, non-streaming, JSON responses.
+- Legacy server MAY respond with non-streaming `application/json` response even
+  if the client requested streaming. It is up to the client to inspect
+  the `Content-Type` header before parsing the response.
+- The server MUST NOT respond with streaming response if the client did not
+  explicitly request so.
+
+:::
 
 ## Error Codes
 
