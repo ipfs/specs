@@ -253,7 +253,7 @@ Blocking layer recommendation: BlockService.
 ##### `/ipfs/CID/PATH`
 
 IPFS-Path-Rule: Blocks the exact ipfs path that is referenced from the
-multihash embedded the CID before attempting to resolve it. It does not block
+multihash embedded in the CID before attempting to resolve it. It does not block
 the CID that the path resolves to.
 
 Note `/ipfs/CID/path` and `/ipfs/CID/path/` are equivalent rules.
