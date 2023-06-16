@@ -28,11 +28,11 @@ This specification describes a new HTTP API for Privacy Preserving Delegated Con
  All salts below are 64-bytes long, and represent a string padded with `\x00`.
 
  - `SALT_DOUBLEHASH = bytes("CR_DOUBLEHASH\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00")`
- - `SALT_DOUBLEHASH = bytes("CR_ENCRYPTIONKEY\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00")`
+ - `SALT_ENCRYPTIONKEY = bytes("CR_ENCRYPTIONKEY\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00")`
 
  Magic values are needed to calculate different digests from the same value for different purposes. For example a hash of a Multihash that is used for lookups should be different from the one that is used for
  key derivation, even though both are calculated from the same original value. In order to do that the Multihash is concatenated with different magic values before applying the hash funciton - `SALT_DOUBLEHASH`
- for lookups and `SALT_DOUBLEHASH` for key derivation as described in the `Glossary`.
+ for lookups and `SALT_ENCRYPTIONKEY` for key derivation as described in the `Glossary`.
 
 ### Glossary
 
