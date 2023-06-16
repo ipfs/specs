@@ -98,7 +98,7 @@ Users and developers will benefit from a list format that is easy to work with b
 
 The current Protocol Labs denylist format
 https://badbits.dwebops.pub/denylist.json can be easily converted into the
-proposed compact format. This is shown at https://badbits.dwebops.pub/denylist.json.
+proposed compact format. This is shown at https://badbits.dwebops.pub/badbits.deny.
 
 
 ### Alternatives
