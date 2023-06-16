@@ -53,8 +53,12 @@ already encoded as a part of the multihash format. Max `contextID` length is 64 
 - **`Metadata`** is free form bytes that can represent such information such as IPNI metadata. Max `Metadata` length is 1024 bytes. 
 - **`EncMetadata`** is `Nonce || enc(deriveKey(ProviderRecordKey), Nonce, Metadata)`. Max `EncMetadata` length is 2000 bytes.
 
-Note: maximum allowed lengths might change without incrementing the API version. Such fields as `contextID` or `Metadata` are free-form bytes and
+:::note
+
+Maximum allowed lengths might change without incrementing the API version. Such fields as `contextID` or `Metadata` are free-form bytes and
 their maximum lengths can be changed in the underlying protocols. 
+
+:::
 
 ### API
 #### `GET /routing/v1/encrypted/providers/{HASH2}`
