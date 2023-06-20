@@ -4,7 +4,7 @@ description: >
   Trustless Gateways are a minimal subset of Path Gateways that allow light IPFS
   clients to retrieve data behind a CID and verify its integrity without delegating any
   trust to the gateway itself.
-date: 2023-04-17
+date: 2023-06-20
 maturity: reliable
 editors:
   - name: Marcin Rataj
@@ -159,18 +159,9 @@ The Body hash MUST match the Multihash from the requested CID.
 
 ### CAR Response
 
-A CAR stream
-([application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car))
-for the requested content type,  path and optional `dag-scope` and `entity-bytes` URL parameters.
-
-:::note
-
-By default, block order in CAR response is not deterministic, blocks can
-be returned in different order, depending on implementation choices (traversal,
-speed at which blocks arrive from the network, etc). An opt-in ordered CAR
-responses MAY be introduced in a future, see [IPIP-412](https://github.com/ipfs/specs/pull/412).
-
-:::
+A CAR stream for the requested
+[application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car)
+content type, path and optional `dag-scope` and `entity-bytes` URL parameters.
 
 #### CAR version
 
@@ -180,9 +171,40 @@ field MUST match the `version` parameter returned in `Content-Type` header.
 
 #### CAR roots
 
-If the response uses version 1 or 2 of the CAR spec, the
+The behavior associated with the
 [`CarV1Header.roots`](https://ipld.io/specs/transport/car/carv1/#header) field
-MAY contain the CID of the terminus of the content path.
+is not currently specified.
 
-If implementation prefers to avoid buffering blocks, and return them as soon as
-possible, the field MAY be left empty.
+Clients MAY ignore it.
+
+:::issue
+
+As of 2023-06-20, the behavior of the `roots`  CAR field remains an [unresolved item within the CARv1 specification](https://web.archive.org/web/20230328013837/https://ipld.io/specs/transport/car/carv1/#unresolved-items).
+
+:::
+
+#### CAR determinism
+
+The default CAR header and block order in a CAR response is not specified and is non-deterministic.
+
+Clients MUST NOT assume that CAR responses are deterministic (byte-for-byte identical) across different gateways.
+
+Clients MUST NOT assume that CAR includes CIDs and their blocks in the same order across different gateways.
+
+:::issue
+
+In controlled environments, clients MAY choose to rely on undocumented CAR determinism,
+subject to the agreement of the following conditions between the client and the
+gateway:
+- CAR version
+- content of [`CarV1Header.roots`](https://ipld.io/specs/transport/car/carv1/#header) field
+- order of blocks
+- status of duplicate blocks
+
+In the future, there may be an introduction of a convention to indicate aspects
+of determinism in CAR responses. Please refer to
+[IPIP-412](https://github.com/ipfs/specs/pull/412) for potential developments
+in this area.
+
+:::
+
