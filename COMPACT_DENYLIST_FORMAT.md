@@ -145,9 +145,9 @@ hints:
 
 # Block some subpaths with exceptions: last-matching-rule wins (!)
 /ipfs/QmUboz9UsQBDeS6Tug1U8jgoFkgYxyYood9NDyVURAY9pK/blocked*
-+/ipfs/QmUboz9UsQBDeS6Tug1U8jgoFkgYxyYood9NDyVURAY9pK/blockednot
-+/ipfs/QmUboz9UsQBDeS6Tug1U8jgoFkgYxyYood9NDyVURAY9pK/blocked/not
-+/ipfs/QmUboz9UsQBDeS6Tug1U8jgoFkgYxyYood9NDyVURAY9pK/blocked/exceptions*
+!/ipfs/QmUboz9UsQBDeS6Tug1U8jgoFkgYxyYood9NDyVURAY9pK/blockednot
+!/ipfs/QmUboz9UsQBDeS6Tug1U8jgoFkgYxyYood9NDyVURAY9pK/blocked/not
+!/ipfs/QmUboz9UsQBDeS6Tug1U8jgoFkgYxyYood9NDyVURAY9pK/blocked/exceptions*
 
 # Block IPNS domain name
 /ipns/domain.example
@@ -160,7 +160,7 @@ hints:
 
 # Block all mime types with exceptions
 /mime/image/*
-+/mime/image/gif
+!/mime/image/gif
 
 # Legacy CID double-hash block
 # sha256(bafybeiefwqslmf6zyyrxodaxx4vwqircuxpza5ri45ws3y5a62ypxti42e/)
@@ -381,7 +381,7 @@ blocks get assembled into an actual files. That should cover gateway usage.
 
 #### Allow (or negated) rules
 
-Block items can be prepended by `+`, which means that items matching the rule are to be allowed rather than blocked.
+Block items can be prepended by `!`, which means that items matching the rule are to be allowed rather than blocked.
 
 This can be used to undo existing rules, but also to add concrete exceptions to wider rules. Order matters, and Allow rules must come AFTER other existing rules.
 
@@ -394,15 +394,15 @@ Examples:
 
 ```
 /ipfs/QmecDgNqCRirkc3Cjz9eoRBNwXGckJ9WvTdmY16HP88768/photo*
-+/ipfs/QmecDgNqCRirkc3Cjz9eoRBNwXGckJ9WvTdmY16HP88768/photo123.jpg
+!/ipfs/QmecDgNqCRirkc3Cjz9eoRBNwXGckJ9WvTdmY16HP88768/photo123.jpg
 /mime/*
-+/mime/text/plain
-+/ipns/my.domain
+!/mime/text/plain
+!/ipns/my.domain
 /ipns/my.domain
 ```
 
 In this example, `/ipns/my.domain` stays blocked because the deny rule happens
-after the allow one.
+AFTER the allow one.
 
 #### Hint list
 
