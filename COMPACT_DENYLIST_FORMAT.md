@@ -143,7 +143,7 @@ hints:
 /ipfs/Qmah2YDTfrox4watLCr3YgKyBwvjq8FJZEFdWY6WtJ3Xt2/test*
 /ipfs/QmTuvSQbEDR3sarFAN9kAeXBpiBCyYYNxdxciazBba11eC/test/*
 
-# Block some subpaths with exceptions
+# Block some subpaths with exceptions: last-matching-rule wins (!)
 /ipfs/QmUboz9UsQBDeS6Tug1U8jgoFkgYxyYood9NDyVURAY9pK/blocked*
 +/ipfs/QmUboz9UsQBDeS6Tug1U8jgoFkgYxyYood9NDyVURAY9pK/blockednot
 +/ipfs/QmUboz9UsQBDeS6Tug1U8jgoFkgYxyYood9NDyVURAY9pK/blocked/not
@@ -381,8 +381,7 @@ blocks get assembled into an actual files. That should cover gateway usage.
 
 #### Allow (or negated) rules
 
-Block items can be prepended by `+`, that items matching the rule are to be allowed
-rather than blocked.
+Block items can be prepended by `+`, which means that items matching the rule are to be allowed rather than blocked.
 
 This can be used to undo existing rules, but also to add concrete exceptions to wider rules. Order matters, and Allow rules must come AFTER other existing rules.
 
