@@ -430,7 +430,7 @@ In particular, a [Blocker implementation validator](https://github.com/ipfs-ship
 This proposal takes into account security:
 
 - Denylist headers and line-length limits are well specified to avoid malformed lists to cause things like large memory usage while parsing.
-- Supported type of blocks have been though out to avoid amplified consumption of resources or side effects (i.e. downloading of additional dag-blocks) during the implementation.
+- Supported type of blocks have been thought out to avoid amplified consumption of resources or side effects (i.e. downloading of additional dag-blocks) during the implementation.
 - Paths are sanitized and follow the same encoding rules as URLs (RFC 3986), so that existing and safe parsing can be done with regular tooling.
 - Official and custom-hint systems allow the introduction of additional features that can co-exist with the specified format without needing to be supported.
 
