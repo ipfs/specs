@@ -6,7 +6,9 @@ please update title and include an abbreviated title in the filename too:
 
 - Start Date: 2023-03-20
 - Related Issues:
-  - (add links here)
+  - https://github.com/ipfs-shipyard/someguy/issues/12
+  - https://github.com/ipfs-shipyard/someguy/issues/13
+  - https://github.com/ipfs/bifrost-gateway/issues/151
 
 ## Summary
 
