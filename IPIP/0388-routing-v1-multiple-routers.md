@@ -1,4 +1,4 @@
-# IPIP-0388: Routing v1 Multiple Routers
+# IPIP-0388: Routing HTTP API Support for Querying Multiple Routers
 
 <!-- IPIP number should  match its pull request number. After you open a PR,
 please update title and include an abbreviated title in the filename too:
