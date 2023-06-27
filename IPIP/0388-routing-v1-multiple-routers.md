@@ -24,7 +24,7 @@ AKA Solution Proposal
 
 The proposal is to:
 1. Add a `?routing=<list-of-routers>` optional parameter to `GET /routing/v1/providers/{CID}` that indicates which routing systems to use
-2. Add an `OPTIONS /routing/v1/providers` endpoint which when queried may respond with a `SUPPORTED_ROUTERS` header key, with the value as the comma separated list of the routing systems supported
+2. Add an `OPTIONS /routing/v1/providers` endpoint which when queried may respond with a `Ipfs-Supported-Routers` HTTP  header, with the value as the comma separated list of the routing systems supported
 
 ## Design rationale
 

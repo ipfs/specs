@@ -100,7 +100,7 @@ To select all routers use `?routers=*`. To determine the list of available route
 
 ### `OPTIONS /routing/v1/providers`
 
-If supported the server should include a `SUPPORTED_ROUTERS` header key, with the value as the comma separated list of the routing systems supported.
+If supported the server should include an `Ipfs-Supported-Routers` header key, with the value as the comma separated list of the routing systems supported.
 
 ## Pagination
 
