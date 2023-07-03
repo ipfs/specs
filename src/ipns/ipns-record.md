@@ -144,7 +144,7 @@ A logical :dfn[IPNS Record] is a data structure containing the following fields:
 - **Extensible Data** (DAG-CBOR)
   - Extensible record data in [DAG-CBOR](https://ipld.io/specs/codecs/dag-cbor/spec/) format.
   - The default set of fields can be augmented with additional information.
-    - Implementations are free to leverage this, or simply ignore unexpected fields.
+    - Implementations MAY leverage this, but otherwise MUST ignore unexpected fields.
     - A good practice is to:
       - prefix custom field names with `_` to avoid collisions with any new
         mandatory fields that may be added in a future version of this

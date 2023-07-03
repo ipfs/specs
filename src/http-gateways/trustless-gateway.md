@@ -57,14 +57,15 @@ Same as in :cite[path-gateway], but with limited number of supported response ty
 
 This HTTP header is required when running in a strict, trustless mode.
 
-Gateway is free to return HTTP 400 Bad Request when running in strict trustless
-mode and  `Accept` header is missing
-
 Below response types MUST to be supported:
-
 - [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw) – requests a single, verifiable raw block to be returned
+
+Below response types SHOULD to be supported:
 - [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car) – disables IPLD/IPFS deserialization, requests a verifiable CAR stream to be returned
 - [application/vnd.ipfs.ipns-record](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record) – requests a verifiable :cite[ipns-record] (multicodec `0x0300`).
+
+Gateway SHOULD return HTTP 400 Bad Request when running in strict trustless
+mode (no deserialized responses) and  `Accept` header is missing.
 
 # HTTP Response
 

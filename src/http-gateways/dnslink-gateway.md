@@ -92,5 +92,5 @@ Same as "HTTP Response" of :cite[path-gateway].
 
 ## Redirects, single-page applications, and custom 404s
 
-DNSLink Gateway implementations are free to include `_redirects` file support
+DNSLink Gateway implementations SHOULD include `_redirects` file support
 defined in :cite[web-redirects-file].
