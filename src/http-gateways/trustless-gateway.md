@@ -99,24 +99,29 @@ When present, returned `Etag` must include unique prefix based on the passed sco
 
 ### :dfn[entity-bytes] (request query parameter)
 
-Optional, `entity-bytes=from:to` with the default value `0:*`, only available for CAR requests.
-Serves as a trustless form of an HTTP Range Request.
+The optional `entity-bytes=from:to` parameter is available only for CAR
+requests.
 
-When the terminating entity at the end of the specified content path can be
-interpreted as a continuous array of bytes (such as a UnixFS file), returns
-only the minimal set of blocks required to verify the specified byte range of
-said entity.
+It implies `dag-scope=entity` and serves as a trustless equivalent of an HTTP
+Range Request.
 
-Allowed values for `from` and `to` are positive integers where `to` >= `from`, which
-limit the return blocks to needed to satisfy the range `[from,to]`:
+When the terminating entity at the end of the specified content path:
+
+- can be interpreted as a continuous array of bytes (such as a UnixFS file), a
+  Gateway MUST return only the minimal set of blocks necessary to verify the
+  specified byte range of that entity.
+
+- cannot be interpreted as a continuous array of bytes (such as a DAG-CBOR/JSON
+  map or UnixFS directory), the parameter MUST be ignored, and the request is
+  equivalent to `dag-scope=entity`.
+
+Allowed values for `from` and `to` follow a subset of section 14.1.2 from
+:cite[rfc9110], where they are defined as offset integers that limit the
+returned blocks to only those necessary to satisfy the range `[from,to]`:
 
 - `from` value gives the byte-offset of the first byte in a range.
-- `to` value gives the byte-offset of the last byte in the range; that is,
-the byte positions specified are inclusive.  Byte offsets start at zero.
-
-If the entity at the end of the path cannot be interpreted as a continuous
-array of bytes (such as a DAG-CBOR/JSON map, or UnixFS directory), this
-parameter has no effect.
+- `to` value gives the byte-offset of the last byte in the range;
+  that is, the byte positions specified are inclusive.
 
 The following additional values are supported:
 
@@ -129,7 +134,28 @@ The following additional values are supported:
     range of 500 bytes from the beginning of the file to 1000 bytes from the
     end: `entity-bytes=499:-1000`
 
-When present, returned `Etag` must include unique prefix based on the passed range.
+A Gateway MUST augment the returned `Etag` based on the passed `entity-bytes`.
+
+A Gateway SHOULD return an HTTP 400 Bad Request error when the requested range
+cannot be parsed as valid offset positions.
+
+In more nuanced error scenarios, a Gateway MUST return a valid CAR response
+that includes enough blocks for the client to understand why the requested
+`entity-bytes` was incorrect or why only a part of the requested byte range was
+returned:
+
+- If the requested `entity-bytes` resolves to a range that partially falls
+  outside of the entity's byte range, the response MUST include the subset of
+  blocks within the entity's bytes.
+  - This allows clients to request valid ranges of the entity without needing
+    to know its total size beforehand, and it does not require the Gateway to
+    buffer the entire entity before returning the response.
+
+- If the requested `entity-bytes` resolves to a zero-length range or falls
+  fully outside of the entity's bytes, the response is equivalent to
+  `dag-scope=block`.
+  - This allows client to produce a meaningful error (e.g, in case of UnixFS,
+    leverage `Data.blocksizes` information present in the root `dag-pb` block).
 
 # HTTP Response
 
@@ -207,4 +233,3 @@ of determinism in CAR responses. Please refer to
 in this area.
 
 :::
-
