@@ -140,7 +140,7 @@ The [max file size](#max-file-size) helps to prevent an additional [denial of se
 ## Test fixtures
 
 Sample files for various test cases can be found in `QmQyqMY5vUBSbSxyitJqthgwZunCQjDVtNd8ggVCxzuPQ4`.
-Implementations are free to use it for internal testing.
+Implementations SHOULD use it for internal testing.
 
 ```
 $ ipfs ls QmQyqMY5vUBSbSxyitJqthgwZunCQjDVtNd8ggVCxzuPQ4
