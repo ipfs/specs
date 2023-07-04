@@ -54,7 +54,7 @@ Downloads data at specified **immutable** content path.
 
 Same as GET, but does not return any payload.
 
-Implementations are free to limit the scope of IPFS data transfer triggered by
+Implementations SHOULD limit the scope of IPFS data transfer triggered by
 `HEAD` requests to a minimal DAG subset required for producing response headers
 such as
 [`X-Ipfs-Roots`](#x-ipfs-roots-response-header),
@@ -121,7 +121,7 @@ fetch, a [`412 Precondition Failed`](#412-precondition-failed) HTTP status code
 should be returned by the gateway without any payload or specific HTTP headers.
 
 NOTE: when processing a request for a DAG, traversing it and checking every CID
-might be too expensive. Implementations are free to implement own heuristics to
+might be too expensive. Implementations SHOULD implement own heuristics to
 maximize cache hits while minimizing performance cost of checking if the entire
 DAG is locally cached. A good rule of thumb is to at the minimum test if the root
 block is in the local cache.
@@ -139,7 +139,7 @@ For example:
 - [application/vnd.ipld.dag-cbor](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-cbor) – requests [IPLD Data Model](https://ipld.io/docs/data-model/) representation serialized into [DAG-CBOR format](https://ipld.io/docs/codecs/known/dag-cbor/). If the requested CID already has `dag-cbor` (0x71) codec,  data is validated as DAG-CBOR before being returned as-is. Invalid DAG-CBON produces HTTP Error 500.
 - [application/json](https://www.iana.org/assignments/media-types/application/json) – same as `application/vnd.ipld.dag-json`, unless the CID's codec already is `json` (0x0200). Then, the raw JSON block can be returned as-is without any conversion.
 - [application/cbor](https://www.iana.org/assignments/media-types/application/cbor) – same as `application/vnd.ipld.dag-cbor`, unless the CID's codec already is `cbor` (0x51). Then, the raw CBOR block can be returned as-is without any conversion.
-- [application/vnd.ipfs.ipns-record](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record) – requests a verifiable [IPNS Record](../ipns/IPNS.md#ipns-record) to be returned. Produces 400 Bad Request if the content is not under the IPNS namespace, or contains a path.
+- [application/vnd.ipfs.ipns-record](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record) – requests a verifiable :cite[ipns-record] to be returned. Produces 400 Bad Request if the content is not under the IPNS namespace, or contains a path.
 
 ### `Range` (request header)
 
@@ -357,10 +357,10 @@ Returned directive depends on requested content path and format:
   resources under `/ipns/{id-with-ttl}/` namespace; `max-age=<ttl>` should
   indicate remaining TTL of the mutable pointer such as IPNS record or DNSLink
   TXT record.
-  - Implementations are free to place an upper bound on any TTL received, as
-    noted in Section 8 of :cite[rfc2131].
-  - If TTL value is unknown, implementations are free to set it to a static
-    value, but it should not be lower than 60 seconds.
+  - Implementations MAY place an upper bound on any TTL received, as
+    noted in Section 8 of :cite[rfc2181].
+  - If TTL value is unknown, implementations SHOULD set it to a static
+    value, but it SHOULD not be lower than 60 seconds.
 
 ### `Last-Modified` (response header)
 
@@ -392,9 +392,10 @@ Returned with custom response formats such as `application/vnd.ipld.car` or
 `application/vnd.ipld.raw`. CAR must be returned with explicit version.
 Example: `Content-Type: application/vnd.ipld.car; version=1`
 
-When no explicit response format is provided with the request, and the
+When deserialized responses are enabled,
+and no explicit response format is provided with the request, and the
 requested data itself has no built-in content type metadata, implementations
-are free to perform content type sniffing based on file name
+SHOULD perform content type sniffing based on file name
 (from :ref[url] path, or optional [`filename`](#filename-request-query-parameter) parameter)
 and magic bytes to improve the utility of produced responses.
 
@@ -541,12 +542,27 @@ Optional, present in certain response types:
   non-executable binary response types are not used in `<script>` and `<style>`
   HTML tags.
 
-### `X-Trace-Id` (response header)
+### `Server-Timing` (response header)
 
-Optional. Implementations are free to use this header to return a globally
+Optional. Implementations MAY use this header to communicate one or more
+metrics and descriptions for the given request-response cycle.
+
+See `Server-Timing` at [W3C: Server Timing](https://www.w3.org/TR/server-timing/#the-server-timing-header-field).
+
+### `Traceparent` (response header)
+
+Optional. Implementations MAY use this header to return a globally
 unique identifier to help in debugging errors and performance issues.
 
-A good practice is to always return it with HTTP error [status codes](#response-status-codes) >=`400`.
+See `Traceparent` at [W3C: Trace Context](https://www.w3.org/TR/trace-context-1/#traceparent-header).
+
+### `Tracestate` (response header)
+
+Optional. Implementations MAY use this header to return a additional
+vendor-specific trace identification information across different distributed
+tracing systems and is a companion header for the `Traceparent` header.
+
+See `Tracestate` at [W3C: Trace Context](https://www.w3.org/TR/trace-context-1/#tracestate-header).
 
 ## Response Payload
 
@@ -676,7 +692,7 @@ Gateway MUST respond with HTTP error when requested CID is on any of active deny
 - [410 Gone](#410-gone) returned when CID is denied for non-legal reasons, or when the exact reason is unknown
 - [451 Unavailable For Legal Reasons](#451-unavailable-for-legal-reasons) returned when denylist indicates that content was blocked on legal basis
 
-Implementation is free to apply some denylists by default as long the gateway
+Gateway implementation MAY apply some denylists by default as long the gateway
 operator is able to inspect and modify the list of denylists that are applied.
 
 **Examples of public deny lists**
@@ -688,7 +704,7 @@ operator is able to inspect and modify the list of denylists that are applied.
 
 ## Generated HTML with directory index
 
-While implementations are free to decide on the way HTML directory listing is
+While implementations decide on the way HTML directory listing is
 generated and presented to the user, following below suggestions is advised.
 
 Linking to alternative response types such as CAR and dag-json allows clients
