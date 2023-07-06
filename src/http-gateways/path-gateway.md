@@ -542,6 +542,46 @@ Optional, present in certain response types:
   non-executable binary response types are not used in `<script>` and `<style>`
   HTML tags.
 
+### `Ipfs-Gateway-Features` (response header)
+
+Optional, this header SHOULD be only returned in response to HTTP `OPTIONS` request.
+
+The value is a list of key-value pairs, as specified by the 5.6.1. Lists section of :cite[rfc9110].
+
+Each feature is indicated by a key and optional value. When more than one value is supported, `|` is used as a separator.
+For example:
+
+```
+Ipfs-Gateway-Features: foo, bar=1, buzz=a|b|c
+```
+
+A Gateway SHOULD use this header to communicate support for specific Gateway feeatures, enabling clients to make better decisions on how to retrieve data.
+
+A Gateway MAY define and return their own features.
+
+A Client MUST send HTTP OPTIONS request to inspect this header before performaning any more expensive feature-detection.
+
+#### Canonical Ipfs-Features values
+
+- `trustless-gateway` for :cite[trustless-gateway]
+  - `path-proof` indicates support for returning parent blocks up to the terminus element
+  - `car-version=1|2` indicates CAR support
+  - `dag-scope=block|entity|all` from :cite[ipip-0402]
+  - `entity-bytes` from :cite[ipip-0402], implies support for `dag-scope=entity` as well
+  - `car-block-order=dfs` from :cite[ipip-0412]
+  - `car-block-dupes=y|n`  from :cite[ipip-0412]
+- `path-gateway` for deserialized responses defined by :cite[path-gateway]
+- `subdomain-gateway=example.com` for :cite[subdomain-gateway] support based on `Host` header
+- `dnslink-gateway` for :cite[dnslink-gateway] support based on `Host` header
+- `ipns` indicating :cite[ipns-record] support on `/ipns/` content paths
+- `dnslink` indicating [DNSLink](https://dnslink.dev) support on `/ipns/` content paths
+
+<!-- TODO do we want these too?
+- `multibase` list of prefixes, indicates which multibase encoding are supported in CIDs
+- `multihash` indicates which hash functions are supported in CIDs
+- `multicodec` indicates which codecs are supported in CIDs
+-->
+
 ### `Server-Timing` (response header)
 
 Optional. Implementations MAY use this header to communicate one or more
