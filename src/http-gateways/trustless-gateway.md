@@ -13,6 +13,10 @@ editors:
   - name: Henrique Dias
     github: hacdias
     url: https://hacdias.com/
+xref:
+  - url
+  - path-gateway
+  - ipip-0412
 tags: ['httpGateways', 'lowLevelHttpGateways']
 order: 1
 ---
@@ -25,11 +29,11 @@ The minimal implementation means:
 
 - response type is always fully verifiable: client can decide between a raw block or a CAR stream
 - no UnixFS/IPLD deserialization
-- for CAR files:
-  - the behavior is identical to :cite[path-gateway]
 - for raw blocks:
   - data is requested by CID, only supported path is `/ipfs/{cid}`
   - no path traversal or recursive resolution
+- for CAR files:
+  - the pathing behavior is identical to :cite[path-gateway]
 
 # HTTP API
 
@@ -63,14 +67,23 @@ Same as in :cite[path-gateway], but with limited number of supported response ty
 
 ### `Accept` (request header)
 
-This HTTP header is required when running in a strict, trustless mode.
+A Client SHOULD sent this HTTP header to leverage content type negotiation
+based on section 12.5.1 of :cite[rfc9110].
 
 Below response types MUST to be supported:
-- [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw) – requests a single, verifiable raw block to be returned
+
+- [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw)
+  - A single, verifiable raw block to be returned.
 
 Below response types SHOULD to be supported:
-- [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car) – disables IPLD/IPFS deserialization, requests a verifiable CAR stream to be returned, implementations MAY support optional parameters (:cite[ipip-0412])
-- [application/vnd.ipfs.ipns-record](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record) – requests a verifiable :cite[ipns-record] (multicodec `0x0300`).
+
+- [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car)
+  - Disables IPLD/IPFS deserialization, requests a verifiable CAR stream to be
+    returned, implementations MAY support optional CAR content type parameters
+    (:cite[ipip-0412]) and the explicit [CAR format signaling in HTTP Request](#car-format-signaling-in-request).
+
+- [application/vnd.ipfs.ipns-record](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record)
+  - A verifiable :cite[ipns-record] (multicodec `0x0300`).
 
 Gateway SHOULD return HTTP 400 Bad Request when running in strict trustless
 mode (no deserialized responses) and  `Accept` header is missing.
@@ -168,35 +181,37 @@ Below MUST be implemented **in addition** to "HTTP Response" of :cite[path-gatew
 
 MUST be returned and include additional format-specific parameters when possible.
 
-If a CAR stream was requested, the response MUST include the parameter specifying CAR version.
-For example: `Content-Type: application/vnd.ipld.car; version=1`
+If a CAR stream was requested:
+- the response MUST include the parameter specifying CAR version. For example:
+  `Content-Type: application/vnd.ipld.car; version=1`
+- the response SHOULD include additional content type parameters, as noted in
+  [CAR format signaling in Response](#car-format-signaling-in-response).
 
 ### `Content-Disposition` (response header)
 
 MUST be returned and set to `attachment` to ensure requested bytes are not rendered by a web browser.
 
-## Response Payload
-
-### Block Response
+# Block Responses (application/vnd.ipld.raw)
 
 An opaque bytes matching the requested block CID
 ([application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw)).
 
 The Body hash MUST match the Multihash from the requested CID.
 
-### CAR Response
+# CAR Responses (application/vnd.ipld.car)
 
 A CAR stream for the requested
 [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car)
-content type, path and optional `dag-scope` and `entity-bytes` URL parameters.
+content type (with optional `order` and `dups` params), path and optional
+`dag-scope` and `entity-bytes` URL parameters.
 
-#### CAR version
+## CAR version
 
 Value returned in
 [`CarV1Header.version`](https://ipld.io/specs/transport/car/carv1/#header)
 field MUST match the `version` parameter returned in `Content-Type` header.
 
-#### CAR roots
+## CAR roots
 
 The behavior associated with the
 [`CarV1Header.roots`](https://ipld.io/specs/transport/car/carv1/#header) field
@@ -210,27 +225,146 @@ As of 2023-06-20, the behavior of the `roots`  CAR field remains an [unresolved 
 
 :::
 
-#### CAR determinism
+## CAR `order` (content type parameter)
 
-The default CAR header and block order in a CAR response is not specified and is non-deterministic.
+The `order` parameter allows clients to specify the desired block order in the
+response. It supports the following values:
+
+- `dfs`: [Depth-First Search](https://en.wikipedia.org/wiki/Depth-first_search)
+  order, enables streaming responses with minimal memory usage.
+- `unk` (or missing): Unknown order, which serves as the implicit default when the `order`
+  parameter is unspecified. In this case, the client cannot make any assumptions
+  about the block order: blocks may arrive in a random order or be a result of
+  a custom DAG traversal algorithm.
+
+A Gateway SHOULD always return explicit `order` in CAR's `Content-Type` response header.
+
+A Gateway MAY skip `order` in CAR response if no order was explicitly requested
+by the client and the default order is unknown.
+
+A Client MUST assume implicit `order=unk` when `order` is missing, unknown, or empty.
+
+## CAR `dups` (content type parameter)
+
+The `dups` parameter specifies whether duplicate blocks (the same block
+occurring multiple times in the requested DAG) will be present in the CAR
+response. Useful when a deterministic block order is used.
+
+It accepts two values:
+- `y`: Duplicate blocks MUST be sent every time they occur during the DAG walk.
+- `n`: Duplicate blocks MUST be sent only once.
+
+When set to `y`, light clients are able to  discard blocks after
+reading them, removing the need for caching in-memory or on-disk.
+
+Setting to `n` allows for more efficient data transfer of certain types of
+data, but introduces additional resource cost on the receiving end, as each
+block needs to be kept around in case its CID appears again.
+
+A Client MUST not assume any implicit behavior when `dups` is missing.
+
+If the `dups` parameter is not present in the `Content-Type` header, the
+behavior is unspecified, and the CAR response includes an arbitrary list of
+blocks. In this unknown state, the client MUST assume duplicates are not sent,
+but also MUST ignore duplicates if they are present.
+
+A Gateway MUST return always return `dups` in `Content-Type` response header
+when the duplicate status is known at the time of response.
+
+A Gateway MAY skip `dups` if it was not present in `Accept` header sent by the
+client or if it is not possible to tell the duplicate status.
+
+:::warning
+
+The specified parameter does not apply to virtual blocks identified by identity
+CIDs. CAR responses MUST never include these virtual blocks. The parameter in
+question is meant to control the behavior of non-virtual blocks in the
+response. Therefore, it does not have any effect on virtual blocks, and they
+should never be included in the CAR response, no matter if present, or what
+value is set.
+
+:::
+
+## CAR format parameters and determinism
+
+The default header and block order in a CAR format is not specified by IPLD specifications.
 
 Clients MUST NOT assume that CAR responses are deterministic (byte-for-byte identical) across different gateways.
 
 Clients MUST NOT assume that CAR includes CIDs and their blocks in the same order across different gateways.
 
+Clients MUST assume block order and duplicate status only if `Content-Type` returned with CAR responses includes optional `order` or `dups` parameters, as specified by :cite[ipip-0412].
+
+A Gateway SHOULD support some aspects of determinism by implementing content type negotiation and signaling via `Accept` and `Content-Type` headers.
+
 :::issue
 
-In controlled environments, clients MAY choose to rely on undocumented CAR determinism,
-subject to the agreement of the following conditions between the client and the
-gateway:
+In controlled environments, clients MAY choose to rely on implicit and
+undocumented CAR determinism, subject to the agreement of the following
+conditions between the client and the gateway:
 - CAR version
 - content of [`CarV1Header.roots`](https://ipld.io/specs/transport/car/carv1/#header) field
-- order of blocks
-- status of duplicate blocks
+- order of blocks (`order` from :cite[ipip-0412])
+- status of duplicate blocks (`dups` from :cite[ipip-0412])
 
-In the future, there may be an introduction of a convention to indicate aspects
-of determinism in CAR responses. Please refer to
-[IPIP-412](https://github.com/ipfs/specs/pull/412) for potential developments
-in this area.
+Mind this is undocumented behavior, and MUST NOT be used on public networks.
 
 :::
+
+### CAR format signaling in Request
+
+Content type negotiation is based on section 12.5.1 of :cite[rfc9110].
+
+Clients MAY indicate their preferred block order by sending an `Accept` header in
+the HTTP request. The `Accept` header format is as follows:
+
+```
+Accept: application/vnd.ipld.car; version=1; order=dfs; dups=y
+```
+
+In the future, when more orders or parameters exist, clients will be able to
+specify a list of preferences, for example:
+
+```
+Accept: application/vnd.ipld.car;order=foo, application/vnd.ipld.car;order=dfs;dups=y;q=0.5
+```
+
+The above example is a list of preferences, the client would really like to use
+the hypothetical `order=foo` however if this isn't available it would accept
+`order=dfs` with `dups=y` instead (lower priority indicated via `q` parameter,
+as noted in :cite[rfc9110]).
+
+### CAR format signaling in Response
+
+The Trustless Gateway MUST always respond with a `Content-Type` header that includes
+information about all supported and known parameters, even if the client did not
+specify them in the request.
+
+The `Content-Type` header format is as follows:
+
+```
+Content-Type: application/vnd.ipld.car;version=1;order=dfs;dups=n
+```
+
+Gateway implementations SHOULD decide on the implicit default ordering or
+other parameters, and use it in responses when client did not explicitly
+specify any matching preference.
+
+A Gateway MAY choose to implement only some of the parameters and return HTTP
+400 Bad Request or 406 Not Acceptable when client requested a response with
+unsupported content type variant.
+
+A Client MUST verify `Content-Type` returned with CAR response before
+processing the payload, as the legacy gateway may not support optional content
+type parameters like `order` an `dups` and return plain
+`application/vnd.ipld.car`.
+
+# IPNS Record Responses (application/vnd.ipfs.ipns-record)
+
+An opaque bytes matching the [Signed IPNS Record](https://specs.ipfs.tech/ipns/ipns-record/#ipns-record)
+for the requested [IPNS Name](https://specs.ipfs.tech/ipns/ipns-record/#ipns-name)
+returned as [application/vnd.ipfs.ipns-record](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record).
+
+A Client MUST confirm the record signature match `libp2p-key` from the requested IPNS Name.
+
+A Client MUST [perform additional record verification according to the IPNS specification](https://specs.ipfs.tech/ipns/ipns-record/#record-verification).
