@@ -261,29 +261,31 @@ Setting to `n` allows for more efficient data transfer of certain types of
 data, but introduces additional resource cost on the receiving end, as each
 block needs to be kept around in case its CID appears again.
 
+If the `dups` parameter is absent from the `Accept` request header, the
+behavior is unspecified. In such cases, a Gateway should respond with `dups=n`
+if it has control over the duplicate status, or without `dups` parameter if it
+does not.
+Defaulting to the inclusion of duplicate blocks (`dups=y`) SHOULD only be
+implemented by Gateway systems that exclusively support `dups=y` and do not
+support any other behavior.
+
 A Client MUST not assume any implicit behavior when `dups` is missing.
 
-If the `dups` parameter is not present in the `Content-Type` header, the
+If the `dups` parameter is absent from the `Content-Type` response header, the
 behavior is unspecified, and the CAR response includes an arbitrary list of
 blocks. In this unknown state, the client MUST assume duplicates are not sent,
-but also MUST ignore duplicates if they are present.
+but also MUST ignore duplicates and other unexpected blocks if they are present.
 
-A Gateway MUST return always return `dups` in `Content-Type` response header
-when the duplicate status is known at the time of response.
+A Gateway MUST always return `dups` in `Content-Type` response header
+when the duplicate status is known at the time of processing the request.
+A Gateway SHOULD not return `dups` if determining the duplicate status is not
+possible at the time of processing the request.
 
-A Gateway MAY skip `dups` if it was not present in `Accept` header sent by the
-client or if it is not possible to tell the duplicate status.
-
-:::warning
-
-The specified parameter does not apply to virtual blocks identified by identity
-CIDs. CAR responses MUST never include these virtual blocks. The parameter in
-question is meant to control the behavior of non-virtual blocks in the
-response. Therefore, it does not have any effect on virtual blocks, and they
-should never be included in the CAR response, no matter if present, or what
-value is set.
-
-:::
+A Gateway MUST NOT include virtual blocks identified by identity CIDs
+(multihash with `0x00` code) in CAR responses. This exclusion applies regardless
+of their presence in the DAG or the value assigned to the "dups" parameter, as
+the raw data is already present in the parent block that links to the identity
+CID.
 
 ## CAR format parameters and determinism
 
