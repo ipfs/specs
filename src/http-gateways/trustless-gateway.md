@@ -125,6 +125,10 @@ When the terminating entity at the end of the specified content path:
   Gateway MUST return only the minimal set of blocks necessary to verify the
   specified byte range of that entity.
 
+  - When dealing with a sharded UnixFS file (`dag-pb`, `0x70`) and a non-zero
+  `from` value, the UnixFS values `filesize` and `blocksizes` determine the
+  corresponding starting block for a given `from` offset.
+
 - cannot be interpreted as a continuous array of bytes (such as a DAG-CBOR/JSON
   map or UnixFS directory), the parameter MUST be ignored, and the request is
   equivalent to `dag-scope=entity`.
@@ -170,6 +174,14 @@ returned:
   `dag-scope=block`.
   - This allows client to produce a meaningful error (e.g, in case of UnixFS,
     leverage `Data.blocksizes` information present in the root `dag-pb` block).
+
+- In streaming scenarios, if a Gateway is capable of returning the root block
+  but lacks prior knowledge of the final component of the requested content
+  path being invalid or absent in the DAG, a Gateway SHOULD respond with HTTP 200.
+  - This behavior is a consequence of HTTP streaming limitations: blocks are
+    not buffered, by the time a related parent block is being parsed and
+    returned to the client, the HTTP status code has already been sent to the
+    client.
 
 # HTTP Response
 
