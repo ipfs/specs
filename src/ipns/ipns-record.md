@@ -144,7 +144,7 @@ A logical :dfn[IPNS Record] is a data structure containing the following fields:
 - **Extensible Data** (DAG-CBOR)
   - Extensible record data in [DAG-CBOR](https://ipld.io/specs/codecs/dag-cbor/spec/) format.
   - The default set of fields can be augmented with additional information.
-    - Implementations are free to leverage this, or simply ignore unexpected fields.
+    - Implementations MAY leverage this, but otherwise MUST ignore unexpected fields.
     - A good practice is to:
       - prefix custom field names with `_` to avoid collisions with any new
         mandatory fields that may be added in a future version of this
@@ -158,6 +158,8 @@ IPNS records are stored locally, as well as spread across the network, in order 
 
 For storing this structured data at rest and on the wire, we use `IpnsEntry` encoded as [protobuf](https://github.com/google/protobuf), which is a language-neutral, platform neutral extensible mechanism for serializing structured data.
 The extensible part of IPNS Record is placed in `IpnsEntry.data` field, which itself is encoded using a strict and deterministic subset of CBOR named [DAG-CBOR](https://ipld.io/specs/codecs/dag-cbor/spec/).
+
+This canonical serialization format uses the [`application/vnd.ipfs.ipns-record`](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record) content type.
 
 ```protobuf
 message IpnsEntry {
@@ -196,10 +198,14 @@ message IpnsEntry {
 }
 ```
 
-Notes:
+:::issue
 
-- For legacy reasons, some values must be stored in both `IpnsEntry` protobuf and `IpnsEntry.data` CBOR.
-  This should not be ignored, as it impacts interoperability with old software.
+For legacy reasons, some values must be stored in both `IpnsEntry` protobuf **and** `IpnsEntry.data` CBOR.
+This should not be ignored, as it impacts interoperability with old software.
+
+Opt-in lean IPNS Records are discussed in [ipfs/specs#376](https://github.com/ipfs/specs/issues/376).
+
+:::
 
 ### Record Size Limit
 
