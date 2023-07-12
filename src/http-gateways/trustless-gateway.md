@@ -41,11 +41,11 @@ A subset of "HTTP API" of :cite[path-gateway].
 
 ## `GET /ipfs/{cid}[/{path}][?{params}]`
 
-Downloads verifiable data for the specified **immutable** content path.
+Downloads verifiable, content-addressed data for the specified **immutable** content path.
 
-Optional `path` is permitted for requests that specify CAR format (`application/vnd.ipld.car`).
+Optional `path` is permitted for requests that specify CAR format (`?format=car` or `Accept: application/vnd.ipld.car`).
 
-For RAW requests, only `GET /ipfs/{cid}[?{params}]` is supported.
+For block requests (`?format=raw` or `Accept: application/vnd.ipld.raw`), only `GET /ipfs/{cid}[?{params}]` is supported.
 
 ## `HEAD /ipfs/{cid}[/{path}][?{params}]`
 
@@ -53,7 +53,7 @@ Same as GET, but does not return any payload.
 
 ## `GET /ipns/{key}[?{params}]`
 
-Downloads data at specified IPNS Key. Verifiable :cite[ipns-record] can be requested via `?format=ipns-record`
+Downloads data at specified IPNS Key. Verifiable :cite[ipns-record] can be requested via `?format=ipns-record` or `Accept: application/vnd.ipfs.ipns-record`.
 
 ## `HEAD /ipns/{key}[?{params}]`
 
@@ -85,7 +85,7 @@ Below response types SHOULD to be supported:
 - [application/vnd.ipfs.ipns-record](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record)
   - A verifiable :cite[ipns-record] (multicodec `0x0300`).
 
-Gateway SHOULD return HTTP 400 Bad Request when running in strict trustless
+A Gateway SHOULD return HTTP 400 Bad Request when running in strict trustless
 mode (no deserialized responses) and  `Accept` header is missing.
 
 ## Request Query Parameters
@@ -229,7 +229,9 @@ The behavior associated with the
 [`CarV1Header.roots`](https://ipld.io/specs/transport/car/carv1/#header) field
 is not currently specified.
 
-Clients MAY ignore it.
+The lack of standard here means a client MUST assume different Gateways could return a different value.
+
+A Client SHOULD ignore this field.
 
 :::issue
 
