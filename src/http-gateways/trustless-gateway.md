@@ -162,6 +162,14 @@ returned:
   - This allows client to produce a meaningful error (e.g, in case of UnixFS,
     leverage `Data.blocksizes` information present in the root `dag-pb` block).
 
+- In streaming scenarios, if a Gateway is capable of returning the root block
+  but lacks prior knowledge of the final component of the requested content
+  path being invalid or absent in the DAG, a Gateway SHOULD respond with HTTP 200.
+  - This behavior is a consequence of HTTP streaming limitations: blocks are
+    not buffered, by the time a related parent block is being parsed and
+    returned to the client, the HTTP status code has already been sent to the
+    client.
+
 # HTTP Response
 
 Below MUST be implemented **in addition** to "HTTP Response" of :cite[path-gateway].
