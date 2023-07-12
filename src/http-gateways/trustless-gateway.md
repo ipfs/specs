@@ -112,6 +112,10 @@ When the terminating entity at the end of the specified content path:
   Gateway MUST return only the minimal set of blocks necessary to verify the
   specified byte range of that entity.
 
+  - When dealing with a sharded UnixFS file (`dag-pb`, `0x70`) and a non-zero
+  `from` value, the UnixFS values `filesize` and `blocksizes` determine the
+  corresponding starting block for a given `from` offset.
+
 - cannot be interpreted as a continuous array of bytes (such as a DAG-CBOR/JSON
   map or UnixFS directory), the parameter MUST be ignored, and the request is
   equivalent to `dag-scope=entity`.
