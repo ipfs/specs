@@ -8,16 +8,31 @@ maturity: reliable
 editors:
   - name: Vasco Santos
     github: vasco-santos
+    affiliation:
+        name: Protocol Labs
+        url: https://protocol.ai/
   - name: Steve Allen
     github: Stebalien
+    affiliation:
+        name: Protocol Labs
+        url: https://protocol.ai/
   - name: Marcin Rataj
     github: lidel
     url: https://lidel.org/
+    affiliation:
+        name: Protocol Labs
+        url: https://protocol.ai/
   - name: Henrique Dias
     github: hacdias
     url: https://hacdias.com/
+    affiliation:
+        name: Protocol Labs
+        url: https://protocol.ai/
   - name: Gus Eggert
     github: guseggert
+    affiliation:
+        name: Protocol Labs
+        url: https://protocol.ai/
 tags: ['ipns']
 order: 0
 ---
@@ -116,31 +131,38 @@ and refer to IPNS addresses as `/ipns/{ipns-name}` (or `/ipns/{libp2p-key}`).
 A logical :dfn[IPNS Record] is a data structure containing the following fields:
 
 - **Value** (bytes)
-  - It can be any path, such as a `/ipns/{ipns-key}` path to another IPNS record, a [DNSLink](https://dnslink.dev/) path (`/ipns/example.com`) or an immutable IPFS path (`/ipfs/baf...`).
-  - Implementations MUST include this value in both `IpnsEntry.value` and inside the DAG-CBOR document in `IpnsEntry.data[Value]`.
+  - It can be any content path, such as a `/ipns/{ipns-key}` path to another IPNS record, a [DNSLink](https://dnslink.dev/) path (`/ipns/example.com`) or an immutable IPFS path (`/ipfs/baf...`).
+  - Implementations MUST include this value inside the DAG-CBOR document in `IpnsEntry.data[Value]`.
+
 - **Validity Type** (uint64)
   - Defines the conditions under which the record is valid.
   - The only supported value is `0`, which indicates the `validity` field contains the expiration date after which the IPNS record becomes invalid.
-  - Implementations MUST support `validityType = 0` and include this value in both `IpnsEntry.validityType` and inside the DAG-CBOR document at `IpnsEntry.data[ValidityType]`.
+  - Implementations MUST support `ValidityType = 0` and include this value inside the DAG-CBOR document at `IpnsEntry.data[ValidityType]`.
+
 - **Validity** (bytes)
-  - When `validityType = 0`
+  - When `ValidityType = 0`
     - Expiration date of the record with nanoseconds precision.  Expiration time should match the publishing medium's window.
       - For example, IPNS records published on the DHT should have an expiration time set to within 48 hours after publication. Setting the expiration time to longer than 48 hours will not have any effect, as DHT peers only keep records for up to 48 hours.
     - Represented as an ASCII string that follows notation from :cite[rfc3339] (`1970-01-01T00:00:00.000000001Z`).
-  - Implementations MUST include this value in both `IpnsEntry.validity` and inside the DAG-CBOR document at `IpnsEntry.data[Validity]`.
+  - Implementations MUST include this value inside the DAG-CBOR document at `IpnsEntry.data[Validity]`.
+
 - **Sequence** (uint64)
   - Represents the current version of the record (starts at 0).
-  - Implementations MUST include this value in both `IpnsEntry.sequence` and inside the DAG-CBOR document at `IpnsEntry.data[Sequence]`.
+  - Implementations MUST include this value in inside the DAG-CBOR document at `IpnsEntry.data[Sequence]`.
+
 - **TTL** (uint64)
   - A hint for how long the record should be cached before going back to, for instance the DHT, in order to check if it has been updated.
-  - Implementations MUST include this value in both `IpnsEntry.ttl` and inside the DAG-CBOR document at `IpnsEntry.data[TTL]`.
+  - Implementations MUST include this value inside the DAG-CBOR document at `IpnsEntry.data[TTL]`.
+
 - **Public Key** (bytes)
   - Public key used to sign this record.
     - If public key is small enough to fit in IPNS name (e.g., Ed25519 keys inlined using `identity` multihash), `IpnsEntry.pubKey` field is redundant and MAY be skipped to save space.
     - The public key MUST be included if it cannot be extracted from the IPNS name (e.g., legacy RSA keys). Implementers MUST follow key serialization defined in [PeerID specs](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#key-types).
+
 - **Signature** (bytes)
   - Provides the cryptographic proof that the IPNS record was created by the owner of the private key.
   - Implementations MUST include this value in `IpnsEntry.signatureV2` and follow signature creation and verification as described in [Record Creation](#record-creation) and [Record Verification](#record-verification).
+
 - **Extensible Data** (DAG-CBOR)
   - Extensible record data in [DAG-CBOR](https://ipld.io/specs/codecs/dag-cbor/spec/) format.
   - The default set of fields can be augmented with additional information.
@@ -168,42 +190,46 @@ message IpnsEntry {
   EOL = 0;
  }
 
- // deserialized copy of data[Value]
+ // legacy V1 copy of data[Value]
  optional bytes value = 1;
 
- // legacy field, verify 'signatureV2' instead
+ // legacy V1 field, verify 'signatureV2' instead
  optional bytes signatureV1 = 2;
 
- // deserialized copies of data[ValidityType] and data[Validity]
+ // legacy V1 copies of data[ValidityType] and data[Validity]
  optional ValidityType validityType = 3;
  optional bytes validity = 4;
 
- // deserialized copy of data[Sequence]
+ // legacy V1 copy of data[Sequence]
  optional uint64 sequence = 5;
 
- // record TTL in nanoseconds, a deserialized copy of data[TTL]
+ // legacy V1 copy copy of data[TTL]
  optional uint64 ttl = 6;
 
- // in order for nodes to properly validate a record upon receipt, they need the public
- // key associated with it. For old RSA keys, its easiest if we just send this as part of
- // the record itself. For newer Ed25519 keys, the public key can be embedded in the
+ // Optional Public Key to be used for signature verification.
+ // Used for big keys such as old RSA keys. Including the public key as part of
+ // the record itself makes it verifiable in offline mode, without any additional lookup.
+ // For newer Ed25519 keys, the public key is small enough that it can be embedded in the
  // IPNS Name itself, making this field unnecessary.
  optional bytes pubKey = 7;
 
- // the signature of the IPNS record
+ // (mandatory V2) signature of the IPNS record
  optional bytes signatureV2 = 8;
 
- // extensible record data in DAG-CBOR format
+ // (mandatory V2) extensible record data in DAG-CBOR format
  optional bytes data = 9;
 }
 ```
 
-:::issue
+:::warning
 
-For legacy reasons, some values must be stored in both `IpnsEntry` protobuf **and** `IpnsEntry.data` CBOR.
-This should not be ignored, as it impacts interoperability with old software.
+The `optional` keyword in Protocol Buffers (protobufs) indicates a field isn't
+required for message exchange. However, even if a field is marked `optional` in
+protobuf `message` syntax, an application such as IPNS may require it, making
+it mandatory at the application level.
 
-Opt-in lean IPNS Records are discussed in [ipfs/specs#376](https://github.com/ipfs/specs/issues/376).
+Thus, despite protobuf rules, developers must heed application-level
+requirements present in [Record Creation](#record-creation) section.
 
 :::
 
@@ -259,8 +285,90 @@ Finally, the network nodes may also republish their records, so that the records
 
 ### Record Creation
 
-IPNS record MUST be serialized as `IpnsEntry` protobuf, and `IpnsEntry.data` MUST be signed using the private key.
+IPNS record MUST be serialized as `IpnsEntry` protobuf, and `IpnsEntry.data`
+MUST be signed (`IpnsEntry.signatureV2`) using the private key.
+
 Creating a new IPNS record MUST follow the below steps:
+
+1. Create `IpnsEntry` protobuf
+
+2. Create a DAG-CBOR document with values for `Value`, `Validity`,
+   `ValidityType`, `Sequence`, and `TTL`
+
+   - Following [DAG-CBOR specification](https://ipld.io/specs/codecs/dag-cbor/spec/) is paramount.
+     The CBOR bytes will be used for signing and the serialized form must be
+     deterministic.
+
+   - If you are updating an existing record, remember to increase values in
+     `sequence` and `validity`
+
+3. Store DAG-CBOR in `IpnsEntry.data`.
+
+   - If you want to store additional metadata in the record, add it under
+     unique keys at `IpnsEntry.data`.
+
+   - The order of fields impacts signature verification. If you are using an
+     alternative CBOR implementation, make sure the CBOR field order follows
+     :cite[rfc7049] sorting rules: length and then bytewise. The order of
+     fields impacts signature verification.
+
+4. If your public key can't be inlined inside the IPNS Name, include a
+   serialized copy in `IpnsEntry.pubKey`
+
+   - This step SHOULD be skipped for Ed25519, and any other key types that are
+     small enough (32 bytes) to be inlined inside of [IPNS Name](#ipns-name) itself.
+
+5. Create `IpnsEntry.signatureV2`
+
+   - Create bytes for signing by concatenating `ipns-signature:` prefix (bytes
+     in hex: `69706e732d7369676e61747572653a`) with raw CBOR bytes from
+     `IpnsEntry.data`
+
+   - Sign concatenated bytes from the previous step using the private key, and
+     store the signature in `IpnsEntry.signatureV2`
+
+7. Confirm that the serialized `IpnsEntry` bytes sum to less than or equal to
+   [the size limit](#record-size-limit).
+
+
+Created `IpnsEntry` protobuf includes signed `data` CBOR and optional public key:
+
+```protobuf
+message IpnsEntry {
+ optional bytes pubKey = 7;
+ optional bytes signatureV2 = 8;
+ optional bytes data = 9;
+}
+```
+
+The `IpnsEntry.data` CBOR document includes key-value pairs for `Value`,
+`Validity`, `ValidityType`, `Sequence` and `TTL`.
+Keys are sorted and serialized in order that follows
+the [DAG-CBOR specification](https://ipld.io/specs/codecs/dag-cbor/spec/):
+
+```json
+// IpnsEntry.data
+{
+  Sequence: …
+  TTL: …
+  Validity: …
+  ValidityType: …
+  Value: …
+}
+```
+
+#### Record Creation: V1+V2 with Legacy V1 Signature
+
+:::warning
+
+Fields related to `signatureV1` has been deprecated since 2021.
+V1 signatures are no longer used during record validation.
+
+However it may be necessary to create a V1+V2 record that allows legacy
+software to use IPNS to upgrade itself to the latest version which supports V2
+signatures. In such case, follow the steps below.
+
+:::
 
 1. Create `IpnsEntry` and set `value`, `validity`, `validityType`, `sequence`, and `ttl`
    - If you are updating an existing record, remember to increase values in `sequence` and `validity`
@@ -281,7 +389,7 @@ Creating a new IPNS record MUST follow the below steps:
 
 ### Record Verification
 
-Implementations MUST resolve IPNS Names using only verified records.
+Implementations MUST resolve IPNS Names only using verified records.
 Record's data and signature verification MUST be implemented as outlined below, and fail on the first error.
 
 1. Before parsing the protobuf, confirm that the serialized `IpnsEntry` bytes sum to less than or equal to [the size limit](#record-size-limit).
@@ -293,16 +401,24 @@ Record's data and signature verification MUST be implemented as outlined below, 
      - Confirm Multihash type is `identity`
      - Unmarshall public key from Multihash digest
 4. Deserialize `IpnsEntry.data` as a DAG-CBOR document
-5. Confirm values in `IpnsEntry` protobuf match deserialized ones from `IpnsEntry.data`:
+5. Create bytes for signature verification by concatenating `ipns-signature:` prefix (bytes in hex: `69706e732d7369676e61747572653a`) with raw CBOR bytes from `IpnsEntry.data`
+6. Verify the signature in `IpnsEntry.signatureV2` against the concatenated result from the previous step.
+7. If `IpnsEntry.signatureV1` or `IpnsEntry.value` is present, confirm the values in `IpnsEntry` protobuf match deserialized ones from `IpnsEntry.data`:
    - `IpnsEntry.value` must match `IpnsEntry.data[Value]`
    - `IpnsEntry.validity` must match `IpnsEntry.data[Validity]`
    - `IpnsEntry.validityType` must match `IpnsEntry.data[ValidityType]`
    - `IpnsEntry.sequence` must match `IpnsEntry.data[Sequence]`
    - `IpnsEntry.ttl` must match `IpnsEntry.data[TTL]`
-6. Create bytes for signature verification by concatenating `ipns-signature:` prefix (bytes in hex: `69706e732d7369676e61747572653a`) with raw CBOR bytes from `IpnsEntry.data`
-7. Verify signature in `IpnsEntry.signatureV2` against concatenation result from the previous step.
+8. Check `Validity`
+   - If `ValidityType` is `0` (EOL) parse the `Validity` as an ASCII string
+     that follows notation from :cite[rfc3339]
+     (`1970-01-01T00:00:00.000000001Z`) and confirm it is bigger than the
+     current time.
 
-Value in `IpnsEntry.signatureV1` MUST be ignored.
+Value from `IpnsEntry.signatureV1` MUST never be used for signature verification.
+Implementations MUST ensure `IpnsEntry.signatureV2` is used instead.
+
+Value from `IpnsEntry.value` MUST never be used unless it is the same as signed `IpnsEntry.data[Value]`.
 
 ## Integration with IPFS
 
@@ -331,5 +447,5 @@ As the `pubsub` topics must be `utf-8` for interoperability among different impl
 
 ### Implementations
 
-- <https://github.com/ipfs/go-ipns>
+- <https://github.com/ipfs/boxo/tree/main/ipns>
 - <https://github.com/ipfs/js-ipns>
