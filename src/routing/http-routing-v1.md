@@ -205,9 +205,9 @@ This section contains a non-exhaustive list of known transfer protocols (by name
 
 ### Bitswap
 
-Multicodec name: `transport-bitswap`
-Schema: `bitswap`
-Specification: [ipfs/specs/BITSWAP.md](https://github.com/ipfs/specs/blob/main/BITSWAP.md)
+- Multicodec name: `transport-bitswap`
+- Schema: `bitswap`
+- Specification: [ipfs/specs/BITSWAP.md](https://github.com/ipfs/specs/blob/main/BITSWAP.md)
 
 #### Bitswap Read Provider Records
 
@@ -228,9 +228,9 @@ The server should respect a passed `transport` query parameter by filtering agai
 
 ### Filecoin Graphsync
 
-Multicodec name: `transport-graphsync-filecoinv1`
-Schema: `graphsync-filecoinv1`
-Specification: [ipfs/go-graphsync/blob/main/docs/architecture.md](https://github.com/ipfs/go-graphsync/blob/main/docs/architecture.md)
+- Multicodec name: `transport-graphsync-filecoinv1`
+- Schema: `graphsync-filecoinv1`
+- Specification: [ipfs/go-graphsync/blob/main/docs/architecture.md](https://github.com/ipfs/go-graphsync/blob/main/docs/architecture.md)
 
 #### Filecoin Graphsync Read Provider Records
 
