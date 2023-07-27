@@ -126,7 +126,7 @@ When the terminating entity at the end of the specified content path:
   specified byte range of that entity.
 
   - When dealing with a sharded UnixFS file (`dag-pb`, `0x70`) and a non-zero
-  `from` value, the UnixFS values `filesize` and `blocksizes` determine the
+  `from` value, the UnixFS data and `blocksizes`  determine the
   corresponding starting block for a given `from` offset.
 
 - cannot be interpreted as a continuous array of bytes (such as a DAG-CBOR/JSON
