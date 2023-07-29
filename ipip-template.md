@@ -36,13 +36,6 @@ interoperable implementations.
 When modifying an existing specification file, this section should provide a
 summary of changes. When adding new specification files, list all of them.
 
-## Test fixtures
-
-List relevant CIDs. Describe how implementations can use them to determine
-specification compliance. This section can be skipped if IPIP does not deal
-with the way IPFS handles content-addressed data, or the modified specification
-file already includes this information.
-
 ## Design rationale
 
 The rationale fleshes out the specification by describing what motivated
@@ -66,6 +59,13 @@ Explain the security implications/considerations relevant to the proposed change
 ### Alternatives
 
 Describe alternate designs that were considered and related work.
+
+## Test fixtures
+
+List relevant CIDs. Describe how implementations can use them to determine
+specification compliance. This section can be skipped if IPIP does not deal
+with the way IPFS handles content-addressed data, or the modified specification
+file already includes this information.
 
 ### Copyright
 

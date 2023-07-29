@@ -21,6 +21,7 @@ editors:
     url: https://hacdias.com/
 xref:
   - url
+  - trustless-gateway
 tags: ['httpGateways', 'lowLevelHttpGateways']
 order: 0
 ---
@@ -214,11 +215,13 @@ These are the equivalents:
 - `format=cbor` → `Accept: application/cbor`
 - `format=ipns-record` → `Accept: application/vnd.ipfs.ipns-record`
 
-<!-- TODO Planned: https://github.com/ipfs/go-ipfs/issues/8769
-- `selector=<cid>`  can be used for passing a CID with [IPLD selector](https://ipld.io/specs/selectors)
-    - Selector should be in dag-json or dag-cbor format
-    - This is a powerful primitive that allows for fetching subsets of data in specific order, either as raw bytes, or a CAR stream. Think “HTTP range requests”, but for IPLD, and more powerful.
--->
+### `dag-scope` (request query parameter)
+
+Only used on CAR requests, same as :ref[dag-scope] from :cite[trustless-gateway].
+
+### `entity-bytes` (request query parameter)
+
+Only used on CAR requests, same as :ref[entity-bytes] from :cite[trustless-gateway].
 
 # HTTP Response
 
@@ -592,7 +595,11 @@ The following response types require an explicit opt-in, can only be requested w
 - Raw Block (`?format=raw`)
   - Opaque bytes, see [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw).
 - CAR (`?format=car`)
-  - Arbitrary DAG as a verifiable CAR file or a stream, see [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car).
+  - A CAR file or a stream that contains all blocks required to trustlessly verify the requested content path query, see [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car) and :cite[trustless-gateway].
+  - **Note:** by default, block order in CAR response is not deterministic,
+    blocks can be returned in different order, depending on implementation
+    choices (traversal, speed at which blocks arrive from the network, etc).
+    An opt-in ordered CAR responses MAY be introduced in a future IPIP.
 - TAR (`?format=tar`)
   - Deserialized UnixFS files and directories as a TAR file or a stream, see :cite[ipip-0288].
 - IPNS Record
