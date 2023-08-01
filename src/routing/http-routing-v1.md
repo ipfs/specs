@@ -38,11 +38,11 @@ As such, human-readable encodings of types are preferred. This specification may
 
 Until required for business logic, servers should treat these types as opaque strings, and should preserve unknown JSON fields.
 
-### Versioning
+## Versioning
 
 This API uses a standard version prefix in the path, such as `/v1/...`. If a backwards-incompatible change must be made, then the version number should be increased.
 
-## Content Providers API
+## Content Routing API
 
 ### `GET /routing/v1/providers/{cid}`
 
@@ -72,11 +72,11 @@ This API uses a standard version prefix in the path, such as `/v1/...`. If a bac
 }
 ```
 
-Response limit: 100 providers.
+Responses SHOULD be limited to 100 providers. This endpoint MAY support [streaming](#streaming).
 
-Each object in the `Providers` list is a record confirming to the [Peer Schema](#peer).
+Each object in the `Providers` list is a record conforming to the [Peer Schema](#peer).
 
-## Peers API
+## Peer Routing API
 
 ### `GET /routing/v1/peers/{peer-id}`
 
@@ -107,9 +107,9 @@ represented as a CIDv1 encoded with `libp2p-key` codec.
 }
 ```
 
-Response limit: 100 peer records.
+Responses SHOULD be limited to 100 providers. This endpoint MAY support [streaming](#streaming).
 
-Each object in the `Peers` list is a record confirming to the [Peer Schema](#peer).
+Each object in the `Peers` list is a record conforming to the [Peer Schema](#peer).
 
 ## IPNS API
 
@@ -172,7 +172,7 @@ with one result per line:
 
 :::note
 
-Streaming is opt-in and backwards-compatibile with clients and servers that do
+Streaming is opt-in and backwards-compatible with clients and servers that do
 not support streaming:
 
 - Requests without the `Accept: application/x-ndjson` header MUST default to
