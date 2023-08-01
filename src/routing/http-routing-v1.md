@@ -42,34 +42,6 @@ Until required for business logic, servers should treat these types as opaque st
 
 This API uses a standard version prefix in the path, such as `/v1/...`. If a backwards-incompatible change must be made, then the version number should be increased.
 
-### Provider Records
-
-A provider record contains information about a content provider, including the transfer protocol and any protocol-specific information useful for fetching the content from the provider.
-
-The information required to write a record to a router (*"write" provider records*) may be different than the information contained when reading provider records (*"read" provider records*).
-
-For example, indexers may require a signature in `bitswap` write records for authentication of the peer contained in the record, but the read records may not include this authentication information.
-
-Both read and write provider records have a minimal required schema as follows:
-
-```json
-{
-    "Protocol": "<transfer_protocol_name>",
-    "Schema": "<transfer_protocol_schema>",
-    ...
-}
-```
-
-Where:
-
-- `Protocol` is the multicodec name of the transfer protocol or an opaque string (for experimenting with novel protocols without a multicodec)
-- `Schema` denotes the schema to use for encoding/decoding the record
-  - This is separate from the `Protocol` to allow this HTTP API to evolve independently of the transfer protocol
-  - Implementations should switch on this when parsing records, not on `Protocol`
-- `...` denotes opaque JSON, which may contain information specific to the transfer protocol
-
-Specifications for some transfer protocols are provided in the "Transfer Protocols" section.
-
 ## Content Providers API
 
 ### `GET /routing/v1/providers/{cid}`
@@ -90,17 +62,19 @@ Specifications for some transfer protocols are provided in the "Transfer Protoco
 {
   "Providers": [
     {
-      "Protocol": "<protocol_name>",
-      "Schema": "<schema>",
-      ...
-    }
+      "Schema": "peer",
+      "Protocols": ["<protocol-a>", "<protocol-b>", ...],
+      "ID": "12D3K...",
+      "Addrs": ["/ip4/..."],
+    },
+    ...
   ]
 }
 ```
 
-Response limit: 100 providers
+Response limit: 100 providers.
 
-Each object in the `Providers` list is a *read provider record*.
+Each object in the `Providers` list is a record confirming to the [Peer Schema](#peer).
 
 ## Peers API
 
@@ -119,7 +93,23 @@ represented as a CIDv1 encoded with `libp2p-key` codec.
 
 #### Response Body
 
-A [`peer` schema record](#peer).
+```json
+{
+  "Peers": [
+    {
+      "Schema": "<schema>",
+      "Protocols": ["<protocol-a>", "<protocol-b>", ...],
+      "ID": "12D3K...",
+      "Addrs": ["/ip4/..."],
+    },
+    ...
+  ]
+}
+```
+
+Response limit: 100 peer records.
+
+Each object in the `Peers` list is a record confirming to the [Peer Schema](#peer).
 
 ## IPNS API
 
@@ -142,7 +132,7 @@ A [`peer` schema record](#peer).
 
 #### Response Body
 
-The response body contains a  :ref[IPNS Record] serialized using the verifiable [`application/vnd.ipfs.ipns-record`](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record) protobuf format.
+The response body contains a :ref[IPNS Record] serialized using the verifiable [`application/vnd.ipfs.ipns-record`](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record) protobuf format.
 
 ### `PUT /routing/v1/ipns/{name}`
 
