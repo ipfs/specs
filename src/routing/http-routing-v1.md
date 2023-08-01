@@ -243,7 +243,7 @@ use the information contained in the additional field. If that is not the case, 
   "ID": "12D3K...",
   "Addrs": ["/ip4/..."],
   "Protocols": ["transport-bitswap", "foobar", ...],
-  "foobar": "[base64-blob]",
+  "foobar": "[base64-blob]"
 }
 ```
 
