@@ -240,6 +240,25 @@ The `peer` schema represents an arbitrary peer.
 - `Protocols`: a list of protocols known to be supported by this peer. 
   - If empty, it means the server is missing protocol information, and the client should use `ID` and `Addrs` to connect to the peer and use the [libp2p identify protocol](https://github.com/libp2p/specs/tree/master/identify) to learn about supported ones.
 
+:::note
+
+To allow for protocol-specific fields and future-proofing, the parser MUST allow for unknown fields,
+and the clients MUST ignore unknown ones. Below is an example on how one could create a `foobar` protocol
+that includes an additional field `foobar`. If the client knows the `foobar` protocol, they are free to
+use the information contained in the additional field. If that is not the case, the field MUST be ignored.
+
+```json
+{
+  "Schema": "peer",
+  "ID": "12D3K...",
+  "Addrs": ["/ip4/..."],
+  "Protocols": ["transport-bitswap", "foobar", ...],
+  "foobar": "[base64-blob]",
+}
+```
+
+:::
+
 ## Known Transfer Protocols
 
 This section contains a non-exhaustive list of known transfer protocols (by name) that may be supported by clients and servers.
