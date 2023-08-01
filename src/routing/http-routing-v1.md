@@ -235,9 +235,9 @@ The `peer` schema represents an arbitrary peer.
 }
 ```
 
-- `ID`: the [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md).
+- `ID`: the [Peer ID][peer-id].
 - `Addrs`: a list of known [multiaddrs][multiaddr] for this peer. This list MAY be incomplete.
-- `Protocols`: a list of protocols known to be supported by this peer. 
+- `Protocols`: a list of protocols known to be supported by this peer.
   - If empty, it means the server is missing protocol information, and the client should use `ID` and `Addrs` to connect to the peer and use the [libp2p identify protocol](https://github.com/libp2p/specs/tree/master/identify) to learn about supported ones.
 
 :::note
@@ -258,59 +258,6 @@ use the information contained in the additional field. If that is not the case, 
 ```
 
 :::
-
-## Known Transfer Protocols
-
-This section contains a non-exhaustive list of known transfer protocols (by name) that may be supported by clients and servers.
-
-### Bitswap
-
-- Multicodec name: `transport-bitswap`
-- Schema: `bitswap`
-- Specification: [ipfs/specs/BITSWAP.md](https://github.com/ipfs/specs/blob/main/BITSWAP.md)
-
-#### Bitswap Read Provider Records
-
-```json
-{
-  "Protocol": "transport-bitswap",
-  "Schema": "bitswap",
-  "ID": "12D3K...",
-  "Addrs": ["/ip4/..."]
-}
-```
-
-- `ID`: the [Peer ID][peer-id] to contact
-- `Addrs`: a list of known multiaddrs for the peer
-  - This list may be incomplete or incorrect and should only be treated as *hints* to improve performance by avoiding extra peer lookups
-
-The server should respect a passed `transport` query parameter by filtering against the `Addrs` list.
-
-### Filecoin Graphsync
-
-- Multicodec name: `transport-graphsync-filecoinv1`
-- Schema: `graphsync-filecoinv1`
-- Specification: [ipfs/go-graphsync/blob/main/docs/architecture.md](https://github.com/ipfs/go-graphsync/blob/main/docs/architecture.md)
-
-#### Filecoin Graphsync Read Provider Records
-
-```json
-{
-  "Protocol": "transport-graphsync-filecoinv1",
-  "Schema": "graphsync-filecoinv1",
-  "ID": "12D3K...",
-  "Addrs": ["/ip4/..."],
-  "PieceCID": "<cid>",
-  "VerifiedDeal": true,
-  "FastRetrieval": true
-}
-```
-
-- `ID`: the [Peer ID][peer-id] of the provider
-- `Addrs`: a list of known multiaddrs for the provider
-- `PieceCID`: the CID of the [piece](https://spec.filecoin.io/systems/filecoin_files/piece/#section-systems.filecoin_files.piece) within which the data is stored
-- `VerifiedDeal`: whether the deal corresponding to the data is verified
-- `FastRetrieval`: whether the provider claims there is an unsealed copy of the data available for fast retrieval
 
 [multibase]: https://github.com/multiformats/multibase
 [CIDv1]: https://github.com/multiformats/cid#cidv1
