@@ -22,6 +22,8 @@ editors:
 xref:
   - url
   - trustless-gateway
+  - ipip-0402
+  - ipip-0412
 tags: ['httpGateways', 'lowLevelHttpGateways']
 order: 0
 ---
@@ -143,15 +145,22 @@ For example:
 
 ### `Range` (request header)
 
-`Range` can be used for requesting specific byte ranges of UnixFS files and raw
+`Range` can be used for requesting specific byte range of UnixFS files and raw
 blocks.
 
 Gateway implementations SHOULD be smart enough to require only the minimal DAG subset
 necessary for handling the range request.
 
-NOTE: for more advanced use cases such as partial DAG/CAR streaming, or
-non-UnixFS data structures, see the `selector` query parameter
-[proposal](https://github.com/ipfs/go-ipfs/issues/8769).
+Gateways SHOULD support single range requests. The support of more than one
+range is optional: implementation MAY decide to not support more than one range.
+
+:::note
+
+For more advanced use cases such as partial DAG/CAR streaming, or non-UnixFS
+data structures, see `dag-scope` and `entity-bytes` from :cite[ipip-0402] and
+ordered CARs from :cite[ipip-0412].
+
+:::
 
 ### `Service-Worker` (request header)
 
