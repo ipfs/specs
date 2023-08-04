@@ -67,15 +67,15 @@ Same as in :cite[path-gateway], but with limited number of supported response ty
 
 ### `Accept` (request header)
 
-A Client SHOULD sent this HTTP header to leverage content type negotiation
+A Client SHOULD send this HTTP header to leverage content type negotiation
 based on section 12.5.1 of :cite[rfc9110].
 
-Below response types MUST to be supported:
+Below response types MUST be supported:
 
 - [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw)
   - A single, verifiable raw block to be returned.
 
-Below response types SHOULD to be supported:
+Below response types SHOULD be supported:
 
 - [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car)
   - Disables IPLD/IPFS deserialization, requests a verifiable CAR stream to be
@@ -86,7 +86,7 @@ Below response types SHOULD to be supported:
   - A verifiable :cite[ipns-record] (multicodec `0x0300`).
 
 A Gateway SHOULD return HTTP 400 Bad Request when running in strict trustless
-mode (no deserialized responses) and  `Accept` header is missing.
+mode (no deserialized responses) and `Accept` header is missing.
 
 ## Request Query Parameters
 
@@ -126,7 +126,7 @@ When the terminating entity at the end of the specified content path:
   specified byte range of that entity.
 
   - When dealing with a sharded UnixFS file (`dag-pb`, `0x70`) and a non-zero
-  `from` value, the UnixFS data and `blocksizes`  determine the
+  `from` value, the UnixFS data and `blocksizes` determine the
   corresponding starting block for a given `from` offset.
 
 - cannot be interpreted as a continuous array of bytes (such as a DAG-CBOR/JSON
@@ -163,14 +163,14 @@ that includes enough blocks for the client to understand why the requested
 returned:
 
 - If the requested `entity-bytes` resolves to a range that partially falls
-  outside of the entity's byte range, the response MUST include the subset of
+  outside the entity's byte range, the response MUST include the subset of
   blocks within the entity's bytes.
   - This allows clients to request valid ranges of the entity without needing
     to know its total size beforehand, and it does not require the Gateway to
     buffer the entire entity before returning the response.
 
 - If the requested `entity-bytes` resolves to a zero-length range or falls
-  fully outside of the entity's bytes, the response is equivalent to
+  fully outside the entity's bytes, the response is equivalent to
   `dag-scope=block`.
   - This allows client to produce a meaningful error (e.g, in case of UnixFS,
     leverage `Data.blocksizes` information present in the root `dag-pb` block).
@@ -366,8 +366,8 @@ Gateway implementations SHOULD decide on the implicit default ordering or
 other parameters, and use it in responses when client did not explicitly
 specify any matching preference.
 
-A Gateway MAY choose to implement only some of the parameters and return HTTP
-400 Bad Request or 406 Not Acceptable when client requested a response with
+A Gateway MAY choose to implement only some parameters and return HTTP
+400 Bad Request or 406 Not Acceptable when a client requested a response with
 unsupported content type variant.
 
 A Client MUST verify `Content-Type` returned with CAR response before
