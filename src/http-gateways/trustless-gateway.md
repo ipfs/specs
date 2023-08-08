@@ -304,16 +304,17 @@ CID.
 
 ## CAR `meta` (content type parameter)
 
-The `meta` parameter allows clients to request the server to include additional metadata about the
+The `meta=eof` parameter allows clients to request the server to include additional metadata about the
 CAR to be included at the end of the response body.
 
-This parameter can be used with `version=1` only.
+This parameter SHOULD only be used with CAR `version=1`.
+Values other than `eof` SHOULD be ignored.
 
 When the parameter is not set, the server must not add any extra CAR blocks to the response.
 
 The metadata block is a regular CAR block with the following properties:
 
-- CID specifies multicodec `car-metada` (0x04ff), see
+- CID specifies multicodec `car-metadata` (`0x04ff`), see
   [multicodec#334](https://github.com/multiformats/multicodec/pull/334).
 
 - The payload contains metadata encoded as DAG-CBOR.

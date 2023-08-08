@@ -1,15 +1,17 @@
 ---
-# IPIP number should  match its pull request number. After you open a PR,
-# please update title and update the filename to `ipip0000`.
-title: "IPIP-0431: CAR metadata trailer in Gateway responses"
+title: "IPIP-0431: Opt-in Extensible CAR Metadata on Trustless Gateway"
 date: 2023-08-08
 ipip: proposal
 editors:
   - name: Miroslav Bajtoš
-# relatedIssues:
-#   - link to issue
-order: 0000
-tags: ['ipips', 'httpGateways']
+    github: bajtos
+    affiliation:
+        name: Protocol Labs
+        url: https://protocol.ai/
+relatedIssues:
+  - https://github.com/filecoin-project/boost/issues/1597
+order: 431
+tags: ['ipips']
 ---
 
 ## Summary
@@ -26,25 +28,32 @@ is an unsolved problem, we need a way to verify that a SPARK node retrieved the 
 given SP. To enable that, we need the Trustless Gateway serving the retrieval request to include a
 retrieval attestation after the entire response was sent to the client.
 
-We currently have no mechanism to signal that a CAR file transmission over HTTP completed
-successfully. However, we need this in order to be able to use CARs as a way of serving streaming
+Aside from this specific use case, the IPFS Ecosystem at large has no reliable
+mechanism to signal that a CAR file transmission over HTTP completed successfully.
+
+However, we need this in order to be able to use CARs as a way of serving streaming
 responses for queries. One way of solving this problem is to append an extra block at the end of the
 CAR stream with information that clients can use to check whether all CAR blocks have been received.
 
 ## Detailed design
 
 CAR content type
-(`[application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car)`)
-already supports multiple parameters like `version` and `order`, which allows gateways to indicate
-which CAR flavors is returned with the response.
+([`application/vnd.ipld.car`](https://www.iana.org/assignments/media-types/application/vnd.ipld.car))
+already supports optional parameters like `version` and `order`, which allows
+HTTP client to opt-in via `Accept` header and Gateway to indicate via
+`Content-Type` header which CAR flavor is returned with the response.
 
-The proposed solution introduces a new parameters for the content type headers in HTTP requests
+The proposed solution introduces a new parameter for the CAR content type in HTTP requests
 and responses: `meta`.
 
-When the content type parameter `meta` is set to `eof`, the Gateway will write one additional CAR
+When the CAR content type parameter `meta` is set to `eof`, the Gateway will write one additional CAR
 block with metadata to the response, after it sent all CAR blocks.
 
-The metadata format is DAG-CBOR and open to extension.
+The metadata format is DAG-CBOR and open to extension, allowing standardized
+userland experimentation similar to the Extensible Data field from IPNS V2.
+
+See [CAR `meta` (content type parameter)](/http-gateways/trustless-gateway/#car-meta-content-type-parameter)
+in Trustless Gateway specification for more details.
 
 ## Design rationale
 
@@ -60,15 +69,15 @@ in the future.
 performed the retrieval from the given server.
 
 - The `len` field in the metadata block allows clients to verify whether they received all CAR
-bytes.
+bytes, which provides a backward-compatible solution for the [CARv1 streaming problem](https://github.com/ipfs/specs/pull/332) until new CAR version is introduced.
 
 ### Compatibility
 
-The new feature requires clients to explicitly ask the server to include the extra block,
+The new feature requires clients to explicitly ask the server to include the extra block via `Accept` header,
 therefore the change is fully backwards-compatible for all existing gateway clients.
 
-Gateways receiving requests for the new content type can ignore the `meta` parameter they don't
-support and return back a response with one of the content types they support. This makes the
+Gateways receiving requests for the CAR content type can ignore the `meta` parameter they don't
+support and return back a response with one of the CAR content types they support. This makes the
 proposed change backwards-compatible for existing gateways too.
 
 
@@ -78,10 +87,28 @@ The proposed specification change does not introduce any negative security impli
 
 ### Alternatives
 
+#### HTTP Trailers
+
 Instead of adding a new content type argument, we were considering sending the additional metadata
 in HTTP response trailers. Unfortunately, HTTP trailers are not widely supported by the ecosystem.
-Nginx proxy module discards them, browser `Fetch API` do not allow clients to access trailer
-headers, neither does the Rust `reqwest` client.
+Nginx proxy module discards them, [browser `Fetch API` does not allow JS clients to access trailer
+headers](https://github.com/mdn/browser-compat-data/issues/14703), neither does the Rust `reqwest` client.
+
+#### New Content-Type
+
+We could introduce new `Content-Type: application/vnd.ipld.car-stream` and
+create a specification of its wire format that wraps CARv1 and includes
+additional DAG-CBOR  manifest at the end. It would be effectively the same CAR
+byte stream, but with different `Content-Type`.
+
+Downsides of this solution:
+
+- maintenance cost, requires duplicating of all CAR-related tests and features
+- opportunity cost, in creating new content type, we increase cognitive
+  overhead for everyone working with IPFS over HTTP
+- no backward-compatible interop with existing tools and gateways that only
+  speak `application/vnd.ipld.car`
+- distracts us away from working on things like large blocks and CARv3
 
 ## Test fixtures
 
