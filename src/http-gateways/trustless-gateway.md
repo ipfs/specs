@@ -80,7 +80,8 @@ Below response types SHOULD be supported:
 - [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car)
   - Disables IPLD/IPFS deserialization, requests a verifiable CAR stream to be
     returned, implementations MAY support optional CAR content type parameters
-    (:cite[ipip-0412]) and the explicit [CAR format signaling in HTTP Request](#car-format-signaling-in-request).
+    (:cite[ipip-0412]), the explicit [CAR format signaling in HTTP Request](#car-format-signaling-in-request)
+    and the optional [CAR metadata block](#car-meta-content-type-parameter).
 
 - [application/vnd.ipfs.ipns-record](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record)
   - A verifiable :cite[ipns-record] (multicodec `0x0300`).
@@ -300,6 +301,31 @@ A Gateway MUST NOT include virtual blocks identified by identity CIDs
 of their presence in the DAG or the value assigned to the "dups" parameter, as
 the raw data is already present in the parent block that links to the identity
 CID.
+
+## CAR `meta` (content type parameter)
+
+The `meta` parameter allows clients to request the server to include additional metadata about the
+CAR to be included at the end of the response body.
+
+This parameter can be used with `version=1` only.
+
+When the parameter is not set, the server must not add any extra CAR blocks to the response.
+
+The metadata block is a regular CAR block with the following properties:
+
+- CID specifies multicodec `car-metada` (0x04ff), see
+  [multicodec#334](https://github.com/multiformats/multicodec/pull/334).
+
+- The payload contains metadata encoded as DAG-CBOR.
+
+The metadata MUST include the following fields:
+
+- `len` - byte length of the CAR data (excluding the metadata block)
+- `b3h` - Blake3 hash (checksum) of the CAR data (excluding the metadata block).
+- `b3h_sig` - A signature over `<len><b3h><request>` using server's Ed2559 identity.
+  - `len` is encoded as `varint`,
+  - `b3h` is encoded as 32 bytes,
+  - The effective query as executed by the gateway. This query is the request url - path and query string arguments.
 
 ## CAR format parameters and determinism
 
