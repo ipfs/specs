@@ -1,1 +1,1 @@
-Moved to [../ipip-template.md].
+Moved to [`../ipip-template.md`](../ipip-template.md).
