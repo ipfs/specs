@@ -9,11 +9,31 @@ maturity: reliable
 editors:
   - name: Gus Eggert
     github: guseggert
+    affiliation:
+        name: Protocol Labs
+        url: https://protocol.ai/
   - name: Masih H. Derkani
     github: masih
+    affiliation:
+        name: Protocol Labs
+        url: https://protocol.ai/
   - name: Henrique Dias
     url: https://hacdias.com/
     github: hacdias
+    affiliation:
+        name: Protocol Labs
+        url: https://protocol.ai/
+  - name: Adin Schmahmann
+    github: aschmahmann
+    affiliation:
+        name: Protocol Labs
+        url: https://protocol.ai/
+  - name: Marcin Rataj
+    github: lidel
+    url: https://lidel.org/
+    affiliation:
+        name: Protocol Labs
+        url: https://protocol.ai/
 xref:
   - ipns-record
 order: 0
@@ -72,7 +92,7 @@ Specifications for some transfer protocols are provided in the "Transfer Protoco
 
 ## Content Providers API
 
-### `GET /routing/v1/providers/{cid}[?routers=rA,rB]`
+### `GET /routing/v1/providers/{cid}`
 
 #### Path Parameters
 
@@ -118,7 +138,7 @@ Each object in the `Providers` list is a *read provider record*.
 
 ## Routers API
 
-### `GET /routing/v1/routers
+### `GET /routing/v1/routers`
 
 #### Response Status Codes
 
@@ -133,7 +153,6 @@ Each object in the `Providers` list is a *read provider record*.
     {
       "Schema": "router",
       "Name": "<router_name>",
-      "Description": "<router_description>",
       ...
     },
     ...
@@ -144,6 +163,8 @@ Each object in the `Providers` list is a *read provider record*.
 Response limit: 100 routers
 
 Each `Name` can be used in explicit `?routers=name1,name2` queries.
+
+Additional metadata per router SHOULD be included in other fields defined by `router` schema.
 
 ## IPNS API
 
@@ -255,7 +276,10 @@ This section contains a non-exhaustive list of known schemas (by name) that may 
 {
   "Schema": "router",
   "Name": "example",
+  "Default": false, // is it used when no ?routers is not passed
+  "RoutingType": ["providers", "ipns", "peers"], // where can this router be used
   "Description": "A human-readable description of this router.",
+  "Addrs": ["/ip4/..."] // optional URLs or Multiddrs of the upstream router
 }
 ```
 
