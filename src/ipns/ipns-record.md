@@ -239,7 +239,7 @@ IPNS implementations MUST support sending and receiving a serialized
 `IpnsEntry` less than or equal to **10 KiB** in size.
 
 Records over the limit MAY be ignored. Handling records larger than the
-limit is not recommended so as to keep compatibility with implementations and
+limit is not recommended to keep compatibility with implementations and
 transports that follow this specification.
 
 ### Backward Compatibility
@@ -316,7 +316,7 @@ Creating a new IPNS record MUST follow the below steps:
    serialized copy in `IpnsEntry.pubKey`
 
    - This step SHOULD be skipped for Ed25519, and any other key types that are
-     small enough (32 bytes) to be inlined inside of [IPNS Name](#ipns-name) itself.
+     small enough (32 bytes) to be inlined inside [IPNS Name](#ipns-name) itself.
 
 5. Create `IpnsEntry.signatureV2`
 
@@ -327,9 +327,8 @@ Creating a new IPNS record MUST follow the below steps:
    - Sign concatenated bytes from the previous step using the private key, and
      store the signature in `IpnsEntry.signatureV2`
 
-7. Confirm that the serialized `IpnsEntry` bytes sum to less than or equal to
+6. Confirm that the serialized `IpnsEntry` bytes sum to less than or equal to
    [the size limit](#record-size-limit).
-
 
 Created `IpnsEntry` protobuf includes signed `data` CBOR and optional public key:
 
@@ -357,14 +356,14 @@ the [DAG-CBOR specification](https://ipld.io/specs/codecs/dag-cbor/spec/):
 }
 ```
 
-#### Record Creation: V1+V2 with Legacy V1 Signature
+#### Record Creation with Legacy SignatureV1
 
 :::warning
 
 Fields related to `signatureV1` has been deprecated since 2021.
 V1 signatures are no longer used during record validation.
 
-However it may be necessary to create a V1+V2 record that allows legacy
+However, it may be necessary to create a V2+V1 record that allows legacy
 software to use IPNS to upgrade itself to the latest version which supports V2
 signatures. In such case, follow the steps below.
 
@@ -378,7 +377,7 @@ signatures. In such case, follow the steps below.
    - If you want to store additional metadata in the record, add it under unique keys at `IpnsEntry.data`.
    - The order of fields impacts signature verification. If you are using an alternative CBOR implementation, make sure the CBOR field order follows :cite[rfc7049] sorting rules: length and then bytewise. The order of fields impacts signature verification.
 4. If your public key can't be inlined inside the IPNS Name, include a serialized copy in `IpnsEntry.pubKey`
-   - This step SHOULD be skipped for Ed25519, and any other key types that are inlined inside of [IPNS Name](#ipns-name) itself.
+   - This step SHOULD be skipped for Ed25519, and any other key types that are inlined inside [IPNS Name](#ipns-name) itself.
 5. Create `IpnsEntry.signatureV2`
    - Create bytes for signing by concatenating `ipns-signature:` prefix (bytes in hex: `69706e732d7369676e61747572653a`) with raw CBOR bytes from `IpnsEntry.data`
    - Sign concatenated bytes from the previous step using the private key, and store the signature in `IpnsEntry.signatureV2`
@@ -420,11 +419,13 @@ Implementations MUST ensure `IpnsEntry.signatureV2` is used instead.
 
 Value from `IpnsEntry.value` MUST never be used unless it is the same as signed `IpnsEntry.data[Value]`.
 
-## Integration with IPFS
+## Appendix: Notes for Implementers
+
+### Integration with IPFS
 
 Below are additional notes for implementers, documenting how IPNS is integrated within IPFS ecosystem.
 
-### Local Record
+#### Local Record
 
 This record is stored in the peer's repo datastore and contains the **latest** version of the IPNS record published by the provided key. This record is useful for republishing, as well as tracking the sequence number.
 A legacy convention that implementers MAY want to follow is to store serialized `IpnsEntry` under:
@@ -433,7 +434,7 @@ A legacy convention that implementers MAY want to follow is to store serialized 
 
 Note: Base32 according to the :cite[rfc4648].
 
-### Routing Record
+#### Routing Record
 
 The routing record is spread across the network according to the available routing systems.
 The two routing systems currently available in IPFS are the [libp2p Kademlia DHT](https://github.com/libp2p/specs/tree/master/kad-dht) and :cite[ipns-pubsub-router].
@@ -445,7 +446,11 @@ The two routing systems currently available in IPFS are the [libp2p Kademlia DHT
 
 As the `pubsub` topics must be `utf-8` for interoperability among different implementations, IPNS over PubSub topics use additional wrapping `/record/base64url-unpadded(key)`
 
-### Implementations
+#### Reference Implementations
+
+When language-specific nuances are not covered by this specification, consider
+below reference  implementations as the baseline for making decisions around
+interoperability.
 
 - <https://github.com/ipfs/boxo/tree/main/ipns>
 - <https://github.com/ipfs/js-ipns>
