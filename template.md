@@ -1,16 +1,13 @@
-# Specification Template
-
-![wip](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
-
-**Author(s)**:
-- Name
-
-**Maintainer(s)**:
-- Name
-
-* * *
-
-**Abstract**
+---
+title: Specification Title
+description: >
+  Specification short description.
+date: YYYY-MM_DD
+maturity: wip
+editors:
+  - name: Your Name
+    github: yourGitHubHandle
+---
 
 One paragraph explanation of the specification
 

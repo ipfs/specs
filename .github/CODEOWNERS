@@ -5,9 +5,11 @@
 
 # global IPIP
 IPIP/ @ipfs/specs-stewards
+src/ipips/ @ipfs/specs-stewards
 
 # Selected Spec Stewards can be defined below to be automatically requested for
 # review when someone opens a pull request that modifies area of their
 # interest.
 
 http-gateways/  @lidel
+src/http-gateways/ @lidel
