@@ -4,7 +4,7 @@ description: >
   Delegated routing is a mechanism for IPFS implementations to use for offloading
   content routing and naming to another process/server. This specification describes
   an HTTP API for delegated content routing.
-date: 2023-03-22
+date: 2023-08-31
 maturity: reliable
 editors:
   - name: Gus Eggert
