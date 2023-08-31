@@ -9,11 +9,26 @@ maturity: reliable
 editors:
   - name: Gus Eggert
     github: guseggert
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
   - name: Masih H. Derkani
     github: masih
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
   - name: Henrique Dias
     url: https://hacdias.com/
     github: hacdias
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
+  - name: Marcin Rataj
+    github: lidel
+    url: https://lidel.org/
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
 xref:
   - ipns-record
 order: 0
@@ -32,7 +47,7 @@ As such, human-readable encodings of types are preferred. This specification may
 
 - CIDs are always string-encoded using a [multibase]-encoded [CIDv1].
 - Multiaddrs are string-encoded according to the [human-readable multiaddr specification][multiaddr].
-- Peer IDs are string-encoded according [PeerID string representation specification][peer-id-representation].
+- Peer IDs are string-encoded according [PeerID string representation specification][peer-id-representation]: either a Multihash in Base58btc, or a CIDv1 with libp2p-key (`0x72`) codec.
 - Multibase bytes are string-encoded according to [the Multibase spec][multibase], and SHOULD use base64.
 - Timestamps are Unix millisecond epoch timestamps.
 
@@ -62,19 +77,21 @@ This API uses a standard version prefix in the path, such as `/v1/...`. If a bac
 {
   "Providers": [
     {
-      "Schema": "peer",
-      "Protocols": ["<protocol-a>", "<protocol-b>", ...],
-      "ID": "12D3K...",
+      "Schema": "<schema>",
+      "ID": "bafz...",
       "Addrs": ["/ip4/..."],
+      ...
     },
     ...
   ]
 }
 ```
 
-Responses SHOULD be limited to 100 providers. This endpoint MAY support [streaming](#streaming).
+The `application/json` responses SHOULD be limited to 100 providers.
 
-Each object in the `Providers` list is a record conforming to the [Peer Schema](#peer).
+The client SHOULD be able to make a request with `Accept: application/x-ndjson` and get a [stream](#streaming) with more results.
+
+Each object in the `Providers` list is a record conforming to a schema, usually the [Peer Schema](#peer-schema).
 
 ## Peer Routing API
 
@@ -99,17 +116,20 @@ represented as a CIDv1 encoded with `libp2p-key` codec.
     {
       "Schema": "<schema>",
       "Protocols": ["<protocol-a>", "<protocol-b>", ...],
-      "ID": "12D3K...",
+      "ID": "bafz...",
       "Addrs": ["/ip4/..."],
+      ...
     },
     ...
   ]
 }
 ```
 
-Responses SHOULD be limited to 100 providers. This endpoint MAY support [streaming](#streaming).
+The `application/json` responses SHOULD be limited to 100 peers.
 
-Each object in the `Peers` list is a record conforming to the [Peer Schema](#peer).
+The client SHOULD be able to make a request with `Accept: application/x-ndjson` and get a [stream](#streaming) with more results.
+
+Each object in the `Peers` list is a record conforming to the [Peer Schema](#peer-schema).
 
 ## IPNS API
 
@@ -212,42 +232,91 @@ Access-Control-Allow-Methods: GET, OPTIONS
 
 This section contains a non-exhaustive list of known schemas that MAY be supported by clients and servers.
 
-### Peer
+### Peer Schema
 
 The `peer` schema represents an arbitrary peer.
 
 ```json
 {
   "Schema": "peer",
-  "ID": "12D3K...",
+  "ID": "bafz...",
   "Addrs": ["/ip4/..."],
   "Protocols": ["transport-bitswap", ...]
+  ...
 }
 ```
 
-- `ID`: the [Peer ID][peer-id].
-- `Addrs`: a list of known [multiaddrs][multiaddr] for this peer. This list MAY be incomplete.
-- `Protocols`: a list of protocols known to be supported by this peer.
-  - If empty, it means the server is missing protocol information, and the client should use `ID` and `Addrs` to connect to the peer and use the [libp2p identify protocol](https://github.com/libp2p/specs/tree/master/identify) to learn about supported ones.
+- `ID`: the [Peer ID][peer-id] as Multihash in Base58btc or CIDv1 with libp2p-key codec.
+- `Addrs`: an optional list of known [multiaddrs][multiaddr] for this peer.
+  - If missing or empty, it means the router server is missing that information, and the client should use `ID` to lookup updated peer information.
+- `Protocols`: an optional list of protocols known to be supported by this peer.
+  - If missing or empty, it means the router server is missing that information, and the client should use `ID` and `Addrs` to lookup connect to the peer and use the [libp2p identify protocol](https://github.com/libp2p/specs/tree/master/identify) to learn about supported ones.
 
 :::note
 
-To allow for protocol-specific fields and future-proofing, the parser MUST allow for unknown fields,
-and the clients MUST ignore unknown ones. Below is an example on how one could create a `foobar` protocol
-that includes an additional field `foobar`. If the client knows the `foobar` protocol, they are free to
-use the information contained in the additional field. If that is not the case, the field MUST be ignored.
+To allow for protocol-specific fields and future-proofing, the parser MUST
+allow for unknown fields, and the clients MUST ignore unknown ones.
+
+Below is an example on how one could include `protocol-a` and `protocol-b`
+protocols that includes an additional fields `protocol-a` and `protocol-b`.
+
+If the client knows the protocol, they are free to use the extra binary
+(base64) or JSON information contained in the additional field. If that is not
+the case, the field MUST be ignored.
 
 ```json
 {
   "Schema": "peer",
-  "ID": "12D3K...",
+  "ID": "bafz...",
   "Addrs": ["/ip4/..."],
-  "Protocols": ["transport-bitswap", "foobar", ...],
-  "foobar": "[base64-blob]"
+  "Protocols": ["transport-bitswap", "protocol-a", "protocol-b", ...],
+  "protocol-a": "[base64-blob]",
+  "protocol-b": { "foo": "bar" }
 }
 ```
 
 :::
+
+### Legacy Schemas
+
+Legacy schemas include `ID` and optional `Addrs` list just like
+the [`peer` schema](#peer-schema) does.
+
+These schemas are deprecated and SHOULD be replaced with `peer` over time, but
+MAY be returned by some legacy endpoints. In such case, a client MAY parse
+them the same way as the `peer` schema.
+
+#### Bitswap Schema
+
+A legacy schema used by some routers to indicate a peer supports retrieval over
+the `/ipfs/bitswap[/*]` libp2p protocol.
+
+```json
+{
+  "Protocol": "transport-bitswap",
+  "Schema": "bitswap",
+  "ID": "bafz...",
+  "Addrs": ["/ip4/..."]
+}
+```
+
+#### Graphsync Schema
+
+A legacy schema used by some routers to indicate a peer supports retrieval over
+the [graphsync](https://github.com/ipfs/go-graphsync/blob/main/docs/architecture.md)
+libp2p protocol.
+
+```json
+{
+  "Protocol": "transport-graphsync-filecoinv1",
+  "Schema": "graphsync-filecoinv1",
+  "ID": "bafz...",
+  "Addrs": ["/ip4/..."],
+  "PieceCID": "<cid>",
+  "VerifiedDeal": true,
+  "FastRetrieval": true
+}
+```
 
 [multibase]: https://github.com/multiformats/multibase
 [CIDv1]: https://github.com/multiformats/cid#cidv1
