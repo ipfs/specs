@@ -291,10 +291,9 @@ sent by the client.
 
 ### `429` Too Many Requests
 
-A
-[`Retry-After`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After)
-header might be included to this response, indicating how long to wait before
-making a new request.
+Error to indicate the client has sent too many requests in a given amount of time.
+
+This error response SHOULD include [`Retry-After`](#retry-after-response-header) HTTP header to indicate how long the client should wait before making a follow-up request.
 
 ### `451` Unavailable For Legal Reasons
 
@@ -308,9 +307,21 @@ See: [Denylists](#denylists)
 
 A generic server error returned when it is not possible to return a better one.
 
+### `502` Bad Gateway
+
+Returned immediately when Gateway was not able to produce response for a known reason.
+For example, when gateway failed to find any providers for requested data.
+
+This error response SHOULD include [`Retry-After`](#retry-after-response-header) HTTP header to indicate how long the client should wait before retrying.
+
 ### `504` Gateway Timeout
 
-Returned when Gateway was not able to produce response under set limits.
+Returned when Gateway was not able to produce response under set time limits.
+For example, when gateway failed to retrieve data from a remote provider.
+
+There is no generic timeout, Gateway implementations SHOULD set timeouts based on specific use cases.
+
+This error response SHOULD include [`Retry-After`](#retry-after-response-header) HTTP header to indicate how long the client should wait before retrying.
 
 ## Response Headers
 
@@ -550,6 +561,14 @@ Optional, present in certain response types:
   followed and not be changed. This is a security feature, ensures that
   non-executable binary response types are not used in `<script>` and `<style>`
   HTML tags.
+
+### `Retry-After` (response header)
+
+Gateway returns this header with error responses such as [`429 Too Many Requests`](#429-too-many-requests) or [`504 Gateway Timeout`](#504-gateway-timeout).
+
+The "Retry-After" header indicates how long the user agent ought to wait before making a follow-up request.
+
+See Section 10.2.3 of :cite[rfc9110].
 
 ### `Server-Timing` (response header)
 
