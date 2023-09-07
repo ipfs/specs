@@ -380,7 +380,8 @@ Returned directive depends on requested content path and format:
   - Implementations MAY place an upper bound on any TTL received, as
     noted in Section 8 of :cite[rfc2181].
   - If TTL value is unknown, implementations SHOULD not send a `Cache-Control`
-    header and instead send a [`Last-Modified`](#last-modified-response-header) header.
+  - No matter if TTL value is known or not, implementations SHOULD always
+    send a [`Last-Modified`](#last-modified-response-header) header with the timestamp of the record resolution.
 
 ### `Last-Modified` (response header)
 
