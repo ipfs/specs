@@ -421,6 +421,28 @@ Value from `IpnsEntry.value` MUST never be used unless it is the same as signed 
 
 ## Appendix: Notes for Implementers
 
+### Test Vectors
+
+Below are test vectors in [Record Serialization Format](#record-serialization-format),
+along with the expected verification results. The records are valid for 100
+years, making them safe for use in CI tests.
+
+1. [V1-only](https://dweb.link/ipfs/bafybeifkipmlz2fehxda6y7x752uolfed7bdd46jzdammpfga5zrnkq33u/k51qzi5uqu5dm4tm0wt8srkg9h9suud4wuiwjimndrkydqm81cqtlb5ak6p7ku_v1.ipns-record) → record invalid
+2. [V1+V2](https://dweb.link/ipfs/bafybeifkipmlz2fehxda6y7x752uolfed7bdd46jzdammpfga5zrnkq33u/k51qzi5uqu5dlkw8pxuw9qmqayfdeh4kfebhmreauqdc6a7c3y7d5i9fi8mk9w_v1-v2.ipns-record) (both signatures valid) → record valid, value points at `/ipfs/bafkqaddwgevxmmraojswg33smq`
+3. [V1+V2](https://dweb.link/ipfs/bafybeifkipmlz2fehxda6y7x752uolfed7bdd46jzdammpfga5zrnkq33u/k51qzi5uqu5dlmit2tuwdvnx4sbnyqgmvbxftl0eo3f33wwtb9gr7yozae9kpw_v1-v2-broken-v1-value.ipns-record) (both signatures valid, but 'value' is different in V1 pb vs V2 CBOR) → record invalid
+4. [V1+V2](https://dweb.link/ipfs/bafybeifkipmlz2fehxda6y7x752uolfed7bdd46jzdammpfga5zrnkq33u/k51qzi5uqu5diamp7qnnvs1p1gzmku3eijkeijs3418j23j077zrkok63xdm8c_v1-v2-broken-signature-v2.ipns-record) (only signatureV1 valid) → record invalid
+5. [V1+V2](https://dweb.link/ipfs/bafybeifkipmlz2fehxda6y7x752uolfed7bdd46jzdammpfga5zrnkq33u/k51qzi5uqu5dilgf7gorsh9vcqqq4myo6jd4zmqkuy9pxyxi5fua3uf7axph4y_v1-v2-broken-signature-v1.ipns-record) (only signatureV2 valid) → record valid, value points at `/ipfs/bafkqahtwgevxmmrao5uxi2bamjzg623fnyqhg2lhnzqxi5lsmuqhmmi`
+6. [V2-only](https://dweb.link/ipfs/bafybeifkipmlz2fehxda6y7x752uolfed7bdd46jzdammpfga5zrnkq33u/k51qzi5uqu5dit2ku9mutlfgwyz8u730on38kd10m97m36bjt66my99hb6103f_v2.ipns-record) (no V1 fields) → record valid
+
+:::note
+
+Implementers can either write own tests against the above test vectors, or run
+[gateway-conformance](https://github.com/ipfs/gateway-conformance/) test suite,
+which includes tests for these vectors since
+[gateway-conformance/pull/157](https://github.com/ipfs/gateway-conformance/pull/157).
+
+:::
+
 ### Integration with IPFS
 
 Below are additional notes for implementers, documenting how IPNS is integrated within IPFS ecosystem.
