@@ -147,22 +147,33 @@ Below MUST be implemented **in addition** to `Location` requirements defined in 
 
 #### Use in interop with Path Gateway
 
-Returned with `301` Moved Permanently (:cite[path-gateway]) when `Host` header does
+The `Location` HTTP header is returned with `301` Moved Permanently
+(:cite[path-gateway]) when `Host` header does
 not follow the subdomain naming convention, but the requested URL path happens
-to be a valid `/ipfs/{cid}` or `/ipfs/{name}` content path.
+to be a valid `/ipfs/{cid}[/{path}][?{query}]` or `/ipfs/..` content path.
 
-This redirect allows subdomain gateway to be used as a drop-in
-replacement compatible with regular path gateways.
+This redirect allows a subdomain gateway to be used as a drop-in replacement
+compatible with regular path gateways, as long as the rules below are followed:
 
-NOTE: the content root identifier must be converted to case-insensitive/inlined
-form if necessary. For example:
-
-- `https://dweb.link/ipfs/QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR`
-  returns HTTP 301 redirect to the same CID but in case-insensitive base32:
-  - `Location: https://bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi.ipfs.dweb.link/`
-- `https://dweb.link/ipns/en.wikipedia-on-ipfs.org` returns HTTP 301 redirect
-  to subdomain with DNSLink name correctly inlined:
-  - `Location: https://en-wikipedia--on--ipfs-org.ipns.dweb.link/`
+- Redirect from a path gateway URL to the corresponding subdomain URL MUST
+  preserve the originally requested `{path}` and `{query}` parameters, if
+  present.
+  - Content path validation before the redirect SHOULD be limited to the
+    correctness of the root CID. If the content path includes any subpath or
+    query parameters, they SHOULD be preserved and processed after the redirect
+    to a subdomain is completed.
+    - Namely, additional logic, such as IPLD path traversal or processing the
+      `_redirects` file, SHOULD only be executed by the subdomain gateway after
+      the redirect.
+- Before redirecting, the content root identifier MUST be converted to
+  case-insensitive/inlined form if necessary. For example:
+  - `https://dweb.link/ipfs/QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR`
+    returns HTTP 301 redirect to the same CID but in case-insensitive base32:
+    - `Location:
+      https://bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi.ipfs.dweb.link/`
+  - `https://dweb.link/ipns/en.wikipedia-on-ipfs.org` returns HTTP 301 redirect
+    to subdomain with DNSLink name correctly inlined:
+    - `Location: https://en-wikipedia--on--ipfs-org.ipns.dweb.link/`
 
 See also: [Migrate from Path to Subdomain Gateway](#migrating-from-path-to-subdomain-gateway).
 
