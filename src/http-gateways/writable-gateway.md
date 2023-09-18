@@ -1,7 +1,7 @@
 ---
-title: Writable Gateway Specification
+title: Data Onboarding with HTTP Semantics
 description: >
-  Writable Gateways are a way of onboarding data into IPFS via the HTTP gateways. It exposes a POST endpoint
+  Reusing HTTP Semantics for onboarding data into IPFS via the HTTP gateways. It exposes a POST endpoint
   that supports multiple input types, then ingests the data into IPFS, returning its final location.
 date: 2023-04-17
 editors:
