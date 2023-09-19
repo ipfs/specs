@@ -80,6 +80,21 @@ title: Home
         {% include 'list.html', posts: collections.meta %}
       </section>
       <section>
+        <h3><a href="/routing/">Routing</a></h3>
+        <p>
+          Routing is the way to determine where to find a given CID, Peer, or IPNS Record on the network;
+          specifically, which network peers provide specific CIDs.
+        </p>
+        {% include 'list.html', posts: collections.routing %}
+      </section>
+      <section>
+        <h3><a href="/exchange/">Exchange</a></h3>
+        <p>
+          Exchange is the way to for sending and receiving content addressed blocks of data.
+        </p>
+        {% include 'list.html', posts: collections.exchange %}
+      </section>
+      <section>
         <h3><a href="/http-gateways/">HTTP Gateways</a></h3>
         <p>
           IPFS Gateway acts as a bridge between traditional HTTP clients and IPFS. Through the gateway, users can download files,
@@ -100,14 +115,6 @@ title: Home
           The InterPlanetary Naming System (IPNS) is a naming system responsible for creating, reading and updating mutable pointers to data.
         </p>
         {% include 'list.html', posts: collections.ipns %}
-      </section>
-      <section>
-        <h3><a href="/routing/">Routing</a></h3>
-        <p>
-          Content routing is the way to determine where to find a given CID on the network;
-          specifically, which network peers provide specific CIDs. 
-        </p>
-        {% include 'list.html', posts: collections.routing %}
       </section>
       <section>
         <h3><a href="/ipips/">InterPlanetary Improvement Proposals</a></h3>

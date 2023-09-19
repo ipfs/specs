@@ -1,19 +1,15 @@
 ---
 title: Bitswap
 description: >
-  Bitswap is a data exchange protocol for sending and receiving content addressed
-  blocks of data. It attempts to acquire blocks from the network that have been
-  requested by the client, and also send blocks to others who want them.
+  Bitswap is a libp2p data exchange protocol for sending and receiving content
+  addressed blocks of data. It attempts to acquire blocks from the p2p network
+  that have been requested by the client, and also send blocks to others who
+  want them.
 date: 2022-08-26
 maturity: reliable
 editors:
-  - name: Adin Schmahmann
-    github: aschmahmann
-    affiliation:
-      name: Protocol Labs
-      url: https://protocol.ai/
-  - name: David Dias
-    github: daviddias
+  - name: Juan Benet
+    github: jbenet
     affiliation:
       name: Protocol Labs
       url: https://protocol.ai/
@@ -22,16 +18,23 @@ editors:
     affiliation:
       name: Protocol Labs
       url: https://protocol.ai/
-  - name: Juan Benet
-    github: jbenet
+  - name: David Dias
+    github: daviddias
     affiliation:
       name: Protocol Labs
       url: https://protocol.ai/
-tags: ['architecture']
+  - name: Adin Schmahmann
+    github: aschmahmann
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
+tags: ['exchange']
 order: 1
 ---
 
-Bitswap is a data exchange protocol for sending and receiving content addressed blocks of data.
+Bitswap is a libp2p data exchange protocol for sending and receiving content
+addressed blocks of data.
+
 Bitswap has two primary jobs:
 
 1. Attempt to acquire blocks from the network that have been requested by the client.
@@ -238,7 +241,7 @@ message Message {
 
 ## Implementations
 
-- [Boxo Bitswap](https://github.com/ipfs/boxo/tree/main/bitswap)
-- [js-ipfs-bitswap](https://github.com/ipfs/js-ipfs-bitswap)
+- GO: [`boxo/bitswap`](https://github.com/ipfs/boxo/tree/main/bitswap)
+- JS: [js-ipfs-bitswap](https://github.com/ipfs/js-ipfs-bitswap)
 
 [unsigned-varint]: https://github.com/multiformats/unsigned-varint

@@ -1,3 +1,3 @@
 # Bitswap
 
-Moved to https://specs.ipfs.tech/architecture/bitswap/
+Moved to https://specs.ipfs.tech/exchange/bitswap/
