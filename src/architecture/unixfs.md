@@ -1,31 +1,42 @@
-# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) UnixFS  <!-- omit in toc -->
+---
+title: UnixFS
+description: >
+  UnixFS is a Protocol Buffers-based format for describing files, directories,
+  and symlinks as DAGs in IPFS.
+date: 2022-10-10
+maturity: reliable
+editors:
+  - name: David Dias
+    github: daviddias
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
+  - name: Jeromy Johnson
+    github: whyrusleeping
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
+  - name: Alex Potsides
+    github: achingbrain
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
+  - name: Peter Rabbitson
+    github: ribasushi
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
+  - name: Hugo Valtier
+    github: jorropo
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
 
-**Author(s)**:
-- NA
-
-* * *
-
-**Abstract**
+tags: ['architecture']
+order: 1
+---
 
 UnixFS is a [protocol-buffers](https://developers.google.com/protocol-buffers/) based format for describing files, directories, and symlinks as merkle-dags in IPFS.
-
-## Table of Contents <!-- omit in toc -->
-
-- [Implementations](#implementations)
-- [Data Format](#data-format)
-- [Metadata](#metadata)
-	- [Deduplication and inlining](#deduplication-and-inlining)
-- [Importing](#importing)
-	- [Chunking](#chunking)
-	- [Layout](#layout)
-- [Exporting](#exporting)
-- [Design decision rationale](#design-decision-rationale)
-	- [Metadata](#metadata-1)
-		- [Separate Metadata node](#separate-metadata-node)
-		- [Metadata in the directory](#metadata-in-the-directory)
-		- [Metadata in the file](#metadata-in-the-file)
-		- [Side trees](#side-trees)
-		- [Side database](#side-database)
 
 ## How to read a Node
 
@@ -65,32 +76,32 @@ The UnixfsV1 `Data` message format is represented by this protobuf:
 
 ```protobuf
 message Data {
-	enum DataType {
-		Raw = 0;
-		Directory = 1;
-		File = 2;
-		Metadata = 3;
-		Symlink = 4;
-		HAMTShard = 5;
-	}
+  enum DataType {
+    Raw = 0;
+    Directory = 1;
+    File = 2;
+    Metadata = 3;
+    Symlink = 4;
+    HAMTShard = 5;
+  }
 
-	required DataType Type = 1;
-	optional bytes Data = 2;
-	optional uint64 filesize = 3;
-	repeated uint64 blocksizes = 4;
-	optional uint64 hashType = 5;
-	optional uint64 fanout = 6;
-	optional uint32 mode = 7;
-	optional UnixTime mtime = 8;
+  required DataType Type = 1;
+  optional bytes Data = 2;
+  optional uint64 filesize = 3;
+  repeated uint64 blocksizes = 4;
+  optional uint64 hashType = 5;
+  optional uint64 fanout = 6;
+  optional uint32 mode = 7;
+  optional UnixTime mtime = 8;
 }
 
 message Metadata {
-	optional string MimeType = 1;
+  optional string MimeType = 1;
 }
 
 message UnixTime {
-	required int64 Seconds = 1;
-	optional fixed32 FractionalNanoseconds = 2;
+  required int64 Seconds = 1;
+  optional fixed32 FractionalNanoseconds = 2;
 }
 ```
 
@@ -100,22 +111,22 @@ A very important other spec for unixfs is the [`dag-pb`](https://ipld.io/specs/c
 
 ```protobuf
 message PBLink {
-	// binary CID (with no multibase prefix) of the target object
-	optional bytes Hash = 1;
+  // binary CID (with no multibase prefix) of the target object
+  optional bytes Hash = 1;
 
-	// UTF-8 string name
-	optional string Name = 2;
+  // UTF-8 string name
+  optional string Name = 2;
 
-	// cumulative size of target object
-	optional uint64 Tsize = 3; // also known as dagsize
+  // cumulative size of target object
+  optional uint64 Tsize = 3; // also known as dagsize
 }
 
 message PBNode {
-	// refs to other objects
-	repeated PBLink Links = 2;
+  // refs to other objects
+  repeated PBLink Links = 2;
 
-	// opaque user data
-	optional bytes Data = 1;
+  // opaque user data
+  optional bytes Data = 1;
 }
 ```
 
@@ -145,11 +156,11 @@ Child nodes must be of type file (so `dag-pb` where type is `File` or `Raw`)
 For example this example pseudo-json block:
 ```json
 {
-	"Links": [{"Hash":"Qmfoo"}, {"Hash":"Qmbar"}],
-	"Data": {
-		"Type": "File",
-		"blocksizes": [20, 30]
-	}
+  "Links": [{"Hash":"Qmfoo"}, {"Hash":"Qmbar"}],
+  "Data": {
+    "Type": "File",
+    "blocksizes": [20, 30]
+  }
 }
 ```
 
@@ -368,7 +379,7 @@ This was ultimately rejected for a number of reasons:
 
 1. You would always need to retrieve an additional node to access file data which limits the kind of optimizations that are possible.
 
-	For example many files are under the 256KiB block size limit, so we tend to inline them into the describing UnixFS `File` node.  This would not be possible with an intermediate `Metadata` node.
+  For example many files are under the 256KiB block size limit, so we tend to inline them into the describing UnixFS `File` node.  This would not be possible with an intermediate `Metadata` node.
 
 2. The `File` node already contains some metadata (e.g. the file size) so metadata would be stored in multiple places which complicates forwards compatibility with UnixFSv2 as to map between metadata formats potentially requires multiple fetch operations
 
@@ -398,7 +409,7 @@ Downsides to this approach are:
 
 1. Two users adding the same file to IPFS at different times will have different [CID]s due to the `mtime`s being different.
 
-	If the content is stored in another node, its [CID] will be constant between the two users but you can't navigate to it unless you have the parent node which will be less available due to the proliferation of [CID]s.
+  If the content is stored in another node, its [CID] will be constant between the two users but you can't navigate to it unless you have the parent node which will be less available due to the proliferation of [CID]s.
 
 2. Metadata is also impossible to remove without changing the [CID], so metadata becomes part of the content.
 
@@ -448,12 +459,12 @@ This section and included subsections are not authoritative.
   - Importer - [unixfs-importer](https://github.com/ipfs/js-ipfs-unixfs-importer)
   - Exporter - [unixfs-exporter](https://github.com/ipfs/js-ipfs-unixfs-exporter)
 - Go
-	- Protocol Buffer Definitions - [`ipfs/go-unixfs/pb`](https://github.com/ipfs/go-unixfs/blob/707110f05dac4309bdcf581450881fb00f5bc578/pb/unixfs.proto)
+  - Protocol Buffer Definitions - [`ipfs/go-unixfs/pb`](https://github.com/ipfs/go-unixfs/blob/707110f05dac4309bdcf581450881fb00f5bc578/pb/unixfs.proto)
   - [`ipfs/go-unixfs`](https://github.com/ipfs/go-unixfs/)
-	- `go-ipld-prime` implementation [`ipfs/go-unixfsnode`](https://github.com/ipfs/go-unixfsnode)
+  - `go-ipld-prime` implementation [`ipfs/go-unixfsnode`](https://github.com/ipfs/go-unixfsnode)
 - Rust
-	- [`iroh-unixfs`](https://github.com/n0-computer/iroh/tree/b7a4dd2b01dbc665435659951e3e06d900966f5f/iroh-unixfs)
-	- [`unixfs-v1`](https://github.com/ipfs-rust/unixfsv1)
+  - [`iroh-unixfs`](https://github.com/n0-computer/iroh/tree/b7a4dd2b01dbc665435659951e3e06d900966f5f/iroh-unixfs)
+  - [`unixfs-v1`](https://github.com/ipfs-rust/unixfsv1)
 
 ## Simple `Raw` Example
 
@@ -488,12 +499,12 @@ test
 The offset list isn't the only way to use blocksizes and reach a correct implementation, it is a simple cannonical one, python pseudo code to compute it looks like this:
 ```python
 def offsetlist(node):
-	unixfs = decodeDataField(node.Data)
-	if len(node.Links) != len(unixfs.Blocksizes):
-		raise "unmatched sister-lists" # error messages are implementation details
+  unixfs = decodeDataField(node.Data)
+  if len(node.Links) != len(unixfs.Blocksizes):
+    raise "unmatched sister-lists" # error messages are implementation details
 
-	cursor = len(unixfs.Data) if unixfs.Data else 0
-	return [cursor] + [cursor := cursor + size for size in unixfs.Blocksizes[:-1]]
+  cursor = len(unixfs.Data) if unixfs.Data else 0
+  return [cursor] + [cursor := cursor + size for size in unixfs.Blocksizes[:-1]]
 ```
 
 This will tell you which offset inside this node the children at the corresponding index starts to cover. (using `[x,y)` ranging)
