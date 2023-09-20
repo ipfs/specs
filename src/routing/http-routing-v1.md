@@ -9,11 +9,31 @@ maturity: reliable
 editors:
   - name: Gus Eggert
     github: guseggert
+    affiliation:
+        name: Protocol Labs
+        url: https://protocol.ai/
   - name: Masih H. Derkani
     github: masih
+    affiliation:
+        name: Protocol Labs
+        url: https://protocol.ai/
   - name: Henrique Dias
     url: https://hacdias.com/
     github: hacdias
+    affiliation:
+        name: Protocol Labs
+        url: https://protocol.ai/
+  - name: Adin Schmahmann
+    github: aschmahmann
+    affiliation:
+        name: Protocol Labs
+        url: https://protocol.ai/
+  - name: Marcin Rataj
+    github: lidel
+    url: https://lidel.org/
+    affiliation:
+        name: Protocol Labs
+        url: https://protocol.ai/
 xref:
   - ipns-record
 order: 0
@@ -78,6 +98,20 @@ Specifications for some transfer protocols are provided in the "Transfer Protoco
 
 - `cid` is the [CID](https://github.com/multiformats/cid) to fetch provider records for.
 
+#### Query Parameters
+
+##### `routers` (request query parameter)
+
+An optional comma-separated list of routers that should be consulted for responses.
+
+If no `routers` are provided the server SHOULD decide which ones to use as an implicit default.
+
+The specification imposes no constraints on the order by which the results are returned.
+
+Clients SHOULD be able to explicitly select all available backend routers via opt-in `?routers=all` query prameter.
+
+Servers SHOULD allow clients to determine the list of available routers via `GET /routing/v1/routers`.
+
 #### Response Status Codes
 
 - `200` (OK): the response body contains 0 or more records.
@@ -101,6 +135,36 @@ Specifications for some transfer protocols are provided in the "Transfer Protoco
 Response limit: 100 providers
 
 Each object in the `Providers` list is a *read provider record*.
+
+## Routers API
+
+### `GET /routing/v1/routers`
+
+#### Response Status Codes
+
+- `200` (OK): the response body contains 0 or more records.
+- `404` (Not Found): returned if backend enumeration is not possible
+
+#### Response Body
+
+```json
+{
+  "Routers": [
+    {
+      "Schema": "router",
+      "Name": "<router_name>",
+      ...
+    },
+    ...
+  ]
+}
+```
+
+Response limit: 100 routers
+
+Each `Name` can be used in explicit `?routers=name1,name2` queries.
+
+Additional metadata per router SHOULD be included in other fields defined by `router` schema.
 
 ## IPNS API
 
@@ -199,9 +263,30 @@ Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: GET, OPTIONS
 ```
 
-## Known Transfer Protocols
+## Known Schemas
 
-This section contains a non-exhaustive list of known transfer protocols (by name) that may be supported by clients and servers.
+This section contains a non-exhaustive list of known schemas (by name) that may be supported by clients and servers.
+
+### Router
+
+- Schema: `router`
+- Specification: see `GET /routing/v1/routers` above
+
+```json
+{
+  "Schema": "router",
+  "Name": "example",
+  "Default": false, // is it used when no ?routers is not passed
+  "RoutingType": ["providers", "ipns", "peers"], // where can this router be used
+  "Description": "A human-readable description of this router.",
+  "Addrs": ["/ip4/..."] // optional URLs or Multiddrs of the upstream router
+}
+```
+
+The `Name` is an opaque string but it MUST never be `all`, as it is reserved
+keywork for enabling all backend routers via `?routers=all`.
+
+There is no canonical set of router names, each `/routing/v1` implementation SHOULD come up with meaningful names and descriptions.
 
 ### Bitswap
 
