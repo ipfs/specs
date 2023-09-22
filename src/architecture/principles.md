@@ -119,7 +119,7 @@ principle states that the reliability properties of a protocol have to be
 supported at its endpoints and not in intermediary nodes. For instance, you can best guarantee
 the confidentiality or authenticity of a message by encrypting or signing at one endpoint and
 decrypting or verifying at the other rather than asking relaying nodes to implement local
-protections. IPFS's aproach to robustness, via CIDs, is well aligned with that principle.
+protections. IPFS's approach to robustness, via CIDs, is well aligned with that principle.
 
 ## IPFS Implementation Requirements
 
@@ -247,7 +247,7 @@ authority delegation. This is notably clear in the *URI Ownership* passage of th
 > ultimately resides in the hands of a single social entity. Allowing multiple owners
 > increases the likelihood of URI collisions.
 >
-> URI owners may organize or deploy infrastruture [sic] to ensure that representations of
+> URI owners may organize or deploy infrastructure [sic] to ensure that representations of
 > associated resources are available and, where appropriate, interaction with the resource
 > is possible through the exchange of representations. There are social expectations for
 > responsible representation management (§3.5) by URI owners. Additional social
