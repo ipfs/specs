@@ -151,7 +151,7 @@ available RFC2119 keywords are:
 
 It is probably a bad idea to use the SHALL variants, and generally it is best to stick to MUST, SHOULD, MAY,
 and their negations. In an ideal world, a :ref[spec] would stick to only using MUST and MUST NOT because
-optionality in standards is harmful. In practice, however, some flexibilty can prove necessary.
+optionality in standards is harmful. In practice, however, some flexibility can prove necessary.
 
 :::note
 
@@ -266,7 +266,7 @@ There are two primary types of references: to :ref[definitions] and to full docu
 bibliographic references section.
 
 Once a :ref[definition] has been created, it can be referenced with `:ref[definition]`. This includes the synonyms it
-was givem, for instance :ref[def].
+was given, for instance :ref[def].
 
 It's also possible to reference definitions from other specs by importing those other specs by referencing their :ref[shortnames]
 in the `xref` section of the YAML :ref[frontmatter]:
