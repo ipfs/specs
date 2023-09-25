@@ -4,16 +4,31 @@ description: >
   Delegated routing is a mechanism for IPFS implementations to use for offloading
   content routing and naming to another process/server. This specification describes
   an HTTP API for delegated content routing.
-date: 2023-03-22
+date: 2023-08-31
 maturity: reliable
 editors:
   - name: Gus Eggert
     github: guseggert
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
   - name: Masih H. Derkani
     github: masih
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
   - name: Henrique Dias
     url: https://hacdias.com/
     github: hacdias
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
+  - name: Marcin Rataj
+    github: lidel
+    url: https://lidel.org/
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
 xref:
   - ipns-record
 order: 0
@@ -32,45 +47,17 @@ As such, human-readable encodings of types are preferred. This specification may
 
 - CIDs are always string-encoded using a [multibase]-encoded [CIDv1].
 - Multiaddrs are string-encoded according to the [human-readable multiaddr specification][multiaddr].
-- Peer IDs are string-encoded according [PeerID string representation specification][peer-id-representation].
+- Peer IDs are string-encoded according [PeerID string representation specification][peer-id-representation]: either a Multihash in Base58btc, or a CIDv1 with libp2p-key (`0x72`) codec.
 - Multibase bytes are string-encoded according to [the Multibase spec][multibase], and SHOULD use base64.
 - Timestamps are Unix millisecond epoch timestamps.
 
 Until required for business logic, servers should treat these types as opaque strings, and should preserve unknown JSON fields.
 
-### Versioning
+## Versioning
 
 This API uses a standard version prefix in the path, such as `/v1/...`. If a backwards-incompatible change must be made, then the version number should be increased.
 
-### Provider Records
-
-A provider record contains information about a content provider, including the transfer protocol and any protocol-specific information useful for fetching the content from the provider.
-
-The information required to write a record to a router (*"write" provider records*) may be different than the information contained when reading provider records (*"read" provider records*).
-
-For example, indexers may require a signature in `bitswap` write records for authentication of the peer contained in the record, but the read records may not include this authentication information.
-
-Both read and write provider records have a minimal required schema as follows:
-
-```json
-{
-    "Protocol": "<transfer_protocol_name>",
-    "Schema": "<transfer_protocol_schema>",
-    ...
-}
-```
-
-Where:
-
-- `Protocol` is the multicodec name of the transfer protocol or an opaque string (for experimenting with novel protocols without a multicodec)
-- `Schema` denotes the schema to use for encoding/decoding the record
-  - This is separate from the `Protocol` to allow this HTTP API to evolve independently of the transfer protocol
-  - Implementations should switch on this when parsing records, not on `Protocol`
-- `...` denotes opaque JSON, which may contain information specific to the transfer protocol
-
-Specifications for some transfer protocols are provided in the "Transfer Protocols" section.
-
-## Content Providers API
+## Content Routing API
 
 ### `GET /routing/v1/providers/{cid}`
 
@@ -90,17 +77,59 @@ Specifications for some transfer protocols are provided in the "Transfer Protoco
 {
   "Providers": [
     {
-      "Protocol": "<protocol_name>",
       "Schema": "<schema>",
+      "ID": "bafz...",
+      "Addrs": ["/ip4/..."],
       ...
-    }
+    },
+    ...
   ]
 }
 ```
 
-Response limit: 100 providers
+The `application/json` responses SHOULD be limited to 100 providers.
 
-Each object in the `Providers` list is a *read provider record*.
+The client SHOULD be able to make a request with `Accept: application/x-ndjson` and get a [stream](#streaming) with more results.
+
+Each object in the `Providers` list is a record conforming to a schema, usually the [Peer Schema](#peer-schema).
+
+## Peer Routing API
+
+### `GET /routing/v1/peers/{peer-id}`
+
+#### Path Parameters
+
+- `peer-id` is the [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md) to fetch peer records for,
+represented as a CIDv1 encoded with `libp2p-key` codec.
+
+#### Response Status Codes
+
+- `200` (OK): the response body contains the peer record.
+- `404` (Not Found): must be returned if no matching records are found.
+- `422` (Unprocessable Entity): request does not conform to schema or semantic constraints.
+
+#### Response Body
+
+```json
+{
+  "Peers": [
+    {
+      "Schema": "<schema>",
+      "Protocols": ["<protocol-a>", "<protocol-b>", ...],
+      "ID": "bafz...",
+      "Addrs": ["/ip4/..."],
+      ...
+    },
+    ...
+  ]
+}
+```
+
+The `application/json` responses SHOULD be limited to 100 peers.
+
+The client SHOULD be able to make a request with `Accept: application/x-ndjson` and get a [stream](#streaming) with more results.
+
+Each object in the `Peers` list is a record conforming to the [Peer Schema](#peer-schema).
 
 ## IPNS API
 
@@ -123,7 +152,7 @@ Each object in the `Providers` list is a *read provider record*.
 
 #### Response Body
 
-The response body contains a  :ref[IPNS Record] serialized using the verifiable [`application/vnd.ipfs.ipns-record`](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record) protobuf format.
+The response body contains a :ref[IPNS Record] serialized using the verifiable [`application/vnd.ipfs.ipns-record`](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record) protobuf format.
 
 ### `PUT /routing/v1/ipns/{name}`
 
@@ -163,7 +192,7 @@ with one result per line:
 
 :::note
 
-Streaming is opt-in and backwards-compatibile with clients and servers that do
+Streaming is opt-in and backwards-compatible with clients and servers that do
 not support streaming:
 
 - Requests without the `Accept: application/x-ndjson` header MUST default to
@@ -199,58 +228,95 @@ Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: GET, OPTIONS
 ```
 
-## Known Transfer Protocols
+## Known Schemas
 
-This section contains a non-exhaustive list of known transfer protocols (by name) that may be supported by clients and servers.
+This section contains a non-exhaustive list of known schemas that MAY be supported by clients and servers.
 
-### Bitswap
+### Peer Schema
 
-- Multicodec name: `transport-bitswap`
-- Schema: `bitswap`
-- Specification: [ipfs/specs/BITSWAP.md](https://github.com/ipfs/specs/blob/main/BITSWAP.md)
+The `peer` schema represents an arbitrary peer.
 
-#### Bitswap Read Provider Records
+```json
+{
+  "Schema": "peer",
+  "ID": "bafz...",
+  "Addrs": ["/ip4/..."],
+  "Protocols": ["transport-bitswap", ...]
+  ...
+}
+```
+
+- `ID`: the [Peer ID][peer-id] as Multihash in Base58btc or CIDv1 with libp2p-key codec.
+- `Addrs`: an optional list of known [multiaddrs][multiaddr] for this peer.
+  - If missing or empty, it means the router server is missing that information, and the client should use `ID` to lookup updated peer information.
+- `Protocols`: an optional list of protocols known to be supported by this peer.
+  - If missing or empty, it means the router server is missing that information, and the client should use `ID` and `Addrs` to lookup connect to the peer and use the [libp2p identify protocol](https://github.com/libp2p/specs/tree/master/identify) to learn about supported ones.
+
+:::note
+
+To allow for protocol-specific fields and future-proofing, the parser MUST
+allow for unknown fields, and the clients MUST ignore unknown ones.
+
+Below is an example on how one could include `protocol-a` and `protocol-b`
+protocols that includes an additional fields `protocol-a` and `protocol-b`.
+
+If the client knows the protocol, they are free to use the extra binary
+(base64) or JSON information contained in the additional field. If that is not
+the case, the field MUST be ignored.
+
+```json
+{
+  "Schema": "peer",
+  "ID": "bafz...",
+  "Addrs": ["/ip4/..."],
+  "Protocols": ["transport-bitswap", "protocol-a", "protocol-b", ...],
+  "protocol-a": "[base64-blob]",
+  "protocol-b": { "foo": "bar" }
+}
+```
+
+:::
+
+### Legacy Schemas
+
+Legacy schemas include `ID` and optional `Addrs` list just like
+the [`peer` schema](#peer-schema) does.
+
+These schemas are deprecated and SHOULD be replaced with `peer` over time, but
+MAY be returned by some legacy endpoints. In such case, a client MAY parse
+them the same way as the `peer` schema.
+
+#### Bitswap Schema
+
+A legacy schema used by some routers to indicate a peer supports retrieval over
+the `/ipfs/bitswap[/*]` libp2p protocol.
 
 ```json
 {
   "Protocol": "transport-bitswap",
   "Schema": "bitswap",
-  "ID": "12D3K...",
+  "ID": "bafz...",
   "Addrs": ["/ip4/..."]
 }
 ```
 
-- `ID`: the [Peer ID][peer-id] to contact
-- `Addrs`: a list of known multiaddrs for the peer
-  - This list may be incomplete or incorrect and should only be treated as *hints* to improve performance by avoiding extra peer lookups
+#### Graphsync Schema
 
-The server should respect a passed `transport` query parameter by filtering against the `Addrs` list.
-
-### Filecoin Graphsync
-
-- Multicodec name: `transport-graphsync-filecoinv1`
-- Schema: `graphsync-filecoinv1`
-- Specification: [ipfs/go-graphsync/blob/main/docs/architecture.md](https://github.com/ipfs/go-graphsync/blob/main/docs/architecture.md)
-
-#### Filecoin Graphsync Read Provider Records
+A legacy schema used by some routers to indicate a peer supports retrieval over
+the [graphsync](https://github.com/ipfs/go-graphsync/blob/main/docs/architecture.md)
+libp2p protocol.
 
 ```json
 {
   "Protocol": "transport-graphsync-filecoinv1",
   "Schema": "graphsync-filecoinv1",
-  "ID": "12D3K...",
+  "ID": "bafz...",
   "Addrs": ["/ip4/..."],
   "PieceCID": "<cid>",
   "VerifiedDeal": true,
   "FastRetrieval": true
 }
 ```
-
-- `ID`: the [Peer ID][peer-id] of the provider
-- `Addrs`: a list of known multiaddrs for the provider
-- `PieceCID`: the CID of the [piece](https://spec.filecoin.io/systems/filecoin_files/piece/#section-systems.filecoin_files.piece) within which the data is stored
-- `VerifiedDeal`: whether the deal corresponding to the data is verified
-- `FastRetrieval`: whether the provider claims there is an unsealed copy of the data available for fast retrieval
 
 [multibase]: https://github.com/multiformats/multibase
 [CIDv1]: https://github.com/multiformats/cid#cidv1
