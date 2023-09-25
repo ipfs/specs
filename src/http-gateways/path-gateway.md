@@ -370,17 +370,18 @@ in caches.
 
 Returned directive depends on requested content path and format:
 
-- `Cache-Control: public, max-age=29030400, immutable` must be returned for
+- `Cache-Control: public, max-age=29030400, immutable` MUST be returned for
   every immutable resource under `/ipfs/` namespace.
 
-- `Cache-Control: public, max-age=<ttl>` should be returned for mutable
-  resources under `/ipns/{id-with-ttl}/` namespace; `max-age=<ttl>` should
-  indicate remaining TTL of the mutable pointer such as IPNS record or DNSLink
+- `Cache-Control: public, max-age=<ttl>` SHOULD be returned for mutable
+  resources under `/ipns/{id-with-ttl}/` namespace; `max-age=<ttl>` SHOULD
+  indicate remaining TTL of the mutable pointer such as :cite[ipns-record] or DNSLink
   TXT record.
   - Implementations MAY place an upper bound on any TTL received, as
     noted in Section 8 of :cite[rfc2181].
-  - If TTL value is unknown, implementations SHOULD set it to a static
-    value, but it SHOULD not be lower than 60 seconds.
+  - If TTL value is unknown, implementations SHOULD not send a `Cache-Control`
+  - No matter if TTL value is known or not, implementations SHOULD always
+    send a [`Last-Modified`](#last-modified-response-header) header with the timestamp of the record resolution.
 
 ### `Last-Modified` (response header)
 
