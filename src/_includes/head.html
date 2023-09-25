@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>{% if title != 'Home' %}{{ title }} | {% endif %}IPFS Standards</title>
+  {% if description %}<meta name="description" content="{{ description | singleLine }}">{% endif %}
+  <link rel="canonical" href="{{ page.url | permalink }}">
+  <link rel="stylesheet" href="/css/index.css">
+  <link rel="stylesheet" href="/css/ipseity.min.css">
+  <link rel="icon" href="/img/ipfs-standards.svg">
+</head>
+<body>

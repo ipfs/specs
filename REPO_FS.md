@@ -47,7 +47,7 @@ This spec defines `fs-repo` version `1`, its formats, and semantics.
 `./api` is a file that exists to denote an API endpoint to listen to.
 - It MAY exist even if the endpoint is no longer live (i.e. it is a _stale_ or left-over `./api` file).
 
-In the presence of an `./api` file, ipfs tools (eg go-ipfs `ipfs daemon`) MUST attempt to delegate to the endpoint, and MAY remove the file if reasonably certain the file is stale. (e.g. endpoint is local, but no process is live)
+In the presence of an `./api` file, ipfs tools (e.g. go-ipfs `ipfs daemon`) MUST attempt to delegate to the endpoint, and MAY remove the file if reasonably certain the file is stale. (e.g. endpoint is local, but no process is live)
 
 The `./api` file is used in conjunction with the `repo.lock`. Clients may opt to use the api service, or wait until the process holding `repo.lock` exits. The file's content is the api endpoint as a [multiaddr](https://github.com/jbenet/multiaddr)
 
