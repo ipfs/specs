@@ -5,7 +5,7 @@
 
 ## Summary
 
-Defines how IPFS implementations must expose their gateway. This only affects the file-based method of exposiing a gateway.
+Defines how IPFS implementations must expose their gateway. This only affects the file-based method of exposing a gateway.
 
 ## Motivation
 
@@ -17,7 +17,7 @@ Users should be aware that this is just a list of gateways. It could contain a l
 
 This integration spec defines the recommended way for IPFS implementations to expose the gateway they host for IPFS integrations (think applications wanting to support IPFS) to find and use said gateways.
 
-An IPFS implementation must expose the gateway it serves in a file called `gateways` (more on where this file is located in the section below). The gateway must be exposed as a single line in the following format:
+An IPFS implementation must expose the gateway it serves in a file called `gateways` (more on where this file is located in the [section below](#Gateways-file-placement). The gateway must be exposed as a single line in the following format:
 
 `http://<ip>:<port>`
 
@@ -36,14 +36,16 @@ As a reference, [this](https://github.com/cjbassi/platform-dirs-rs#path-list) li
 | (user) macOS     | $XDG_CONFIG_HOME/ipfs     | ~/Library/Application Support/ipfs     |
 | (global) macOS     | N/A     | /Library/Application Support/ipfs     |
 | (user) Linux     | $XDG_CONFIG_HOME/ipfs     | ~/.config/ipfs     |
-| (global) Linux     | N/A     | /etc/ipfs     |
+| (global) Linux     | N/A     | /etc/ipfs
 
-The `gateways` file must be placed in the folder appropiate for the platform the IPFS implementation instance is running on. For linux that would be `~/.config/ipfs/gateways` or `$XDG_CONFIG_HOME/ipfs/gateways`
+The `gateways` file must be placed in the folder appropriate for the platform the IPFS implementation instance is running on. For linux that would be `~/.config/ipfs/gateways` or `$XDG_CONFIG_HOME/ipfs/gateways`
 
 The file will be created when it doesn't exist.
-It will never be delated! This means the file will exist and be empty when an IPFS implementation removes it's own gateway from that file and if that gateway was the only line in the file.
+It will never be deleted! This means the file will exist and be empty when an IPFS implementation removes it's own gateway from that file and if that gateway was the only line in the file.
 
 Creating and updating the `gateways` file only applies to the `(user)` prefixed file. The `(global)` prefixed file will not be written to by the IPFS implementation!
+
+An implementation of this spec shall implement the [compatibility](#Compatibility) of the legacy gateway file too.
 
 #### Local file
 The local file is for read-write access for the IPFS implementation.
@@ -65,18 +67,18 @@ Users, applications using IPFS, get a defined way to find gateways to use. Witho
 
 ### Compatibility
 
-This is only applicable to Kubo! Other IPFS implementations are to ignore this
+The legacy gateway file (placed in `~/.ipfs/gateway`) was made up as a response to a need to know which gateway an IPFS node would expose. While that file itself was never specced out, it served the need. The existence of this file is now checked for (and it's content used) in a couple application supporting the IPFS protocols. This file, for backwards compatibility reasons, is therefore a requirement to be support.
 
-The legacy gateway file (placed in `~/.ipfs/gateway`) was made up as a response to a need to know which gateway an IPFS node would expose. While that file itself was never specced out, it served the need. Some applications are using this file therefore the file has to be maintained for the Kubo reference implemenation. Any other IPFS implementation should ignore this.
+The file (`~/.ipfs/gateway`) only contains a single line being the http gateway url. For example: "http://localhost:8080".
 
-The file only contains a single line being the http gateway url. For example: "http://localhost:8080".
+An implementation shall:
 
-The file conditions:
-    1. is named "gateway"
-    2. only exists when Kubo starts a gateway
-    3. is removed when Kubo shuts down
+1. Inspect the content of `~/.ipfs/gateway` or create the file if it doesn't exist.
+2. Replace it's content by the gateway the implementation exposes.
+3. Keep the file limited to 1 single line.
 
-Future Kubo implemenations will do the above via symlinking the `gateways` file to `gateway` while maintaining the same rules as stated above.
+An implementation shall not remove this file or empty it at application shutdown.
+In other terms, the file remains with the last used gateway.
 
 ### Security
 
