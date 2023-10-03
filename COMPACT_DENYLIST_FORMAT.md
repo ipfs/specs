@@ -207,7 +207,7 @@ The list header is a YAML block:
 
 - Must be valid YAML
 - Fully optional
-- 1KB maximum size
+- 1 MiB (1048576 bytes) maximum size
 - Delimited by a line containing `---` at the end (document separator)
 
 Known-fields (they must be lowercase):
