@@ -218,14 +218,39 @@ Known-fields (they must be lowercase):
 - `name`
 - `description`
 - `author`
-- `hints`: a map of *hints*. See section below for known hints
+- `hints`: a map of *hints*. See below.
+
+The known fields-list may be expanded as this specification is developed. To
+include custom information in the header, we recommend using custom fields or hints.
+
+Custom fields:
+
+- Fields starting with `x-` or `X-` are considered custom. Users can freely
+  include them in the header and implementations can support them as needed.
+- Custom fields are not a property of each block item as "header hints" are
+  considered to be.
+
+In order to parse the header, implementations should read the denylist until a
+`---` is found or the 1MiB limit is reached. If the `---` is found, they
+should attempt parsing the header as YAML:
+
+- If parsing the header fails, they should abort and signal an error.
+- If the size limit is reached, they should assume the list includes no header
+  and start parsing block items from the beginning of the denylist. A header
+  that was too large will be parsed line by line as block items and error
+  accordingly line per line, without causing excessive resource allocation.
+
 
 #### Hints
 
-A *hint* is a key-value duple associated to the denylist as a whole (part of the header), or to a specific \<block_item\>.
+A *hint* is a key-value duple associated to a \<block_item\>. the denylist as
+a whole (part of the header), or to a specific \<block_item\>.
 
-Header hints can be used to set denylist-wide options or information that
-implementations can choose to interpret or not.
+A list of hints can optionally follow every \<block_item\> as show
+above. Hints can also be specified in the denylist header ("header
+hints"). This is equivalent to adding the same hints to every single
+\<block_item\> in the denylist. Implementations should associate both the
+specific and the header hints to every block rule.
 
 #### List body
 
