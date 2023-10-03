@@ -212,7 +212,9 @@ The list header is a YAML block:
 
 Known-fields (they must be lowercase):
 
-- `version`: the denylist format version. Defaults to 1 when not specified.
+- `version`: the denylist format version. Defaults to 1 when not
+  specified. Implementations should reject parsing denylist versions that they
+  do not support.
 - `name`
 - `description`
 - `author`
