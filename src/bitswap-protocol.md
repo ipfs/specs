@@ -1,7 +1,7 @@
 ---
-title: Bitswap
+title: Bitswap Protocol
 description: >
-  Bitswap is a libp2p data exchange protocol for sending and receiving content
+  Bitswap is a libp2p data exchange protocol for finding, sending and receiving content
   addressed blocks of data. It attempts to acquire blocks from the p2p network
   that have been requested by the client, and also send blocks to others who
   want them.
