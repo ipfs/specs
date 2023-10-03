@@ -373,7 +373,11 @@ $ printf "QmecDgNqCRirkc3Cjz9eoRBNwXGckJ9WvTdmY16HP88768/my/path" | ipfs add --r
 QmSju6XPmYLG611rmK7rEeCMFVuL6EHpqyvmEU6oGx3GR8
 ```
 
-The rule `//QmSju6XPmYLG611rmK7rEeCMFVuL6EHpqyvmEU6oGx3GR8` will block `/ipfs/bafybeihrw75yfhdx5qsqgesdnxejtjybscwuclpusvxkuttep6h7pkgmze/my/path`, with `QmSju6XPmYLG611rmK7rEeCMFVuL6EHpqyvmEU6oGx3GR8` being the base58-encoded multihash contained in `bafybeihrw75yfhdx5qsqgesdnxejtjybscwuclpusvxkuttep6h7pkgmze`.
+The rule `//QmSju6XPmYLG611rmK7rEeCMFVuL6EHpqyvmEU6oGx3GR8` will block
+`/ipfs/bafybeihrw75yfhdx5qsqgesdnxejtjybscwuclpusvxkuttep6h7pkgmze/my/path`,
+with `QmSju6XPmYLG611rmK7rEeCMFVuL6EHpqyvmEU6oGx3GR8` being the base58-encoded
+multihash contained in
+`bafybeihrw75yfhdx5qsqgesdnxejtjybscwuclpusvxkuttep6h7pkgmze`.
 
 We can convert any CID to its multihash with:
 
