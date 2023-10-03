@@ -206,7 +206,7 @@ DNS labels, must be case-insensitive, and up to a maximum of 63 characters
 per label (Section 11 of :cite[rfc2181]). Representing CIDs within these limits
 requires some care.
 
-Base32 multibase encoding is used for CIDs to ensure case-insensitve,
+Base32 multibase encoding is used for CIDs to ensure case-insensitive,
 URL safe characters are used.
 
 Base36 multibase is used for ED25519 libp2p keys to get the string
