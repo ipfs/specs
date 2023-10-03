@@ -240,7 +240,6 @@ should attempt parsing the header as YAML:
   that was too large will be parsed line by line as block items and error
   accordingly line per line, without causing excessive resource allocation.
 
-
 #### Hints
 
 A *hint* is a key-value duple associated to a \<block_item\>. the denylist as
@@ -271,7 +270,6 @@ Implementations must decide what to do when processing a denylist and an invalid
 - Prominently log the parsing error (always recommended)
 - Abort parsing and return a general error OR
 - Continue processing the list, discarding unrecognized rules
-
 
 ##### `/ipfs/CID`
 
