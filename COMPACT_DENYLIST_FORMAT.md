@@ -189,7 +189,7 @@ hints:
 
 #### High level list format
 
-A denylist is made of an optional header and a list of blockitems separated by newlines. Comment lines start with `#`. Empty lines are allowed.
+A denylist is a UTF-8 encoded text file made of an optional header and a list of blockitems separated by newlines (`\n`). Comment lines start with `#`. Empty lines are allowed.
 
 ```
 <header>
