@@ -81,7 +81,7 @@ Below response types SHOULD be supported:
   - Disables IPLD/IPFS deserialization, requests a verifiable CAR stream to be
     returned, implementations MAY support optional CAR content type parameters
     (:cite[ipip-0412]), the explicit [CAR format signaling in HTTP Request](#car-format-signaling-in-request)
-    and the optional [CAR metadata block](#car-meta-content-type-parameter).
+    and the optional [metadata block](#meta-content-type-parameter).
 
 - [application/vnd.ipfs.ipns-record](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record)
   - A verifiable :cite[ipns-record] (multicodec `0x0300`).
@@ -302,31 +302,30 @@ of their presence in the DAG or the value assigned to the "dups" parameter, as
 the raw data is already present in the parent block that links to the identity
 CID.
 
-## CAR `meta` (content type parameter)
+## `meta` (content type parameter)
 
-The `meta=eof` parameter allows clients to request the server to include additional metadata about the
-CAR to be included at the end of the response body.
+The `meta` parameter allows clients to request the server to include additional metadata about the CAR along with the response body.
 
-This parameter SHOULD only be used with CAR `version=1`.
-Values other than `eof` SHOULD be ignored.
+The value of this parameter includes both the location where the metadata is given (e.g. `eof`) as well as the type of data received (e.g. `json`) separated by a `+`, to give a value such as `meta=eof+json`
 
-When the parameter is not set, the server must not add any extra CAR blocks to the response.
+When the location parameter is set to `eof`, which is currently the only supported value, the server SHOULD respond with <Response body as CARv1 stream> <0x00 byte> <Metadata>.
 
-The metadata block is a regular CAR block with the following properties:
+The only supported value for the data type parameter is `json`. This signifies that the metadata MUST be of type `dag-json` (multicodec `0x0129`).
 
-- CID specifies multicodec `car-metadata` (`0x04ff`), see
-  [multicodec#334](https://github.com/multiformats/multicodec/pull/334).
+This parameter MUST only be used with CAR `version=1`.
 
-- The payload contains metadata encoded as DAG-CBOR.
+When the parameter is not set or does not equal `eof+json`, the server SHOULD not add any extra blocks to the response, neither the 0x00 byte nor any metadata.
 
-The metadata MUST include the following fields:
+When `meta=eof+json`, the dag-json object can include the following keys that SHOULD take values based on their corresponding definiton below.
 
-- `len` - byte length of the CAR data (excluding the metadata block)
-- `b3h` - Blake3 hash (checksum) of the CAR data (excluding the metadata block).
-- `b3h_sig` - A signature over `<len><b3h><request>` using server's Ed2559 identity.
-  - `len` is encoded as `varint`,
-  - `b3h` is encoded as 32 bytes,
-  - The effective query as executed by the gateway. This query is the request url - path and query string arguments.
+- `car_bytes`: The total byte length of the CAR stream (excluding the 0x00 byte and the metadata block)
+- `data_bytes`: Total byte length of blocks (excluding the 0x00 byte and the metadata block, but including duplicates when present)
+- `block_count`: Total number of blocks present in the CAR stream (excluding the 0x00 byte and the metadata block, but including duplicates when present)
+- `car_cid`: A hash of the CAR stream giving a CIDv1 with 0x0202 codec
+- `b3checksum`: A Blake3 hash (checksum) of the CAR stream (excluding the 0x00 byte and the metadata block)
+- `content_path`: The url path in the request as executed by the gateway
+- `query_params`: The query string in the request as executed by the gateway
+- `sig`: A signature, using the server's Ed2559 identity, over all other fields returned in the metadata block
 
 ## CAR format parameters and determinism
 
