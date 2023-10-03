@@ -17,7 +17,7 @@ xref:
   - url
   - path-gateway
   - ipip-0412
-tags: ['httpGateways', 'lowLevelHttpGateways']
+tags: ['httpGateways', 'lowLevelHttpGateways', 'exchange']
 order: 1
 ---
 
