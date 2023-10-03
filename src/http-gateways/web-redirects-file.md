@@ -13,7 +13,7 @@ editors:
     github: lidel
     url: https://lidel.org/
 tags: ['httpGateways', 'webHttpGateways']
-order: 4
+order: 5
 ---
 
 The Web Redirects File specification is an extension of the Subdomain Gateway and DNSLink Gateway specifications.
