@@ -402,17 +402,6 @@ The BlockService should:
 
 - Convert the CID to b58-encoded-multihash (that is CIDv0) and hash the CID string.
 
-##### `/mime/MIMETYPE` `/mime/*`
-
-Blocks content detected to be of the given type. `/mime/*` blocks all the mimetypes and is meant to work with allow rules (all mimetypes blocked except specific ones).
-
-Blocking layer recommendation: Unixfs
-
-Our recommendation is that /mime/ rules automatically set IPFS clients into a
-"unixfs only" mode where only unixfs (+raw blocks) are allowed at the
-BlockService layer, and content type is checked at the Unixfs layer, as the
-blocks get assembled into an actual files. That should cover gateway usage.
-
 #### Allow (or negated) rules
 
 Block items can be prepended by `!`, which means that items matching the rule are to be allowed rather than blocked.
