@@ -151,10 +151,9 @@ A logical :dfn[IPNS Record] is a data structure containing the following fields:
   - Implementations MUST include this value in inside the DAG-CBOR document at `IpnsEntry.data[Sequence]`.
 
 - **TTL** (uint64)
-  - A hint for how long (in nanoseconds) the record should be cached before going back to, for instance the DHT, in order to check if it has been updated.
+  - A hint for how long (in nanoseconds) the record should be cached before going back to, for instance the DHT, in order to check if it has been updated. The function and trade-offs of this value are analogous to the TTL of DNS record.
   - Implementations MUST include this value inside the DAG-CBOR document at `IpnsEntry.data[TTL]`.
   - Suggested default: 1 hour (3 600 000 000 000 nanoseconds).
-
 
 - **Public Key** (bytes)
   - Public key used to sign this record.
