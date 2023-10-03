@@ -28,7 +28,7 @@ editors:
     affiliation:
       name: Protocol Labs
       url: https://protocol.ai/
-tags: ['exchange']
+tags: ['exchange', 'routing']
 order: 1
 ---
 
@@ -39,6 +39,8 @@ Bitswap has two primary jobs:
 
 1. Attempt to acquire blocks from the network that have been requested by the client.
 2. Send blocks in its possession to other peers who want them.
+
+Secondary job (since [v1.2.0](#bitswap-1-2-0)) is to act as a basic content routing system for querying connected peers.
 
 ## Introduction
 
@@ -196,6 +198,13 @@ Given that a client *C* wants to fetch data from some server *S*:
   `Cancel` message for that request to any peers that have not already responded
   about that particular block. It SHOULD particularly send `Cancel` messages for
   `Block` requests (as opposed to `Have` requests) that have not yet been answered.
+
+:::note
+
+`Have`'s and `Have`/`DontHave` responses enable Bitswap to be used as
+bare-bones content routing system for connected peers.
+
+:::
 
 ### Bitswap 1.2.0: Wire Format
 
