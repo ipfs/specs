@@ -402,7 +402,6 @@ The NameSystem should:
 - If NAME is a CID (try parsing as CID first), extract the multihash, encoded with base58btc and hash it with the hashing functions used in the denylist. Match against declared double-hashes.
 - Otherwise, assume NAME is a domain name: Hash `/ipns/NAME` with the hashing functions used in the denylist. Match against declared double-hashes.
 
-
 The BlockService should:
 
 - Convert the CID to `CIDV1BASE32/` (keeping the CID codec and adding a slash at the end) and hash it with the hashing functions used in the denylist. Match against declared double-hashes.
