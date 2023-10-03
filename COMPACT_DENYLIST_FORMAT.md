@@ -266,6 +266,13 @@ A block item represents a rule to enable content-blocking:
 - `CID` elements represent a CID (either V0 or V1).
 - `CIDv0` are for us equivalent to baseb58btc-encoded sha256 multihashes although they are not the same thing (a CIDV0 carries implicit codec (dag-pb) and multibase information (b58btc). When we say a b58-encoded multihash needs to be extracted from the CID, this usually is a no-op in case of CIDv0s.
 
+Implementations must decide what to do when processing a denylist and an invalid block-item rule is found:
+
+- Prominently log the parsing error (always recommended)
+- Abort parsing and return a general error OR
+- Continue processing the list, discarding unrecognized rules
+
+
 ##### `/ipfs/CID`
 
 CID-rule: Blocks a specific multihash. If the CID is a V1, it blocks the
