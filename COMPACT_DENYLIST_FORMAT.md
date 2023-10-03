@@ -353,8 +353,8 @@ Doublehash-Rule: Blocks using double-hashed item, which can be:
   (`CIDV1_BASE32/`).
 - A b58-encoded multihash (a.k.a CIDV0), corresponding to the Sum() of:
   - An IPNS-Path:
-    - `/ipns/IPNS` when the IPNS name is NOT a CID.
-    - The b58-encoded-multihash extracted from an IPNS key when the IPNS key
+    - `/ipns/NAME` when the IPNS name is NOT a CID.
+    - The b58-encoded-multihash extracted from an IPNS name when the IPNS name
       is a CID.
   - An IPFS-Path: `b58-encoded-multihash/P/A/T/H` where the multihash is
     extracted from the CID in `/ipfs/CID/P/A/T/H` (The multihash and the CID
@@ -388,17 +388,22 @@ QmecDgNqCRirkc3Cjz9eoRBNwXGckJ9WvTdmY16HP88768
 
 Blocking layer recommendation: NameSystem + PathResolver + BlockService.
 
-In order to check for a matching rule, the PathResolver should:
+In order to check for a matching rule, the PathResolver working with `CID/PATH` elements should:
 
-- IPFS path: convert the CID to v1base32 and hash `CIDV1BASE32/PATH` with the
-  hashing functions used in the denylist. Match against declared double-hashes.
-- IPFS path: convert the CID to CIDv0 and hash `CIDV0/PATH` without trailing `/` with the hashing functions used in the denylist. Match against declared double-hashes.
-- IPNS path:
+- Convert the CID to v1base32 and hash `CIDV1BASE32/PATH` with the hashing
+  functions used in the denylist. Match against declared double-hashes. An
+  empty path means that the value to hash is `CIDV1BASE32/` (with the trailing
+  slash). This is the legacy hashing so the hashing function is usually
+  sha256 and the matched rules are legacy badbits anchor rules.
+- Convert the CID to CIDv0 and hash `CIDV0/PATH` without trailing `/` with the
+  hashing functions used in the denylist. Match against declared
+  double-hashes.
 
 The NameSystem should:
 
-- If NAME is a domain name: Hash `/ipns/NAME` with the hashing functions used in the denylist. Match against declared double-hashes.
-- If NAME is a CID, extract the multihash, encode it with baseb58btc and hash it with the hashing functions used in the denylist. Match against declared double-hashes.
+- If NAME is a CID (try parsing as CID first), extract the multihash, encoded with base58btc and hash it with the hashing functions used in the denylist. Match against declared double-hashes.
+- Otherwise, assume NAME is a domain name: Hash `/ipns/NAME` with the hashing functions used in the denylist. Match against declared double-hashes.
+
 
 The BlockService should:
 
