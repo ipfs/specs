@@ -398,7 +398,7 @@ In order to check for a matching rule, the PathResolver should:
 The NameSystem should:
 
 - If NAME is a domain name: Hash `/ipns/NAME` with the hashing functions used in the denylist. Match against declared double-hashes.
-- If NAME is a CID, extract the multihash, encoded with baseb58btc and hash it with the hashing functions used in the denylist. Match against declared double-hashes.
+- If NAME is a CID, extract the multihash, encode it with baseb58btc and hash it with the hashing functions used in the denylist. Match against declared double-hashes.
 
 The BlockService should:
 
