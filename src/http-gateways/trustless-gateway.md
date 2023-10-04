@@ -320,17 +320,21 @@ When `meta=eof+json`, the JSON object SHOULD conform to the following [JSON sche
 
 ```json
 {
+  "type": "object",
   "properties": {
-    "description": "Properties of the response"
-    "type": "object"
-  },
-  "error": {
-    "description": "Error message"
-    "type": "string"
-  },
-  "sig": {
-    "description": "A signature, using the server's Ed2559 identity, over the metadata properties object"
-    "type": "string"
+    "data": {
+      "description": "Properties of the response"
+      "type": "object"
+    },
+    "error": {
+      "description": "Error message"
+      "type": "string"
+    },
+    "sig": {
+      "description": "A signature, using the server's Ed2559 identity, over the metadata properties object"
+      "type": "string"
+    },
+    "required": []
   }
 }
 ```
