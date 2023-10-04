@@ -310,22 +310,65 @@ The value of this parameter includes both the location where the metadata is giv
 
 When the location parameter is set to `eof`, which is currently the only supported value, the server SHOULD respond with <Response body as CARv1 stream> <0x00 byte> <Metadata>.
 
-The only supported value for the data type parameter is `json`. This signifies that the metadata MUST be of type `dag-json` (multicodec `0x0129`).
+The only supported value for the data type parameter is `json`. This signifies that the metadata MUST be a JSON object.
 
 This parameter MUST only be used with CAR `version=1`.
 
 When the parameter is not set or does not equal `eof+json`, the server SHOULD not add any extra blocks to the response, neither the 0x00 byte nor any metadata.
 
-When `meta=eof+json`, the dag-json object can include the following keys that SHOULD take values based on their corresponding definiton below.
+When `meta=eof+json`, the JSON object SHOULD conform to the following [JSON schema](https://json-schema.org/).
 
-- `car_bytes`: The total byte length of the CAR stream (excluding the 0x00 byte and the metadata block)
-- `data_bytes`: Total byte length of blocks (excluding the 0x00 byte and the metadata block, but including duplicates when present)
-- `block_count`: Total number of blocks present in the CAR stream (excluding the 0x00 byte and the metadata block, but including duplicates when present)
-- `car_cid`: A hash of the CAR stream giving a CIDv1 with 0x0202 codec
-- `b3checksum`: A Blake3 hash (checksum) of the CAR stream (excluding the 0x00 byte and the metadata block)
-- `content_path`: The url path in the request as executed by the gateway
-- `query_params`: The query string in the request as executed by the gateway
-- `sig`: A signature, using the server's Ed2559 identity, over all other fields returned in the metadata block
+```json
+{
+  "properties": {
+    "description": "Properties of the response"
+    "type": "object"
+  },
+  "error": {
+    "description": "Error message"
+    "type": "string"
+  },
+  "sig": {
+    "description": "A signature, using the server's Ed2559 identity, over the metadata properties object"
+    "type": "string"
+  }
+}
+```
+
+The properties object can include any fields that the server would like to implement. The following properties fields are mentioned explicitly to reach a convention on their definition as they have existing use cases.
+
+```json
+{
+  "car_bytes": {
+    "description": "The total byte length of the CAR stream (excluding the 0x00 byte and the metadata block)",
+    "type": "integer"
+  },
+  "data_bytes": {
+    "description": "Total byte length of blocks (excluding the 0x00 byte and the metadata block, but including duplicates when present)",
+    "type": "integer"
+  },
+  "block_count": {
+    "description": "Total number of blocks present in the CAR stream (excluding the 0x00 byte and the metadata block, but including duplicates when present)",
+    "type": "integer"
+  },
+  "car_cid": {
+    "description": "A hash of the CAR stream giving a CIDv1 with 0x0202 codec",
+    "type": "string"
+  },
+  "b3checksum": {
+    "description": "A Blake3 hash (checksum) of the CAR stream (excluding the 0x00 byte and the metadata block)",
+    "type": "string"
+  },
+  "content_path": {
+    "description": "The url path in the request as executed by the gateway",
+    "type": "string"
+  },
+  "query_params": {
+    "description": "The query string in the request as executed by the gateway",
+    "type": "string"
+  }
+}
+```
 
 ## CAR format parameters and determinism
 
