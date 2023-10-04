@@ -359,13 +359,9 @@ The properties object can include any fields that the server would like to imple
     "description": "A Blake3 hash (checksum) of the CAR stream (excluding the 0x00 byte and the metadata block)",
     "type": "string"
   },
-  "content_path": {
-    "description": "The url path in the request as executed by the gateway",
-    "type": "string"
-  },
-  "query_params": {
-    "description": "The query string in the request as executed by the gateway",
-    "type": "string"
+  "retrieval_params": {
+    "description": "Retrieval parameters describing what the client requested from the gateway",
+    "type": "object"
   }
 }
 ```
