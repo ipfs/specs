@@ -344,7 +344,7 @@ The properties object can include any fields that the server would like to imple
     "type": "integer"
   },
   "data_bytes": {
-    "description": "Total byte length of blocks (excluding the 0x00 byte and the metadata block, but including duplicates when present)",
+    "description": "Total byte length of the flat file before it was encoded into a CAR file",
     "type": "integer"
   },
   "block_count": {
