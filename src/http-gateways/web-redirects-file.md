@@ -1,30 +1,35 @@
 ---
 title: Web _redirects File Specification
 description: >
-  The Redirects File specification is an extension of the Subdomain Gateway and DNSLink Gateway specifications that
-  enables URL redirects or rewrites by adding redirect rules to a0 file stored underneath the root CID of a web
-  site.
+  Defines how URL redirects and rewrites can be implemented by adding rules to
+  a plain text file stored underneath the root CID of a website.
 date: 2023-01-28
 maturity: reliable
 editors:
   - name: Justin Johnson
     github: justincjohnson
+    affiliation:
+      name: Fission
+      url: https://fission.codes/
   - name: Marcin Rataj
     github: lidel
     url: https://lidel.org/
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
 tags: ['httpGateways', 'webHttpGateways']
 order: 5
 ---
 
 The Web Redirects File specification is an extension of the Subdomain Gateway and DNSLink Gateway specifications.
 
-Developers can enable URL redirects or rewrites by adding redirect rules to a file named `_redirects` stored underneath the root CID of their web site.
+Developers can enable URL redirects or rewrites by adding redirect rules to a file named `_redirects` stored underneath the root CID of their website.
 
 This can be used, for example, to enable URL rewriting for hosting a single-page application, to redirect invalid URLs to a pretty 404 page, or to avoid  [link rot](https://en.wikipedia.org/wiki/Link_rot) when moving to IPFS-based website hosting.
 
 # File Name and Location
 
-The Redirects File MUST be named `_redirects` and stored underneath the root CID of the web site.
+The Redirects File MUST be named `_redirects` and stored underneath the root CID of the website.
 
 # File Format
 
