@@ -47,7 +47,7 @@ tags: ['httpGateways', 'webHttpGateways']
 order: 3
 ---
 
-Subdomain Gateways extend :cite[path-gateway] with HTTP [Host](#host-request-heafer)
+Subdomain Gateways extend :cite[path-gateway] with HTTP [Host](#host-request-header)
 header support. Below should be read as a delta on top of that spec.
 
 This specification enables isolated website hosting based on root CID-derived
