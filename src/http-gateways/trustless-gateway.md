@@ -214,7 +214,7 @@ The Body hash MUST match the Multihash from the requested CID.
 
 A CAR stream for the requested
 [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car)
-content type (with optional `order` and `dups` params), path and optional
+content type (with optional `order`, `dups` and `skip-leaves` params), path and optional
 `dag-scope` and `entity-bytes` URL parameters.
 
 ## CAR version
@@ -300,6 +300,26 @@ A Gateway MUST NOT include virtual blocks identified by identity CIDs
 of their presence in the DAG or the value assigned to the "dups" parameter, as
 the raw data is already present in the parent block that links to the identity
 CID.
+
+## CAR `skip-leaves` (content type parameter)
+
+The `skip-leaves` parameter specifies whether blocks with the multicodec `raw`
+`0x55` must be sent.
+
+It accepts two values:
+- `y`: Blocks with `raw` multicodec MUST NOT be sent.
+- `n`, or unspecified: Blocks with `raw` multicodec MUST be sent.
+
+A gateway MUST NOT assume this field is `y` if unspecified.
+When not specified it always MUST be understood as `n`.
+
+:::note Notes for implementers
+
+A request which is rooted at a `raw` block and has `skip-leaves=y` does not
+make sense and SHOULD NOT be sent by clients, it is fair for servers to
+error in this situation.
+
+:::
 
 ## CAR format parameters and determinism
 
