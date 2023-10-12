@@ -2,7 +2,7 @@
 title: Delegated Routing V1 HTTP API
 description: >
   Delegated routing is a mechanism for IPFS implementations to use for offloading
-  content routing and naming to another process/server. This specification describes
+  content routing, peer routing and naming to another process/server. This specification describes
   an HTTP API for delegated content routing.
 date: 2023-08-31
 maturity: reliable
@@ -35,7 +35,7 @@ order: 0
 tags: ['routing']
 ---
 
-Delegated routing is a mechanism for IPFS implementations to use for offloading content routing and naming to another process/server. This specification describes a vendor-agnostic HTTP API for delegated content routing.
+Delegated routing is a mechanism for IPFS implementations to use for offloading content routing, peer routing, and naming to another process/server. This specification describes a vendor-agnostic HTTP API for delegated content routing.
 
 ## API Specification
 
