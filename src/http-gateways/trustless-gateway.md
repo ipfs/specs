@@ -339,34 +339,64 @@ When `meta=eof+json`, the JSON object SHOULD conform to the following [JSON sche
 }
 ```
 
-The properties object can include any fields that the server would like to implement. The following properties fields are mentioned explicitly to reach a convention on their definition as they have existing use cases.
+The properties object can include any fields that the server would like to implement. The following JSON schema explicitly mentions certain properties fields in order to reach a convention on their definition as they have existing use cases.
 
 ```json
 {
-  "car_bytes": {
-    "description": "The total byte length of the CAR stream (excluding the 0x00 byte and the metadata block)",
-    "type": "integer"
+  "type": "object",
+  "properties": {
+    "car_bytes": {
+      "description": "The total byte length of the CAR stream (excluding the 0x00 byte and the metadata block)",
+      "type": "integer"
+    },
+    "data_bytes": {
+      "description": "Total byte length of the flat file before it was encoded into a CAR file",
+      "type": "integer"
+    },
+    "block_count": {
+      "description": "Total number of blocks present in the CAR stream (excluding the 0x00 byte and the metadata block, but including duplicates when present)",
+      "type": "integer"
+    },
+    "car_cid": {
+      "description": "A hash of the CAR stream giving a CIDv1 with 0x0202 codec",
+      "type": "string"
+    },
+    "b3checksum": {
+      "description": "A Blake3 hash (checksum) of the CAR stream (excluding the 0x00 byte and the metadata block)",
+      "type": "string"
+    },
+    "dag_params": {
+      "description": "A map with DAG params like dag-scope, entity-bytes from [IPIP-402](https://specs.ipfs.tech/ipips/ipip-0402/)",
+      "type": "object",
+      "properties": {
+        "dag-scope": {
+          "description": "See [IPIP-402](https://specs.ipfs.tech/ipips/ipip-0402/) for the definition",
+          "type": "string"
+        },
+        "entity-bytes": {
+          "description": "See [IPIP-402](https://specs.ipfs.tech/ipips/ipip-0402/) for the definition",
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "car_params": {
+      "description": "A map with CAR content type params like order and dups from [IPIP-412](https://specs.ipfs.tech/ipips/ipip-0412/)",
+      "type": "object",
+      "properties": {
+        "order": {
+          "description": "See [IPIP-412](https://specs.ipfs.tech/ipips/ipip-0412/) for the definition.",
+          "type": "string"
+        },
+        "dups": {
+          "description": "See [IPIP-412](https://specs.ipfs.tech/ipips/ipip-0412/) for the definition.",
+          "type": "string"
+        }
+      },
+      "required": []
+    }
   },
-  "data_bytes": {
-    "description": "Total byte length of the flat file before it was encoded into a CAR file",
-    "type": "integer"
-  },
-  "block_count": {
-    "description": "Total number of blocks present in the CAR stream (excluding the 0x00 byte and the metadata block, but including duplicates when present)",
-    "type": "integer"
-  },
-  "car_cid": {
-    "description": "A hash of the CAR stream giving a CIDv1 with 0x0202 codec",
-    "type": "string"
-  },
-  "b3checksum": {
-    "description": "A Blake3 hash (checksum) of the CAR stream (excluding the 0x00 byte and the metadata block)",
-    "type": "string"
-  },
-  "retrieval_params": {
-    "description": "Retrieval parameters describing what the client requested from the gateway",
-    "type": "object"
-  }
+  "required": []
 }
 ```
 
