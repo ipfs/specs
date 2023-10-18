@@ -85,7 +85,14 @@ title: Home
           IPFS Gateway acts as a bridge between traditional HTTP clients and IPFS. Through the gateway, users can download files,
           directories and other IPLD data stored in IPFS as if they were stored in a traditional web server.
         </p>
-        {% include 'list.html', posts: collections.httpGateways %}
+        <p>
+          Low-level HTTP semantics:
+        </p>
+        {% include 'list.html', posts: collections.lowLevelHttpGateways %}
+        <p>
+          Web semantics (for website hosting and web browsers):
+        </p>
+        {% include 'list.html', posts: collections.webHttpGateways %}
       </section>
       <section>
         <h3><a href="/ipns/">InterPlanetary Naming System</a></h3>

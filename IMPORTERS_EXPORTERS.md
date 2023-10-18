@@ -68,9 +68,9 @@ These are a set of requirements (or guidelines) of the expectations that need to
 
 ```bash
               ┌───────────┐        ┌──────────┐
-┌──────┐      │           │        │          │        ┌───────────────┐
-│ DATA │━━━━━▶│  chunker  │━━━━━━━▶│  layout  │━━━━━━━▶│ DATA formated │
-└──────┘      │           │        │          │        └───────────────┘
+┌──────┐      │           │        │          │        ┌────────────────┐
+│ DATA │━━━━━▶│  chunker  │━━━━━━━▶│  layout  │━━━━━━━▶│ DATA formatted │
+└──────┘      │           │        │          │        └────────────────┘
               └───────────┘        └──────────┘
              ▲                                 ▲
              └─────────────────────────────────┘

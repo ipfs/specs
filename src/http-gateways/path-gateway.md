@@ -1,24 +1,39 @@
 ---
 title: Path Gateway Specification
 description: >
-  The most versatile form of IPFS Gateway is a Path Gateway. It exposes namespaces, such
-  as /ipfs/ and /ipns/ under an HTTP server root and provides basic primitives for integrating
-  IPFS resources within the existing HTTP stack.
+  The comprehensive low-level HTTP Gateway enables the integration of IPFS
+  resources into the HTTP stack through /ipfs and /ipns namespaces, supporting
+  both deserialized and verifiable response types.
 date: 2023-03-30
 maturity: reliable
 editors:
   - name: Marcin Rataj
     github: lidel
     url: https://lidel.org/
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
   - name: Adrian Lanzafame
     github: lanzafame
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
   - name: Vasco Santos
     github: vasco-santos
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
   - name: Oli Evans
     github: olizilla
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
   - name: Henrique Dias
     github: hacdias
     url: https://hacdias.com/
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
 xref:
   - url
   - trustless-gateway
@@ -291,10 +306,9 @@ sent by the client.
 
 ### `429` Too Many Requests
 
-A
-[`Retry-After`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After)
-header might be included to this response, indicating how long to wait before
-making a new request.
+Error to indicate the client has sent too many requests in a given amount of time.
+
+This error response SHOULD include [`Retry-After`](#retry-after-response-header) HTTP header to indicate how long the client should wait before making a follow-up request.
 
 ### `451` Unavailable For Legal Reasons
 
@@ -308,9 +322,21 @@ See: [Denylists](#denylists)
 
 A generic server error returned when it is not possible to return a better one.
 
+### `502` Bad Gateway
+
+Returned immediately when Gateway was not able to produce response for a known reason.
+For example, when gateway failed to find any providers for requested data.
+
+This error response SHOULD include [`Retry-After`](#retry-after-response-header) HTTP header to indicate how long the client should wait before retrying.
+
 ### `504` Gateway Timeout
 
-Returned when Gateway was not able to produce response under set limits.
+Returned when Gateway was not able to produce response under set time limits.
+For example, when gateway failed to retrieve data from a remote provider.
+
+There is no generic timeout, Gateway implementations SHOULD set timeouts based on specific use cases.
+
+This error response SHOULD include [`Retry-After`](#retry-after-response-header) HTTP header to indicate how long the client should wait before retrying.
 
 ## Response Headers
 
@@ -359,17 +385,18 @@ in caches.
 
 Returned directive depends on requested content path and format:
 
-- `Cache-Control: public, max-age=29030400, immutable` must be returned for
+- `Cache-Control: public, max-age=29030400, immutable` MUST be returned for
   every immutable resource under `/ipfs/` namespace.
 
-- `Cache-Control: public, max-age=<ttl>` should be returned for mutable
-  resources under `/ipns/{id-with-ttl}/` namespace; `max-age=<ttl>` should
-  indicate remaining TTL of the mutable pointer such as IPNS record or DNSLink
+- `Cache-Control: public, max-age=<ttl>` SHOULD be returned for mutable
+  resources under `/ipns/{id-with-ttl}/` namespace; `max-age=<ttl>` SHOULD
+  indicate remaining TTL of the mutable pointer such as :cite[ipns-record] or DNSLink
   TXT record.
   - Implementations MAY place an upper bound on any TTL received, as
     noted in Section 8 of :cite[rfc2181].
-  - If TTL value is unknown, implementations SHOULD set it to a static
-    value, but it SHOULD not be lower than 60 seconds.
+  - If TTL value is unknown, implementations SHOULD not send a `Cache-Control`
+  - No matter if TTL value is known or not, implementations SHOULD always
+    send a [`Last-Modified`](#last-modified-response-header) header with the timestamp of the record resolution.
 
 ### `Last-Modified` (response header)
 
@@ -550,6 +577,14 @@ Optional, present in certain response types:
   followed and not be changed. This is a security feature, ensures that
   non-executable binary response types are not used in `<script>` and `<style>`
   HTML tags.
+
+### `Retry-After` (response header)
+
+Gateway returns this header with error responses such as [`429 Too Many Requests`](#429-too-many-requests) or [`504 Gateway Timeout`](#504-gateway-timeout).
+
+The "Retry-After" header indicates how long the user agent ought to wait before making a follow-up request.
+
+See Section 10.2.3 of :cite[rfc9110].
 
 ### `Server-Timing` (response header)
 

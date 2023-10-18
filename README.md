@@ -37,10 +37,10 @@ The specs contained in this and related repositories are:
   - [IPFS Guide](https://docs.ipfs.tech/) - to start your IPFS journey
   - [Protocol Architecture Overview](./ARCHITECTURE.md) - the top-level spec and the stack
 - **User Interface (aka Public APIs):**
-  - [HTTP Gateways](./http-gateways/) - implementation agnostic interfaces for accessing content-addressed data over HTTP
-  - IPFS implementations may provide additional interfaces, for example:
-    - [Legacy HTTP RPC API exposed by Kubo (go-ipfs)](https://docs.ipfs.io/reference/http/api/)
-    - [Programmatic Core API for JavaScript](https://github.com/ipfs/js-ipfs/tree/master/docs/core-api#readme)
+  - [HTTP Gateways](https://specs.ipfs.tech/http-gateways/) - implementation agnostic interfaces for accessing content-addressed data over HTTP
+  - [Routing V1](https://specs.ipfs.tech/routing/http-routing-v1/) - implementation agnostic interfaces for content/peer/IPNS routing over HTTP
+  - IPFS implementations may provide additional HTTP interfaces, for example:
+    - [Kubo RPC at /api/v0](https://docs.ipfs.tech/reference/kubo/rpc/)
 - **Data Formats:**
   - [IPLD](https://ipld.io/specs/) - InterPlanetary Linked Data.
     - [DAG-CBOR](https://ipld.io/docs/codecs/known/dag-cbor/) -  binary format, supporting the complete IPLD Data Model, with excellent performance, and suitable for any job.
@@ -52,9 +52,10 @@ The specs contained in this and related repositories are:
     - [multiaddr](https://github.com/multiformats/multiaddr) - self-describing addressing format.
     - [multicodec](https://github.com/multiformats/multicodec) - self-describing protocol/encoding streams (note: a file is a stream).
     - [multistream](https://github.com/multiformats/multistream) - multistream is a format -- or simple protocol -- for disambiguating, and layering streams. It is extremely simple.
-- **Files / Mutable File System:**
+- **Files and Directories:**
   - [UnixFS](./UNIXFS.md)
-  - [Mutable File System (the Files API)](./MUTABLE_FILE_SYSTEM.md) - Virtual File System interface, unix like, on top of the MerkleDAG
+  - Related userland concepts (external docs):
+    - [MFS, Mutable File System, or the Files API](https://docs.ipfs.tech/concepts/file-systems/#mutable-file-system-mfs)
 - **Storage Layer:**
   - [Pinning Service API](https://ipfs.github.io/pinning-services-api-spec/)
   - [Repo](./REPO.md) - IPFS node local repository spec
@@ -67,9 +68,11 @@ The specs contained in this and related repositories are:
 - **Networking layer:**
   - [libp2p](https://github.com/libp2p/specs) - libp2p is a modular and extensible network stack, built and use by IPFS, but that it can be reused as a standalone project. Covers:
 - **Records, Naming and Record Systems:**
-  - [IPNS](./ipns/IPNS.md) - InterPlanetary Naming System
-    - [IPNS over PubSub](./ipns/IPNS_PUBSUB.md) - IPNS over PubSub Router
-  - [DNSLink](https://dnslink.dev)
+  - [IPNS](https://specs.ipfs.tech/ipns/) - InterPlanetary Naming System
+    - [IPNS Record Creation and Verification](https://specs.ipfs.tech/ipns/ipns-pubsub-router/)
+    - [IPNS over PubSub](https://specs.ipfs.tech/ipns/ipns-pubsub-router/)
+  - [DNSLink](https://dnslink.dev) - mapping DNS names to IPFS content paths
+  - [DNSAddr](https://github.com/multiformats/multiaddr/blob/master/protocols/DNSADDR.md) - mapping DNS names to libp2p multiaddrs
 - **Other/related/included:**
   - [PDD](https://github.com/ipfs/pdd) - Protocol Driven Development
 
@@ -86,7 +89,6 @@ This repository falls under the IPFS [Code of Conduct](https://github.com/ipfs/c
 - Or add a new protocol?
 
 See:
- - [IPIP: Improvement Process for IPFS Specifications](./IPIP_PROCESS.md).
- - List of [IPIPs](./IPIP/)
-
-Accepted proposals can be found in the [`IPIP/`](./IPIP/) directory.
+- [IPIP: Improvement Process for IPFS Specifications](https://specs.ipfs.tech/meta/ipip-process/)
+  - List of [ratified IPIPs](https://specs.ipfs.tech/ipips/)
+  - List of [open IPIPs](https://github.com/ipfs/specs/pulls?q=is%3Apr+is%3Aopen+ipip+sort%3Aupdated-desc)
