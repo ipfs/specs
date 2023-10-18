@@ -81,7 +81,7 @@ Below response types SHOULD be supported:
   - Disables IPLD/IPFS deserialization, requests a verifiable CAR stream to be
     returned, implementations MAY support optional CAR content type parameters
     (:cite[ipip-0412]), the explicit [CAR format signaling in HTTP Request](#car-format-signaling-in-request)
-    and the optional [CAR metadata block](#car-meta-content-type-parameter).
+    and the optional [metadata block](#meta-content-type-parameter).
 
 - [application/vnd.ipfs.ipns-record](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record)
   - A verifiable :cite[ipns-record] (multicodec `0x0300`).
@@ -302,31 +302,103 @@ of their presence in the DAG or the value assigned to the "dups" parameter, as
 the raw data is already present in the parent block that links to the identity
 CID.
 
-## CAR `meta` (content type parameter)
+## `meta` (content type parameter)
 
-The `meta=eof` parameter allows clients to request the server to include additional metadata about the
-CAR to be included at the end of the response body.
+The `meta` parameter allows clients to request the server to include additional metadata about the CAR along with the response body.
 
-This parameter SHOULD only be used with CAR `version=1`.
-Values other than `eof` SHOULD be ignored.
+The value of this parameter includes both the location where the metadata is given (e.g. `eof`) as well as the type of data received (e.g. `json`) separated by a `+`, to give a value such as `meta=eof+json`
 
-When the parameter is not set, the server must not add any extra CAR blocks to the response.
+When the location parameter is set to `eof`, which is currently the only supported value, the server SHOULD respond with <Response body as CARv1 stream> <0x00 byte> <Metadata>.
 
-The metadata block is a regular CAR block with the following properties:
+The only supported value for the data type parameter is `json`. This signifies that the metadata MUST be a JSON object.
 
-- CID specifies multicodec `car-metadata` (`0x04ff`), see
-  [multicodec#334](https://github.com/multiformats/multicodec/pull/334).
+This parameter MUST only be used with CAR `version=1`.
 
-- The payload contains metadata encoded as DAG-CBOR.
+When the parameter is not set or does not equal `eof+json`, the server SHOULD not add any extra blocks to the response, neither the 0x00 byte nor any metadata.
 
-The metadata MUST include the following fields:
+When `meta=eof+json`, the JSON object SHOULD conform to the following [JSON schema](https://json-schema.org/).
 
-- `len` - byte length of the CAR data (excluding the metadata block)
-- `b3h` - Blake3 hash (checksum) of the CAR data (excluding the metadata block).
-- `b3h_sig` - A signature over `<len><b3h><request>` using server's Ed2559 identity.
-  - `len` is encoded as `varint`,
-  - `b3h` is encoded as 32 bytes,
-  - The effective query as executed by the gateway. This query is the request url - path and query string arguments.
+```json
+{
+  "type": "object",
+  "properties": {
+    "data": {
+      "description": "Properties of the response"
+      "type": "object"
+    },
+    "error": {
+      "description": "Error message"
+      "type": "string"
+    },
+    "sig": {
+      "description": "A signature, using the server's Ed2559 identity, over the metadata properties object"
+      "type": "string"
+    },
+    "required": []
+  }
+}
+```
+
+The properties object can include any fields that the server would like to implement. The following JSON schema explicitly mentions certain properties fields in order to reach a convention on their definition as they have existing use cases.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "car_bytes": {
+      "description": "The total byte length of the CAR stream (excluding the 0x00 byte and the metadata block)",
+      "type": "integer"
+    },
+    "data_bytes": {
+      "description": "Total byte length of the flat file before it was encoded into a CAR file",
+      "type": "integer"
+    },
+    "block_count": {
+      "description": "Total number of blocks present in the CAR stream (excluding the 0x00 byte and the metadata block, but including duplicates when present)",
+      "type": "integer"
+    },
+    "car_cid": {
+      "description": "A hash of the CAR stream giving a CIDv1 with 0x0202 codec",
+      "type": "string"
+    },
+    "b3checksum": {
+      "description": "A Blake3 hash (checksum) of the CAR stream (excluding the 0x00 byte and the metadata block)",
+      "type": "string"
+    },
+    "dag_params": {
+      "description": "A map with DAG params like dag-scope, entity-bytes from [IPIP-402](https://specs.ipfs.tech/ipips/ipip-0402/)",
+      "type": "object",
+      "properties": {
+        "dag-scope": {
+          "description": "See [IPIP-402](https://specs.ipfs.tech/ipips/ipip-0402/) for the definition",
+          "type": "string"
+        },
+        "entity-bytes": {
+          "description": "See [IPIP-402](https://specs.ipfs.tech/ipips/ipip-0402/) for the definition",
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "car_params": {
+      "description": "A map with CAR content type params like order and dups from [IPIP-412](https://specs.ipfs.tech/ipips/ipip-0412/)",
+      "type": "object",
+      "properties": {
+        "order": {
+          "description": "See [IPIP-412](https://specs.ipfs.tech/ipips/ipip-0412/) for the definition.",
+          "type": "string"
+        },
+        "dups": {
+          "description": "See [IPIP-412](https://specs.ipfs.tech/ipips/ipip-0412/) for the definition.",
+          "type": "string"
+        }
+      },
+      "required": []
+    }
+  },
+  "required": []
+}
+```
 
 ## CAR format parameters and determinism
 
