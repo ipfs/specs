@@ -308,7 +308,11 @@ The `meta` parameter allows clients to request the server to include additional 
 
 The value of this parameter includes both the location where the metadata is given (e.g. `eof`) as well as the type of data received (e.g. `json`) separated by a `+`, to give a value such as `meta=eof+json`
 
-When the location parameter is set to `eof`, which is currently the only supported value, the server SHOULD respond with <Response body as CARv1 stream> <0x00 byte> <Metadata>.
+When the location parameter is set to `eof`, which is currently the only supported value, the server SHOULD respond with the following response body:
+
+```
+<Response body as CARv1 stream> <0x00 byte> <Metadata>
+```
 
 The only supported value for the data type parameter is `json`. This signifies that the metadata MUST be a JSON object.
 
@@ -323,16 +327,16 @@ When `meta=eof+json`, the JSON object SHOULD conform to the following [JSON sche
   "type": "object",
   "properties": {
     "data": {
+      "type": "object",
       "description": "Properties of the response"
-      "type": "object"
     },
     "error": {
+      "type": "string",
       "description": "Error message"
-      "type": "string"
     },
     "sig": {
-      "description": "A signature, using the server's Ed2559 identity, over the metadata properties object"
-      "type": "string"
+      "type": "string",
+      "description": "A signature, using the server's Ed2559 identity, over the `data` object serialized as JSON."
     },
     "required": []
   }
@@ -362,7 +366,11 @@ The properties object can include any fields that the server would like to imple
       "type": "string"
     },
     "b3checksum": {
-      "description": "A Blake3 hash (checksum) of the CAR stream (excluding the 0x00 byte and the metadata block)",
+      "description": "A Blake3 hash (checksum) of the CAR stream (excluding the 0x00 byte and the metadata block). The value should be serialized as a multihash with multibase prefix, preferably using Base58 encoding.",
+      "type": "string"
+    },
+    "content_path": {
+      "description": "The url path in the request as executed by the gateway, e.g. `/ipfs/bafy1234/cat.jpg`. The query string MUST BE stripped from the path.",
       "type": "string"
     },
     "dag_params": {
