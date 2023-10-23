@@ -362,7 +362,7 @@ Doublehash-Rule: Blocks using double-hashed item, which can be:
   badbits block anchor format. It can only block by CID and not by
   multihash. When no path present, the trailing slash must be kept
   (`CIDV1_BASE32/`).
-- A b58-encoded multihash (a.k.a CIDV0), corresponding to the Sum() of:
+- A b58-encoded multihash, corresponding to the Sum() of:
   - An IPNS-Path:
     - `/ipns/NAME` when the IPNS name is NOT a CID.
     - The b58-encoded-multihash extracted from an IPNS name when the IPNS name
