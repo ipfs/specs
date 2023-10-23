@@ -133,13 +133,11 @@ hints:
   hint2: value2
 ---
 # Blocking by CID - blocks wrapped multihash.
-# Does not block subpaths.
+# Does not block subpaths per se, but might stop an implementation
+# from resolving subpaths if this block is not retrievable.
 /ipfs/bafybeihvvulpp4evxj7x7armbqcyg6uezzuig6jp3lktpbovlqfkuqeuoq
 
-# Block all subpaths
-/ipfs/QmdWFA9FL52hx3j9EJZPQP1ZUH8Ygi5tLCX2cRDs6knSf8/*
-
-# Block some subpaths (equivalent rules)
+# Blocking by subpath (equivalent rules)
 /ipfs/Qmah2YDTfrox4watLCr3YgKyBwvjq8FJZEFdWY6WtJ3Xt2/test*
 /ipfs/QmTuvSQbEDR3sarFAN9kAeXBpiBCyYYNxdxciazBba11eC/test/*
 
@@ -280,7 +278,11 @@ When users want to block by multihash directly, they must base58btc-encoded
 multihashes. This rule does not block subpaths that start at this CID, only
 the CID itself.
 
-Blocking layer recommendation: BlockService.
+Blocking layer recommendation: BlockService (or PathResolver if wanting to
+block by path only).
+
+**NOTE**: See note in `/ipfs/CID/*` below, as to why this rule may effectively
+  block all subpaths too.
 
 ##### `/ipfs/CID/PATH`
 
@@ -298,11 +300,22 @@ IPFS-Path-Prefix-Rule: Blocks any multihash-path combination starting with the
 the given path prefix. `/*` includes the empty path. Thus `/ipfs/CID/*`
 blocks the CID itself, and any paths. Examples:
 
-- `/ipfs/CID/*` : blocks CID (by multihash) and any path before resolving.
+- `/ipfs/CID/*` : blocks CID (by multihash) and any path BEFORE resolving.
 - `/ipfs/CID/ab*`: blocks any path derived from the CID (multihash) and starting with "ab", including "ab"
 - `/ipfs/CID/ab/*`: equivalent to the above.
 
-Blocking layer recommendation: PathResolver + (BlockService if the CID itself is blocked too).
+Blocking layer recommendation: PathResolver
+
+**NOTE**: When the rule `/ipfs/CID` exists and BlockService-level blocking
+  exists, subpaths of CID will effectively be blocked in the process of being
+  resolved, as we would disallow fetching the root CID, even if the subpath
+  itself is not block. This causes `/ipfs/CID` to behave like
+  `/ipfs/CID/*`. In cases where all requests go through the PathResolver,
+  blocking at the BlockService could be disabled. In that case fetching
+  `/ipfs/CID` would be allowed even if that rule existed, when the process is
+  part of the resolution of a subpath that is not blocked. Implementations can
+  decide which model they want to adopt.
+
 
 ##### `/ipns/IPNS`
 
