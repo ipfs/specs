@@ -1,24 +1,39 @@
 ---
 title: Path Gateway Specification
 description: >
-  The most versatile form of IPFS Gateway is a Path Gateway. It exposes namespaces, such
-  as /ipfs/ and /ipns/ under an HTTP server root and provides basic primitives for integrating
-  IPFS resources within the existing HTTP stack.
+  The comprehensive low-level HTTP Gateway enables the integration of IPFS
+  resources into the HTTP stack through /ipfs and /ipns namespaces, supporting
+  both deserialized and verifiable response types.
 date: 2023-03-30
 maturity: reliable
 editors:
   - name: Marcin Rataj
     github: lidel
     url: https://lidel.org/
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
   - name: Adrian Lanzafame
     github: lanzafame
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
   - name: Vasco Santos
     github: vasco-santos
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
   - name: Oli Evans
     github: olizilla
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
   - name: Henrique Dias
     github: hacdias
     url: https://hacdias.com/
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
 xref:
   - url
   - trustless-gateway

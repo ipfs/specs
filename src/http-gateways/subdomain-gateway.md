@@ -1,25 +1,45 @@
 ---
 title: Subdomain Gateway Specification
 description: >
-  Subdomain Gateways are an extension of Path Gateways that enable website hosting
-  isolated per CID/name, while remaining compatible with web browsers relative pathing and
-  the security model of the web.
+  Defines how HTTP Gateway can implement support for HTTP Host headers to
+  enable isolated website hosting based on root CID-derived Origins. This
+  ensures compatibility with native ipfs:// and ipns:// URIs, and aligns with
+  the existing Same-origin security model in web browsers, including
+  relative URL pathing and permission scopes of Web APIs.
 date: 2023-01-28
 maturity: reliable
 editors:
   - name: Marcin Rataj
     github: lidel
     url: https://lidel.org/
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
   - name: Adrian Lanzafame
     github: lanzafame
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
   - name: Vasco Santos
     github: vasco-santos
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
   - name: Oli Evans
     github: olizilla
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
   - name: Thibault Meunier
     github: thibmeu
+    affiliation:
+      name: Cloudflare
+      url: https://cloudflare.com/
   - name: Steve Loeppky
     github: BigLep
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
 xref:
   - url
   - html
@@ -27,10 +47,13 @@ tags: ['httpGateways', 'webHttpGateways']
 order: 3
 ---
 
-Subdomain Gateway is an extension of :cite[path-gateway] that
-enables website hosting isolated per CID/name, while remaining compatible with
-web browsers relative pathing and security model of the web.
-Below should be read as a delta on top of that spec.
+Subdomain Gateways extend :cite[path-gateway] with HTTP [Host](#host-request-header)
+header support. Below should be read as a delta on top of that spec.
+
+This specification enables isolated website hosting based on root CID-derived
+Origins, ensures compatibility with native ipfs:// and ipns:// URIs, and aligns
+with the existing Same-origin security model in web browsers,
+including relative URL pathing and permission scopes of Web APIs.
 
 Summary:
 
