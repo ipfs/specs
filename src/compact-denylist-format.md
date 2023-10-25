@@ -45,7 +45,7 @@ The denylist itself, after the header, is a collection of **block items** and
 block-item-specific hints. There are different flavours of block items,
 depending on whether we are blocking by CID, CID+path, Path, IPNS, using
 double-hashing etc. but the idea is that whether an item is blocked or not
-SHOULD be decided directly and ideally, _prior to retrieval_.
+SHOULD be decided directly and ideally, *prior to retrieval*.
 
 We include *negative block items* as well, with the idea of enabling denylists
 that are append-only. One of the main operational constraints we have seen is
