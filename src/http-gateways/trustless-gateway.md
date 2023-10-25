@@ -183,6 +183,28 @@ returned:
     returned to the client, the HTTP status code has already been sent to the
     client.
 
+### :dfn[skip-raw-blocks] (request query parameter)
+
+The optional `skip-raw-blocks` parameter is available only for CAR requests.
+
+It specifies whether blocks with the multicodec `raw` `0x55` MUST be present in
+the CAR response.
+
+It accepts two values:
+- `y`: Blocks with `raw` multicodec MUST NOT be returned.
+- `n`, or missing (unspecified): no-op, no special handling of `raw` blocks.
+
+When not specified a gateway implementation MUST assume `n`.
+
+:::note Notes for implementers
+
+A `skip-raw-blocks=y` request for a content path with `raw` root CID does not
+make sense and SHOULD NOT be sent by clients.
+
+A Gateway SHOULD return HTTP error 400 Bad Request
+
+:::
+
 # HTTP Response
 
 Below MUST be implemented **in addition** to "HTTP Response" of :cite[path-gateway].
@@ -212,10 +234,10 @@ The Body hash MUST match the Multihash from the requested CID.
 
 # CAR Responses (application/vnd.ipld.car)
 
-A CAR stream for the requested
-[application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car)
-content type (with optional `order`, `dups` and `skip-leaves` params), path and optional
-`dag-scope` and `entity-bytes` URL parameters.
+A CAR stream ([application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car)
+with optional `order` and `dups` content type parameters) for the requested
+content path (and optional `dag-scope`, `entity-bytes` and/or `skip-raw-blocks`
+URL parameters).
 
 ## CAR version
 
@@ -300,26 +322,6 @@ A Gateway MUST NOT include virtual blocks identified by identity CIDs
 of their presence in the DAG or the value assigned to the "dups" parameter, as
 the raw data is already present in the parent block that links to the identity
 CID.
-
-## CAR `skip-leaves` (content type parameter)
-
-The `skip-leaves` parameter specifies whether blocks with the multicodec `raw`
-`0x55` must be sent.
-
-It accepts two values:
-- `y`: Blocks with `raw` multicodec MUST NOT be sent.
-- `n`, or unspecified: Blocks with `raw` multicodec MUST be sent.
-
-A gateway MUST NOT assume this field is `y` if unspecified.
-When not specified it always MUST be understood as `n`.
-
-:::note Notes for implementers
-
-A request which is rooted at a `raw` block and has `skip-leaves=y` does not
-make sense and SHOULD NOT be sent by clients, it is fair for servers to
-error in this situation.
-
-:::
 
 ## CAR format parameters and determinism
 
