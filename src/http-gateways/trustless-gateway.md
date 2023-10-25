@@ -196,14 +196,8 @@ It accepts two values:
 
 When not specified a gateway implementation MUST assume `n`.
 
-:::note Notes for implementers
-
-A `skip-raw-blocks=y` request for a content path with `raw` root CID does not
-make sense and SHOULD NOT be sent by clients.
-
-A Gateway SHOULD return HTTP error 400 Bad Request
-
-:::
+A Gateway MUST return HTTP error 400 Bad Request when `skip-raw-blocks=y` is
+sent for a content path with a root CID with the `raw` multicodec.
 
 # HTTP Response
 
