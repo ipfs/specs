@@ -145,10 +145,6 @@ hints:
 # Block IPNS key - blocks wrapped multihash.
 /ipns/k51qzi5uqu5dhmzyv3zac033i7rl9hkgczxyl81lwoukda2htteop7d3x0y1mf
 
-# Block all mime types with exceptions
-/mime/image/*
-!/mime/image/gif
-
 # Double-hash CID block
 # base58btc-sha256-multihash(QmVTF1yEejXd9iMgoRTFDxBv7HAz9kuZcQNBzHrceuK9HR)
 # Blocks bafybeidjwik6im54nrpfg7osdvmx7zojl5oaxqel5cmsz46iuelwf5acja
@@ -435,8 +431,6 @@ Examples:
 ```
 /ipfs/QmecDgNqCRirkc3Cjz9eoRBNwXGckJ9WvTdmY16HP88768/photo*
 !/ipfs/QmecDgNqCRirkc3Cjz9eoRBNwXGckJ9WvTdmY16HP88768/photo123.jpg
-/mime/*
-!/mime/text/plain
 !/ipns/my.domain
 /ipns/my.domain
 ```
