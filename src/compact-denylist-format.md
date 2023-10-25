@@ -1,31 +1,20 @@
-# Compact Denylist Format specification
-
-![wip](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
-
-**Author(s)**:
-- @hsanjuan
-
-**Maintainer(s)**:
-- @hsanjuan
-
-* * *
-
-**Abstract**
-
-This is the specification for [compact denlylist format V1](IPIP/383-compact-denylist-format.md).
+---
+title: Compact Denylist Format
+description: >
+  How content blocking rules can be represented as a .deny file.
+date: 2023-10-25
+maturity: reliable
+editors:
+  - name: Hector Sanjuan
+    github: hsanjuan
+    affiliation:
+        name: Protocol Labs
+        url: https://protocol.ai/
+tags: ['filtering']
+order: 1
+---
 
 Denylists provide a way to indicate what content should be blocked by IPFS.
-
-## Organization of this document
-
-- [Introduction](#introduction)
-- [Specification](#specification)
-  - [Denylist File extension, locations and order](#denylist-file-extension-locations-and-order)
-  - [Denylist format](#denylist-format)
-  - [Test fixtures](#test-fixtures)
-  - [Security](#security)
-  - [Privacy and User Control](#privacy-and-user-control)
-- [Implementations](#implementations)
 
 ## Introduction
 
@@ -55,8 +44,8 @@ done in the future to support specific features.
 The denylist itself, after the header, is a collection of **block items** and
 block-item-specific hints. There are different flavours of block items,
 depending on whether we are blocking by CID, CID+path, Path, IPNS, using
-double-hashing etc. but the idea is that whether an item is blocked or not can
-be decided directly and ideally, prior to retrieval.
+double-hashing etc. but the idea is that whether an item is blocked or not
+SHOULD be decided directly and ideally, _prior to retrieval_.
 
 We include *negative block items* as well, with the idea of enabling denylists
 that are append-only. One of the main operational constraints we have seen is
@@ -111,9 +100,9 @@ in future versions.
 
 While not pertaining to the denylist format itself, we introduce the following conventions about denylist files when they are stored in the local filesystem:
 
-- Denylist files are named with the extension `.deny`.
-- Implementations should look in `/etc/ipfs/denylists/` and
-  `$XDG_CONFIG_HOME/ipfs/denylists/` for denylist files.
+- Denylist files MUST be named with the extension `.deny`.
+- Implementations SHOULD look in `/etc/ipfs/denylists/` and
+  `$XDG_CONFIG_HOME/ipfs/denylists/` (default: `~/.config/ipfs/denylists`) for denylist files.
 - Denylist files are processed in alphabetical order so that rules from later
   denylists override rules from earlier denylists on conflict.
 
@@ -123,7 +112,7 @@ While not pertaining to the denylist format itself, we introduce the following c
 
 The following example showcases the features and syntax of a compact denylist:
 
-```
+```yaml
 version: 1
 name: IPFSCorp blocking list
 description: A collection of bad things we have found in the universe
@@ -132,7 +121,7 @@ hints:
   hint: value
   hint2: value2
 ---
-# Blocking by CID - blocks wrapped multihash.
+# Blocking by CID is codec-agnostic (blocks by multihash).
 # Does not block subpaths per se, but might stop an implementation
 # from resolving subpaths if this block is not retrievable.
 /ipfs/bafybeihvvulpp4evxj7x7armbqcyg6uezzuig6jp3lktpbovlqfkuqeuoq
@@ -160,6 +149,20 @@ hints:
 /mime/image/*
 !/mime/image/gif
 
+# Double-hash CID block
+# base58btc-sha256-multihash(QmVTF1yEejXd9iMgoRTFDxBv7HAz9kuZcQNBzHrceuK9HR)
+# Blocks bafybeidjwik6im54nrpfg7osdvmx7zojl5oaxqel5cmsz46iuelwf5acja
+# and QmVTF1yEejXd9iMgoRTFDxBv7HAz9kuZcQNBzHrceuK9HR etc. by multihash
+//QmX9dhRcQcKUw3Ws8485T5a9dtjrSCQaUAHnG4iK9i4ceM
+
+# Double-hash Path block using blake3 hashing
+# base58btc-blake3-multihash(gW7Nhu4HrfDtphEivm3Z9NNE7gpdh5Tga8g6JNZc1S8E47/path)
+# Blocks /ipfs/bafyb4ieqht3b2rssdmc7sjv2cy2gfdilxkfh7623nvndziyqnawkmo266a/path
+# /ipfs/bafyb4ieqht3b2rssdmc7sjv2cy2gfdilxkfh7623nvndziyqnawkmo266a/path
+# /ipfs/f01701e20903cf61d46521b05f926ba1634628d0bba8a7ffb5b6d5a3ca310682ca63b5ef0/path etc...
+# But not /path2
+//QmbK7LDv5NNBvYQzNfm2eED17SNLt1yNMapcUhSuNLgkqz
+
 # Legacy CID double-hash block
 # sha256(bafybeiefwqslmf6zyyrxodaxx4vwqircuxpza5ri45ws3y5a62ypxti42e/)
 # blocks only this CID
@@ -170,32 +173,19 @@ hints:
 # but not any other paths.
 //3f8b9febd851873b3774b937cce126910699ceac56e72e64b866f8e258d09572
 
-# Double hash CID block
-# base58btc-sha256-multihash(QmVTF1yEejXd9iMgoRTFDxBv7HAz9kuZcQNBzHrceuK9HR)
-# Blocks bafybeidjwik6im54nrpfg7osdvmx7zojl5oaxqel5cmsz46iuelwf5acja
-# and QmVTF1yEejXd9iMgoRTFDxBv7HAz9kuZcQNBzHrceuK9HR etc. by multihash
-//QmX9dhRcQcKUw3Ws8485T5a9dtjrSCQaUAHnG4iK9i4ceM
-
-# Double hash Path block using blake3 hashing
-# base58btc-blake3-multihash(gW7Nhu4HrfDtphEivm3Z9NNE7gpdh5Tga8g6JNZc1S8E47/path)
-# Blocks /ipfs/bafyb4ieqht3b2rssdmc7sjv2cy2gfdilxkfh7623nvndziyqnawkmo266a/path
-# /ipfs/bafyb4ieqht3b2rssdmc7sjv2cy2gfdilxkfh7623nvndziyqnawkmo266a/path
-# /ipfs/f01701e20903cf61d46521b05f926ba1634628d0bba8a7ffb5b6d5a3ca310682ca63b5ef0/path etc...
-# But not /path2
-//QmbK7LDv5NNBvYQzNfm2eED17SNLt1yNMapcUhSuNLgkqz
 ```
 
 #### High level list format
 
 A denylist is a UTF-8 encoded text file made of an optional header and a list of blockitems separated by newlines (`\n`). Comment lines start with `#`. Empty lines are allowed.
 
-```
-<header>
+```yaml
+[yaml_header]
 ---
-<block_item1> [hint_list]
+[block_item1] [optional_hint_list]
 
 # comment
-<block_item2> [hint_list]
+[block_item2] [optional_hint_list]
 ...
 ```
 
@@ -240,13 +230,13 @@ should attempt parsing the header as YAML:
 
 #### Hints
 
-A *hint* is a key-value duple associated to a \<block_item\>. the denylist as
-a whole (part of the header), or to a specific \<block_item\>.
+A *hint* is a key-value duple associated to a `[block_item]`. the denylist as
+a whole (part of the header), or to a specific `[block_item]`.
 
-A list of hints can optionally follow every \<block_item\> as show
+A list of hints can optionally follow every `[block_item]` as show
 above. Hints can also be specified in the denylist header ("header
 hints"). This is equivalent to adding the same hints to every single
-\<block_item\> in the denylist. Implementations should associate both the
+`[block_item]` in the denylist. Implementations should associate both the
 specific and the header hints to every block rule.
 
 #### List body
@@ -281,8 +271,11 @@ the CID itself.
 Blocking layer recommendation: BlockService (or PathResolver if wanting to
 block by path only).
 
-**NOTE**: See note in `/ipfs/CID/*` below, as to why this rule may effectively
-  block all subpaths too.
+:::warning
+
+See note in `/ipfs/CID/*` below, as to why this rule may effectively block all subpaths too.
+
+:::
 
 ##### `/ipfs/CID/PATH`
 
@@ -306,7 +299,9 @@ blocks the CID itself, and any paths. Examples:
 
 Blocking layer recommendation: PathResolver
 
-**NOTE**: When the rule `/ipfs/CID` exists and BlockService-level blocking
+:::warning
+
+When the rule `/ipfs/CID` exists and BlockService-level blocking
   exists, subpaths of CID will effectively be blocked in the process of being
   resolved, as we would disallow fetching the root CID, even if the subpath
   itself is not block. This causes `/ipfs/CID` to behave like
@@ -316,6 +311,7 @@ Blocking layer recommendation: PathResolver
   part of the resolution of a subpath that is not blocked. Implementations can
   decide which model they want to adopt.
 
+:::
 
 ##### `/ipns/IPNS`
 
@@ -423,6 +419,8 @@ The BlockService should:
 
 #### Allow (or negated) rules
 
+The specification syntax examples describe a `.deny` list of items to block (deny).
+
 Block items can be prepended by `!`, which means that items matching the rule are to be allowed rather than blocked.
 
 This can be used to undo existing rules, but also to add concrete exceptions to wider rules. Order matters, and Allow rules must come AFTER other existing rules.
@@ -446,12 +444,19 @@ Examples:
 In this example, `/ipns/my.domain` stays blocked because the deny rule happens
 AFTER the allow one.
 
+:::note
+
+Implementations MAY reuse denylist format for `.allow` files, where  everything
+is blocked by default, and only matching items are allowed.
+
+:::
+
 #### Hint list
 
 A hint list is an optional space-separated list of hints associated with specific block items in the form:
 
 ```
-<block_item> hintA:v1 hintB:v2 hintC:v3
+[block_item] hintA:v1 hintB:v2 hintC:v3
 ```
 
 Block items and hints are separated by one or more consecutive instances of
@@ -464,7 +469,7 @@ Denylist parsing and correct behaviour can be tested using the
 denylist, which provides example rules and describes the expected behaviour in
 detail.
 
-In particular, a [Blocker implementation validator](https://github.com/ipfs-shipyard/nopfs/tree/master/tester) is provided in Go, and can be adapted to other languages if needed.
+In particular, a reference [Blocker implementation validator](https://github.com/ipfs-shipyard/nopfs/tree/master/tester) is provided in Go, and can be adapted to other languages if needed.
 
 ### Security
 

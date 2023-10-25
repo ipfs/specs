@@ -88,7 +88,7 @@ title: Home
         {% include 'list.html', posts: collections.httpGateways %}
       </section>
       <section>
-        <h3><a href="/ipns/">InterPlanetary Naming System</a></h3>
+        <h3><a href="/ipns/">IPNS</a></h3>
         <p>
           The InterPlanetary Naming System (IPNS) is a naming system responsible for creating, reading and updating mutable pointers to data.
         </p>
@@ -98,9 +98,16 @@ title: Home
         <h3><a href="/routing/">Routing</a></h3>
         <p>
           Content routing is the way to determine where to find a given CID on the network;
-          specifically, which network peers provide specific CIDs. 
+          specifically, which network peers provide specific CIDs.
         </p>
         {% include 'list.html', posts: collections.routing %}
+      </section>
+      <section>
+        <h3>Content Filtering</h3>
+        <p>
+          How IPFS service operators can control the content hosted on their nodes.
+        </p>
+        {% include 'list.html', posts: collections.filtering %}
       </section>
       <section>
         <h3><a href="/ipips/">InterPlanetary Improvement Proposals</a></h3>
