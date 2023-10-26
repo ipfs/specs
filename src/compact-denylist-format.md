@@ -58,14 +58,14 @@ We include *negative block items* as well, with the idea of enabling denylists
 that are append-only. One of the main operational constraints we have seen is
 that a single item can cause a full denylist to be re-read, re-parsed and
 ultimately need a full restart of the application. We want to avoid that by
-providing operators and implementors with the possiblity of just watching
+providing operators and implementors with the possibility of just watching
 denylists for new items without then need to restart anything while new items
-are added. This also gives the possiblity of storing an offset and seeking
+are added. This also gives the possibility of storing an offset and seeking
 directly to it after application restarts. *negative block items* can also be
 used to make exceptions to otherwise more general rules.
 
 Another aspect that we have maintained in the back of our minds is the
-possiblity of sharing lists using IPFS. The append-mostly aspect also plays a
+possibility of sharing lists using IPFS. The append-mostly aspect also plays a
 role here, for lists can be chunked and DAG-ified and only the last chunk will
 change as the file grows. This makes our lists immediately friendly to
 content-addressing and efficient transmission over IPFS. However, the
@@ -75,16 +75,16 @@ this spec.
 Beyond all of that, we put emphasis in making our format easily editable by
 users and facilitating integrations using scripts and with other applications
 (unrelated to the implementation of the parsing/blocking inside IPFS). We
-conciously avoid JSON and other machine formats and opt for text and for
+consciously avoid JSON and other machine formats and opt for text and for
 space-delimited items in a grep/sed/cut-friendly way. For example, we expect
-that the following should just work accross implementations for adding and
+that the following should just work across implementations for adding and
 blocking something new:
 
 ```
 echo /ipfs/QmecDgNqCRirkc3Cjz9eoRBNwXGckJ9WvTdmY16HP88768 >> ~/.config/ipfs/custom.deny
 ```
 
-We conciously avoid defining any other API other than expecting
+We consciously avoid defining any other API other than expecting
 implementations to honor blocking what is on the denylist and act accordingly
 when it is updated. CLI commands or API endpoint to modify list items etc. are
 outside the scope of this spec. Implementations how much information to
@@ -138,7 +138,7 @@ hints:
 # Block IPNS key - blocks wrapped multihash.
 /ipns/k51qzi5uqu5dhmzyv3zac033i7rl9hkgczxyl81lwoukda2htteop7d3x0y1mf
 
-# Double-hash CID block
+# Double-hash CID block using sha2-256 hashing
 # base58btc-sha256-multihash(QmVTF1yEejXd9iMgoRTFDxBv7HAz9kuZcQNBzHrceuK9HR)
 # Blocks bafybeidjwik6im54nrpfg7osdvmx7zojl5oaxqel5cmsz46iuelwf5acja
 # and QmVTF1yEejXd9iMgoRTFDxBv7HAz9kuZcQNBzHrceuK9HR etc. by multihash
@@ -150,7 +150,7 @@ hints:
 # /ipfs/bafyb4ieqht3b2rssdmc7sjv2cy2gfdilxkfh7623nvndziyqnawkmo266a/path
 # /ipfs/f01701e20903cf61d46521b05f926ba1634628d0bba8a7ffb5b6d5a3ca310682ca63b5ef0/path etc...
 # But not /path2
-//QmbK7LDv5NNBvYQzNfm2eED17SNLt1yNMapcUhSuNLgkqz
+//gW813G35CnLsy7gRYYHuf63hrz71U1xoLFDVeV7actx6oX
 
 # Legacy CID double-hash block
 # sha256(bafybeiefwqslmf6zyyrxodaxx4vwqircuxpza5ri45ws3y5a62ypxti42e/)
@@ -183,7 +183,6 @@ Comment lines start with `#`. Empty lines are allowed.
 ```
 
 Lines should not be longer than 2MiB including the "\n" delimiter.
-
 
 ### Header
 
@@ -273,7 +272,7 @@ Blocking layer recommendation: PathResolver.
 #### `/ipfs/CID/PATH*`
 
 IPFS-Path-Prefix-Rule: Blocks any multihash-path combination starting with the
-the given path prefix. `/*` includes the empty path. Thus `/ipfs/CID/*`
+given path prefix. `/*` includes the empty path. Thus, `/ipfs/CID/*`
 blocks the CID itself, and any paths. Examples:
 
 - `/ipfs/CID/*` : blocks CID (by multihash) and any path BEFORE resolving.
@@ -301,7 +300,7 @@ When the rule `/ipfs/CID` exists and BlockService-level blocking
 IPNS-rule: Blocks the given IPNS name before resolving. It does not block the CID that it
 resolves to.
 
-If the IPNS `NAME` is a domain name, it is blocked directy.
+If the IPNS `NAME` is a domain name, it is blocked directly.
 
 If the IPNS `NAME` is a CIDv1 (libp2p-key) or b58-encoded-multihash (CIDV0),
 then the blocking affects the underlying Multihash.
@@ -380,8 +379,8 @@ In order to check for a matching rule, the PathResolver working with `/ipfs/CID/
 - (legacy) Convert the CID to CIDv1Base32 and hash `CIDV1BASE32/PATH` with the
   hashing functions used in the denylist. Match against declared double-hashes.
   An empty path means that the value to hash is `CIDV1BASE32/` (with the
-  trailing slash). This is the legacy hashing so the hashing function is
-  usually sha256 and the matched rules are legacy badbits anchor rules.
+  trailing slash). This is the legacy hashing, the function is
+  sha256 and the matched rules are legacy badbits anchor rules.
 
 The NameSystem (used only for `/ipns/*`) should:
 
@@ -399,23 +398,26 @@ The "modern" double-hashed items (b58-encoded-multihash) can be created with
 existing CLI tools like
 [Kubo](https://docs.ipfs.tech/how-to/command-line-quick-start/):
 
-```
-$ printf "QmecDgNqCRirkc3Cjz9eoRBNwXGckJ9WvTdmY16HP88768/my/path" | ipfs add --raw-leaves --only-hash --quiet | ipfs cid format -f '%M' -b base58btc
-QmSju6XPmYLG611rmK7rEeCMFVuL6EHpqyvmEU6oGx3GR8
-```
-
-The rule `//QmSju6XPmYLG611rmK7rEeCMFVuL6EHpqyvmEU6oGx3GR8` will block
-`/ipfs/bafybeihrw75yfhdx5qsqgesdnxejtjybscwuclpusvxkuttep6h7pkgmze/my/path`,
-with `QmSju6XPmYLG611rmK7rEeCMFVuL6EHpqyvmEU6oGx3GR8` being the base58-encoded
-multihash contained in
-`bafybeihrw75yfhdx5qsqgesdnxejtjybscwuclpusvxkuttep6h7pkgmze`.
-
-We can convert any CID to its multihash with:
+Convert any CID to its multihash with:
 
 ```
 $ ipfs cid format -f '%M' -b base58btc bafybeihrw75yfhdx5qsqgesdnxejtjybscwuclpusvxkuttep6h7pkgmze
 QmecDgNqCRirkc3Cjz9eoRBNwXGckJ9WvTdmY16HP88768
 ```
+
+Then, create a second multihash to be used in `//DOUBLE-HASH` rule that will be
+blocking specific content path under the extracted multihash:
+
+```
+$ printf "QmecDgNqCRirkc3Cjz9eoRBNwXGckJ9WvTdmY16HP88768/my/path" | ipfs block put --mhtype sha2-256 | ipfs cid format -f '%M' -b base58btc
+QmSju6XPmYLG611rmK7rEeCMFVuL6EHpqyvmEU6oGx3GR8
+```
+
+The double-hash rule `//QmSju6XPmYLG611rmK7rEeCMFVuL6EHpqyvmEU6oGx3GR8` will block
+`/ipfs/bafybeihrw75yfhdx5qsqgesdnxejtjybscwuclpusvxkuttep6h7pkgmze/my/path`.
+
+The `QmecDgNqCRirkc3Cjz9eoRBNwXGckJ9WvTdmY16HP88768` is the multihash contained
+in `bafybeihrw75yfhdx5qsqgesdnxejtjybscwuclpusvxkuttep6h7pkgmze`.
 
 :::
 
@@ -516,7 +518,6 @@ denylist, which provides example rules and describes the expected behaviour in
 detail.
 
 In particular, a reference [Blocker implementation validator](https://github.com/ipfs-shipyard/nopfs/tree/master/tester) is provided in Go, and can be adapted to other languages if needed.
-
 
 ### Implementations
 
