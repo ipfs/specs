@@ -10,11 +10,18 @@ editors:
     affiliation:
         name: Protocol Labs
         url: https://protocol.ai/
+  - name: Marcin Rataj
+    github: lidel
+    url: https://lidel.org/
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
 tags: ['filtering']
 order: 1
 ---
 
-Denylists provide a way to indicate what content should be blocked by IPFS.
+Denylists provide technical means for IPFS service operators to control
+the content hosted on their nodes.
 
 ## Introduction
 
@@ -94,23 +101,9 @@ limited the number of features and extensions to a minimum to start working
 with, leaving some ideas on the table and the door open to develop the format
 in future versions.
 
-## Specification
+## Example
 
-### Denylist file extension, locations and order
-
-While not pertaining to the denylist format itself, we introduce the following conventions about denylist files when they are stored in the local filesystem:
-
-- Denylist files MUST be named with the extension `.deny`.
-- Implementations SHOULD look in `/etc/ipfs/denylists/` and
-  `$XDG_CONFIG_HOME/ipfs/denylists/` (default: `~/.config/ipfs/denylists`) for denylist files.
-- Denylist files are processed in alphabetical order so that rules from later
-  denylists override rules from earlier denylists on conflict.
-
-### Denylist format
-
-#### Summary
-
-The following example showcases the features and syntax of a compact denylist:
+The following example showcases the features and [syntax](#file-syntax) of a compact denylist:
 
 ```yaml
 version: 1
@@ -171,9 +164,13 @@ hints:
 
 ```
 
-#### High level list format
+## File syntax
 
-A denylist is a UTF-8 encoded text file made of an optional header and a list of blockitems separated by newlines (`\n`). Comment lines start with `#`. Empty lines are allowed.
+A denylist is a UTF-8 encoded text file made of an optional [header](#header)
+terminated with `---` and a list of [block items](#block-item) separated by
+newlines (`\n`). Block items can have optional [hints](#hints).
+
+Comment lines start with `#`. Empty lines are allowed.
 
 ```yaml
 [yaml_header]
@@ -185,69 +182,59 @@ A denylist is a UTF-8 encoded text file made of an optional header and a list of
 ...
 ```
 
-#### Header
+Lines should not be longer than 2MiB including the "\n" delimiter.
 
-The list header is a YAML block:
+
+### Header
+
+The list header is an optional YAML block.
 
 - Must be valid YAML
 - Fully optional
 - 1 MiB (1048576 bytes) maximum size
 - Delimited by a line containing `---` at the end (document separator)
+- Field names are case-sensitive
 
-Known-fields (they must be lowercase):
-
-- `version`: the denylist format version. Defaults to 1 when not
-  specified. Implementations should reject parsing denylist versions that they
-  do not support.
+Known fields:
+- `version`
+  - The denylist format version. Defaults to 1 when not specified.
+  - Implementations SHOULD reject parsing denylist versions that they do not
+    support.
 - `name`
 - `description`
 - `author`
-- `hints`: a map of *hints*. See below.
+- `hints`
+  - A map of optional global [hints](#hints). When present, SHOULD be applied
+    to every [block item](#block-item) on the list before applying per item
+    ones (if any).
 
-The known fields-list may be expanded as this specification is developed. To
-include custom information in the header, we recommend using custom fields or hints.
+The list of known fields may be expanded in the future. Fields with names not
+listed above are considered custom. List creators can freely include custom
+fields in the header and implementations can support them as needed.
+Implementations SHOULD ignore unknown header fields to ensure custom fields do
+not impact parsing of the list.
 
-Custom fields:
+In order to parse the YAML header, implementations MUST:
+1. Read the denylist until a `---` is found or the 1MiB limit is reached.
+   - If the size limit is reached, assume the list includes no
+     header and start parsing block items from the beginning of the denylist. A
+     header that was too large will be parsed line by line as block items and
+     error accordingly line per line, without causing excessive resource
+     allocation.
+2. If the `---` is found, attempt parsing the header as YAML.
+   - If parsing the header fails, abort and signal an error.
 
-- Fields starting with `x-` or `X-` are considered custom. Users can freely
-  include them in the header and implementations can support them as needed.
-- Custom fields are not a property of each block item as "header hints" are
-  considered to be.
-
-In order to parse the header, implementations should read the denylist until a
-`---` is found or the 1MiB limit is reached. If the `---` is found, they
-should attempt parsing the header as YAML:
-
-- If parsing the header fails, they should abort and signal an error.
-- If the size limit is reached, they should assume the list includes no header
-  and start parsing block items from the beginning of the denylist. A header
-  that was too large will be parsed line by line as block items and error
-  accordingly line per line, without causing excessive resource allocation.
-
-#### Hints
-
-A *hint* is a key-value duple associated to a `[block_item]`. the denylist as
-a whole (part of the header), or to a specific `[block_item]`.
-
-A list of hints can optionally follow every `[block_item]` as show
-above. Hints can also be specified in the denylist header ("header
-hints"). This is equivalent to adding the same hints to every single
-`[block_item]` in the denylist. Implementations should associate both the
-specific and the header hints to every block rule.
-
-#### List body
-
-A denylist is made of lines which are made by a *block items* followed by zero or more space-separated hints.
-
-Lines should not be longer than 2MiB including the "\n" delimiter.
-
-#### Block item
+### Block item
 
 A block item represents a rule to enable content-blocking:
 
 - `PATH` elements are expected to be %-encoded, per [RFC 3986, section 2.1](https://developer.mozilla.org/en-US/docs/Glossary/percent-encoding).
 - `CID` elements represent a CID (either V0 or V1).
-- `CIDv0` are for us equivalent to baseb58btc-encoded sha256 multihashes although they are not the same thing (a CIDV0 carries implicit codec (dag-pb) and multibase information (b58btc). When we say a b58-encoded multihash needs to be extracted from the CID, this usually is a no-op in case of CIDv0s.
+  - Legacy CIDv0 are equivalent to baseb58btc-encoded sha256 multihashes
+    although they are not the same thing. A CIDv0 carries implicit codec
+    (dag-pb) and multibase information (b58btc). When we say a b58-encoded
+    multihash needs to be extracted from the CID, this is a no-op in
+    case of CIDv0s.
 
 Implementations must decide what to do when processing a denylist and an invalid block-item rule is found:
 
@@ -255,7 +242,7 @@ Implementations must decide what to do when processing a denylist and an invalid
 - Abort parsing and return a general error OR
 - Continue processing the list, discarding unrecognized rules
 
-##### `/ipfs/CID`
+#### `/ipfs/CID`
 
 CID-rule: Blocks a specific multihash. If the CID is a V1, it blocks the
 multihash contained in it (CIDv0s are multihashes already).
@@ -273,7 +260,7 @@ See note in `/ipfs/CID/*` below, as to why this rule may effectively block all s
 
 :::
 
-##### `/ipfs/CID/PATH`
+#### `/ipfs/CID/PATH`
 
 IPFS-Path-Rule: Blocks the exact ipfs path that is referenced from the
 multihash embedded in the CID before attempting to resolve it. It does not block
@@ -283,7 +270,7 @@ Note `/ipfs/CID/path` and `/ipfs/CID/path/` are equivalent rules.
 
 Blocking layer recommendation: PathResolver.
 
-##### `/ipfs/CID/*` `/ipfs/CID/P/A/T/H*`
+#### `/ipfs/CID/PATH*`
 
 IPFS-Path-Prefix-Rule: Blocks any multihash-path combination starting with the
 the given path prefix. `/*` includes the empty path. Thus `/ipfs/CID/*`
@@ -309,19 +296,19 @@ When the rule `/ipfs/CID` exists and BlockService-level blocking
 
 :::
 
-##### `/ipns/IPNS`
+#### `/ipns/NAME`
 
 IPNS-rule: Blocks the given IPNS name before resolving. It does not block the CID that it
 resolves to.
 
-If the IPNS name is a domain name, it is blocked directy.
+If the IPNS `NAME` is a domain name, it is blocked directy.
 
-If the IPNS name is a CIDv1 (libp2p-key) or b58-encoded-multihash (CIDV0),
+If the IPNS `NAME` is a CIDv1 (libp2p-key) or b58-encoded-multihash (CIDV0),
 then the blocking affects the underlying Multihash.
 
 Blocking layer recommendation: NameSystem.
 
-##### `/ipns/IPNS/PATH`
+#### `/ipns/NAME/PATH`
 
 IPNS-Path-rule: Blocks specifically the IPNS path, before resolving. Equivalent to `/ipfs/CID/PATH`.
 
@@ -329,7 +316,7 @@ Blocking layer recommendation: There is no good place to implement this rule
 as the NameSystem only handles IPNS names (without paths), and the
 path.Resolver only handles already-resolved Paths.
 
-##### `/ipns/NAME/*` `/ipns/NAME/PATH*`
+#### `/ipns/NAME/PATH*`
 
 IPNS-Path-Prefix-Rule: Same as with the IPFS-Path-Prefix-Rule.
 
@@ -337,7 +324,10 @@ Blocking layer recommendation:  There is no good place to implement this rule
 as the NameSystem only handles IPNS names (without paths), and the
 path.Resolver only handles already-resolved Paths.
 
-##### `/PATH` `/PATH/*` `/PATH*`
+<!-- TODO: hidding for now, we don't use this nor have tests for this, and it
+           creates ambiguity when we add new top level namespace like /ipld
+
+#### `/PATH` `/PATH/*` `/PATH*`
 
 Subpath-Rule: Block solely by looking at the subpath component of an IPFS path. Examples:
 
@@ -346,30 +336,68 @@ Subpath-Rule: Block solely by looking at the subpath component of an IPFS path. 
 
 Blocking layer recommendation: PathResolver.
 
-##### `//DOUBLE_HASH`
+-->
+
+#### `//DOUBLE-HASH`
 
 Doublehash-Rule: Blocks using double-hashed item, which can be:
 
-- The sha256-hex-encoded hash of `CIDV1_BASE32/PATH`: this is the legacy
-  badbits block anchor format. It can only block by CID and not by
-  multihash. When no path present, the trailing slash must be kept
-  (`CIDV1_BASE32/`).
-- A b58-encoded multihash, corresponding to the Sum() of:
+- (modern) a base58btc-encoded multihash, corresponding to the hash of either:
+  - An IPFS-Path: `b58-encoded-multihash/P/A/T/H` where the multihash is
+    extracted from the CID in `/ipfs/CID/P/A/T/H`
+    - CIDv1 needs to be converted to a raw Multihash in b58 mutlibase. CIDv0 is
+      already a valid b58 Multihash and required no conversion.
+    - The `/P/A/T/H` component is optional and should not have a trailing `/`.
   - An IPNS-Path:
     - `/ipns/NAME` when the IPNS name is NOT a CID.
     - The b58-encoded-multihash extracted from an IPNS name when the IPNS name
       is a CID.
-  - An IPFS-Path: `b58-encoded-multihash/P/A/T/H` where the multihash is
-    extracted from the CID in `/ipfs/CID/P/A/T/H` (The multihash and the CID
-    are the same in the case of CIDV0). The `/P/A/T/H` component is optional
-    and should not have a trailing `/`.
+  - The modern Multihash form allows blocking by double-hash using any hashing
+    function of choice. Implementations will have to hash requests using all
+    the hashing functions used in the denylist, so we recommend sticking to
+    one.
+- (legacy) the sha256-hex-encoded hash of `CIDV1_BASE32/PATH`
+  - This is the legacy badbits block anchor format used before this
+    specification was created.
+  - When no path is present, the trailing slash must be kept (`CIDV1_BASE32/`).
+  - It can only block by CID and not by multihash, and is tied to sha256 hash
+    function, which makes is inferior to the modern and more future-proof
+    b58-encoded multihash notation which supports use of alternative hash
+    functions.
 
-The latter form allows blocking by double-hash using any hashing function of
-choice. Implementations will have to hash requests using all the hashing functions
-used in the denylist, so we recommend sticking to one.
+In a case where implementation cannot distinguish a double-hashed rule between
+a b58btc multihash (modern) and a sha256 hex-string (legacy), content blocking
+system MUST create deny rules for both.
 
-Conveniently, the latter form allows using a b58-encoded sha256 multihashes
-(usual form of CIDv0 - `Qmxxx...`), so that double-hashes can be like:
+Content filtering of double-hashed entries SHOULD be applied in every logical
+system acting as NameSystem, PathResolver or BlockService.
+
+In order to check for a matching rule, the PathResolver working with `/ipfs/CID/PATH` should:
+
+- (modern) Convert the CID to Multihash and hash `b58-multihash/PATH` without
+  trailing `/` with the hashing functions used in the denylist. Match against
+  declared double-hashes.
+- (legacy) Convert the CID to CIDv1Base32 and hash `CIDV1BASE32/PATH` with the
+  hashing functions used in the denylist. Match against declared double-hashes.
+  An empty path means that the value to hash is `CIDV1BASE32/` (with the
+  trailing slash). This is the legacy hashing so the hashing function is
+  usually sha256 and the matched rules are legacy badbits anchor rules.
+
+The NameSystem (used only for `/ipns/*`) should:
+
+- If NAME is a CID (try parsing as CID first), extract the multihash, encode it with base58btc and hash it with the hashing functions used in the denylist. Match against declared double-hashes.
+- Otherwise, assume NAME is a domain name: Hash `/ipns/NAME` with the hashing functions used in the denylist. Match against declared double-hashes.
+
+The BlockService should:
+
+- (modern) Convert the CID to b58-encoded-multihash (that is CIDv0) and hash the CID string.
+- (legacy) Convert the CID to `CIDV1BASE32/` (keeping the CID codec and adding a slash at the end) and hash it with the hashing functions used in the denylist. Match against declared double-hashes.
+
+:::note
+
+The "modern" double-hashed items (b58-encoded-multihash) can be created with
+existing CLI tools like
+[Kubo](https://docs.ipfs.tech/how-to/command-line-quick-start/):
 
 ```
 $ printf "QmecDgNqCRirkc3Cjz9eoRBNwXGckJ9WvTdmY16HP88768/my/path" | ipfs add --raw-leaves --only-hash --quiet | ipfs cid format -f '%M' -b base58btc
@@ -389,31 +417,9 @@ $ ipfs cid format -f '%M' -b base58btc bafybeihrw75yfhdx5qsqgesdnxejtjybscwuclpu
 QmecDgNqCRirkc3Cjz9eoRBNwXGckJ9WvTdmY16HP88768
 ```
 
-Blocking layer recommendation: NameSystem + PathResolver + BlockService.
+:::
 
-In order to check for a matching rule, the PathResolver working with `CID/PATH` elements should:
-
-- Convert the CID to v1base32 and hash `CIDV1BASE32/PATH` with the hashing
-  functions used in the denylist. Match against declared double-hashes. An
-  empty path means that the value to hash is `CIDV1BASE32/` (with the trailing
-  slash). This is the legacy hashing so the hashing function is usually
-  sha256 and the matched rules are legacy badbits anchor rules.
-- Convert the CID to CIDv0 and hash `CIDV0/PATH` without trailing `/` with the
-  hashing functions used in the denylist. Match against declared
-  double-hashes.
-
-The NameSystem should:
-
-- If NAME is a CID (try parsing as CID first), extract the multihash, encoded with base58btc and hash it with the hashing functions used in the denylist. Match against declared double-hashes.
-- Otherwise, assume NAME is a domain name: Hash `/ipns/NAME` with the hashing functions used in the denylist. Match against declared double-hashes.
-
-The BlockService should:
-
-- Convert the CID to `CIDV1BASE32/` (keeping the CID codec and adding a slash at the end) and hash it with the hashing functions used in the denylist. Match against declared double-hashes.
-
-- Convert the CID to b58-encoded-multihash (that is CIDv0) and hash the CID string.
-
-#### Allow (or negated) rules
+#### Negated rules
 
 The specification syntax examples describe a `.deny` list of items to block (deny).
 
@@ -445,16 +451,62 @@ is blocked by default, and only matching items are allowed.
 
 :::
 
-#### Hint list
+#### Hints
 
-A hint list is an optional space-separated list of hints associated with specific block items in the form:
+A *hint* is an optional key-value metadata duple associated to a [block item](#block-item).
+
+Hints can be defined for the entire denylist when `hints` map is present in the
+[header](#header), or per item, as space-separated list at the end of a [block
+item](#block-item):
 
 ```
 [block_item] hintA:v1 hintB:v2 hintC:v3
 ```
 
-Block items and hints are separated by one or more consecutive instances of
-the "space" character.
+Local hint overrides a global one with the same key name.
+
+## Denylist integration
+
+### File extension, locations and order
+
+While not pertaining to the denylist format itself, we introduce the following conventions about denylist files when they are stored in the local filesystem:
+
+- Denylist files MUST be named with the extension `.deny`.
+- Implementations SHOULD look in `/etc/ipfs/denylists/` and
+  `$XDG_CONFIG_HOME/ipfs/denylists/` (default: `~/.config/ipfs/denylists`) for denylist files.
+- Implementations MAY also look in their own configuration directory.
+- Denylist files are processed in alphabetical order so that rules from later
+  denylists override rules from earlier denylists on conflict.
+
+### Security
+
+- Denylist headers and line-length limits are well specified to avoid malformed lists to cause things like large memory usage while parsing.
+  - Implementations MUST error when parsed list is bigger than the limit defined in this specification.
+- Supported type of blocks have been thought out to avoid amplified consumption of resources or side effects (i.e. downloading of additional dag-blocks) during the implementation.
+  - Implementations SHOULD avoid retrieving content that is blocked by a denylist.
+- Paths are sanitized and follow the same encoding rules as URLs (RFC 3986), so that existing and safe parsing can be done with regular tooling.
+- Official and custom-hint systems allow the introduction of additional features that can co-exist with the specified format without needing to be supported.
+  - Implementation SHOULD ignore unsupported fields and hints.
+
+### Privacy and User Control
+
+The goal of content filtering is to empower operators of IPFS services with
+tools to control what content is hosted and processed by their infrastructure.
+
+Implementations SHOULD allow the end user to configure denylists.
+
+The main aspect regarding privacy in the scope of this specification has to do
+with supporting the use of [double-hashing](#double-hash) in block items.
+
+Double-hashing is particularly useful when the denylist is meant to be shared. Double-hashing:
+
+- Prevents readers of the denylist to know what the original content-address
+  of the block item is, and therefore avoids making the denylist a directory
+  of *bad* content. This is particularly useful for harmful content, where
+  solely publishing the address (CID) and not the content it is bad.
+- Double-hashing does not exclude adding additional context via comments or hints
+- The presence of a single double-hashed block item makes necessary that the implementation hashes every CID and CID+path that needs to be checked, which has a performance impact.
+- In general, it is good that users can inspect the nature of the content blocked if they wish to, so we recommend not using double-hashing by default as it helps transparency (i.e. blocking due to copyright claims).
 
 ### Test fixtures
 
@@ -465,33 +517,10 @@ detail.
 
 In particular, a reference [Blocker implementation validator](https://github.com/ipfs-shipyard/nopfs/tree/master/tester) is provided in Go, and can be adapted to other languages if needed.
 
-### Security
 
-This proposal takes into account security:
+### Implementations
 
-- Denylist headers and line-length limits are well specified to avoid malformed lists to cause things like large memory usage while parsing.
-- Supported type of blocks have been thought out to avoid amplified consumption of resources or side effects (i.e. downloading of additional dag-blocks) during the implementation.
-- Paths are sanitized and follow the same encoding rules as URLs (RFC 3986), so that existing and safe parsing can be done with regular tooling.
-- Official and custom-hint systems allow the introduction of additional features that can co-exist with the specified format without needing to be supported.
-
-### Privacy and User Control
-
-The main aspect regarding privacy in the scope of this specification has to do
-with supporting the use of double-hashing in block items.
-
-Double-hashing is particularly useful when the denylist is meant to be shared. Double-hashing:
-
-- Prevents readers of the denylist to know what the original content-address
-  of the block item is, and therefore avoids making the denylist a directory
-  of *bad* content. This is particularly useful for harmful content, where
-  solely accessing it is bad.
-- Double-hashing does not exclude adding additional context via comments or hints
-- The presence of a single double-hashed block item makes necessary that the implementation hashes every CID and CID+path that needs to be checked, which has a performance impact.
-- In general, it is good that users can inspect the nature of the content blocked if they wish to, so we recommend not using double-hashing by default as it helps transparency (i.e. blocking due to copyright claims).
-
-## Implementations
-
-- [NoPFS](https://github.com/ipfs-shipyard/nopfs): An implementation of IPIP-383 which add supports for content blocking to the go-ipfs stack and particularly to Kubo.
+- [NOpfs](https://github.com/ipfs-shipyard/nopfs): An implementation of IPIP-383 which add supports for content blocking to the go-ipfs stack and particularly to [Kubo](https://github.com/ipfs/kubo).
 
 ## Copyright
 
