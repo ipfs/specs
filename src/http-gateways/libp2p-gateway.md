@@ -1,7 +1,7 @@
 ---
 title: libp2p+HTTP Transport Gateway Specification
 description: >
-  The libp2p Transport Gateway specification describes how HTTP Gateway semantics can be used over libp2p transports.
+  Describes how HTTP Gateway semantics can be used over libp2p transports.
 date: 2023-10-04
 maturity: draft
 editors:

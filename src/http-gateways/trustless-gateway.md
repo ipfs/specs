@@ -1,9 +1,9 @@
 ---
 title: Trustless Gateway Specification
 description: >
-  Trustless Gateways are a minimal subset of Path Gateways that allow light IPFS
-  clients to retrieve data behind a CID and verify its integrity without delegating any
-  trust to the gateway itself.
+  The minimal subset of HTTP Gateway response types facilitates data retrieval
+  via CID and ensures integrity verification, all while eliminating the need to
+  trust the gateway itself.
 date: 2023-06-20
 maturity: reliable
 editors:
@@ -17,7 +17,7 @@ xref:
   - url
   - path-gateway
   - ipip-0412
-tags: ['httpGateways', 'lowLevelHttpGateways']
+tags: ['httpGateways', 'lowLevelHttpGateways', 'exchange']
 order: 1
 ---
 
