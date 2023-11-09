@@ -10,9 +10,21 @@ editors:
   - name: Marcin Rataj
     github: lidel
     url: https://lidel.org/
+    affiliation:
+        name: Protocol Labs
+        url: https://protocol.ai/
   - name: Henrique Dias
     github: hacdias
     url: https://hacdias.com/
+    affiliation:
+        name: Protocol Labs
+        url: https://protocol.ai/
+  - name: Hugo Valtier
+    github: Jorropo
+    url: https://jorropo.net/
+    affiliation:
+        name: Protocol Labs
+        url: https://protocol.ai/
 xref:
   - url
   - path-gateway
