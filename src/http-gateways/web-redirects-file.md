@@ -3,7 +3,7 @@ title: Web _redirects File Specification
 description: >
   Defines how URL redirects and rewrites can be implemented by adding rules to
   a plain text file stored underneath the root CID of a website.
-date: 2023-01-28
+date: 2023-11-09
 maturity: reliable
 editors:
   - name: Justin Johnson
@@ -75,7 +75,11 @@ For example:
 
 This rule will redirect a URL like `/posts/06/15/2022/hello-world` to `/articles/2022/06/15/hello-world`.
 
-### Splat
+Implementation MUST error when the same placeholder name is used more than once in `from`.
+
+Implementation MUST allow the same placeholder name to be used more than once in `to`.
+
+### Catch-All Splat
 
 If a `from` path ends with an asterisk (i.e. `*`), the remainder of the `from` path is slurped up into the special `:splat` placeholder, which can then be injected into the `to` path.
 
@@ -91,7 +95,7 @@ Splat logic MUST only apply to a single trailing asterisk, as this is a greedy m
 
 ### Comments
 
-Any line beginning with `#` will be treated as a comment and ignored at evaluation time.
+Any line beginning with `#` MUST be treated as a comment and ignored at evaluation time.
 
 For example:
 
@@ -108,7 +112,14 @@ is functionally equivalent to
 
 ### Line Termination
 
-Lines MUST be terminated by either `\n` or `\r\n`.
+Lines MUST be separated from each other by either `\n` or `\r\n`.
+
+Termination of the last line in the file is optional.
+
+### Whitespace Characters
+
+Blank lines, leading and trailing whitespace characters like `\x20` (space) or
+`\t` (tab) MUST be ignored, aside from the line termination mentioned above.
 
 ### Max File Size
 
@@ -116,9 +127,14 @@ The file size MUST NOT exceed 64 KiB.
 
 # Evaluation
 
-## Subdomain or DNSLink Gateways
+## Same-Origin Requirement
 
-Rules MUST only be evaluated when hosted on a Subdomain or DNSLink Gateway, so that we have [Same-Origin](https://en.wikipedia.org/wiki/Same-origin_policy) isolation.
+Rules MUST only be evaluated in contexts where
+[Same-Origin](https://en.wikipedia.org/wiki/Same-origin_policy) isolation per
+root CID is possible.
+
+This requirement is fulfilled on a Subdomain or DNSLink HTTP Gateway,
+and also applies to a web browser with native `ipfs://` and `ipns://` scheme handler.
 
 ## Order
 
