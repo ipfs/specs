@@ -371,7 +371,7 @@ the `/ipfs/bitswap[/*]` libp2p protocol.
 - `AdvisoryTTL` is the time by which the caller expects the server to keep the record available, specified in milliseconds.
   - If this value is unknown, the caller may use a value of 0
 - `ID` is the peer ID that was used to sign the record
--  `Addrs` is a list of string-encoded multiaddrs
+- `Addrs` is a list of string-encoded multiaddrs
 
 A [400 Bad Request](https://httpwg.org/specs/rfc9110.html#status.400)  response code should be returned if the signature check fails.
 
