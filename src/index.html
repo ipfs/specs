@@ -1,0 +1,131 @@
+---
+title: Home
+---
+
+{% include 'head.html' %}
+
+<header>
+  <div>
+    <img src="/img/ipfs-standards.svg" alt="InterPlanetary Standards Logo" width="60" height="60" class="logo">
+    <h1>IPFS Standards</h1>
+    <p>
+      The purpose of <em>IPFS Standards</em> is to foster interoperability between independent implementations of
+      the IPFS stack by producing Internet-grade specifications and test suites.
+    </p>
+  </div>
+</header>
+
+<main>
+  <h2 class="pitch-title">Specifying IPFS and the InterPlanetary stack.</h2>
+  <p class="pitch-subtitle">
+    The technology that powers the content-addressable web is being standardized here.
+  </p>
+  <!--
+  <div class="basic-grid">
+    <div class="pitch">
+      <h3>High-quality open standards</h3>
+      <p>
+        We aim to fully define implementation behaviour and to empower anyone to build their
+        own system that fits into the interplanetary ecosystem without needing to reverse-engineer
+        the behavior of other implementations.
+      </p>
+    </div>
+    <div class="pitch">
+      <h3>Comprehensive test suites</h3>
+      <p>
+        A specification is only as useful as it is both testable and tested. We are building extensive
+        test suites that allow specifications to prove their interoperability and implementations to demonstrate
+        their correctness.
+        </p>
+    </div>
+    <div class="pitch">
+      <h3>Testing infrastructure</h3>
+      <p>
+        We build tools to support detecting interoperability issues early and often as part of CI/CD pipelines
+        and to report on implementation maturity as the stack evolves so that people who build on top of the
+        interplanetary stack can know what they can use in production.
+      </p>
+    </div>
+    <div class="pitch">
+      <h3>An open governance model</h3>
+      <p>
+        We guarantee community ownership of the standards, of the standards-production process, and of
+        the infrastructure to operate it, in collective pursuit of efficient, transformative, ethical
+        technology.
+      </p>
+    </div>
+  </div>
+  -->
+  <section>
+    <h2>Specifications</h2>
+    <p>
+      The specifications are broken up into multiple areas that cover the stack.
+    </p>
+    <div class="basic-grid">
+      <section>
+        <h3><a href="/architecture/">Architecture</a></h3>
+        <p>
+          These documents define the architectural principles that IPFS is built upon, and can be used as tools to evaluate
+          implementations and applications of IPFS.
+        </p>
+        {% include 'list.html', posts: collections.architecture %}
+      </section>
+      <section>
+        <h3><a href="/meta/">Meta</a></h3>
+        <p>
+          <em>Meta</em> contains all the non-technical documents that conspire to make the standards
+          project work: what the core values are, what the governance model is, how to produce documents,
+          etc.
+        </p>
+        {% include 'list.html', posts: collections.meta %}
+      </section>
+      <section>
+        <h3><a href="/routing/">Routing</a></h3>
+        <p>
+          Routing is the way to determine where to find a given content, peer, or IPNS record.
+        </p>
+        {% include 'list.html', posts: collections.routing %}
+      </section>
+      <section>
+        <h3><a href="/exchange/">Exchange</a></h3>
+        <p>
+          Exchange is the way to for sending and receiving content-addressed blocks of data.
+        </p>
+        {% include 'list.html', posts: collections.exchange %}
+      </section>
+      <section>
+        <h3><a href="/http-gateways/">HTTP Gateways</a></h3>
+        <p>
+          IPFS Gateway acts as a bridge between traditional HTTP clients and IPFS. Through the gateway, users can download files,
+          directories and other IPLD data stored in IPFS as if they were stored in a traditional web server.
+        </p>
+        <p>
+          Low-level HTTP semantics:
+        </p>
+        {% include 'list.html', posts: collections.lowLevelHttpGateways %}
+        <p>
+          Web semantics (for website hosting and web browsers):
+        </p>
+        {% include 'list.html', posts: collections.webHttpGateways %}
+      </section>
+      <section>
+        <h3><a href="/ipns/">InterPlanetary Naming System</a></h3>
+        <p>
+          The InterPlanetary Naming System (IPNS) is a naming system responsible for creating, reading and updating mutable pointers to data.
+        </p>
+        {% include 'list.html', posts: collections.ipns %}
+      </section>
+      <section>
+        <h3><a href="/ipips/">InterPlanetary Improvement Proposals</a></h3>
+        <p>
+          InterPlanetary Improvement Proposals (IPIP) are an <a href="/meta/ipip-process">orderly mechanism</a> to consider
+          changes to the IPFS specification. They are not changes to the specification itself,
+          but their approval leads to a change in the specification.
+        </p>
+        {% include 'ipips-list.html' %}
+      </section>
+    </div>
+  </section>
+</main>
+
+{% include 'footer.html' %}

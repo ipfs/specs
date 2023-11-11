@@ -1,0 +1,24 @@
+---
+title: HTTP Gateways
+description: |
+  IPFS Gateway acts as a bridge between traditional HTTP clients and IPFS. Through the gateway, users can download files,
+  directories and other IPLD data stored in IPFS as if they were stored in a traditional web server.
+---
+
+{% include 'header.html' %}
+
+<main>
+  <h3>HTTP</h3>
+  <p>
+    Low-level gateways that expose IPFS resources over HTTP protocol.
+  </p>
+  {% include 'list.html', posts: collections.lowLevelHttpGateways %}
+  <h3>Web</h3>
+  <p>
+    Designed for website hosting and improved interoperability with web browsers and
+    <a href="https://en.wikipedia.org/wiki/Same-origin_policy">origin-based security model</a>.
+  </p>
+  {% include 'list.html', posts: collections.webHttpGateways %}
+</main>
+
+{% include 'footer.html' %}
