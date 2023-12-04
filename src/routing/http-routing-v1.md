@@ -115,7 +115,6 @@ Each object in the `Providers` list is a record conforming to a schema, usually 
 }
 ```
 
-
 Each object in the `Providers` list is a *write provider record* entry.
 
 Server SHOULD accept  representing writes is [Announcement Schema](#announcement-schema).
@@ -202,7 +201,6 @@ Each object in the `Peers` list is a record conforming to the [Peer Schema](#pee
   ]
 }
 ```
-
 
 Each object in the `Providers` list is a *write provider record* entry.
 
@@ -358,7 +356,6 @@ the case, the field MUST be ignored.
 ### Announcement Schema
 
 The `announcement` schema can be used in `PUT` operations to announce content providers or peer routing information.
-
 
 ```json
   {
