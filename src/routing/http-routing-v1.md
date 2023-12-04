@@ -106,17 +106,27 @@ Each object in the `Providers` list is a record conforming to a schema, usually 
 
 ```json
 {
-    "Providers": [
-        {
-            "Protocol": "<protocol_name>",
-            "Schema": "bitswap",
-            ...
-        }
-    ]
+  "Providers": [
+    {
+      "Schema": "announcement",
+      ...
+    }
+  ]
 }
 ```
 
-Each object in the `Providers` list is a *write provider record*.
+
+Each object in the `Providers` list is a *write provider record* entry.
+
+Server SHOULD accept  representing writes is [Announcement Schema](#announcement-schema).
+
+:::warn
+
+TODO: is below a sensible limit?
+
+There SHOULD be no more than 100 `Providers` per request.
+
+:::
 
 #### `PUT` Response Body
 
@@ -130,9 +140,8 @@ Each object in the `Providers` list is a *write provider record*.
 
 - `ProvideResults` is a list of results in the same order as the `Providers` in the request, and the schema of each object is determined by the `Protocol` of the corresponding write object
   - This may contain output information such as TTLs, errors, etc.
-  - It is undefined whether the server will allow partial results
+  - It is undefined whether the server will allow partial results <!-- TODO: maybe add Error field to `announcement` schema and use it in responses ?  -->
 - The work for processing each provider record should be idempotent so that it can be retried without excessive cost in the case of full or partial failure of the request
-- Default limit of 100 keys per request
 
 ## Peer Routing API
 
@@ -155,10 +164,10 @@ represented as a CIDv1 encoded with `libp2p-key` codec.
 {
   "Peers": [
     {
-      "Schema": "<schema>",
-      "Protocols": ["<protocol-a>", "<protocol-b>", ...],
+      "Schema": "peer",
       "ID": "bafz...",
       "Addrs": ["/ip4/..."],
+      "Protocols": ["<protocol-a>", "<protocol-b>", ...],
       ...
     },
     ...
@@ -171,6 +180,34 @@ The `application/json` responses SHOULD be limited to 100 peers.
 The client SHOULD be able to make a request with `Accept: application/x-ndjson` and get a [stream](#streaming) with more results.
 
 Each object in the `Peers` list is a record conforming to the [Peer Schema](#peer-schema).
+
+### `PUT /routing/v1/peers`
+
+#### `PUT` Response codes
+
+- `200` (OK): the server processed the full list of provider records (possibly unsuccessfully, depending on the semantics of the particular records)
+- `400` (Bad Request): the server deems the request to be invalid and cannot process it
+- `422` (Unprocessable Entity): request does not conform to schema or semantic constraints
+- `501` (Not Implemented): the server does not support providing records
+
+#### `PUT` Request Body
+
+```json
+{
+  "Providers": [
+    {
+      "Schema": "announcement",
+      ...
+    }
+  ]
+}
+```
+
+
+Each object in the `Providers` list is a *write provider record* entry.
+
+Server SHOULD accept writes represented with [Announcement Schema](#announcement-schema)
+objects with `CID` list.
 
 ## IPNS API
 
@@ -318,6 +355,81 @@ the case, the field MUST be ignored.
 
 :::
 
+### Announcement Schema
+
+The `announcement` schema can be used in `PUT` operations to announce content providers or peer routing information.
+
+
+```json
+  {
+    "Schema": "announcement",
+    "Payload": {
+      "CID": ["cid1", "cid2", ...],
+      "Scope": "block",
+      "Timestamp": "YYYY-MM-DDT23:59:59Z",
+      "TTL": 0,
+      "ID": "12D3K...",
+      "Addrs": ["/ip4/...", ...],
+      "Protocols": ["foo", ...],
+      "Metadata": "mbase64-blob",
+    },
+    "Signature": "mbase64-signature"
+  }
+```
+
+- `Schema`: tells the server to interpret the JSON object as announce provider
+- `Payload`: is a DAG-JSON-compatible object with a subset of the below fields
+  - `CID` is a list of the CIDs being provided.
+    - Skipped when used for `PUT /routing/v1/peers`
+    - `Scope` is an optional hint that provides semantic meaning about announced identifies:
+      - `block` announces only the individual blocks (implicit default if `Scope` is missing).
+      - `entity` announces enumerable entities behind the CIDs (e.g.: all blocks for UnixFS file or a minimum  set of blocks to enumerate HAMT-sharded UnixFS directory).
+      - `recursive` announces entire DAGs behind the CIDs (e.g.: entire DAG-CBOR DAG, or everything in UnixFS directory, including all files in all subdirectories).
+  - `Timetamp` is the current time, formatted as an ASCII string that follows notation from [rfc3339](https://specs.ipfs.tech/ipns/ipns-record/#ref-rfc3339).
+  - `TTL` is  caching and expiration hint informing the server how long to keep the record available, specified in milliseconds.
+    - If this value is unknown, the caller may skip this field, or use a value of 0. The server's default will be used.
+  - `ID` is Peer ID of the node that provides the content and also indicates the `libp2p-key` that SHOULD be used for verifying `Signature` field.
+  - `Addrs` is an a list of string-encoded multiaddrs without `/p2p/peerID` suffix.
+  - `Protocols` is a list of protocols supported by `ID` and/or `Addrs`, if known upfront.
+  - `Metadata` is a string with multibase-encoded binary metadata that should be passed as-is
+- `Signature` is a string with multibase-encoded binary signature that provides integrity and authenticity of the `Payload` field.
+  - Signature is created by following below steps:
+    1. Convert `Payload` to deterministic, ordered [DAG-JSON](https://ipld.io/specs/codecs/dag-json/spec/) map notation
+    2. Prefix the DAG-JSON bytes with ASCII string `PUT /routing/v1 announcement:`
+    3. Sign the bytes with the private key of the Peer ID specified in the `Payload.ID`.
+       - Signing details for specific key types should follow [libp2p/peerid specs](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#key-types), unless stated otherwise.
+  - Client SHOULD sign every announcement.
+  - Servers SHOULD verify signature before accepting a record, unless running in a trusted environment.
+    - ED25519 and other small public keys MUST be inlined inside of the `ID` field with the identity multihash type.
+    - Key types that exceed 42 bytes (e.g. RSA) SHOULD NOT be inlined, the `ID` field should only include the multihash of the key. The key itself SHOULD be obtained out-of-band (e.g. by fetching the block via IPFS) and cached.
+      If support for big keys is needed in the future, this spec can be updated to allow the client to provide the key and key type out-of-band by adding optional `PublicKey` fields, and if the Peer ID is a CID, then the server can verify the public key's authenticity against the CID, and then proceed with the rest of the verification scheme.
+  - A [400 Bad Request](https://httpwg.org/specs/rfc9110.html#status.400)  response code SHOULD be returned if the `Signature` check fails.
+
+:::warn
+
+TODO: what should be the  limits? Max number of CIDs per `announcement` ?
+
+:::
+
+#### Use in PUT responses
+
+Server MAY return additional TTL information if the TTL is not provided in the request,
+or if server policy is to provide TTL different than the requested one.
+
+```json
+{
+  "Schema": "announcement",
+  "Payload": {
+    "TTL": 17280000
+  }
+}
+```
+
+- `TTL` in response is the time at which the server expects itself to drop the record
+  - If less than the `TTL` in the request, then the client SHOULD repeat announcement earlier, before the announcement TTL expires and is forgotten by the routing system
+  - If greater than the `TTL` in the request, then the server client SHOULD save resources and not repeat announcement until the announcement TTL expires and is forgotten by the routing system
+  - If `0`, the server makes no claims about the lifetime of the record
+
 ### Legacy Schemas
 
 Legacy schemas include `ID` and optional `Addrs` list just like
@@ -340,59 +452,6 @@ the `/ipfs/bitswap[/*]` libp2p protocol.
   "Addrs": ["/ip4/..."]
 }
 ```
-
-#### Bitswap Write Provider Records
-
-```json
-{
-    "Protocol": "transport-bitswap",
-    "Schema": "bitswap",
-    "Signature": "<signature>",
-    "Payload": "<payload>"
-}
-```
-
-- `Signature`: a multibase-encoded signature of the sha256 multihash of the `Payload` field, signed using the private key of the Peer ID specified in the `Payload` DAG-JSON. Signing details for specific key types should follow [libp2p/peerid specs](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#key-types), unless stated otherwise.
-  - Servers may ignore this field if they do not require signature verification.
-- `Payload`: a string containing a serialized JSON object which conforms with the following schema:
-
-  ```json
-   {
-       "Keys": ["cid1", "cid2"],
-       "Timestamp": 0,
-       "AdvisoryTTL": 0,
-       "ID": "12D3K...",
-       "Addrs": ["/ip4/..."]
-   }
-   ```
-
-- `Keys` is a list of the CIDs being provided
-- `Timestamp` is the current time, formatted as an ASCII string that follows notation from [rfc3339](https://specs.ipfs.tech/ipns/ipns-record/#ref-rfc3339)
-- `AdvisoryTTL` is the time by which the caller expects the server to keep the record available, specified in milliseconds.
-  - If this value is unknown, the caller may use a value of 0
-- `ID` is the peer ID that was used to sign the record
-- `Addrs` is a list of string-encoded multiaddrs
-
-A [400 Bad Request](https://httpwg.org/specs/rfc9110.html#status.400)  response code should be returned if the signature check fails.
-
-Note that this only supports Peer IDs expressed as identity multihashes. Peer IDs with older key types that exceed 42 bytes are not verifiable since they only contain a hash of the key, not the key itself.
-Normally, if the Peer ID contains only a hash of the key, then the key is obtained out-of-band (e.g. by fetching the block via IPFS).
-If support for these Peer IDs is needed in the future, this spec can be updated to allow the client to provide the key and key type out-of-band by adding optional `PublicKey` and `PublicKeyType` fields, and if the Peer ID is a CID, then the server can verify the public key's authenticity against the CID, and then proceed with the rest of the verification scheme.
-
-The `Payload` field is a string, not a proper JSON object, to prevent its contents from being accidentally parsed and re-encoded by intermediaries, which may change the order of JSON fields and thus cause the record to fail validation.
-
-#### Write Provider Records Response
-
-```json
-{
-    "AdvisoryTTL": 0
-}
-```
-
-- `AdvisoryTTL` is the time at which the server expects itself to drop the record
-  - If less than the `AdvisoryTTL` in the request, then the client should re-issue the request by that point
-  - If greater than the `AdvisoryTTL` in the request, then the server expects the client to be responsible for the content for up to that amount of time (TODO: this is ambiguous)
-  - If 0, the server makes no claims about the lifetime of the record
 
 #### Graphsync Schema
 
