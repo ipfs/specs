@@ -128,52 +128,63 @@ and refer to IPNS addresses as `/ipns/{ipns-name}` (or `/ipns/{libp2p-key}`).
 
 ## IPNS Record
 
+### Record Fields
+
 A logical :dfn[IPNS Record] is a data structure containing the following fields:
 
-- **Value** (bytes)
-  - It can be any content path, such as a `/ipns/{ipns-key}` path to another IPNS record, a [DNSLink](https://dnslink.dev/) path (`/ipns/example.com`) or an immutable IPFS path (`/ipfs/baf...`).
-  - Implementations MUST include this value inside the DAG-CBOR document in `IpnsEntry.data[Value]`.
+#### :dfn[Value]{also="ipns-record-value"} (bytes)
 
-- **Validity Type** (uint64)
-  - Defines the conditions under which the record is valid.
-  - The only supported value is `0`, which indicates the `validity` field contains the expiration date after which the IPNS record becomes invalid.
-  - Implementations MUST support `ValidityType = 0` and include this value inside the DAG-CBOR document at `IpnsEntry.data[ValidityType]`.
+- It can be any content path, such as a `/ipns/{ipns-key}` path to another IPNS record, a [DNSLink](https://dnslink.dev/) path (`/ipns/example.com`) or an immutable IPFS path (`/ipfs/baf...`).
+- Implementations MUST include this value inside the DAG-CBOR document in `IpnsEntry.data[Value]`.
 
-- **Validity** (bytes)
-  - When `ValidityType = 0`
-    - Expiration date of the record with nanoseconds precision.  Expiration time should match the publishing medium's window.
-      - For example, IPNS records published on the DHT should have an expiration time set to within 48 hours after publication. Setting the expiration time to longer than 48 hours will not have any effect, as DHT peers only keep records for up to 48 hours.
-    - Represented as an ASCII string that follows notation from :cite[rfc3339] (`1970-01-01T00:00:00.000000001Z`).
-  - Implementations MUST include this value inside the DAG-CBOR document at `IpnsEntry.data[Validity]`.
+#### :dfn[Validity Type]{also="ipns-record-validity-type"} (uint64)
 
-- **Sequence** (uint64)
-  - Represents the current version of the record (starts at 0).
-  - Implementations MUST include this value in inside the DAG-CBOR document at `IpnsEntry.data[Sequence]`.
+- Defines the conditions under which the record is valid.
+- The only supported value is `0`, which indicates the `validity` field contains the expiration date after which the IPNS record becomes invalid.
+- Implementations MUST support `ValidityType = 0` and include this value inside the DAG-CBOR document at `IpnsEntry.data[ValidityType]`.
 
-- **TTL** (uint64)
-  - A hint for how long (in nanoseconds) the record should be cached before going back to, for instance the DHT, in order to check if it has been updated. The function and trade-offs of this value are analogous to the TTL of DNS record.
-  - Implementations MUST include this value inside the DAG-CBOR document at `IpnsEntry.data[TTL]`.
-  - Suggested default: 1 hour (3 600 000 000 000 nanoseconds).
+#### :dfn[Validity]{also="ipns-record-validity"} (bytes)
 
-- **Public Key** (bytes)
-  - Public key used to sign this record.
-    - If public key is small enough to fit in IPNS name (e.g., Ed25519 keys inlined using `identity` multihash), `IpnsEntry.pubKey` field is redundant and MAY be skipped to save space.
-    - The public key MUST be included if it cannot be extracted from the IPNS name (e.g., legacy RSA keys). Implementers MUST follow key serialization defined in [PeerID specs](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#key-types).
+- When `ValidityType = 0`
+  - Expiration date of the record with nanoseconds precision.  Expiration time should match the publishing medium's window.
+    - For example, IPNS records published on the DHT should have an expiration time set to within 48 hours after publication. Setting the expiration time to longer than 48 hours will not have any effect, as DHT peers only keep records for up to 48 hours.
+  - Represented as an ASCII string that follows notation from :cite[rfc3339] (`1970-01-01T00:00:00.000000001Z`).
+- Implementations MUST include this value inside the DAG-CBOR document at `IpnsEntry.data[Validity]`.
 
-- **Signature** (bytes)
-  - Provides the cryptographic proof that the IPNS record was created by the owner of the private key.
-  - Implementations MUST include this value in `IpnsEntry.signatureV2` and follow signature creation and verification as described in [Record Creation](#record-creation) and [Record Verification](#record-verification).
+#### :dfn[Sequence]{also="ipns-record-sequence"} (uint64)
 
-- **Extensible Data** (DAG-CBOR)
-  - Extensible record data in [DAG-CBOR](https://ipld.io/specs/codecs/dag-cbor/spec/) format.
-  - The default set of fields can be augmented with additional information.
-    - Implementations MAY leverage this, but otherwise MUST ignore unexpected fields.
-    - A good practice is to:
-      - prefix custom field names with `_` to avoid collisions with any new
-        mandatory fields that may be added in a future version of this
-        specification.
-      - and/or create own namespace by setting value to DAG-CBOR:
-        `IpnsEntry.data[_namespace][customfield]`.
+- Represents the current version of the record (starts at 0).
+- Implementations MUST include this value in inside the DAG-CBOR document at `IpnsEntry.data[Sequence]`.
+
+#### :dfn[TTL]{also="ipns-record-ttl"} (uint64)
+
+- A hint for how long (in nanoseconds) the record should be cached before going back to, for instance the DHT, in order to check if it has been updated. The function and trade-offs of this value are analogous to the TTL of DNS record.
+- Implementations MUST include this value inside the DAG-CBOR document at `IpnsEntry.data[TTL]`.
+- Suggested default: 1 hour (3 600 000 000 000 nanoseconds).
+
+#### :dfn[Public Key]{also="ipns-record-public-key"} (bytes)
+
+- Public key used to sign this record.
+  - If public key is small enough to fit in IPNS name (e.g., Ed25519 keys inlined using `identity` multihash), `IpnsEntry.pubKey` field is redundant and MAY be skipped to save space.
+  - The public key MUST be included if it cannot be extracted from the IPNS name (e.g., legacy RSA keys). Implementers MUST follow key serialization defined in [PeerID specs](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#key-types).
+  - List of supported key types listed in [IPNS Keys](#ipns-keys) section.
+
+#### :dfn[Signature]{also="ipns-record-signature"} (bytes)
+
+- Provides the cryptographic proof that the IPNS record was created by the owner of the private key.
+- Implementations MUST include this value in `IpnsEntry.signatureV2` and follow signature creation and verification as described in [Record Creation](#record-creation) and [Record Verification](#record-verification).
+
+#### :dfn[Extensible Data]{also="ipns-record-extensible-data"} (DAG-CBOR)
+
+- Extensible record data in [DAG-CBOR](https://ipld.io/specs/codecs/dag-cbor/spec/) format.
+- The default set of fields can be augmented with additional information.
+  - Implementations MAY leverage this, but otherwise MUST ignore unexpected fields.
+  - A good practice is to:
+    - prefix custom field names with `_` to avoid collisions with any new
+      mandatory fields that may be added in a future version of this
+      specification.
+    - and/or create own namespace by setting value to DAG-CBOR:
+      `IpnsEntry.data[_namespace][customfield]`.
 
 IPNS records are stored locally, as well as spread across the network, in order to be accessible to everyone.
 
@@ -234,7 +245,7 @@ requirements present in [Record Creation](#record-creation) section.
 
 :::
 
-### Record Size Limit
+#### Record Size Limit
 
 IPNS implementations MUST support sending and receiving a serialized
 `IpnsEntry` less than or equal to **10 KiB** in size.

@@ -9,39 +9,31 @@ editors:
     github: yourGitHubHandle
 ---
 
-One paragraph explanation of the specification
-
-## Organization of this document
-
-- [Introduction](#introduction)
-- [Specification](#specification)
-  - [Test fixtures](#test-fixtures)
-  - [Security](#security)
-  - [Privacy and User Control](#privacy-and-user-control)
+TODO: One paragraph explanation of the specification
 
 ## Introduction
 
-Clearly explain why the specification exists, what is the problem solved here.
+TODO: Clearly explain why the specification exists, what is the problem solved here.
 
 ## Specification
 
-Explain things in depth.
+TODO: Explain things in depth.
 
 The resulting specification should be detailed enough to allow competing,
 interoperable implementations.
 
 ### Test fixtures
 
-List relevant CIDs. Describe how implementations can use them to determine
+TODO: List relevant CIDs. Describe how implementations can use them to determine
 specification compliance.
 
 ### Security
 
-Explain the security implications/considerations relevant to the spec.
+TODO: Explain the security implications/considerations relevant to the spec.
 
 ### Privacy and User Control
 
-Note if there are any privacy or user control considerations that should be
+TODO: Note if there are any privacy or user control considerations that should be
 taken into account by the implementers.
 
 ## Copyright
