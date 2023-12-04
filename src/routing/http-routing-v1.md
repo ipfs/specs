@@ -471,10 +471,6 @@ libp2p protocol.
 }
 ```
 
-#### Filecoin Graphsync Write Provider Records
-
-There is currently no specified schema.
-
 [multibase]: https://github.com/multiformats/multibase
 [CIDv1]: https://github.com/multiformats/cid#cidv1
 [multiaddr]: https://github.com/multiformats/multiaddr#specification
