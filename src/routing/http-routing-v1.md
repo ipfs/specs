@@ -95,13 +95,6 @@ Each object in the `Providers` list is a record conforming to a schema, usually 
 
 ### `PUT /routing/v1/providers`
 
-#### `PUT` Response codes
-
-- `200` (OK): the server processed the full list of provider records (possibly unsuccessfully, depending on the semantics of the particular records)
-- `400` (Bad Request): the server deems the request to be invalid and cannot process it
-- `422` (Unprocessable Entity): request does not conform to schema or semantic constraints
-- `501` (Not Implemented): the server does not support providing records
-
 #### `PUT` Request Body
 
 ```json
@@ -127,6 +120,14 @@ There SHOULD be no more than 100 `Providers` per request.
 
 :::
 
+#### `PUT` Response codes
+
+- `200` (OK): the server processed the full list of provider records (possibly unsuccessfully, depending on the semantics of the particular records)
+- `400` (Bad Request): the server deems the request to be invalid and cannot process it
+- `422` (Unprocessable Entity): request does not conform to schema or semantic constraints
+- `501` (Not Implemented): the server does not support providing records
+
+
 #### `PUT` Response Body
 
   ```json
@@ -138,8 +139,8 @@ There SHOULD be no more than 100 `Providers` per request.
   ```
 
 - `ProvideResults` is a list of results in the same order as the `Providers` in the request, and the schema of each object is determined by the `Protocol` of the corresponding write object
-  - This may contain output information such as TTLs, errors, etc.
-  - It is undefined whether the server will allow partial results <!-- TODO: maybe add Error field to `announcement` schema and use it in responses ?  -->
+  - Returned list MAY contain entry-specific information such as server-specific TTL, per-entry error message, etc. Fields which are not relevant, can be omitted.
+  - In error scenarios, a client can check for presence of non-empty `Error` field (top level, or per `ProvideResults` entry) to learn about the reason why PUT failed.
 - The work for processing each provider record should be idempotent so that it can be retried without excessive cost in the case of full or partial failure of the request
 
 ## Peer Routing API
@@ -182,13 +183,6 @@ Each object in the `Peers` list is a record conforming to the [Peer Schema](#pee
 
 ### `PUT /routing/v1/peers`
 
-#### `PUT` Response codes
-
-- `200` (OK): the server processed the full list of provider records (possibly unsuccessfully, depending on the semantics of the particular records)
-- `400` (Bad Request): the server deems the request to be invalid and cannot process it
-- `422` (Unprocessable Entity): request does not conform to schema or semantic constraints
-- `501` (Not Implemented): the server does not support providing records
-
 #### `PUT` Request Body
 
 ```json
@@ -206,6 +200,33 @@ Each object in the `Providers` list is a *write provider record* entry.
 
 Server SHOULD accept writes represented with [Announcement Schema](#announcement-schema)
 objects with `CID` list.
+
+#### `PUT` Response codes
+
+- `200` (OK): the server processed the full list of provider records (possibly unsuccessfully, depending on the semantics of the particular records)
+- `400` (Bad Request): the server deems the request to be invalid and cannot process it
+- `422` (Unprocessable Entity): request does not conform to schema or semantic constraints
+- `501` (Not Implemented): the server does not support providing records
+
+#### `PUT` Response Body
+
+  ```json
+  {
+      "ProvideResults": [
+          { ... }
+      ]
+  }
+  ```
+
+- `ProvideResults` is a list of results in the same order as the `Providers` in the request, and the schema of each object is determined by the `Protocol` of the corresponding write object
+  - Returned list MAY contain entry-specific information such as server-specific TTL, per-entry error message, etc. Fields which are not relevant, can be omitted.
+  - In error scenarios, a client can check for presence of non-empty `Error` field (top level, or per `ProvideResults` entry) to learn about the reason why PUT failed.
+- The work for processing each provider record should be idempotent so that it can be retried without excessive cost in the case of full or partial failure of the request
+
+#### `PUT` Response Status Codes
+
+- `200` (OK): processed - inspect response to see if there are any `Error` results.
+- `400` (Bad Request): unable to process PUT request, make sure JSON schema and values are correct.
 
 ## IPNS API
 
@@ -361,7 +382,7 @@ The `announcement` schema can be used in `PUT` operations to announce content pr
   {
     "Schema": "announcement",
     "Payload": {
-      "CID": ["cid1", "cid2", ...],
+      "CID": "bafy..cid",
       "Scope": "block",
       "Timestamp": "YYYY-MM-DDT23:59:59Z",
       "TTL": 0,
@@ -376,12 +397,12 @@ The `announcement` schema can be used in `PUT` operations to announce content pr
 
 - `Schema`: tells the server to interpret the JSON object as announce provider
 - `Payload`: is a DAG-JSON-compatible object with a subset of the below fields
-  - `CID` is a list of the CIDs being provided.
-    - Skipped when used for `PUT /routing/v1/peers`
-    - `Scope` is an optional hint that provides semantic meaning about announced identifies:
-      - `block` announces only the individual blocks (implicit default if `Scope` is missing).
-      - `entity` announces enumerable entities behind the CIDs (e.g.: all blocks for UnixFS file or a minimum  set of blocks to enumerate HAMT-sharded UnixFS directory).
-      - `recursive` announces entire DAGs behind the CIDs (e.g.: entire DAG-CBOR DAG, or everything in UnixFS directory, including all files in all subdirectories).
+  - `CID` is the CID being provided.
+    - This field is not presend when used for `PUT /routing/v1/peers`
+  - `Scope` is an optional hint that provides semantic meaning about announced identifies:
+    - `block` announces only the individual block (this is the implicit default if `Scope` field is not present).
+    - `entity` announces CIDs required for enumerating entity behind the CID (e.g.: all blocks for UnixFS file or a minimum set of blocks to enumerate contents of HAMT-sharded UnixFS directory, only top level of directory tree, etc).
+    - `recursive` announces entire DAGs behind the CIDs (e.g.: entire DAG-CBOR DAG, or everything in UnixFS directory, including all files in all subdirectories).
   - `Timetamp` is the current time, formatted as an ASCII string that follows notation from [rfc3339](https://specs.ipfs.tech/ipns/ipns-record/#ref-rfc3339).
   - `TTL` is  caching and expiration hint informing the server how long to keep the record available, specified in milliseconds.
     - If this value is unknown, the caller may skip this field, or use a value of 0. The server's default will be used.
