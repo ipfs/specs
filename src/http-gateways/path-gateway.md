@@ -239,6 +239,9 @@ These are the equivalents:
 - `format=cbor` → `Accept: application/cbor`
 - `format=ipns-record` → `Accept: application/vnd.ipfs.ipns-record`
 
+When both `Accept` HTTP header  and `format` query parameter are present,
+`Accept` SHOULD take precedence.
+
 ### `dag-scope` (request query parameter)
 
 Only used on CAR requests, same as :ref[dag-scope] from :cite[trustless-gateway].
