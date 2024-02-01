@@ -107,7 +107,7 @@ The following example showcases the features and [syntax](#file-syntax) of a com
 
 ```yaml
 version: 1
-name: IPFSCorp blocking list
+name: Example IPFSCorp blocking list
 description: A collection of bad things we have found in the universe
 author: abuse-ipfscorp@example.com
 hints:
@@ -129,10 +129,10 @@ hints:
 !/ipfs/QmUboz9UsQBDeS6Tug1U8jgoFkgYxyYood9NDyVURAY9pK/blocked/not
 !/ipfs/QmUboz9UsQBDeS6Tug1U8jgoFkgYxyYood9NDyVURAY9pK/blocked/exceptions*
 
-# Block IPNS domain name
+# Block DNSLink domain name
 /ipns/domain.example
 
-# Block IPNS domain name and path
+# Block DNSLink domain name and path
 /ipns/domain2.example/path
 
 # Block IPNS key - blocks wrapped multihash.
@@ -521,7 +521,9 @@ In particular, a reference [Blocker implementation validator](https://github.com
 
 ### Implementations
 
-- [NOpfs](https://github.com/ipfs-shipyard/nopfs): An implementation of IPIP-383 which add supports for content blocking to the go-ipfs stack and particularly to [Kubo](https://github.com/ipfs/kubo).
+- [NOpfs](https://github.com/ipfs-shipyard/nopfs): A reference library implementation of IPIP-383 which add supports for content blocking to the go-ipfs stack.
+- [Kubo](https://github.com/ipfs/kubo): IPFS implementation, ships with built-in NOpfs implementation ([docs](https://github.com/ipfs/kubo/blob/master/docs/content-blocking.md))
+- [Rainbow](https://github.com/ipfs/rainbow/): A standalone IPFS Gateway implementation, ships with built-in NOpfs implementation
 
 ## Copyright
 
