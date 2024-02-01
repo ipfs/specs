@@ -109,11 +109,18 @@ title: Home
         {% include 'list.html', posts: collections.webHttpGateways %}
       </section>
       <section>
-        <h3><a href="/ipns/">InterPlanetary Naming System</a></h3>
+        <h3><a href="/ipns/">IPNS</a></h3>
         <p>
           The InterPlanetary Naming System (IPNS) is a naming system responsible for creating, reading and updating mutable pointers to data.
         </p>
         {% include 'list.html', posts: collections.ipns %}
+      </section>
+      <section>
+        <h3>Content Filtering</h3>
+        <p>
+          How IPFS service operators can control the content hosted on their nodes.
+        </p>
+        {% include 'list.html', posts: collections.filtering %}
       </section>
       <section>
         <h3><a href="/ipips/">InterPlanetary Improvement Proposals</a></h3>
