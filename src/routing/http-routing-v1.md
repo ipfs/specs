@@ -186,7 +186,7 @@ Each object in the `Peers` list is a record conforming to the [Peer Schema](#pee
 
 ```json
 {
-  "Providers": [
+  "Peers": [
     {
       "Schema": "announcement",
       ...
@@ -402,7 +402,7 @@ The `announcement` schema can be used in `POST` operations to announce content p
     - `block` announces only the individual block (this is the implicit default if `Scope` field is not present).
     - `entity` announces CIDs required for enumerating entity behind the CID (e.g.: all blocks for UnixFS file or a minimum set of blocks to enumerate contents of HAMT-sharded UnixFS directory, only top level of directory tree, etc).
     - `recursive` announces entire DAGs behind the CIDs (e.g.: entire DAG-CBOR DAG, or everything in UnixFS directory, including all files in all subdirectories).
-  - `Timetamp` is the current time, formatted as an ASCII string that follows notation from [rfc3339](https://specs.ipfs.tech/ipns/ipns-record/#ref-rfc3339).
+  - `Timestamp` is the current time, formatted as an ASCII string that follows notation from [rfc3339](https://specs.ipfs.tech/ipns/ipns-record/#ref-rfc3339).
   - `TTL` is  caching and expiration hint informing the server how long to keep the record available, specified in milliseconds.
     - If this value is unknown, the caller may skip this field, or use a value of 0. The server's default will be used.
   - `ID` is Peer ID of the node that provides the content and also indicates the `libp2p-key` that SHOULD be used for verifying `Signature` field.
