@@ -114,9 +114,8 @@ Server SHOULD accept  representing writes is [Announcement Schema](#announcement
 
 :::warn
 
-TODO: is below a sensible limit?
-
-There SHOULD be no more than 100 `Providers` per request.
+Since non-streaming results have to be buffered before sending,
+server SHOULD be no more than 100 `Providers` per `application/json` response.
 
 :::
 
@@ -195,10 +194,9 @@ Each object in the `Peers` list is a record conforming to the [Peer Schema](#pee
 }
 ```
 
-Each object in the `Providers` list is a *write provider record* entry.
+Each object in the `Peers` list is a *write peer record* entry.
 
-Server SHOULD accept writes represented with [Announcement Schema](#announcement-schema)
-objects with `CID` list.
+Server SHOULD accept writes represented with [Announcement Schema](#announcement-schema).
 
 #### `POST` Response codes
 
@@ -396,9 +394,9 @@ The `announcement` schema can be used in `POST` operations to announce content p
 
 - `Schema`: tells the server to interpret the JSON object as announce provider
 - `Payload`: is a DAG-JSON-compatible object with a subset of the below fields
-  - `CID` is the CID being provided.
+  - `CID` is the CID being provided (`/routing/v1/providers` only).
     - This field is not presend when used for `POST /routing/v1/peers`
-  - `Scope` is an optional hint that provides semantic meaning about announced identifies:
+  - `Scope` is an optional hint that provides semantic meaning about CID (`/routing/v1/providers` only):
     - `block` announces only the individual block (this is the implicit default if `Scope` field is not present).
     - `entity` announces CIDs required for enumerating entity behind the CID (e.g.: all blocks for UnixFS file or a minimum set of blocks to enumerate contents of HAMT-sharded UnixFS directory, only top level of directory tree, etc).
     - `recursive` announces entire DAGs behind the CIDs (e.g.: entire DAG-CBOR DAG, or everything in UnixFS directory, including all files in all subdirectories).
@@ -422,11 +420,7 @@ The `announcement` schema can be used in `POST` operations to announce content p
       If support for big keys is needed in the future, this spec can be updated to allow the client to provide the key and key type out-of-band by adding optional `PublicKey` fields, and if the Peer ID is a CID, then the server can verify the public key's authenticity against the CID, and then proceed with the rest of the verification scheme.
   - A [400 Bad Request](https://httpwg.org/specs/rfc9110.html#status.400)  response code SHOULD be returned if the `Signature` check fails.
 
-:::warn
-
-TODO: what should be the  limits? Max number of CIDs per `announcement` ?
-
-:::
+Server SHOULD return HTTP 400 Bad Request when announcement `Payload` serizalized to DAG-CBOR is bigger than 2MiB.
 
 #### Use in POST responses
 
