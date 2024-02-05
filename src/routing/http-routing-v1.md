@@ -4,7 +4,7 @@ description: >
   Delegated routing is a mechanism for IPFS implementations to use for offloading
   content routing, peer routing and naming to another process/server. This specification describes
   an HTTP API for delegated routing of content, peers, and IPNS.
-date: 2023-08-31
+date: 2024-02-05
 maturity: reliable
 editors:
   - name: Gus Eggert
@@ -93,9 +93,9 @@ The client SHOULD be able to make a request with `Accept: application/x-ndjson` 
 
 Each object in the `Providers` list is a record conforming to a schema, usually the [Peer Schema](#peer-schema).
 
-### `PUT /routing/v1/providers`
+### `POST /routing/v1/providers`
 
-#### `PUT` Request Body
+#### `POST` Request Body
 
 ```json
 {
@@ -120,15 +120,14 @@ There SHOULD be no more than 100 `Providers` per request.
 
 :::
 
-#### `PUT` Response codes
+#### `POST` Response codes
 
 - `200` (OK): the server processed the full list of provider records (possibly unsuccessfully, depending on the semantics of the particular records)
 - `400` (Bad Request): the server deems the request to be invalid and cannot process it
 - `422` (Unprocessable Entity): request does not conform to schema or semantic constraints
 - `501` (Not Implemented): the server does not support providing records
 
-
-#### `PUT` Response Body
+#### `POST` Response Body
 
   ```json
   {
@@ -140,7 +139,7 @@ There SHOULD be no more than 100 `Providers` per request.
 
 - `ProvideResults` is a list of results in the same order as the `Providers` in the request, and the schema of each object is determined by the `Protocol` of the corresponding write object
   - Returned list MAY contain entry-specific information such as server-specific TTL, per-entry error message, etc. Fields which are not relevant, can be omitted.
-  - In error scenarios, a client can check for presence of non-empty `Error` field (top level, or per `ProvideResults` entry) to learn about the reason why PUT failed.
+  - In error scenarios, a client can check for presence of non-empty `Error` field (top level, or per `ProvideResults` entry) to learn about the reason why POST failed.
 - The work for processing each provider record should be idempotent so that it can be retried without excessive cost in the case of full or partial failure of the request
 
 ## Peer Routing API
@@ -181,9 +180,9 @@ The client SHOULD be able to make a request with `Accept: application/x-ndjson` 
 
 Each object in the `Peers` list is a record conforming to the [Peer Schema](#peer-schema).
 
-### `PUT /routing/v1/peers`
+### `POST /routing/v1/peers`
 
-#### `PUT` Request Body
+#### `POST` Request Body
 
 ```json
 {
@@ -201,14 +200,14 @@ Each object in the `Providers` list is a *write provider record* entry.
 Server SHOULD accept writes represented with [Announcement Schema](#announcement-schema)
 objects with `CID` list.
 
-#### `PUT` Response codes
+#### `POST` Response codes
 
 - `200` (OK): the server processed the full list of provider records (possibly unsuccessfully, depending on the semantics of the particular records)
 - `400` (Bad Request): the server deems the request to be invalid and cannot process it
 - `422` (Unprocessable Entity): request does not conform to schema or semantic constraints
 - `501` (Not Implemented): the server does not support providing records
 
-#### `PUT` Response Body
+#### `POST` Response Body
 
   ```json
   {
@@ -220,13 +219,13 @@ objects with `CID` list.
 
 - `ProvideResults` is a list of results in the same order as the `Providers` in the request, and the schema of each object is determined by the `Protocol` of the corresponding write object
   - Returned list MAY contain entry-specific information such as server-specific TTL, per-entry error message, etc. Fields which are not relevant, can be omitted.
-  - In error scenarios, a client can check for presence of non-empty `Error` field (top level, or per `ProvideResults` entry) to learn about the reason why PUT failed.
+  - In error scenarios, a client can check for presence of non-empty `Error` field (top level, or per `ProvideResults` entry) to learn about the reason why POST failed.
 - The work for processing each provider record should be idempotent so that it can be retried without excessive cost in the case of full or partial failure of the request
 
-#### `PUT` Response Status Codes
+#### `POST` Response Status Codes
 
 - `200` (OK): processed - inspect response to see if there are any `Error` results.
-- `400` (Bad Request): unable to process PUT request, make sure JSON schema and values are correct.
+- `400` (Bad Request): unable to process POST request, make sure JSON schema and values are correct.
 
 ## IPNS API
 
@@ -322,7 +321,7 @@ limits, allowing every site to query the API for results:
 
 ```plaintext
 Access-Control-Allow-Origin: *
-Access-Control-Allow-Methods: GET, PUT, OPTIONS
+Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS
 ```
 
 ## Known Schemas
@@ -376,7 +375,7 @@ the case, the field MUST be ignored.
 
 ### Announcement Schema
 
-The `announcement` schema can be used in `PUT` operations to announce content providers or peer routing information.
+The `announcement` schema can be used in `POST` operations to announce content providers or peer routing information.
 
 ```json
   {
@@ -398,7 +397,7 @@ The `announcement` schema can be used in `PUT` operations to announce content pr
 - `Schema`: tells the server to interpret the JSON object as announce provider
 - `Payload`: is a DAG-JSON-compatible object with a subset of the below fields
   - `CID` is the CID being provided.
-    - This field is not presend when used for `PUT /routing/v1/peers`
+    - This field is not presend when used for `POST /routing/v1/peers`
   - `Scope` is an optional hint that provides semantic meaning about announced identifies:
     - `block` announces only the individual block (this is the implicit default if `Scope` field is not present).
     - `entity` announces CIDs required for enumerating entity behind the CID (e.g.: all blocks for UnixFS file or a minimum set of blocks to enumerate contents of HAMT-sharded UnixFS directory, only top level of directory tree, etc).
@@ -413,7 +412,7 @@ The `announcement` schema can be used in `PUT` operations to announce content pr
 - `Signature` is a string with multibase-encoded binary signature that provides integrity and authenticity of the `Payload` field.
   - Signature is created by following below steps:
     1. Convert `Payload` to deterministic, ordered [DAG-JSON](https://ipld.io/specs/codecs/dag-json/spec/) map notation
-    2. Prefix the DAG-JSON bytes with ASCII string `PUT /routing/v1 announcement:`
+    2. Prefix the DAG-JSON bytes with ASCII string `POST /routing/v1 announcement:`
     3. Sign the bytes with the private key of the Peer ID specified in the `Payload.ID`.
        - Signing details for specific key types should follow [libp2p/peerid specs](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#key-types), unless stated otherwise.
   - Client SHOULD sign every announcement.
@@ -429,7 +428,7 @@ TODO: what should be the  limits? Max number of CIDs per `announcement` ?
 
 :::
 
-#### Use in PUT responses
+#### Use in POST responses
 
 Server MAY return additional TTL information if the TTL is not provided in the request,
 or if server policy is to provide TTL different than the requested one.
