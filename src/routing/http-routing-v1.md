@@ -463,6 +463,18 @@ or if server policy is to provide TTL different than the requested one.
   - If greater than the `TTL` in the request, then the server client SHOULD save resources and not repeat announcement until the announcement TTL expires and is forgotten by the routing system
   - If `0`, the server makes no claims about the lifetime of the record
 
+### Error Schema
+
+The `error` schema SHOULD be used in POST and PUT responses to indicate errors related to specific announcement record.
+
+```json
+{
+  "Schema": "error",
+  "Error": "Invalid signature",
+  ...
+}
+```
+
 ### Legacy Schemas
 
 Legacy schemas include `ID` and optional `Addrs` list just like
