@@ -136,7 +136,7 @@ server SHOULD be no more than 100 `Providers` per `application/json` response.
   }
   ```
 
-- `ProvideResults` is a list of results in the same order as the `Providers` in the request, and the schema of each object is determined by the `Protocol` of the corresponding write object
+- `ProvideResults` is a list of results in the same order as the `Providers` in the request, and the schema of each object is determined by the `Schema` of the corresponding write object
   - Returned list MAY contain entry-specific information such as server-specific TTL, per-entry error message, etc. Fields which are not relevant, can be omitted.
   - In error scenarios, a client can check for presence of non-empty `Error` field (top level, or per `ProvideResults` entry) to learn about the reason why POST failed.
 - The work for processing each provider record should be idempotent so that it can be retried without excessive cost in the case of full or partial failure of the request
@@ -209,13 +209,13 @@ Server SHOULD accept writes represented with [Announcement Schema](#announcement
 
   ```json
   {
-      "ProvideResults": [
+      "PeersResults": [
           { ... }
       ]
   }
   ```
 
-- `ProvideResults` is a list of results in the same order as the `Providers` in the request, and the schema of each object is determined by the `Protocol` of the corresponding write object
+- `PeersResults` is a list of results in the same order as the `Peers` in the request, and the schema of each object is determined by the `Schema` of the corresponding write object
   - Returned list MAY contain entry-specific information such as server-specific TTL, per-entry error message, etc. Fields which are not relevant, can be omitted.
   - In error scenarios, a client can check for presence of non-empty `Error` field (top level, or per `ProvideResults` entry) to learn about the reason why POST failed.
 - The work for processing each provider record should be idempotent so that it can be retried without excessive cost in the case of full or partial failure of the request
@@ -392,7 +392,8 @@ The `announcement` schema can be used in `POST` operations to announce content p
   }
 ```
 
-- `Schema`: tells the server to interpret the JSON object as announce provider
+#### Announcement Payload
+
 - `Payload`: is a map object with a subset of the below fields.
   - `CID` is a string with multibase-encoded CID being provided (`/routing/v1/providers` only).
     - This field is not present when used for `POST /routing/v1/peers`
@@ -400,28 +401,48 @@ The `announcement` schema can be used in `POST` operations to announce content p
     - `block` announces only the individual block (this is the implicit default if `Scope` field is not present).
     - `entity` announces CIDs required for enumerating entity behind the CID (e.g.: all blocks for UnixFS file or a minimum set of blocks to enumerate contents of HAMT-sharded UnixFS directory, only top level of directory tree, etc).
     - `recursive` announces entire DAGs behind the CIDs (e.g.: entire DAG-CBOR DAG, or everything in UnixFS directory, including all files in all subdirectories).
+
   - `Timestamp` is the current time, formatted as an ASCII string that follows notation from [rfc3339](https://specs.ipfs.tech/ipns/ipns-record/#ref-rfc3339).
+
   - `TTL` is caching and expiration hint informing the server how long to keep the record available, specified as integer in milliseconds.
     - If this value is unknown, the caller may skip this field or set it to 0. The server's default will be used.
+
   - `ID` is a multibase-encoded Peer ID of the node that provides the content and also indicates the `libp2p-key` that SHOULD be used for verifying `Signature` field.
+    - ED25519 and other small public keys MUST be inlined inside of the `ID` field
+      with the identity multihash type.
+    - Key types that exceed 42 bytes (e.g. RSA) SHOULD NOT be inlined, the `ID`
+      field should only include the multihash of the key. The key itself SHOULD be
+      obtained out-of-band (e.g. by fetching the block via IPFS) and cached to
+      reduce the size of the signed `Payload`.
+
+      If support for big keys is needed in
+      the future, this spec can be updated to allow the client to provide the key
+      and key type out-of-band by adding optional `PublicKey` fields, and if the
+      Peer ID is a CID, then the server can verify the public key's authenticity
+      against the CID, and then proceed with the rest of the verification scheme.
+
   - `Addrs` (optional) is an a list of string-encoded multiaddrs without `/p2p/peerID` suffix.
+
   - `Protocols` (optional) is a list of strings with protocols supported by `ID` and/or `Addrs`, if known upfront.
+
   - `Metadata` (optional) is a string with multibase-encoded binary metadata that should be passed as-is
+
+#### Announcement Signature
+
 - `Signature` is a string with multibase-encoded binary signature that provides integrity and authenticity of the `Payload` field.
+
   - Signature is created by following below steps:
-    1. Convert `Payload` to deterministic, ordered [DAG-JSON](https://ipld.io/specs/codecs/dag-json/spec/) map notation
-    2. Prefix the DAG-JSON bytes with ASCII string `POST /routing/v1 announcement:`
+    1. Convert `Payload` JSON to deterministic, ordered [DAG-CBOR](https://ipld.io/specs/codecs/dag-cbor/spec/) map notation
+       - Specification intention here is to use similar signature normalization as with DAG-CBOR `Data` field in IPNS Records, allowing for partial code and dependency reuse.
+    2. Prefix the DAG-CBOR bytes with ASCII string `routing-record:`
     3. Sign the bytes with the private key of the Peer ID specified in the `Payload.ID`.
        - Signing details for specific key types should follow [libp2p/peerid specs](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#key-types), unless stated otherwise.
+
   - Client SHOULD sign every announcement.
   - Servers SHOULD verify signature before accepting a record, unless running in a trusted environment.
-    - ED25519 and other small public keys MUST be inlined inside of the `ID` field with the identity multihash type.
-    - Key types that exceed 42 bytes (e.g. RSA) SHOULD NOT be inlined, the `ID` field should only include the multihash of the key. The key itself SHOULD be obtained out-of-band (e.g. by fetching the block via IPFS) and cached.
-      If support for big keys is needed in the future, this spec can be updated to allow the client to provide the key and key type out-of-band by adding optional `PublicKey` fields, and if the Peer ID is a CID, then the server can verify the public key's authenticity against the CID, and then proceed with the rest of the verification scheme.
-
-A [400 Bad Request](https://httpwg.org/specs/rfc9110.html#status.400)  response code SHOULD be returned if either
-- `Signature` is not valid
-- `Payload` serialized to DAG-CBOR is bigger than 2MiB
+  - A [400 Bad Request](https://httpwg.org/specs/rfc9110.html#status.400)  response code SHOULD be returned if (in order):
+    - `Payload` serialized to DAG-CBOR is bigger than 2MiB
+    - `Signature` is not valid
 
 #### Use in POST responses
 
