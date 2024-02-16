@@ -88,6 +88,15 @@ Below response types SHOULD be supported:
 A Gateway SHOULD return HTTP 400 Bad Request when running in strict trustless
 mode (no deserialized responses) and `Accept` header is missing.
 
+### `Ipfs-Path-Affinity` (request header)
+
+Optional content routing hint for the server. Indicates that the requested
+resource is a subset of a bigger DAG.
+
+A Client SHOULD use it to send a relevant parent content path when:
+- fetching a big file block by block (`application/vnd.ipld.raw`)
+- parallelizing DAG download by fetching each branch sub-DAG as a CAR (`application/vnd.ipld.car`)
+
 ## Request Query Parameters
 
 ### :dfn[dag-scope] (request query parameter)
