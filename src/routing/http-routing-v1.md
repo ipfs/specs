@@ -215,7 +215,7 @@ Server SHOULD accept writes represented with [Announcement Schema](#announcement
   }
   ```
 
-- `PeersResults` is a list of results in the same order as the `Peers` in the request, and the schema of each object is determined by the `Schema` of the corresponding write object
+- `PeersResults` is a list of results in the same order as the `Peers` in the request, and the schema of each object is determined by the `Schema` of the corresponding write object:
   - Returned list MAY contain entry-specific information such as server-specific TTL, per-entry error message, etc. Fields which are not relevant, can be omitted.
   - In error scenarios, a client can check for presence of non-empty `Error` field (top level, or per `ProvideResults` entry) to learn about the reason why POST failed.
 - The work for processing each provider record should be idempotent so that it can be retried without excessive cost in the case of full or partial failure of the request
@@ -444,36 +444,24 @@ The `announcement` schema can be used in `POST` operations to announce content p
     - `Payload` serialized to DAG-CBOR is bigger than 2MiB
     - `Signature` is not valid
 
-#### Use in POST responses
+### Announcement Response Schema
 
-Server MAY return additional TTL information if the TTL is not provided in the request,
-or if server policy is to provide TTL different than the requested one.
+The `announcement-response` schema can be used as `POST` responses when announcing content providers or peer routing information. This schema allows the server to return additional TTL information if the TTL is not provided in the request, or if the server policy is to provide TTL different than the requested one.
 
 ```json
 {
-  "Schema": "announcement",
-  "Payload": {
-    "TTL": 17280000
-  }
+  "Schema": "announcement-response",
+  "Error": "error in case there was error",
+  "TTL": 17280000
 }
 ```
+
+- `Error` is a string representing the error that might have happened when announcing.
 
 - `TTL` in response is the time at which the server expects itself to drop the record
   - If less than the `TTL` in the request, then the client SHOULD repeat announcement earlier, before the announcement TTL expires and is forgotten by the routing system
   - If greater than the `TTL` in the request, then the server client SHOULD save resources and not repeat announcement until the announcement TTL expires and is forgotten by the routing system
   - If `0`, the server makes no claims about the lifetime of the record
-
-### Error Schema
-
-The `error` schema SHOULD be used in POST and PUT responses to indicate errors related to specific announcement record.
-
-```json
-{
-  "Schema": "error",
-  "Error": "Invalid signature",
-  ...
-}
-```
 
 ### Legacy Schemas
 
