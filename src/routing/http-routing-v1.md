@@ -4,7 +4,7 @@ description: >
   Delegated routing is a mechanism for IPFS implementations to use for offloading
   content routing, peer routing and naming to another process/server. This specification describes
   an HTTP API for delegated routing of content, peers, and IPNS.
-date: 2023-08-31
+date: 2024-02-05
 maturity: reliable
 editors:
   - name: Gus Eggert
@@ -61,17 +61,17 @@ This API uses a standard version prefix in the path, such as `/v1/...`. If a bac
 
 ### `GET /routing/v1/providers/{cid}`
 
-#### Path Parameters
+#### `GET` Path Parameters
 
 - `cid` is the [CID](https://github.com/multiformats/cid) to fetch provider records for.
 
-#### Response Status Codes
+#### `GET` Response Status Codes
 
 - `200` (OK): the response body contains 0 or more records.
 - `404` (Not Found): must be returned if no matching records are found.
 - `422` (Unprocessable Entity): request does not conform to schema or semantic constraints.
 
-#### Response Body
+#### `GET` Response Body
 
 ```json
 {
@@ -92,6 +92,54 @@ The `application/json` responses SHOULD be limited to 100 providers.
 The client SHOULD be able to make a request with `Accept: application/x-ndjson` and get a [stream](#streaming) with more results.
 
 Each object in the `Providers` list is a record conforming to a schema, usually the [Peer Schema](#peer-schema).
+
+### `POST /routing/v1/providers`
+
+#### `POST` Request Body
+
+```json
+{
+  "Providers": [
+    {
+      "Schema": "announcement",
+      ...
+    }
+  ]
+}
+```
+
+Each object in the `Providers` list is a *write provider record* entry.
+
+Server SHOULD accept  representing writes is [Announcement Schema](#announcement-schema).
+
+:::warn
+
+Since non-streaming results have to be buffered before sending,
+server SHOULD be no more than 100 `Providers` per `application/json` response.
+
+:::
+
+#### `POST` Response Status Codes
+
+- `200` (OK): the server processed the full list of provider records (possibly unsuccessfully, depending on the semantics of the particular records)
+- `400` (Bad Request): the server deems the request to be invalid and cannot process it
+- `422` (Unprocessable Entity): request does not conform to schema or semantic constraints
+- `501` (Not Implemented): the server does not support providing records
+
+#### `POST` Response Body
+
+  ```json
+  {
+      "ProvideResults": [
+          { ... }
+      ]
+  }
+  ```
+
+- `ProvideResults` is a list of results in the same order as the `Providers` in the request, and the schema of each object is determined by the `Schema` of the corresponding write object
+  - Returned list MAY contain entry-specific information such as server-specific TTL, per-entry error message, etc. Fields which are not relevant, can be omitted.
+  - In error scenarios, a client can check for presence of non-empty `Error` field (top level, or per `ProvideResults` entry) to learn about the reason why POST failed.
+- The work for processing each provider record should be idempotent so that it can be retried without excessive cost in the case of full or partial failure of the request
 
 ## Peer Routing API
 
@@ -114,10 +162,10 @@ represented as a CIDv1 encoded with `libp2p-key` codec.
 {
   "Peers": [
     {
-      "Schema": "<schema>",
-      "Protocols": ["<protocol-a>", "<protocol-b>", ...],
+      "Schema": "peer",
       "ID": "bafz...",
       "Addrs": ["/ip4/..."],
+      "Protocols": ["<protocol-a>", "<protocol-b>", ...],
       ...
     },
     ...
@@ -130,6 +178,52 @@ The `application/json` responses SHOULD be limited to 100 peers.
 The client SHOULD be able to make a request with `Accept: application/x-ndjson` and get a [stream](#streaming) with more results.
 
 Each object in the `Peers` list is a record conforming to the [Peer Schema](#peer-schema).
+
+### `POST /routing/v1/peers`
+
+#### `POST` Request Body
+
+```json
+{
+  "Peers": [
+    {
+      "Schema": "announcement",
+      ...
+    }
+  ]
+}
+```
+
+Each object in the `Peers` list is a *write peer record* entry.
+
+Server SHOULD accept writes represented with [Announcement Schema](#announcement-schema).
+
+#### `POST` Response Status Codes
+
+- `200` (OK): the server processed the full list of provider records (possibly unsuccessfully, depending on the semantics of the particular records)
+- `400` (Bad Request): the server deems the request to be invalid and cannot process it
+- `422` (Unprocessable Entity): request does not conform to schema or semantic constraints
+- `501` (Not Implemented): the server does not support providing records
+
+#### `POST` Response Body
+
+  ```json
+  {
+      "PeersResults": [
+          { ... }
+      ]
+  }
+  ```
+
+- `PeersResults` is a list of results in the same order as the `Peers` in the request, and the schema of each object is determined by the `Schema` of the corresponding write object:
+  - Returned list MAY contain entry-specific information such as server-specific TTL, per-entry error message, etc. Fields which are not relevant, can be omitted.
+  - In error scenarios, a client can check for presence of non-empty `Error` field (top level, or per `ProvideResults` entry) to learn about the reason why POST failed.
+- The work for processing each provider record should be idempotent so that it can be retried without excessive cost in the case of full or partial failure of the request
+
+#### `POST` Response Status Codes
+
+- `200` (OK): processed - inspect response to see if there are any `Error` results.
+- `400` (Bad Request): unable to process POST request, make sure JSON schema and values are correct.
 
 ## IPNS API
 
@@ -225,7 +319,7 @@ limits, allowing every site to query the API for results:
 
 ```plaintext
 Access-Control-Allow-Origin: *
-Access-Control-Allow-Methods: GET, OPTIONS
+Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS
 ```
 
 ## Known Schemas
@@ -276,6 +370,98 @@ the case, the field MUST be ignored.
 ```
 
 :::
+
+### Announcement Schema
+
+The `announcement` schema can be used in `POST` operations to announce content providers or peer routing information.
+
+```json
+  {
+    "Schema": "announcement",
+    "Payload": {
+      "CID": "bafy..cid",
+      "Scope": "block",
+      "Timestamp": "YYYY-MM-DDT23:59:59Z",
+      "TTL": 0,
+      "ID": "12D3K...",
+      "Addrs": ["/ip4/...", ...],
+      "Protocols": ["foo", ...],
+      "Metadata": "mbase64-blob",
+    },
+    "Signature": "mbase64-signature"
+  }
+```
+
+#### Announcement Payload
+
+- `Payload`: is a map object with a subset of the below fields.
+  - `CID` is a string with multibase-encoded CID being provided (`/routing/v1/providers` only).
+    - This field is not present when used for `POST /routing/v1/peers`
+  - `Scope` (optional) is a string hint that provides semantic meaning about CID (`/routing/v1/providers` only):
+    - `block` announces only the individual block (this is the implicit default if `Scope` field is not present).
+    - `entity` announces CIDs required for enumerating entity behind the CID (e.g.: all blocks for UnixFS file or a minimum set of blocks to enumerate contents of HAMT-sharded UnixFS directory, only top level of directory tree, etc).
+    - `recursive` announces entire DAGs behind the CIDs (e.g.: entire DAG-CBOR DAG, or everything in UnixFS directory, including all files in all subdirectories).
+
+  - `Timestamp` is the current time, formatted as an ASCII string that follows notation from [rfc3339](https://specs.ipfs.tech/ipns/ipns-record/#ref-rfc3339).
+
+  - `TTL` is caching and expiration hint informing the server how long to keep the record available, specified as integer in milliseconds.
+    - If this value is unknown, the caller may skip this field or set it to 0. The server's default will be used.
+
+  - `ID` is a multibase-encoded Peer ID of the node that provides the content and also indicates the `libp2p-key` that SHOULD be used for verifying `Signature` field.
+    - ED25519 and other small public keys MUST be inlined inside of the `ID` field
+      with the identity multihash type.
+    - Key types that exceed 42 bytes (e.g. RSA) SHOULD NOT be inlined, the `ID`
+      field should only include the multihash of the key. The key itself SHOULD be
+      obtained out-of-band (e.g. by fetching the block via IPFS) and cached to
+      reduce the size of the signed `Payload`.
+
+      If support for big keys is needed in
+      the future, this spec can be updated to allow the client to provide the key
+      and key type out-of-band by adding optional `PublicKey` fields, and if the
+      Peer ID is a CID, then the server can verify the public key's authenticity
+      against the CID, and then proceed with the rest of the verification scheme.
+
+  - `Addrs` (optional) is an a list of string-encoded multiaddrs without `/p2p/peerID` suffix.
+
+  - `Protocols` (optional) is a list of strings with protocols supported by `ID` and/or `Addrs`, if known upfront.
+
+  - `Metadata` (optional) is a string with multibase-encoded binary metadata that should be passed as-is
+
+#### Announcement Signature
+
+- `Signature` is a string with multibase-encoded binary signature that provides integrity and authenticity of the `Payload` field.
+
+  - Signature is created by following below steps:
+    1. Convert `Payload` JSON to deterministic, ordered [DAG-CBOR](https://ipld.io/specs/codecs/dag-cbor/spec/) map notation
+       - Specification intention here is to use similar signature normalization as with DAG-CBOR `Data` field in IPNS Records, allowing for partial code and dependency reuse.
+    2. Prefix the DAG-CBOR bytes with ASCII string `routing-record:`
+    3. Sign the bytes with the private key of the Peer ID specified in the `Payload.ID`.
+       - Signing details for specific key types should follow [libp2p/peerid specs](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#key-types), unless stated otherwise.
+
+  - Client SHOULD sign every announcement.
+  - Servers SHOULD verify signature before accepting a record, unless running in a trusted environment.
+  - A [400 Bad Request](https://httpwg.org/specs/rfc9110.html#status.400)  response code SHOULD be returned if (in order):
+    - `Payload` serialized to DAG-CBOR is bigger than 2MiB
+    - `Signature` is not valid
+
+### Announcement Response Schema
+
+The `announcement-response` schema can be used as `POST` responses when announcing content providers or peer routing information. This schema allows the server to return additional TTL information if the TTL is not provided in the request, or if the server policy is to provide TTL different than the requested one.
+
+```json
+{
+  "Schema": "announcement-response",
+  "Error": "error in case there was error",
+  "TTL": 17280000
+}
+```
+
+- `Error` is a string representing the error that might have happened when announcing.
+
+- `TTL` in response is the time at which the server expects itself to drop the record
+  - If less than the `TTL` in the request, then the client SHOULD repeat announcement earlier, before the announcement TTL expires and is forgotten by the routing system
+  - If greater than the `TTL` in the request, then the server client SHOULD save resources and not repeat announcement until the announcement TTL expires and is forgotten by the routing system
+  - If `0`, the server makes no claims about the lifetime of the record
 
 ### Legacy Schemas
 
