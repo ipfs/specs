@@ -524,10 +524,10 @@ without the trailing `/`, for example:
  (no trailing slash) MUST be HTTP 301 redirect with
   `Location: /ipns/en.wikipedia-on-ipfs.org/wiki/`
 
-This normalization is required for directory-based relative links 
+This normalization is required for directory-based relative links
 and security scopes such as Service Worker registrations to work correctly.
 It also ensures the same behavior on path gateways (`https://example.com/ipfs/cid/` with trailing `/`)
-and origin-isolated HTTP contexts `https://cid.ipfs.dweb.link` 
+and origin-isolated HTTP contexts `https://cid.ipfs.dweb.link`
 or non-HTTP URLs like `ipfs://cid`, where empty path component is implicit `/`.
 
 ### `X-Ipfs-Path` (response header)
