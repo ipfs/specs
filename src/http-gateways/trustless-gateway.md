@@ -80,7 +80,8 @@ Below response types SHOULD be supported:
 - [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car)
   - Disables IPLD/IPFS deserialization, requests a verifiable CAR stream to be
     returned, implementations MAY support optional CAR content type parameters
-    (:cite[ipip-0412]) and the explicit [CAR format signaling in HTTP Request](#car-format-signaling-in-request).
+    (:cite[ipip-0412]), the explicit [CAR format signaling in HTTP Request](#car-format-signaling-in-request)
+    and the optional [metadata block](#meta-content-type-parameter).
 
 - [application/vnd.ipfs.ipns-record](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record)
   - A verifiable :cite[ipns-record] (multicodec `0x0300`).
@@ -300,6 +301,112 @@ A Gateway MUST NOT include virtual blocks identified by identity CIDs
 of their presence in the DAG or the value assigned to the "dups" parameter, as
 the raw data is already present in the parent block that links to the identity
 CID.
+
+## `meta` (content type parameter)
+
+The `meta` parameter allows clients to request the server to include additional metadata about the CAR along with the response body.
+
+The value of this parameter includes both the location where the metadata is given (e.g. `eof`) as well as the type of data received (e.g. `json`) separated by a `+`, to give a value such as `meta=eof+json`
+
+When the location parameter is set to `eof`, which is currently the only supported value, the server SHOULD respond with the following response body:
+
+```
+<Response body as CARv1 stream> <0x00 byte> <Metadata>
+```
+
+The only supported value for the data type parameter is `json`. This signifies that the metadata MUST be a JSON object.
+
+This parameter MUST only be used with CAR `version=1`.
+
+When the parameter is not set or does not equal `eof+json`, the server SHOULD not add any extra blocks to the response, neither the 0x00 byte nor any metadata.
+
+When `meta=eof+json`, the JSON object SHOULD conform to the following [JSON schema](https://json-schema.org/).
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "object",
+      "description": "Properties of the response"
+    },
+    "error": {
+      "type": "string",
+      "description": "Error message"
+    },
+    "sig": {
+      "type": "string",
+      "description": "A signature, using the server's Ed2559 identity, over the `data` object serialized as JSON."
+    },
+    "required": []
+  }
+}
+```
+
+The properties object can include any fields that the server would like to implement. The following JSON schema explicitly mentions certain properties fields in order to reach a convention on their definition as they have existing use cases.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "car_bytes": {
+      "description": "The total byte length of the CAR stream (excluding the 0x00 byte and the metadata block)",
+      "type": "integer"
+    },
+    "data_bytes": {
+      "description": "Total byte length of the flat file before it was encoded into a CAR file",
+      "type": "integer"
+    },
+    "block_count": {
+      "description": "Total number of blocks present in the CAR stream (excluding the 0x00 byte and the metadata block, but including duplicates when present)",
+      "type": "integer"
+    },
+    "car_cid": {
+      "description": "A hash of the CAR stream giving a CIDv1 with 0x0202 codec",
+      "type": "string"
+    },
+    "b3checksum": {
+      "description": "A Blake3 hash (checksum) of the CAR stream (excluding the 0x00 byte and the metadata block). The value should be serialized as a multihash with multibase prefix, preferably using Base58 encoding.",
+      "type": "string"
+    },
+    "content_path": {
+      "description": "The url path in the request as executed by the gateway, e.g. `/ipfs/bafy1234/cat.jpg`. The query string MUST BE stripped from the path.",
+      "type": "string"
+    },
+    "dag_params": {
+      "description": "A map with DAG params like dag-scope, entity-bytes from [IPIP-402](https://specs.ipfs.tech/ipips/ipip-0402/)",
+      "type": "object",
+      "properties": {
+        "dag-scope": {
+          "description": "See [IPIP-402](https://specs.ipfs.tech/ipips/ipip-0402/) for the definition",
+          "type": "string"
+        },
+        "entity-bytes": {
+          "description": "See [IPIP-402](https://specs.ipfs.tech/ipips/ipip-0402/) for the definition",
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "car_params": {
+      "description": "A map with CAR content type params like order and dups from [IPIP-412](https://specs.ipfs.tech/ipips/ipip-0412/)",
+      "type": "object",
+      "properties": {
+        "order": {
+          "description": "See [IPIP-412](https://specs.ipfs.tech/ipips/ipip-0412/) for the definition.",
+          "type": "string"
+        },
+        "dups": {
+          "description": "See [IPIP-412](https://specs.ipfs.tech/ipips/ipip-0412/) for the definition.",
+          "type": "string"
+        }
+      },
+      "required": []
+    }
+  },
+  "required": []
+}
+```
 
 ## CAR format parameters and determinism
 
