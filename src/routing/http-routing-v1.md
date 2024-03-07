@@ -71,6 +71,13 @@ This API uses a standard version prefix in the path, such as `/v1/...`. If a bac
 - `404` (Not Found): must be returned if no matching records are found.
 - `422` (Unprocessable Entity): request does not conform to schema or semantic constraints.
 
+#### Response Headers
+
+- `Content-Type`: the content type of this response, which MUST be `application/json` or `application/x-ndjson` (see [streaming](#streaming)).
+- `Last-Modified`: the timestamp of the resolution.
+- `Cache-Control: public, max-age={TTL}`: cache TTL returned with the response. When present, it SHOULD be short for responses that do whose resolution ended in no results (e.g. 15 seconds), and MAY be longer for responses that have results (e.g. 5 minutes).
+- `Vary: Accept`: allows intermediate caches to play nicely with the different possible content types.
+
 #### Response Body
 
 ```json
@@ -107,6 +114,13 @@ represented as a CIDv1 encoded with `libp2p-key` codec.
 - `200` (OK): the response body contains the peer record.
 - `404` (Not Found): must be returned if no matching records are found.
 - `422` (Unprocessable Entity): request does not conform to schema or semantic constraints.
+
+#### Response Headers
+
+- `Content-Type`: the content type of this response, which MUST be `application/json` or `application/x-ndjson` (see [streaming](#streaming)).
+- `Last-Modified`: the timestamp of the resolution.
+- `Cache-Control: public, max-age={TTL}`: cache TTL returned with the response. When present, it SHOULD be short for responses that do whose resolution ended in no results (e.g. 15 seconds), and MAY be longer for responses that have results (e.g. 5 minutes).
+- `Vary: Accept`: allows intermediate caches to play nicely with the different possible content types.
 
 #### Response Body
 
@@ -148,7 +162,9 @@ Each object in the `Peers` list is a record conforming to the [Peer Schema](#pee
 #### Response Headers
 
 - `Etag`: a globally unique opaque string used for HTTP caching. MUST be derived from the protobuf record returned in the body.
-- `Cache-Control: max-age={TTL}`: cache TTL returned with :ref[IPNS Record] that has `IpnsEntry.data[TTL] > 0`. When present, SHOULD match the TTL value from the record. When record was not found (HTTP 404) or has no TTL (value is `0`), implementation SHOULD default to `max-age=60`.
+- `Cache-Control: public, max-age={TTL}`: cache TTL returned with :ref[IPNS Record] that has `IpnsEntry.data[TTL] > 0`. When present, SHOULD match the TTL value from the record. When record was not found (HTTP 404) or has no TTL (value is `0`), implementation SHOULD default to `max-age=60`. Implementations MAY also include other derivatives, such as `stale-while-revalidate` and `stale-if-error`.
+- `Expires: {SIGNATURE_EXPIRATION}`: header with time when the signature expires.
+- `Last-Modified`: with the timestamp of the resolution.
 
 #### Response Body
 
