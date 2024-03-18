@@ -75,7 +75,7 @@ This API uses a standard version prefix in the path, such as `/v1/...`. If a bac
 
 - `Content-Type`: the content type of this response, which MUST be `application/json` or `application/x-ndjson` (see [streaming](#streaming)).
 - `Last-Modified`: the timestamp of the resolution.
-- `Cache-Control: public, max-age={TTL}`: cache TTL returned with the response. When present, it SHOULD be short for responses that do whose resolution ended in no results (e.g. 15 seconds), and MAY be longer for responses that have results (e.g. 5 minutes).
+- `Cache-Control: public, max-age={TTL}`: cache TTL returned with the response. When present, it SHOULD be short for responses whose resolution ended in no results (e.g. 15 seconds), and MAY be longer for responses that have results (e.g. 5 minutes).
 - `Vary: Accept`: allows intermediate caches to play nicely with the different possible content types.
 
 #### Response Body
@@ -119,7 +119,7 @@ represented as a CIDv1 encoded with `libp2p-key` codec.
 
 - `Content-Type`: the content type of this response, which MUST be `application/json` or `application/x-ndjson` (see [streaming](#streaming)).
 - `Last-Modified`: the timestamp of the resolution.
-- `Cache-Control: public, max-age={TTL}`: cache TTL returned with the response. When present, it SHOULD be short for responses that do whose resolution ended in no results (e.g. 15 seconds), and MAY be longer for responses that have results (e.g. 5 minutes).
+- `Cache-Control: public, max-age={TTL}`: cache TTL returned with the response. When present, it SHOULD be short for responses whose resolution ended in no results (e.g. 15 seconds), and MAY be longer for responses that have results (e.g. 5 minutes).
 - `Vary: Accept`: allows intermediate caches to play nicely with the different possible content types.
 
 #### Response Body
