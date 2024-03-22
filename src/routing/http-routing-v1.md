@@ -74,7 +74,7 @@ This API uses a standard version prefix in the path, such as `/v1/...`. If a bac
 #### Response Headers
 
 - `Content-Type`: the content type of this response, which MUST be `application/json` or `application/x-ndjson` (see [streaming](#streaming)).
-- `Last-Modified`: the timestamp of the resolution, allowing CDNs and load balancers to support inexpensive update checks via `If-Modified-Since`
+- `Last-Modified`: an HTTP-date timestamp ([RFC9110, Section 5.6.7](https://www.rfc-editor.org/rfc/rfc9110#section-5.6.7)) of the resolution, allowing HTTP proxies and CDNs to support inexpensive update checks via `If-Modified-Since`
 - `Cache-Control: public, max-age={ttl}, public, stale-while-revalidate={max-ttl}, stale-if-error={max-ttl}`: meaningful cache TTL returned with the response.
   - The `max-age` SHOULD be shorter for responses whose resolution ended in no results (e.g. 15 seconds),
     and longer for responses that have results (e.g. 5 minutes).
@@ -122,7 +122,7 @@ represented as a CIDv1 encoded with `libp2p-key` codec.
 #### Response Headers
 
 - `Content-Type`: the content type of this response, which MUST be `application/json` or `application/x-ndjson` (see [streaming](#streaming)).
-- `Last-Modified`: the timestamp of the resolution, allowing CDNs and load balancers to support inexpensive update checks via `If-Modified-Since`
+- `Last-Modified`: an HTTP-date timestamp ([RFC9110, Section 5.6.7](https://www.rfc-editor.org/rfc/rfc9110#section-5.6.7)) of the resolution, allowing HTTP proxies and CDNs to support inexpensive update checks via `If-Modified-Since`
 - `Cache-Control: public, max-age={ttl}, public, stale-while-revalidate={max-ttl}, stale-if-error={max-ttl}`: meaningful cache TTL returned with the response.
   - When present, `ttl` SHOULD be shorter for responses whose resolution ended in no results (e.g. 15 seconds),
     and longer for responses that have results (e.g. 5 minutes).
@@ -173,8 +173,8 @@ Each object in the `Peers` list is a record conforming to the [Peer Schema](#pee
 - `Cache-Control: public, max-age={ttl}, public, stale-while-revalidate={sig-ttl}, stale-if-error={sig-ttl}`: meaningful cache TTL returned with :ref[IPNS Record]
   - The `max-age` value in seconds SHOULD match duration from `IpnsEntry.data[TTL]`, if present and bigger than `0`. Otherwise, implementation SHOULD default to `max-age=60`.
   - Implementations SHOULD include `sig-ttl`, set to the remaining number of seconds the returned IPNS Record is valid.
-- `Expires: {SIGNATURE_EXPIRATION}`: header with time when the signature expires.
-- `Last-Modified`: the timestamp of cacheable resolution, allowing CDNs and load balancers to support inexpensive update checks via `If-Modified-Since`
+- `Expires:`: an HTTP-date timestamp ([RFC9110, Section 5.6.7](https://www.rfc-editor.org/rfc/rfc9110#section-5.6.7)) when the validity of IPNS Record expires (if `ValidityType=0`, when signature expires)
+- `Last-Modified`: an HTTP-date timestamp of when cacheable resolution occured: allows HTTP proxies and CDNs to support inexpensive update checks via `If-Modified-Since`
 - `Vary: Accept`: allows intermediate caches to play nicely with the different possible content types.
 
 #### Response Body
