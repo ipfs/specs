@@ -4,7 +4,7 @@ description: >
   Delegated routing is a mechanism for IPFS implementations to use for offloading
   content routing, peer routing and naming to another process/server. This specification describes
   an HTTP API for delegated routing of content, peers, and IPNS.
-date: 2023-08-31
+date: 2024-03-22
 maturity: reliable
 editors:
   - name: Gus Eggert
@@ -74,8 +74,12 @@ This API uses a standard version prefix in the path, such as `/v1/...`. If a bac
 #### Response Headers
 
 - `Content-Type`: the content type of this response, which MUST be `application/json` or `application/x-ndjson` (see [streaming](#streaming)).
-- `Last-Modified`: the timestamp of the resolution.
-- `Cache-Control: public, max-age={TTL}`: cache TTL returned with the response. When present, it SHOULD be short for responses whose resolution ended in no results (e.g. 15 seconds), and MAY be longer for responses that have results (e.g. 5 minutes).
+- `Last-Modified`: the timestamp of the resolution, allowing CDNs and load balancers to support inexpensive update checks via `If-Modified-Since`
+- `Cache-Control: public, max-age={ttl}, public, stale-while-revalidate={max-ttl}, stale-if-error={max-ttl}`: meaningful cache TTL returned with the response.
+  - The `max-age` SHOULD be shorter for responses whose resolution ended in no results (e.g. 15 seconds),
+    and longer for responses that have results (e.g. 5 minutes).
+  - Implementations SHOULD include `max-ttl`, set to the maximum cache window of the underlying routing system.
+    For example, if Amino DHT results are returned, `stale-while-revalidate` SHOULD be set to `172800` (48h, which at the time of writing this specification, is the provider record expiration window).
 - `Vary: Accept`: allows intermediate caches to play nicely with the different possible content types.
 
 #### Response Body
@@ -118,8 +122,12 @@ represented as a CIDv1 encoded with `libp2p-key` codec.
 #### Response Headers
 
 - `Content-Type`: the content type of this response, which MUST be `application/json` or `application/x-ndjson` (see [streaming](#streaming)).
-- `Last-Modified`: the timestamp of the resolution.
-- `Cache-Control: public, max-age={TTL}`: cache TTL returned with the response. When present, it SHOULD be short for responses whose resolution ended in no results (e.g. 15 seconds), and MAY be longer for responses that have results (e.g. 5 minutes).
+- `Last-Modified`: the timestamp of the resolution, allowing CDNs and load balancers to support inexpensive update checks via `If-Modified-Since`
+- `Cache-Control: public, max-age={ttl}, public, stale-while-revalidate={max-ttl}, stale-if-error={max-ttl}`: meaningful cache TTL returned with the response.
+  - When present, `ttl` SHOULD be shorter for responses whose resolution ended in no results (e.g. 15 seconds),
+    and longer for responses that have results (e.g. 5 minutes).
+  - Implementations SHOULD include `max-ttl`, set to the maximum cache window of the underlying routing system.
+    For example, if Amino DHT results are returned, `stale-while-revalidate` SHOULD be set to `172800` (48h, which at the time of writing this specification, is the provider record expiration window).
 - `Vary: Accept`: allows intermediate caches to play nicely with the different possible content types.
 
 #### Response Body
@@ -162,9 +170,12 @@ Each object in the `Peers` list is a record conforming to the [Peer Schema](#pee
 #### Response Headers
 
 - `Etag`: a globally unique opaque string used for HTTP caching. MUST be derived from the protobuf record returned in the body.
-- `Cache-Control: public, max-age={TTL}`: cache TTL returned with :ref[IPNS Record] that has `IpnsEntry.data[TTL] > 0`. When present, SHOULD match the TTL value from the record. When record was not found (HTTP 404) or has no TTL (value is `0`), implementation SHOULD default to `max-age=60`. Implementations MAY also include other derivatives, such as `stale-while-revalidate` and `stale-if-error`.
+- `Cache-Control: public, max-age={ttl}, public, stale-while-revalidate={sig-ttl}, stale-if-error={sig-ttl}`: meaningful cache TTL returned with :ref[IPNS Record]
+  - The `max-age` value in seconds SHOULD match duration from `IpnsEntry.data[TTL]`, if present and bigger than `0`. Otherwise, implementation SHOULD default to `max-age=60`.
+  - Implementations SHOULD include `sig-ttl`, set to the remaining number of seconds the returned IPNS Record is valid.
 - `Expires: {SIGNATURE_EXPIRATION}`: header with time when the signature expires.
-- `Last-Modified`: with the timestamp of the resolution.
+- `Last-Modified`: the timestamp of cacheable resolution, allowing CDNs and load balancers to support inexpensive update checks via `If-Modified-Since`
+- `Vary: Accept`: allows intermediate caches to play nicely with the different possible content types.
 
 #### Response Body
 
