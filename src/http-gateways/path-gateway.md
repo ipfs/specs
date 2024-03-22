@@ -195,6 +195,10 @@ Gateway should refuse attempts to register a service worker for entire
 Requests to these paths with `Service-Worker: script` MUST be denied by
 returning HTTP 400 Bad Request error.
 
+### `Ipfs-Path-Affinity` (request header)
+
+Optional content routing hint, see [`Ipfs-Path-Affinity`](https://specs.ipfs.tech/http-gateways/trustless-gateway/#ipfs-path-affinity-request-header) in :cite[trustless-gateway].
+
 ## Request Query Parameters
 
 All query parameters are optional.

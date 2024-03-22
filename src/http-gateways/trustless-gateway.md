@@ -4,15 +4,21 @@ description: >
   The minimal subset of HTTP Gateway response types facilitates data retrieval
   via CID and ensures integrity verification, all while eliminating the need to
   trust the gateway itself.
-date: 2023-06-20
+date: 2024-03-22
 maturity: reliable
 editors:
   - name: Marcin Rataj
     github: lidel
     url: https://lidel.org/
+    affiliation:
+      name: IP Shipyard
+      url: https://ipshipyard.com
   - name: Henrique Dias
     github: hacdias
     url: https://hacdias.com/
+    affiliation:
+      name: IP Shipyard
+      url: https://ipshipyard.com
 xref:
   - url
   - path-gateway
@@ -87,6 +93,30 @@ Below response types SHOULD be supported:
 
 A Gateway SHOULD return HTTP 400 Bad Request when running in strict trustless
 mode (no deserialized responses) and `Accept` header is missing.
+
+### `Ipfs-Path-Affinity` (request header)
+
+Optional content routing hint for the server. Indicates that the requested
+resource is a subset of a bigger DAG.
+
+A Client SHOULD use it to send a relevant parent content path when:
+- fetching a big file block by block (`application/vnd.ipld.raw`)
+- parallelizing DAG download by fetching each branch sub-DAG as a CAR (`application/vnd.ipld.car`)
+
+The value of `Ipfs-Path-Affinity` header SHOULD be percent-encoded
+([ECMA262: `encodeURIComponent`](https://tc39.es/ecma262/multipage/global-object.html#sec-encodeuricomponent-uricomponent))
+unless it meets the following conditions:
+- contains no path beyond the root identifier (`/ipfs/cid`)
+- contains no whitespace characters
+- contains no `:` characters
+- contains no non-ASCII characters
+
+A gateway backend SHOULD leverage this hint to improve retrieval by querying
+providers of additional content paths in addition to the requested one.
+
+Gateway implementation SHOULD support client requests with `Ipfs-Path-Affinity`
+header being present more than once, but also SHOULD set a hard limit of hints
+to process (e.g. 3) to avoid abuse.
 
 ## Request Query Parameters
 
