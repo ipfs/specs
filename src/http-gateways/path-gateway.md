@@ -397,33 +397,23 @@ Returned directive depends on requested content path and format:
   TXT record.
   - Implementations MAY place an upper bound on any TTL received, as
     noted in Section 8 of :cite[rfc2181].
-  - If TTL value is unknown, implementations SHOULD not send a `Cache-Control`
-  - No matter if TTL value is known or not, implementations SHOULD always
-    send a [`Last-Modified`](#last-modified-response-header) header with the timestamp of the record resolution.
+  - Implementations MAY also place an lower bound of 1 minute to avoid excessive lookups.
+  - If TTL value is unknown, implementations MAY not send a `Cache-Control`
+    but SHOULD send [`Last-Modified`](#last-modified-response-header) header.
 
 ### `Last-Modified` (response header)
 
-Optional, used as additional hint for HTTP caching.
+Used for HTTP caching, SHOULD be returned with mutable responses.
 
-Returning this header depends on the information available:
+An HTTP-date timestamp ([RFC9110, Section
+5.6.7](https://www.rfc-editor.org/rfc/rfc9110#section-5.6.7)) indicating when
+the resolution of requested content path occured, allowing HTTP proxies and CDNs
+to support inexpensive update checks via `If-Modified-Since`.
 
-- The header can be returned with `/ipns/` responses when the gateway
-  implementation knows the exact time a mutable pointer was updated by the
-  publisher.
-
-- When only TTL is known, [`Cache-Control`](#cache-control-response-header)
-  should be used instead.
-
-- Legacy implementations set this header to the current timestamp when reading
-  TTL on  `/ipns/` content paths was not available. This hint was used by web
-  browsers in a process called  "Calculating Heuristic Freshness"
-  (Section 4.2.2 of :cite[rfc9111]). Each browser
-  uses different heuristic, making this an inferior, non-deterministic caching
-  strategy.
-
-- New implementations should not return this header if TTL is not known;
-  providing a static expiration window in `Cache-Control` is easier to reason
-  about than cache expiration based on the fuzzy “heuristic freshness”.
+When `Cache-Control` is not present, `Last-Modified` value also acts as a hint
+for web browsers in a process called  "Calculating Heuristic Freshness"
+(Section 4.2.2 of :cite[rfc9111]). Each browser uses different heuristic,
+making this an inferior, non-deterministic caching strategy.
 
 ### `Content-Type` (response header)
 
