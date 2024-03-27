@@ -113,7 +113,7 @@ All request headers are optional.
 
 ### `If-None-Match` (request header)
 
-Used for HTTP caching.
+Optional, used for HTTP caching.
 
 Enables advanced cache control based on `Etag`,
 allowing client and server to skip data transfer if previously downloaded
@@ -122,6 +122,22 @@ payload did not change.
 The Gateway MUST compare Etag values sent in `If-None-Match` with `Etag` that
 would be sent with response. Positive match MUST return HTTP status code 304
 (Not Modified), without any payload.
+
+### `If-Modified-Since` (request header)
+
+Optional, used for HTTP caching of mutable resources.
+
+Enables advanced cache control based on `Last-Modified`,
+allowing client and server to skip data transfer if previously downloaded
+payload did not change.
+
+The Gateway SHOULD compare HTTP-date value sent in `If-Modified-Since` with `Last-Modified` that
+would be sent with response. Positive match MUST return HTTP status code 304
+(Not Modified), without any payload.
+
+While  `Last-Modified` SHOULD be implemented by the gateway itself,
+implementation and handling of this header MAY be delegated to a third-party
+HTTP software such as CDN, reverse proxy, or load-balancer.
 
 ### `Cache-Control` (request header)
 
@@ -271,6 +287,12 @@ Returned when requested range of data described by  [`Range`](#range-request-hea
 Indicates permanent redirection.
 
 The new, canonical URL is returned in the [`Location`](#location-response-header) header.
+
+### `304` Not Modified
+
+Indicates indicates that there is no need to retransmit the requested resources.
+
+See: [`Last-Modified`](#last-modified-response-header).
 
 ### `400` Bad Request
 
