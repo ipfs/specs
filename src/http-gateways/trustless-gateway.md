@@ -10,9 +10,21 @@ editors:
   - name: Marcin Rataj
     github: lidel
     url: https://lidel.org/
+    affiliation:
+        name: Protocol Labs
+        url: https://protocol.ai/
   - name: Henrique Dias
     github: hacdias
     url: https://hacdias.com/
+    affiliation:
+        name: Protocol Labs
+        url: https://protocol.ai/
+  - name: Hugo Valtier
+    github: Jorropo
+    url: https://jorropo.net/
+    affiliation:
+        name: Protocol Labs
+        url: https://protocol.ai/
 xref:
   - url
   - path-gateway
@@ -183,6 +195,22 @@ returned:
     returned to the client, the HTTP status code has already been sent to the
     client.
 
+### :dfn[skip-raw-blocks] (request query parameter)
+
+The optional `skip-raw-blocks` parameter is available only for CAR requests.
+
+It specifies whether blocks with the multicodec `raw` `0x55` MUST be present in
+the CAR response.
+
+It accepts two values:
+- `y`: Blocks with `raw` multicodec MUST NOT be returned.
+- `n`, or missing (unspecified): no-op, no special handling of `raw` blocks.
+
+When not specified a gateway implementation MUST assume `n`.
+
+A Gateway MUST return HTTP error 400 Bad Request when `skip-raw-blocks=y` is
+sent for a content path with a root CID with the `raw` multicodec.
+
 # HTTP Response
 
 Below MUST be implemented **in addition** to "HTTP Response" of :cite[path-gateway].
@@ -212,10 +240,10 @@ The Body hash MUST match the Multihash from the requested CID.
 
 # CAR Responses (application/vnd.ipld.car)
 
-A CAR stream for the requested
-[application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car)
-content type (with optional `order` and `dups` params), path and optional
-`dag-scope` and `entity-bytes` URL parameters.
+A CAR stream ([application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car)
+with optional `order` and `dups` content type parameters) for the requested
+content path (and optional `dag-scope`, `entity-bytes` and/or `skip-raw-blocks`
+URL parameters).
 
 ## CAR version
 
