@@ -4,7 +4,7 @@ description: >
   The minimal subset of HTTP Gateway response types facilitates data retrieval
   via CID and ensures integrity verification, all while eliminating the need to
   trust the gateway itself.
-date: 2023-06-20
+date: 2024-04-17
 maturity: reliable
 editors:
   - name: Marcin Rataj
@@ -90,7 +90,14 @@ mode (no deserialized responses) and `Accept` header is missing.
 
 ## Request Query Parameters
 
-### :dfn[dag-scope] (request query parameter)
+### :dfn[`format`] (request query parameter)
+
+Same as [`format`](https://specs.ipfs.tech/http-gateways/path-gateway/#format-request-query-parameter) in :cite[path-gateway], but with limited number of supported response types:
+- `format=raw` → `application/vnd.ipld.raw`
+- `format=car` → `application/vnd.ipld.car`
+- `format=ipns-record` → `application/vnd.ipfs.ipns-record`
+
+### :dfn[`dag-scope`] (request query parameter)
 
 Optional, `dag-scope=(block|entity|all)` with default value `all`, only available for CAR requests.
 
@@ -111,7 +118,7 @@ path segments.
 
 When present, returned `Etag` must include unique prefix based on the passed scope type.
 
-### :dfn[entity-bytes] (request query parameter)
+### :dfn[`entity-bytes`] (request query parameter)
 
 The optional `entity-bytes=from:to` parameter is available only for CAR
 requests.
@@ -203,6 +210,12 @@ If a CAR stream was requested:
 
 MUST be returned and set to `attachment` to ensure requested bytes are not rendered by a web browser.
 
+### `Content-Location` (response header)
+
+Same as in :cite[path-gateway], SHOULD be returned when Trustless Gateway
+supports more than a single response format and the `format` query parameter is
+missing or does not match well-known format from `Accept` header.
+
 # Block Responses (application/vnd.ipld.raw)
 
 An opaque bytes matching the requested block CID
@@ -217,7 +230,7 @@ A CAR stream for the requested
 content type (with optional `order` and `dups` params), path and optional
 `dag-scope` and `entity-bytes` URL parameters.
 
-## CAR version
+## CAR version (content type parameter)
 
 Value returned in
 [`CarV1Header.version`](https://ipld.io/specs/transport/car/carv1/#header)
