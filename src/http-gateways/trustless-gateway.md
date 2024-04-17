@@ -97,6 +97,10 @@ Same as [`format`](https://specs.ipfs.tech/http-gateways/path-gateway/#format-re
 - `format=car` → `application/vnd.ipld.car`
 - `format=ipns-record` → `application/vnd.ipfs.ipns-record`
 
+A Client SHOULD include the `format` query parameter in the request URL, in
+addition to the `Accept` header. This provides the best interoperability and
+ensures consistent HTTP cache behavior across various gateway implementations.
+
 ### :dfn[`dag-scope`] (request query parameter)
 
 Optional, `dag-scope=(block|entity|all)` with default value `all`, only available for CAR requests.
