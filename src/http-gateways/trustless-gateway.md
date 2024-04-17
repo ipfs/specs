@@ -194,6 +194,21 @@ returned:
     returned to the client, the HTTP status code has already been sent to the
     client.
 
+### :dfn[`car-version`] (request query parameter)
+
+Only used on CAR requests, it is the same as [CAR version](#car-version) content
+type parameter. In case both are present, the value in the HTTP Header has priority.
+
+### :dfn[`car-order`] (request query parameter)
+
+Only used on CAR requests, it is the same as [CAR `order`](#car-order-content-type-parameter)
+content type parameter. In case both are present, the value in the HTTP Header has priority.
+
+### :dfn[`car-dups`] (request query parameter)
+
+Only used on CAR requests, it is the same as [CAR `dups`](#car-dups-content-type-parameter)
+content type parameter. In case both are present, the value in the HTTP Header has priority.
+
 # HTTP Response
 
 Below MUST be implemented **in addition** to "HTTP Response" of :cite[path-gateway].
