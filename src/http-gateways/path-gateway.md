@@ -499,6 +499,17 @@ Returned only when request was a [`Range`](#range-request-header) request.
 
 See Section 14.4 of :cite[rfc9110].
 
+### `Content-Location` (response header)
+
+Returned when a non-default content format has been negotiated with the
+[`Accept` header](#accept-request-header). The value of this field SHOULD include
+the URL of the resource with the `format` query parameter included, so that
+generic HTTP caches can store deserialized, CAR, and block responses separately.
+
+For example, a request to `/ipfs/{cid}` with `Accept: application/vnd.ipld.raw`
+SHOULD return a `Content-Location: /ipfs/{cid}?format=raw` header in order for
+this request to be able to be successfully cached.
+
 ### `Accept-Ranges` (response header)
 
 Optional, returned to explicitly indicate if gateway supports partial HTTP
