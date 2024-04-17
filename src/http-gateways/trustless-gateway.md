@@ -196,18 +196,27 @@ returned:
 
 ### :dfn[`car-version`] (request query parameter)
 
-Only used on CAR requests, it is the same as [CAR version](#car-version) content
-type parameter. In case both are present, the value in the HTTP Header has priority.
+Optional, only used on CAR requests.
+
+Serves same purpose as [CAR `version` content type parameter](#car-version-content-type-parameter).
+
+In case both are present in the request, the value from the [`Accept`](#accept-request-header) HTTP Header has priority and a matching [`Content-Location`](#content-location-response-header) SHOULD be returned with the response.
 
 ### :dfn[`car-order`] (request query parameter)
 
-Only used on CAR requests, it is the same as [CAR `order`](#car-order-content-type-parameter)
-content type parameter. In case both are present, the value in the HTTP Header has priority.
+Optional, only used on CAR requests.
+
+Serves same purpose as [CAR `order` content type parameter](#car-order-content-type-parameter).
+
+In case both are present in the request, the value from the [`Accept`](#accept-request-header) HTTP Header has priority and a matching [`Content-Location`](#content-location-response-header) SHOULD be returned with the response.
 
 ### :dfn[`car-dups`] (request query parameter)
 
-Only used on CAR requests, it is the same as [CAR `dups`](#car-dups-content-type-parameter)
-content type parameter. In case both are present, the value in the HTTP Header has priority.
+Optional, only used on CAR requests.
+
+Serves same purpose as [CAR `dups` content type parameter](#car-dups-content-type-parameter).
+
+In case both are present in the request, the value from the [`Accept`](#accept-request-header) HTTP Header has priority and a matching [`Content-Location`](#content-location-response-header) SHOULD be returned with the response.
 
 # HTTP Response
 
@@ -249,7 +258,7 @@ A CAR stream for the requested
 content type (with optional `order` and `dups` params), path and optional
 `dag-scope` and `entity-bytes` URL parameters.
 
-## CAR version (content type parameter)
+## CAR `version` (content type parameter)
 
 Value returned in
 [`CarV1Header.version`](https://ipld.io/specs/transport/car/carv1/#header)
