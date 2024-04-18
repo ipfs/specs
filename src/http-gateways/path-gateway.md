@@ -4,7 +4,7 @@ description: >
   The comprehensive low-level HTTP Gateway enables the integration of IPFS
   resources into the HTTP stack through /ipfs and /ipns namespaces, supporting
   both deserialized and verifiable response types.
-date: 2023-03-30
+date: 2024-04-17
 maturity: reliable
 editors:
   - name: Marcin Rataj
@@ -242,13 +242,35 @@ These are the equivalents:
 When both `Accept` HTTP header  and `format` query parameter are present,
 `Accept` SHOULD take precedence.
 
+A Client SHOULD include the `format` query parameter in the request URL, in
+addition to the `Accept` header. This provides the best interoperability and
+ensures consistent HTTP cache behavior across various gateway implementations.
+
+A Gateway SHOULD include the
+[`Content-Location`](#content-location-response-header) header in the response when:
+- the request contains an `Accept` header specifying a well-known response
+  format, but the URL does not include the `format` query parameter
+- the `format` parameter is present, but does not match the format from `Accept`
+
 ### `dag-scope` (request query parameter)
 
-Only used on CAR requests, same as :ref[dag-scope] from :cite[trustless-gateway].
+Optional, can be used to limit the scope of verifiable DAG requests such as CAR, same as :ref[dag-scope] from :cite[trustless-gateway].
 
 ### `entity-bytes` (request query parameter)
 
-Only used on CAR requests, same as :ref[entity-bytes] from :cite[trustless-gateway].
+Optional, can be used to limit the scope of verifiable DAG requests such as CAR, same as :ref[entity-bytes] from :cite[trustless-gateway].
+
+### `car-version` (request query parameter)
+
+Optional, specific to CAR requests, same as :ref[car-version] from :cite[trustless-gateway].
+
+### `car-order` (request query parameter)
+
+Optional, specific to CAR requests, same as :ref[car-order] from :cite[trustless-gateway].
+
+### `car-dups` (request query parameter)
+
+Optional, specific to CAR requests, same as :ref[car-dups] from :cite[trustless-gateway].
 
 # HTTP Response
 
@@ -486,12 +508,35 @@ To illustrate, `?filename=testтест.pdf` should produce:
   not attempt to render raw bytes. CID and `.bin` file extension should be used
   if  a custom `filename` was not provided with the request.
 
+### `Content-Location` (response header)
+
+Returned when a non-default content format has been negotiated with the
+[`Accept` header](#accept-request-header) but `format` was missing from the URL.
+
+The value of this field SHOULD include
+the URL of the resource with the `format` query parameter included, so that
+generic HTTP caches can store deserialized, CAR, and block responses separately.
+
+:::note
+
+For example, a request to `/ipfs/{cid}` with `Accept: application/vnd.ipld.raw`
+SHOULD return a `Content-Location: /ipfs/{cid}?format=raw` header in order for
+block response to be cached separately from deserialized one.
+
+:::
+
 ### `Content-Length` (response header)
 
 Represents the length of returned HTTP payload.
 
+:::warning
+
+<!-- TODO https://github.com/ipfs/specs/issues/461 -->
+
 NOTE: the value may differ from the real size of requested data if compression or chunked `Transfer-Encoding` are used.
-<!-- TODO (https://github.com/ipfs/in-web-browsers/issues/194) IPFS clients looking for UnixFS file size should use value from `X-Ipfs-DataSize` instead. -->
+See [ipfs/specs#461](https://github.com/ipfs/specs/issues/461).
+
+:::
 
 ### `Content-Range` (response header)
 
@@ -513,8 +558,6 @@ deterministic.
 Returned only when response status code is [`301` Moved Permanently](#301-moved-permanently).
 The value informs the HTTP client about new URL for requested resource.
 
-This header is more widely used in [SUBDOMAIN_GATEWAY.md](./SUBDOMAIN_GATEWAY.md#location-response-header).
-
 #### Use in directory URL normalization
 
 Gateway MUST return a redirect when a valid UnixFS directory was requested
@@ -529,6 +572,10 @@ and security scopes such as Service Worker registrations to work correctly.
 It also ensures the same behavior on path gateways (`https://example.com/ipfs/cid/` with trailing `/`)
 and origin-isolated HTTP contexts `https://cid.ipfs.dweb.link`
 or non-HTTP URLs like `ipfs://cid`, where empty path component is implicit `/`.
+
+#### Use in interop with Subdomain Gateway
+
+See [`Location` section](https://specs.ipfs.tech/http-gateways/subdomain-gateway/#location-response-header) of :cite[subdomain-gateway].
 
 ### `X-Ipfs-Path` (response header)
 
@@ -566,15 +613,6 @@ X-Ipfs-Roots: bafybeiaysi4s6lnjev27ln5icwm6tueaw2vdykrtjkwiphwekaywqhcjze,bafybe
 NOTE: while the first CID will change every time any article is changed,
 the last root (responsible for specific article or a subdirectory) may not
 change at all, allowing for smarter caching beyond what standard Etag offers.
-
-<!-- TODO: https://github.com/ipfs/in-web-browsers/issues/194
-- `X-Ipfs-DagSize`
-    - Indicates the total size of the DAG (raw data + IPLD metadata) representing the requested resource.
-        - For UnixFS this is equivalent  to  `CumulativeSize` from   `ipfs files stat`
-- `X-Ipfs-DataSize`
-    - Indicates the original byte size of the raw data (not impacted by HTTP transfer encoding or compression), without IPFS/IPLD metadata.
-        - For UnixFS this is equivalent to `Size` from `ipfs files stat` or `ipfs dag stat`
--->
 
 ### `X-Content-Type-Options` (response header)
 
