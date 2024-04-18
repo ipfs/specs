@@ -254,11 +254,23 @@ A Gateway SHOULD include the
 
 ### `dag-scope` (request query parameter)
 
-Only used on CAR requests, same as :ref[dag-scope] from :cite[trustless-gateway].
+Optional, can be used to limit the scope of verifiable DAG requests such as CAR, same as :ref[dag-scope] from :cite[trustless-gateway].
 
 ### `entity-bytes` (request query parameter)
 
-Only used on CAR requests, same as :ref[entity-bytes] from :cite[trustless-gateway].
+Optional, can be used to limit the scope of verifiable DAG requests such as CAR, same as :ref[entity-bytes] from :cite[trustless-gateway].
+
+### `car-version` (request query parameter)
+
+Optional, specific to CAR requests, same as :ref[car-version] from :cite[trustless-gateway].
+
+### `car-order` (request query parameter)
+
+Optional, specific to CAR requests, same as :ref[car-order] from :cite[trustless-gateway].
+
+### `car-dups` (request query parameter)
+
+Optional, specific to CAR requests, same as :ref[car-dups] from :cite[trustless-gateway].
 
 # HTTP Response
 
