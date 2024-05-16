@@ -2,7 +2,7 @@
 title: libp2p+HTTP Transport Gateway Specification
 description: >
   Describes how HTTP Gateway semantics can be used over libp2p transports.
-date: 2023-10-04
+date: 2024-04-20
 maturity: draft
 editors:
   - name: Adin Schmahmann
@@ -34,16 +34,16 @@ The [libp2p+HTTP specification](https://github.com/libp2p/specs/pull/508)
 describes how to use HTTP semantics over stream transports, as well as how
 to do discovery of what protocols are available (and where they are mounted).
 
-### `.well-known/libp2p`
+### `.well-known/libp2p/protocols`
 
 libp2p application sub-protocols exposed behind `/http/1.1` protocol can be
-discovered by the well-known resource (:cite[rfc8615]) at `.well-known/libp2p`.
+discovered by the well-known resource (:cite[rfc8615]) at `.well-known/libp2p/protocols`.
 
 #### Protocol identifier
 
 In order for a given HTTP Gateway protocol like the :cite[trustless-gateway] to
 work in this environment it requires a protocol identifier to act as a key in
-the `.well-known/libp2p` mapping file.
+the `.well-known/libp2p/protocols` mapping file.
 
 The `/http/1.1` sub-protocol identifier for the IPFS Gateway when used over libp2p is:
 
@@ -53,7 +53,7 @@ The `/http/1.1` sub-protocol identifier for the IPFS Gateway when used over libp
 
 #### Protocol mounting
 
-A reference `.well-known/libp2p` JSON body with mapping that assumes the gateway to be mounted at `/`:
+A reference `.well-known/libp2p/protocols` JSON body with mapping that assumes the gateway to be mounted at `/`:
 
 ```js
 {
