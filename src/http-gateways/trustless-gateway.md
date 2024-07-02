@@ -88,6 +88,15 @@ Below response types SHOULD be supported:
 A Gateway SHOULD return HTTP 400 Bad Request when running in strict trustless
 mode (no deserialized responses) and `Accept` header is missing.
 
+:::note
+
+A Client SHOULD include the [`format` query parameter](#format-request-query-parameter)
+in the request URL, in addition to the `Accept` header. This provides the best
+interoperability and ensures consistent HTTP cache behavior across various
+gateway implementations.
+
+:::
+
 ## Request Query Parameters
 
 ### :dfn[`format`] (request query parameter)
@@ -97,9 +106,13 @@ Same as [`format`](https://specs.ipfs.tech/http-gateways/path-gateway/#format-re
 - `format=car` → `application/vnd.ipld.car`
 - `format=ipns-record` → `application/vnd.ipfs.ipns-record`
 
+:::note
+
 A Client SHOULD include the `format` query parameter in the request URL, in
 addition to the `Accept` header. This provides the best interoperability and
 ensures consistent HTTP cache behavior across various gateway implementations.
+
+:::
 
 ### :dfn[`dag-scope`] (request query parameter)
 
