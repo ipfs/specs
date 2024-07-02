@@ -145,7 +145,8 @@ block is in the local cache.
 
 ### `Accept` (request header)
 
-Can be used for requesting specific response format
+Can be used for requesting specific response format, and/or passing optional
+content type parameters.
 
 For example:
 
@@ -157,6 +158,15 @@ For example:
 - [application/json](https://www.iana.org/assignments/media-types/application/json) – same as `application/vnd.ipld.dag-json`, unless the CID's codec already is `json` (0x0200). Then, the raw JSON block can be returned as-is without any conversion.
 - [application/cbor](https://www.iana.org/assignments/media-types/application/cbor) – same as `application/vnd.ipld.dag-cbor`, unless the CID's codec already is `cbor` (0x51). Then, the raw CBOR block can be returned as-is without any conversion.
 - [application/vnd.ipfs.ipns-record](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record) – requests a verifiable :cite[ipns-record] to be returned. Produces 400 Bad Request if the content is not under the IPNS namespace, or contains a path.
+
+:::note
+
+A Client SHOULD include the [`format` query parameter](#format-request-query-parameter)
+in the request URL, in addition to the `Accept` header. This provides the best
+interoperability and ensures consistent HTTP cache behavior across various
+gateway implementations.
+
+:::
 
 ### `Range` (request header)
 
@@ -242,9 +252,13 @@ These are the equivalents:
 When both `Accept` HTTP header  and `format` query parameter are present,
 `Accept` SHOULD take precedence.
 
+:::note
+
 A Client SHOULD include the `format` query parameter in the request URL, in
 addition to the `Accept` header. This provides the best interoperability and
 ensures consistent HTTP cache behavior across various gateway implementations.
+
+:::
 
 A Gateway SHOULD include the
 [`Content-Location`](#content-location-response-header) header in the response when:
