@@ -116,7 +116,7 @@ Each object in the `Providers` list is a record conforming to a schema, usually 
 
 - `closerThan` is an optional [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md) represented as a CIDv1 encoded with `libp2p-key` codec.
   - Returned peer records must be closer to `peer-id` than `closerThan`.
-  - If omitted the routing implementation should use it's own [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md).
+  - If omitted the routing implementation should use its own [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md).
 - `count` is an optional number that specifies how many peer records the requester desires.
   - Minimum 1, maximum 100, default 20.
 
@@ -134,7 +134,7 @@ Each object in the `Providers` list is a record conforming to a schema, usually 
   - When present, `ttl` SHOULD be shorter for responses whose resolution ended in no results (e.g. 15 seconds),
     and longer for responses that have results (e.g. 5 minutes).
   - Implementations SHOULD include `max-ttl`, set to the maximum cache window of the underlying routing system.
-    For example, if Amino DHT results are returned, `stale-while-revalidate` SHOULD be set to `172800` (48h, which at the time of writing this specification, is the provider record expiration window).
+    For example, if Amino DHT results are returned, `stale-while-revalidate` SHOULD be set to `79200` (22h, which at the time of writing this specification, is the [Provider Record Republish Interval](https://github.com/libp2p/specs/tree/master/kad-dht#content-provider-advertisement-and-discovery)).
 - `Vary: Accept`: allows intermediate caches to play nicely with the different possible content types.
 
 #### Response Body
