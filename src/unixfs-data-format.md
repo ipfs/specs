@@ -19,8 +19,8 @@ editors:
   - name: Alex Potsides
     github: achingbrain
     affiliation:
-      name: Protocol Labs
-      url: https://protocol.ai/
+      name: Interplanetary Shipyard
+      url: https://ipshipyard.com/
   - name: Peter Rabbitson
     github: ribasushi
     affiliation:
@@ -449,7 +449,7 @@ The following names SHOULD NOT be used:
   terminations in some systems, such as C-compatible systems. Many unix
   file systems do not accept this character in path components.
 
-## Design Decision Rationale
+## Appendix: Design Decision Rationale
 
 ### `mtime` and `mode` Metadata Support in UnixFSv1.5
 
@@ -555,20 +555,23 @@ In most cases, such values will exceed 2^28 (268,435,456) nanoseconds. Therefore
 the fractional part is represented as a 4-byte `fixed32`,
 [as per Google's recommendation](https://developers.google.com/protocol-buffers/docs/proto#scalar).
 
-# Notes for Implementers
+# Appendix: Notes for Implementers
 
 This section and included subsections are not authoritative.
 
 ## Implementations
 
 - JavaScript
+  - [`@helia/unixfs`](https://www.npmjs.com/package/@helia/unixfs) implementation of a filesystem compatible with [Helia SDK](https://github.com/ipfs/helia#readme)
   - Data Formats - [unixfs](https://github.com/ipfs/js-ipfs-unixfs)
-  - Importer - [unixfs-importer](https://github.com/ipfs/js-ipfs-unixfs-importer)
-  - Exporter - [unixfs-exporter](https://github.com/ipfs/js-ipfs-unixfs-exporter)
+    - Importer - [unixfs-importer](https://github.com/ipfs/js-ipfs-unixfs/tree/main/packages/ipfs-unixfs-importer)
+    - Exporter - [unixfs-exporter](https://github.com/ipfs/js-ipfs-unixfs/tree/main/packages/ipfs-unixfs-exporter)
 - Go
-  - Protocol Buffer Definitions - [`ipfs/go-unixfs/pb`](https://github.com/ipfs/go-unixfs/blob/707110f05dac4309bdcf581450881fb00f5bc578/pb/unixfs.proto)
-  - [`ipfs/go-unixfs`](https://github.com/ipfs/go-unixfs/)
-  - `go-ipld-prime` implementation [`ipfs/go-unixfsnode`](https://github.com/ipfs/go-unixfsnode)
+  - [Boxo SDK](https://github.com/ipfs/boxo#readme) includes implementation of UnixFS filesystem
+    - Protocol Buffer Definitions - [`ipfs/boxo/../unixfs.proto`](https://github.com/ipfs/boxo/blob/v0.23.0/ipld/unixfs/pb/unixfs.proto)
+    - [`boxo/files`](https://github.com/ipfs/boxo/tree/main/files)
+    - [`ipfs/boxo/ipld/unixfs`](https://github.com/ipfs/boxo/tree/main/ipld/unixfs/)
+  - Alternative `go-ipld-prime` implementation: [`ipfs/go-unixfsnode`](https://github.com/ipfs/go-unixfsnode)
 - Rust
   - [`iroh-unixfs`](https://github.com/n0-computer/iroh/tree/b7a4dd2b01dbc665435659951e3e06d900966f5f/iroh-unixfs)
   - [`unixfs-v1`](https://github.com/ipfs-rust/unixfsv1)
