@@ -1,3 +1,3 @@
 # UnixFS
 
-Moved to https://specs.ipfs.tech/architecture/unixfs/
+Moved to https://specs.ipfs.tech/unixfs-data-format/

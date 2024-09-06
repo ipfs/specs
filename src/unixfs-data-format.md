@@ -2,9 +2,9 @@
 title: UnixFS
 description: >
   UnixFS is a Protocol Buffers-based format for describing files, directories,
-  and symlinks as DAGs in IPFS.
-date: 2022-10-10
-maturity: reliable
+  and symlinks as dag-pb and raw DAGs in IPFS.
+date: 2024-09-06
+maturity: draft
 editors:
   - name: David Dias
     github: daviddias
@@ -31,8 +31,13 @@ editors:
     affiliation:
       name: Protocol Labs
       url: https://protocol.ai/
+  - name: Marcin Rataj
+    github: lidel
+    affiliation:
+      name: Interplanetary Shipyard
+      url: https://ipshipyard.com/
 
-tags: ['architecture']
+tags: ['data-formats']
 order: 1
 ---
 
@@ -63,7 +68,7 @@ In UnixFS, a node can be encoded using two different multicodecs, listed below. 
 ## `Raw` Nodes
 
 The simplest nodes use `raw` encoding and are implicitly a :ref[File]. They can
-be recognized because their CIDs are encoded using the `raw` codec:
+be recognized because their CIDs are encoded using the `raw` (`0x55`) codec:
 
 - The file content is purely the block body.
 - They never have any children nodes, and thus are also known as single block files.
@@ -71,7 +76,7 @@ be recognized because their CIDs are encoded using the `raw` codec:
 
 ## `dag-pb` Nodes
 
-More complex nodes use the `dag-pb` encoding. These nodes require two steps of
+More complex nodes use the `dag-pb` (`0x70`) encoding. These nodes require two steps of
 decoding. The first step is to decode the outer container of the block. This is encoded using the IPLD [`dag-pb`][ipld-dag-pb] specification, which can be
 summarized as follows:
 
@@ -117,8 +122,8 @@ message Data {
   repeated uint64 blocksizes = 4;
   optional uint64 hashType = 5;
   optional uint64 fanout = 6;
-  optional uint32 mode = 7;
-  optional UnixTime mtime = 8;
+  optional uint32 mode = 7; // opt-in, AKA UnixFS 1.5
+  optional UnixTime mtime = 8; // opt-in, AKA UnixFS 1.5
 }
 
 message Metadata {
@@ -176,8 +181,10 @@ size in bytes of the partial file content present in children DAGs. Each index i
 `PBNode.Links` MUST have a corresponding chunk size stored at the same index
 in `decode(PBNode.Data).blocksizes`.
 
+:::warning
 Implementers need to be extra careful to ensure the values in `Data.blocksizes`
 are calculated by following the definition from [`Blocksize`](#decodepbnodedatablocksize).
+:::
 
 This allows for fast indexing into the file. For example, if someone is trying
 to read bytes 25 to 35, we can compute an offset list by summing all previous
