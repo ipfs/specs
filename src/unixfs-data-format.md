@@ -268,7 +268,7 @@ a child under `PBNode.Links`. If you find a match, you can then remember the CID
 You MUST continue the search. If you find another match, you MUST error since
 duplicate names are not allowed. <!--TODO: check Kubo does this-->
 
-Assuming no errors were raised, you can continue to the path resolution on the 
+Assuming no errors were raised, you can continue to the path resolution on the
 remaining components and on the CID you popped.
 
 
@@ -345,7 +345,7 @@ links from the fastest source, and smaller ones from the slower sources.
 An implementation SHOULD NOT assume the `TSize` values are correct. The value is only a hint that provides performance optimization for better UX.
 
 Following the [Robustness Principle](https://specs.ipfs.tech/architecture/principles/#robustness), implementation SHOULD be
-able to decode nodes where the `Tsize` field is wrong (not matching the sizes of  sub-DAGs), or 
+able to decode nodes where the `Tsize` field is wrong (not matching the sizes of  sub-DAGs), or
 partially or completely missing.
 
 When total data size is needed for important purposes such as accounting, billing, and cost estimation, the `Tsize` SHOULD NOT be used, and instead a full DAG walk SHOULD to be performed.
@@ -397,7 +397,7 @@ non-IPFS target MUST observe the following:
 - If the target supports a distinction between `unspecified` and `0`/`1970-01-01T00:00:00Z`,
   the distinction must be preserved within the target. For example, if no `mtime` structure
   is available, a web gateway must **not** render a `Last-Modified:` header.
-- If the target requires an `mtime` ( e.g. a FUSE interface ) and no `mtime` is 
+- If the target requires an `mtime` ( e.g. a FUSE interface ) and no `mtime` is
   supplied OR the supplied `mtime` falls outside of the targets accepted range:
   - When no `mtime` is specified or the resulting `UnixTime` is negative:
     implementations must assume `0`/`1970-01-01T00:00:00Z` (note that such values
@@ -513,10 +513,10 @@ Downsides to this approach are:
 
 1. Two users adding the same file to IPFS at different times will have different
   [CID]s due to the `mtime`s being different. If the content is stored in another
-  node, its [CID] will be constant between the two users, but you can't navigate 
-  to it unless you have the parent node, which will be less available due to the 
+  node, its [CID] will be constant between the two users, but you can't navigate
+  to it unless you have the parent node, which will be less available due to the
   proliferation of [CID]s.
-1. Metadata is also impossible to remove without changing the [CID], so 
+1. Metadata is also impossible to remove without changing the [CID], so
   metadata becomes part of the content.
 2. Performance may be impacted as well as if we don't inline UnixFS root nodes
   into [CID]s, so additional fetches will be required to load a given UnixFS entry.
