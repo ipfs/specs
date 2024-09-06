@@ -271,7 +271,6 @@ duplicate names are not allowed. <!--TODO: check Kubo does this-->
 Assuming no errors were raised, you can continue to the path resolution on the
 remaining components and on the CID you popped.
 
-
 #### `Symlink` type
 
 A :dfn[Symlink] represents a POSIX [symbolic link](https://pubs.opengroup.org/onlinepubs/9699919799/functions/symlink.html).
@@ -490,14 +489,14 @@ both UnixFS v1 and v1.5 nodes.
 
 This was rejected for the following reasons:
 
-1. When creating a UnixFS node, there's no way to record metadata without wrapping
-  it in a directory.
-2. If you access any UnixFS node directly by its [CID], there is no way of recreating
-   the metadata which limits flexibility.
-3. In order to list the contents of a directory including entry types and sizes,
-   you have to fetch the root node of each entry, so the performance benefit
-   of including some metadata in the containing directory is negligible in this
-   use case.
+1. When creating a UnixFS node, there's no way to record metadata without
+   wrapping it in a directory.
+2. If you access any UnixFS node directly by its [CID], there is no way of
+   recreating the metadata which limits flexibility.
+3. In order to list the contents of a directory including entry types and
+   sizes, you have to fetch the root node of each entry, so the performance
+   benefit of including some metadata in the containing directory is negligible
+   in this use case.
 
 #### Metadata in the File
 
@@ -511,15 +510,16 @@ we decide to keep file data in a leaf node for deduplication reasons.
 
 Downsides to this approach are:
 
-1. Two users adding the same file to IPFS at different times will have different
-  [CID]s due to the `mtime`s being different. If the content is stored in another
-  node, its [CID] will be constant between the two users, but you can't navigate
-  to it unless you have the parent node, which will be less available due to the
-  proliferation of [CID]s.
-1. Metadata is also impossible to remove without changing the [CID], so
-  metadata becomes part of the content.
-2. Performance may be impacted as well as if we don't inline UnixFS root nodes
-  into [CID]s, so additional fetches will be required to load a given UnixFS entry.
+1. Two users adding the same file to IPFS at different times will have
+   different [CID]s due to the `mtime`s being different. If the content is
+   stored in another node, its [CID] will be constant between the two users,
+   but you can't navigate to it unless you have the parent node, which will be
+   less available due to the proliferation of [CID]s.
+2. Metadata is also impossible to remove without changing the [CID], so
+   metadata becomes part of the content.
+3. Performance may be impacted as well as if we don't inline UnixFS root nodes
+   into [CID]s, so additional fetches will be required to load a given UnixFS
+   entry.
 
 #### Side Trees
 
@@ -580,25 +580,28 @@ This section and included subsections are not authoritative.
 
 In this example, we will build a `Raw` file with the string `test` as its content.
 
-1. First, hash the data:
+First, hash the data:
 
 ```console
 $ echo -n "test" | sha256sum
 9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08  -
 ```
 
-2. Add the CID prefix:
+Add the CID prefix:
 
 ```
+f01551220
+         9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
+
 f this is the multibase prefix, we need it because we are working with a hex CID, this is omitted for binary CIDs
  01 the CID version, here one
    55 the codec, here we MUST use Raw because this is a Raw file
      12 the hashing function used, here sha256
        20 the digest length 32 bytes
-         9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08 the digest we computed earlier
+         9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08 is the the digest we computed earlier
 ```
 
-3. Profit! Assuming we stored this block in some implementation of our choice, which makes it accessible to our client, we can try to decode it.
+Done. Assuming we stored this block in some implementation of our choice, which makes it accessible to our client, we can try to decode it.
 
 ```console
 $ ipfs cat f015512209f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
