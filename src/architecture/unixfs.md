@@ -317,24 +317,33 @@ To resolve the path inside a HAMT:
    name you were trying to resolve, you have successfully resolved a path component.
    Everything past the hex encoded prefix is the name of that element, which is useful when listing children of this directory.
 
-### `TSize` / `DagSize`
+### `TSize` (child DAG size hint)
 
-This is an optional field in `PBNode.Links[]`. It **does not** represent any
-meaningful information of the underlying structure, and there is no known
-usage of it to this day, although some implementations omit these.
+`Tsize` is an optional field in `PBNode.Links[]` which represents the precomputed size of the specific child DAG. It provides a performance optimization: a hint about the total size of child DAG can be read without having to fetch any child nodes.
 
-To compute the `DagSize` of a node, which is stored in the parents, sum the length of the `dag-pb` outside message binary length and the `blocksizes` of all child files.
+To compute the `Tsize` of a child DAG, sum the length of the `dag-pb` outside message binary length and the `blocksizes` of all nodes in the child DAG.
 
-An example of where this could be useful is as a hint to smart download clients.
-For example, if you are downloading a file concurrently from two sources that have
-radically different speeds, it would probably be more efficient to download bigger
-links from the fastest source, and smaller ones from the slowest source.
+:::note
 
-<!--TODO: check that this is true-->
-There is no failure mode known for this field, so your implementation should be
-able to decode nodes where this field is wrong (not the value you expect), or 
-partially or completely missing. This also allows smarter encoders to give a
-more accurate picture (Don't count duplicate blocks, etc.).
+Examples of where `Tsize` is useful:
+
+- User interfaces, where total size of a DAG needs to be displayed immediately, without having to do the full DAG walk.
+- Smart download clients, downloading a file concurrently from two sources that have radically different speeds. It may be more efficient to parallelize and download bigger
+links from the fastest source, and smaller ones from the slower sources.
+
+:::
+
+:::warning
+
+An implementation SHOULD NOT assume the `TSize` values are correct. The value is only a hint that provides performance optimization for better UX.
+
+Following the [Robustness Principle](https://specs.ipfs.tech/architecture/principles/#robustness), implementation SHOULD be
+able to decode nodes where the `Tsize` field is wrong (not matching the sizes of  sub-DAGs), or 
+partially or completely missing.
+
+When total data size is needed for important purposes such as accounting, billing, and cost estimation, the `Tsize` SHOULD NOT be used, and instead a full DAG walk SHOULD to be performed.
+
+:::
 
 ### Metadata
 
