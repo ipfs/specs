@@ -67,7 +67,7 @@ be recognized because their CIDs are encoded using the `raw` codec:
 
 - The file content is purely the block body.
 - They never have any children nodes, and thus are also known as single block files.
-- Their size (both `dagsize` and `blocksize`) is the length of the block body.
+- Their size is the length of the block body (`Tsize` in parent is equal to `blocksize`).
 
 ## `dag-pb` Nodes
 
@@ -270,7 +270,7 @@ remaining components and on the CID you popped.
 A :dfn[Symlink] represents a POSIX [symbolic link](https://pubs.opengroup.org/onlinepubs/9699919799/functions/symlink.html).
 A symlink MUST NOT have children. <!--TODO: check that this is true-->
 
-The `PBNode.Data.Data` field is a POSIX path that MAY be appended in front of the
+The `PBNode.Data.Data` field is a POSIX path that MAY be inserted in front of the
 currently remaining path component stack.
 
 ##### Path Resolution
@@ -279,7 +279,7 @@ There is no current consensus on how pathing over symlinks should behave. Some
 implementations return symlink objects and fail if a consumer tries to follow them
 through.
 
-Following the POSIX specification over the current UnixFS path context is probably fine.
+Symlink path resolution SHOULD follow the POSIX specification, over the current UnixFS path context, as much as is applicable.
 
 #### `HAMTDirectory`
 
