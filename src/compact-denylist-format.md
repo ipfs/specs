@@ -2,7 +2,7 @@
 title: Compact Denylist Format
 description: >
   How content blocking rules can be represented as a .deny file.
-date: 2023-10-25
+date: 2023-08-24
 maturity: reliable
 editors:
   - name: Hector Sanjuan
@@ -87,7 +87,7 @@ echo /ipfs/QmecDgNqCRirkc3Cjz9eoRBNwXGckJ9WvTdmY16HP88768 >> ~/.config/ipfs/cust
 We consciously avoid defining any other API other than expecting
 implementations to honor blocking what is on the denylist and act accordingly
 when it is updated. CLI commands or API endpoint to modify list items etc. are
-outside the scope of this spec. Implementations how much information to
+outside the scope of this spec. Implementations can decide how much information to
 provide to users when a request for an IPFS object is blocked.
 
 As a last note, if we take Kubo and the go-ipfs stack as the reference IPFS
@@ -156,6 +156,10 @@ hints:
 # sha256(bafybeiefwqslmf6zyyrxodaxx4vwqircuxpza5ri45ws3y5a62ypxti42e/)
 # blocks only this CID
 //d9d295bde21f422d471a90f2a37ec53049fdf3e5fa3ee2e8f20e10003da429e7
+
+# Legacy DNSLink double-hash block
+# sha256(bad-domain-name.tld/)
+//c555c4de78827ba42527dd3dc5398db38d6c0a8c345a88e0158b2d100f317e50
 
 # Legacy Path double-hash block
 # Blocks bafybeiefwqslmf6zyyrxodaxx4vwqircuxpza5ri45ws3y5a62ypxti42e/path
@@ -363,6 +367,10 @@ Doublehash-Rule: Blocks using double-hashed item, which can be:
     function, which makes is inferior to the modern and more future-proof
     b58-encoded multihash notation which supports use of alternative hash
     functions.
+  - If necessary, CID blocks can be applied to IPNS namespace:
+    - IPNS Names work out of the box when represented as `CIDV1_LIBP2P-KEY_BASE32/`.
+    - DNSLink rule can be enforced if matching sha256-hex-encoded hash
+      of `dnslink.domain.example.com/` (domain with with trailing slash).
 
 In a case where implementation cannot distinguish a double-hashed rule between
 a b58btc multihash (modern) and a sha256 hex-string (legacy), content blocking
