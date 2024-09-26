@@ -87,7 +87,7 @@ echo /ipfs/QmecDgNqCRirkc3Cjz9eoRBNwXGckJ9WvTdmY16HP88768 >> ~/.config/ipfs/cust
 We consciously avoid defining any other API other than expecting
 implementations to honor blocking what is on the denylist and act accordingly
 when it is updated. CLI commands or API endpoint to modify list items etc. are
-outside the scope of this spec. Implementations how much information to
+outside the scope of this spec. Implementations can decide how much information to
 provide to users when a request for an IPFS object is blocked.
 
 As a last note, if we take Kubo and the go-ipfs stack as the reference IPFS
