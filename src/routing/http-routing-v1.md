@@ -65,6 +65,32 @@ This API uses a standard version prefix in the path, such as `/v1/...`. If a bac
 
 - `cid` is the [CID](https://github.com/multiformats/cid) to fetch provider records for.
 
+#### Request Query Parameters
+
+- `?filter-addrs`: Network Address Filtering
+  - `?filter-addrs=<comma-separated-list>` optional parameter that indicates which network transports to return by filtering the multiaddrs in the `Addrs` field of the [Peer schema].
+  - The value of the `filter-addrs` parameter is a comma-separated list of network transport protocol _name strings_ as defined in the [multiaddr protocol registry](https://github.com/multiformats/multiaddr/blob/master/protocols.csv), e.g. `?filter-addrs=webtransport`.
+  - `unknown` can be be passed to include providers whose multiaddrs are unknown, e.g. `?filter-addrs=unknown`. This allows filtering providers whose multiaddrs are unknown at the time of filtering.
+  - Multiaddrs are filtered by checking if the protocol name appears in any of the multiaddrs (logical OR).
+  - Negative filtering is done by prefixing the protocol name with `!`, e.g. to skip IPv6 and QUIC addrs: `?filter-addrs=!ip6,!quic-v1`. Note that negative filtering is done by checking if the protocol name does not appear in any of the multiaddrs (logical AND).
+  - If no parameter is passed, the default behavior is to return the original list of addresses unchanged.
+  - If only negative filters are provided, addresses not passing any of the negative filters are included.
+  - If positive filters are provided, only addresses passing at least one positive filter (and no negative filters) are included.
+  - If both positive and negative filters are provided, the address must pass all negative filters and at least one positive filter to be included.
+  - If there are no multiaddrs that match the passed transports, the provider is omitted from the response.
+  - Filtering is case-insensitive.
+- `?filter-protocols`: IPFS Protocol Filtering
+  - `?filter-protocols=<comma-separated-list>` optional parameter to filter providers based on the `Protocol` field of the [Peer schema].
+  - The `filter-protocols` parameter is a comma-separated list of transfer protocol names, e.g. `?filter-protocols=transport-bitswap`.
+  - Transfer protocols names should be treated as opaque strings and have a max length of 63 characters. A non-exhaustive list of transfer protocols are defined per convention in the [multicodec registry](https://github.com/multiformats/multicodec/blob/3b7b52deb31481790bc4bae984d8675bda4e0c82/table.csv#L149-L151).
+  - Implementations MUST preserve all transfer protocol names when returning a positive result that matches one or more of them.
+  - A special `unknown` name can be be passed to include providers whose transfer protocol list is empty (unknown), e.g. `?filter-protocols=unknown`. This allows for including providers returned from the DHT that do not contain explicit transfer protocol information.
+  - Providers are filtered by checking if the transfer protocol name appears in the `Protocols` array (logical OR).
+  - If the provider doesn't match any of the passed transfer protocols, the provider is omitted from the response.
+  - If a provider passes the filter, it is returned unchanged, i.e. the full set of protocols is returned including protocols that not included in the filter. (note that this is different from `filter-addrs` where only the multiaddrs that pass the filter are returned)
+  - Filtering is case-insensitive.
+  - If no parameter is passed, the default behavior is to not filter by transfer protocol.
+
 #### Response Status Codes
 
 - `200` (OK): the response body contains 0 or more records.
@@ -112,6 +138,32 @@ Each object in the `Providers` list is a record conforming to a schema, usually 
 
 - `peer-id` is the [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md) to fetch peer records for,
 represented as a CIDv1 encoded with `libp2p-key` codec.
+
+#### Request Query Parameters
+
+- `?filter-addrs`: Network Address Filtering
+  - `?filter-addrs=<comma-separated-list>` optional parameter that indicates which network transports to return by filtering the multiaddrs in the `Addrs` field of the [Peer schema].
+  - The value of the `filter-addrs` parameter is a comma-separated list of network transport protocol _name strings_ as defined in the [multiaddr protocol registry](https://github.com/multiformats/multiaddr/blob/master/protocols.csv), e.g. `?filter-addrs=webtransport`.
+  - `unknown` can be be passed to include providers whose multiaddrs are unknown, e.g. `?filter-addrs=unknown`. This allows filtering providers whose multiaddrs are unknown at the time of filtering.
+  - Multiaddrs are filtered by checking if the protocol name appears in any of the multiaddrs (logical OR).
+  - Negative filtering is done by prefixing the protocol name with `!`, e.g. to skip IPv6 and QUIC addrs: `?filter-addrs=!ip6,!quic-v1`. Note that negative filtering is done by checking if the protocol name does not appear in any of the multiaddrs (logical AND).
+  - If no parameter is passed, the default behavior is to return the original list of addresses unchanged.
+  - If only negative filters are provided, addresses not passing any of the negative filters are included.
+  - If positive filters are provided, only addresses passing at least one positive filter (and no negative filters) are included.
+  - If both positive and negative filters are provided, the address must pass all negative filters and at least one positive filter to be included.
+  - If there are no multiaddrs that match the passed transports, the provider is omitted from the response.
+  - Filtering is case-insensitive.
+- `?filter-protocols`: IPFS Protocol Filtering
+  - `?filter-protocols=<comma-separated-list>` optional parameter to filter providers based on the `Protocol` field of the [Peer schema].
+  - The `filter-protocols` parameter is a comma-separated list of transfer protocol names, e.g. `?filter-protocols=transport-bitswap`.
+  - Transfer protocols names should be treated as opaque strings and have a max length of 63 characters. A non-exhaustive list of transfer protocols are defined per convention in the [multicodec registry](https://github.com/multiformats/multicodec/blob/3b7b52deb31481790bc4bae984d8675bda4e0c82/table.csv#L149-L151).
+  - Implementations MUST preserve all transfer protocol names when returning a positive result that matches one or more of them.
+  - A special `unknown` name can be be passed to include providers whose transfer protocol list is empty (unknown), e.g. `?filter-protocols=unknown`. This allows for including providers returned from the DHT that do not contain explicit transfer protocol information.
+  - Providers are filtered by checking if the transfer protocol name appears in the `Protocols` array (logical OR).
+  - If the provider doesn't match any of the passed transfer protocols, the provider is omitted from the response.
+  - If a provider passes the filter, it is returned unchanged, i.e. the full set of protocols is returned including protocols that not included in the filter. (note that this is different from `filter-addrs` where only the multiaddrs that pass the filter are returned)
+  - Filtering is case-insensitive.
+  - If no parameter is passed, the default behavior is to not filter by transfer protocol.
 
 #### Response Status Codes
 
