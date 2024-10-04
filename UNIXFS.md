@@ -36,8 +36,10 @@ Draft work and discussion on a specification for the upcoming version 2 of the U
   - Importer - [unixfs-importer](https://github.com/ipfs/js-ipfs-unixfs-importer)
   - Exporter - [unixfs-exporter](https://github.com/ipfs/js-ipfs-unixfs-exporter)
 - Go
+  - (Several flavors are available)
+  - [`ipfs/go-unixfsnode`](https://github.com/ipfs/go-unixfsnode/)
   - [`ipfs/go-ipfs/unixfs`](https://github.com/ipfs/go-ipfs/tree/b3faaad1310bcc32dc3dd24e1919e9edf51edba8/unixfs)
-  - Protocol Buffer Definitions - [`ipfs/go-ipfs/unixfs/pb`](https://github.com/ipfs/go-ipfs/blob/b3faaad1310bcc32dc3dd24e1919e9edf51edba8/unixfs/pb/unixfs.proto)
+    - Protocol Buffer Definitions - [`ipfs/go-ipfs/unixfs/pb`](https://github.com/ipfs/go-ipfs/blob/b3faaad1310bcc32dc3dd24e1919e9edf51edba8/unixfs/pb/unixfs.proto)
 
 ## Data Format
 
