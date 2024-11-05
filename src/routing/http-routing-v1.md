@@ -148,7 +148,7 @@ Each object in the `Providers` list is a record conforming to a schema, usually 
 #### Path Parameters
 
 - `peer-id` is the [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md) to fetch peer records for,
-represented as either a Multihash in Base58btc, or a CIDv1 with libp2p-key (`0x72`) codec. 
+represented as either a Multihash in Base58btc, or a CIDv1 with libp2p-key (`0x72`) codec (in Base36 or Base32).
 
 #### Request Query Parameters
 
