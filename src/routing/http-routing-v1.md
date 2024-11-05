@@ -52,7 +52,7 @@ As such, human-readable encodings of types are preferred. This specification may
 
 - CIDs are always string-encoded using a [multibase]-encoded [CIDv1].
 - Multiaddrs are string-encoded according to the [human-readable multiaddr specification][multiaddr].
-- Peer IDs are string-encoded according [PeerID string representation specification][peer-id-representation]: either a Multihash in Base58btc, or a CIDv1 with libp2p-key (`0x72`) codec.
+- Peer IDs are string-encoded according [PeerID string representation specification][peer-id-representation]: either a Multihash in Base58btc, or a CIDv1 with libp2p-key (`0x72`) codec in Base36 or Base32.
 - Multibase bytes are string-encoded according to [the Multibase spec][multibase], and SHOULD use base64.
 - Timestamps are Unix millisecond epoch timestamps.
 
@@ -68,7 +68,7 @@ This API uses a standard version prefix in the path, such as `/v1/...`. If a bac
 
 #### Path Parameters
 
-- `cid` is the [CID](https://github.com/multiformats/cid) to fetch provider records for.
+- `cid` is the [CID](https://github.com/multiformats/cid) to fetch provider records for (preferably normalized to a CIDv1 in Base32, to maximize HTTP cache hits).
 
 #### Request Query Parameters
 
