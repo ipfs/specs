@@ -221,7 +221,7 @@ Each object in the `Peers` list is a record conforming to the [Peer Schema](#pee
   - The `max-age` value in seconds SHOULD match duration from `IpnsEntry.data[TTL]`, if present and bigger than `0`. Otherwise, implementation SHOULD default to `max-age=60`.
   - Implementations SHOULD include `sig-ttl`, set to the remaining number of seconds the returned IPNS Record is valid.
 - `Expires:`: an HTTP-date timestamp ([RFC9110, Section 5.6.7](https://www.rfc-editor.org/rfc/rfc9110#section-5.6.7)) when the validity of IPNS Record expires (if `ValidityType=0`, when signature expires)
-- `Last-Modified`: an HTTP-date timestamp of when cacheable resolution occured: allows HTTP proxies and CDNs to support inexpensive update checks via `If-Modified-Since`
+- `Last-Modified`: an HTTP-date timestamp of when cacheable resolution occurred: allows HTTP proxies and CDNs to support inexpensive update checks via `If-Modified-Since`
 - `Vary: Accept`: allows intermediate caches to play nicely with the different possible content types.
 
 #### Response Body
