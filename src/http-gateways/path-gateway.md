@@ -428,7 +428,7 @@ Returned directive depends on requested content path and format:
   every immutable resource under `/ipfs/` namespace.
   - Generated `/ipfs/` responses such as UnixFS directory listings are not
     byte-for-byte immutable and SHOULD have a meaningful expiration that allows
-    for generated responses to be updated over time. Suggested value is one week:
+    for generated responses to be updated over time. Suggested value is at least one week:
     `public, max-age=604800, stale-while-revalidate=2678400`.
 
 - `Cache-Control: public, max-age=<ttl>, stale-while-revalidate=2678400` SHOULD be returned for mutable
