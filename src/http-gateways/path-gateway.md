@@ -796,7 +796,7 @@ Gateway MUST respond with HTTP error when requested CID is on any of active deny
 Gateway implementation MAY apply some denylists by default as long the gateway
 operator is able to inspect and modify the list of denylists that are applied.
 
-**Examples of public deny lists**
+Examples of public deny lists:
 
 - [The Bad Bits Denylist](https://badbits.dwebops.pub/) – a list of hashed CIDs
   that have been flagged for various reasons (copyright violation, malware,
