@@ -65,6 +65,8 @@ Same as in :cite[path-gateway], but with limited number of supported response ty
 
 ## Request Headers
 
+For HTTP Caching, follow `Cache-Control`, `If-Modified-Since`, and `If-None-Match` from :cite[path-gateway].
+
 ### `Accept` (request header)
 
 A Client SHOULD send this HTTP header to leverage content type negotiation
@@ -236,6 +238,8 @@ In case both are present in the request, the value from the [`Accept`](#accept-r
 Below MUST be implemented **in addition** to "HTTP Response" of :cite[path-gateway].
 
 ## Response Headers
+
+For HTTP Caching, follow `Cache-Control`, `Last-Modified`, and `Etag` from :cite[path-gateway].
 
 ### `Content-Type` (response header)
 
