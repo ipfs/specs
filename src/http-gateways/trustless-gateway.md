@@ -39,6 +39,24 @@ The minimal implementation means:
 
 A subset of "HTTP API" of :cite[path-gateway].
 
+## `GET /ipfs/bafkqaaa`
+
+`bafkqaaa` is the identity empty CID. This endpoint can be used to probe that that the endpoint corresponds to a trustless gateway.
+
+For block requests (`?format=raw`), when supported, it must return `200 OK` and an empty body.
+
+For CAR requests (`?format=car`), when supported, it must return `200 OK` and CAR file with root set to `bafkqaaa` and a single `bafkqaaa` block (which is empty).
+
+We recommend supporting only this specific identity CID and not random identity CIDs.
+
+## `HEAD /ipfs/bafkqaaa`
+
+`bafkqaaa` is the identity empty CID. This endpoint can be used to probe that that the endpoint corresponds to a trustless gateway that correctly supports `HEAD` requests.
+
+It must return `200 OK` in all cases.
+
+We recommend supporting only this specific identity CID and not random identity CIDs.
+
 ## `GET /ipfs/{cid}[/{path}][?{params}]`
 
 Downloads verifiable, content-addressed data for the specified **immutable** content path.
@@ -235,6 +253,21 @@ In case both are present in the request, the value from the [`Accept`](#accept-r
 
 Below MUST be implemented **in addition** to "HTTP Response" of :cite[path-gateway].
 
+## Status codes
+
+Trustless gateways MUST return reasonable status codes.
+
+* `200` for successful requests.
+* `4xx` for client errors.
+* `5xx` for server errors, server unavailability.
+
+For example:
+
+* A CID non retrievable from this gateway SHOULD return `404`
+* A blocked CID SHOULD return `410` or `451`.
+* A request with a malformed or unsupported CID SHOULD return `400`.
+* No `5xx` status should be used for client errors, like requesting an unexistent path under a CID.
+
 ## Response Headers
 
 ### `Content-Type` (response header)
@@ -256,6 +289,15 @@ MUST be returned and set to `attachment` to ensure requested bytes are not rende
 Same as in :cite[path-gateway], SHOULD be returned when Trustless Gateway
 supports more than a single response format and the `format` query parameter is
 missing or does not match well-known format from `Accept` header.
+
+### `Retry-After` (response header)
+
+In conjuction with status code `429` (for rate limiting) and `503` (maintenance), the `Retry-After` header can be used to signal how long the user agent should wait before making a follow-up request. This is a [standard response header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After) with the following syntax:
+
+```
+Retry-After: <http-date>
+Retry-After: <delay-seconds>
+```
 
 # Block Responses (application/vnd.ipld.raw)
 
