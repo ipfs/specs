@@ -237,7 +237,9 @@ In case both are present in the request, the value from the [`Accept`](#accept-r
 
 # HTTP Response
 
-Below MUST be implemented **in addition** to "HTTP Response" of :cite[path-gateway], with special attention to the section relative to Response Status Codes.
+Below MUST be implemented **in addition** to "HTTP Response" of
+:cite[path-gateway], with special attention to the "Response Status Codes" and
+the "Recursive vs non-recursive gateways" sections.
 
 ## Response Headers
 
