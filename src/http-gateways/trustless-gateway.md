@@ -261,7 +261,6 @@ Same as in :cite[path-gateway], SHOULD be returned when Trustless Gateway
 supports more than a single response format and the `format` query parameter is
 missing or does not match well-known format from `Accept` header.
 
-
 # Block Responses (application/vnd.ipld.raw)
 
 An opaque bytes matching the requested block CID
