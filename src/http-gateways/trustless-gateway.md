@@ -47,9 +47,13 @@ Optional `path` is permitted for requests that specify CAR format (`?format=car`
 
 For block requests (`?format=raw` or `Accept: application/vnd.ipld.raw`), only `GET /ipfs/{cid}[?{params}]` is supported.
 
+It is RECOMMENDED to additionally implement the [`GET` probe path](#dedicated-probe-paths).
+
 ## `HEAD /ipfs/{cid}[/{path}][?{params}]`
 
 Same as GET, but does not return any payload.
+
+It is RECOMMENDED to additionally implement the [`HEAD` probe path](#dedicated-probe-paths).
 
 ## `GET /ipns/{key}[?{params}]`
 
@@ -233,7 +237,9 @@ In case both are present in the request, the value from the [`Accept`](#accept-r
 
 # HTTP Response
 
-Below MUST be implemented **in addition** to "HTTP Response" of :cite[path-gateway].
+Below MUST be implemented **in addition** to "HTTP Response" of
+:cite[path-gateway], with special attention to the "Response Status Codes" and
+the "Recursive vs non-recursive gateways" sections.
 
 ## Response Headers
 
@@ -438,3 +444,34 @@ returned as [application/vnd.ipfs.ipns-record](https://www.iana.org/assignments/
 A Client MUST confirm the record signature match `libp2p-key` from the requested IPNS Name.
 
 A Client MUST [perform additional record verification according to the IPNS specification](https://specs.ipfs.tech/ipns/ipns-record/#record-verification).
+
+# Notes for implementers
+
+## Dedicated Probe Paths
+
+Trustless gateways SHOULD provide probing endpoints as described below.
+
+### `GET /ipfs/bafkqaaa`
+
+`bafkqaaa` is the identity empty CID. This endpoint can be used to probe that
+that the endpoint corresponds to a trustless gateway.
+
+For block requests (`?format=raw`), when supported, it must return `200 OK`
+and an empty body.
+
+For CAR requests (`?format=car`), when supported, it must return `200 OK` and
+CAR file with root set to `bafkqaaa` and a single `bafkqaaa` block (which is
+empty).
+
+We recommend supporting only this specific identity CID and not random
+identity CIDs.
+
+### `HEAD /ipfs/bafkqaaa`
+
+`bafkqaaa` is the identity empty CID. If this endpoint is enabled, the gateway
+MUST support [`HEAD` requests](#head-ipfs-cid-path-params).
+
+It must return `200 OK` in all cases.
+
+We recommend supporting only this specific identity CID and not random
+identity CIDs.
