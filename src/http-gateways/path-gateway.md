@@ -296,6 +296,8 @@ The request succeeded.
 
 If the HTTP method was `GET`, then data is transmitted in the message body.
 
+If the HTTP method was `HEAD`, then no body should be sent.
+
 ### `206` Partial Content
 
 Partial Content: range request succeeded.
@@ -310,7 +312,9 @@ The new, canonical URL is returned in the [`Location`](#location-response-header
 
 ### `400` Bad Request
 
-A generic client error returned when it is not possible to return a better one
+A generic client error returned when it is not possible to return a better
+one. For example, this can be used when the CID is malformed or its codec is
+unsupported.
 
 ### `404` Not Found
 
@@ -641,9 +645,15 @@ Optional, present in certain response types:
 
 ### `Retry-After` (response header)
 
-Gateway returns this header with error responses such as [`429 Too Many Requests`](#429-too-many-requests) or [`504 Gateway Timeout`](#504-gateway-timeout).
+Gateway SHOULD return this header with error responses such as [`429 Too Many Requests`](#429-too-many-requests), [`504 Gateway Timeout`](#504-gateway-timeout) or `503` (server maintainance).
 
-The "Retry-After" header indicates how long the user agent ought to wait before making a follow-up request.
+The "Retry-After" header indicates how long the user agent ought to wait before making a follow-up request. It uses the following syntax:
+
+```
+Retry-After: <http-date>
+// or
+Retry-After: <delay-seconds>
+```
 
 See Section 10.2.3 of :cite[rfc9110].
 

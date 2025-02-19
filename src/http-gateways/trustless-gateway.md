@@ -39,24 +39,6 @@ The minimal implementation means:
 
 A subset of "HTTP API" of :cite[path-gateway].
 
-## `GET /ipfs/bafkqaaa`
-
-`bafkqaaa` is the identity empty CID. This endpoint can be used to probe that that the endpoint corresponds to a trustless gateway.
-
-For block requests (`?format=raw`), when supported, it must return `200 OK` and an empty body.
-
-For CAR requests (`?format=car`), when supported, it must return `200 OK` and CAR file with root set to `bafkqaaa` and a single `bafkqaaa` block (which is empty).
-
-We recommend supporting only this specific identity CID and not random identity CIDs.
-
-## `HEAD /ipfs/bafkqaaa`
-
-`bafkqaaa` is the identity empty CID. This endpoint can be used to probe that that the endpoint corresponds to a trustless gateway that correctly supports `HEAD` requests.
-
-It must return `200 OK` in all cases.
-
-We recommend supporting only this specific identity CID and not random identity CIDs.
-
 ## `GET /ipfs/{cid}[/{path}][?{params}]`
 
 Downloads verifiable, content-addressed data for the specified **immutable** content path.
@@ -65,9 +47,13 @@ Optional `path` is permitted for requests that specify CAR format (`?format=car`
 
 For block requests (`?format=raw` or `Accept: application/vnd.ipld.raw`), only `GET /ipfs/{cid}[?{params}]` is supported.
 
+It is RECOMMENDED to additionally implement the [`GET` probe path](#dedicated-probe-paths).
+
 ## `HEAD /ipfs/{cid}[/{path}][?{params}]`
 
 Same as GET, but does not return any payload.
+
+It is RECOMMENDED to additionally implement the [`HEAD` probe path](#dedicated-probe-paths).
 
 ## `GET /ipns/{key}[?{params}]`
 
@@ -251,22 +237,7 @@ In case both are present in the request, the value from the [`Accept`](#accept-r
 
 # HTTP Response
 
-Below MUST be implemented **in addition** to "HTTP Response" of :cite[path-gateway].
-
-## Status codes
-
-Trustless gateways MUST return reasonable status codes.
-
-* `200` for successful requests.
-* `4xx` for client errors.
-* `5xx` for server errors, server unavailability.
-
-For example:
-
-* A CID non retrievable from this gateway SHOULD return `404`
-* A blocked CID SHOULD return `410` or `451`.
-* A request with a malformed or unsupported CID SHOULD return `400`.
-* No `5xx` status should be used for client errors, like requesting an unexistent path under a CID.
+Below MUST be implemented **in addition** to "HTTP Response" of :cite[path-gateway], with special attention to the section relative to Response Status Codes.
 
 ## Response Headers
 
@@ -290,14 +261,6 @@ Same as in :cite[path-gateway], SHOULD be returned when Trustless Gateway
 supports more than a single response format and the `format` query parameter is
 missing or does not match well-known format from `Accept` header.
 
-### `Retry-After` (response header)
-
-In conjuction with status code `429` (for rate limiting) and `503` (maintenance), the `Retry-After` header can be used to signal how long the user agent should wait before making a follow-up request. This is a [standard response header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After) with the following syntax:
-
-```
-Retry-After: <http-date>
-Retry-After: <delay-seconds>
-```
 
 # Block Responses (application/vnd.ipld.raw)
 
@@ -480,3 +443,34 @@ returned as [application/vnd.ipfs.ipns-record](https://www.iana.org/assignments/
 A Client MUST confirm the record signature match `libp2p-key` from the requested IPNS Name.
 
 A Client MUST [perform additional record verification according to the IPNS specification](https://specs.ipfs.tech/ipns/ipns-record/#record-verification).
+
+# Notes for implementers
+
+## Dedicated Probe Paths
+
+Trustless gateways SHOULD provide probing endpoints as described below.
+
+### `GET /ipfs/bafkqaaa`
+
+`bafkqaaa` is the identity empty CID. This endpoint can be used to probe that
+that the endpoint corresponds to a trustless gateway.
+
+For block requests (`?format=raw`), when supported, it must return `200 OK`
+and an empty body.
+
+For CAR requests (`?format=car`), when supported, it must return `200 OK` and
+CAR file with root set to `bafkqaaa` and a single `bafkqaaa` block (which is
+empty).
+
+We recommend supporting only this specific identity CID and not random
+identity CIDs.
+
+### `HEAD /ipfs/bafkqaaa`
+
+`bafkqaaa` is the identity empty CID. If this endpoint is enabled, the gateway
+MUST support [`HEAD` requests](#head-ipfs-cid-path-params).
+
+It must return `200 OK` in all cases.
+
+We recommend supporting only this specific identity CID and not random
+identity CIDs.
