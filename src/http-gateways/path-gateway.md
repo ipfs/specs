@@ -389,8 +389,8 @@ This error response SHOULD include
 [`Retry-After`](#retry-after-response-header) HTTP header to indicate how long
 the client should wait before retrying.
 
-Gateways MUST return `404` instead of `502` when the content is known to be
-unretrivable: for example, when the Gateway is
+Gateways SHOULD return `404` instead of `502` when the content is known to be
+unretrievable: for example, when the Gateway is
 [non-recursive](#recursive-vs-non-recursive-gateways) and the content is known
 to not be available.
 
@@ -408,11 +408,10 @@ This error response SHOULD include
 [`Retry-After`](#retry-after-response-header) HTTP header to indicate how long
 the client should wait before retrying.
 
-Gateways MUST return `404` instead of `504` when the content is known to be
-unretrivable: for example, when the Gateway is
+Gateways SHOULD return `404` instead of `504` when the content is known to be
+unretrievable: for example, when the Gateway is
 [non-recursive](#recursive-vs-non-recursive-gateways) and the content is known
 to not be available.
-
 
 ## Response Headers
 
@@ -888,7 +887,7 @@ suggest that clients retry failed requests later via `502` and `504` respones
 status codes.
 
 A *non-recursive Gateway* is gateway which accesses a known content-set and,
-under normal operation conditions, knows with certainity whether content
+under normal operation conditions, knows with certainty whether content
 requested can be obtained or not. Non-recursive gateways SHOULD prevent
 unnecessary retries from clients when the content is known to be unavailable
 by returning `404`.
