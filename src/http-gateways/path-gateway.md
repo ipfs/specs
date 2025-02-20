@@ -883,7 +883,7 @@ A *recursive Gateway* is a gateway which generally attempts to fetch content
 from a third party it does not control by triggering lookups and retrievals. A
 recursive Gateway may not know in advance whether it can obtain and return a
 piece of content as the availability of it is out of its control. It may also
-suggest that clients retry failed requests later via `502` and `504` respones
+suggest that clients retry failed requests later via `502` and `504` responses
 status codes.
 
 A *non-recursive Gateway* is gateway which accesses a known content-set and,
