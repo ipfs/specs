@@ -3,19 +3,13 @@ title: UnixFS
 description: >
   UnixFS is a Protocol Buffers-based format for describing files, directories,
   and symlinks as dag-pb and raw DAGs in IPFS.
-date: 2024-09-06
+date: 2025-03-01
 maturity: draft
 editors:
   - name: David Dias
     github: daviddias
-    affiliation:
-      name: Protocol Labs
-      url: https://protocol.ai/
   - name: Jeromy Johnson
     github: whyrusleeping
-    affiliation:
-      name: Protocol Labs
-      url: https://protocol.ai/
   - name: Alex Potsides
     github: achingbrain
     affiliation:
@@ -23,14 +17,8 @@ editors:
       url: https://ipshipyard.com/
   - name: Peter Rabbitson
     github: ribasushi
-    affiliation:
-      name: Protocol Labs
-      url: https://protocol.ai/
   - name: Hugo Valtier
     github: jorropo
-    affiliation:
-      name: Protocol Labs
-      url: https://protocol.ai/
   - name: Marcin Rataj
     github: lidel
     affiliation:
@@ -41,10 +29,7 @@ tags: ['data-formats']
 order: 1
 ---
 
-UnixFS is a [protocol-buffers][protobuf]-based format for describing files,
-directories and symlinks as Directed Acyclic Graphs (DAGs) in IPFS.
-
-## Nodes
+# Node Types
 
 A :dfn[Node] is the smallest unit present in a graph, and it comes from graph
 theory. In UnixFS, there is a 1-to-1 mapping between nodes and blocks. Therefore,
@@ -62,19 +47,19 @@ hash function specified in the multihash, gives us the same multihash value back
 
 In UnixFS, a node can be encoded using two different multicodecs, listed below. More details are provided in the following sections:
 
-- `raw` (`0x55`), which are single block :ref[Files].
-- `dag-pb` (`0x70`), which can be of any other type.
+- [`raw`](#raw-node) (`0x55`), which are single block files without any metadata.
+- [`dag-pb`](#dag-pb-node) (`0x70`), which can be of any other type.
 
-## `Raw` Nodes
+# `raw` Node
 
 The simplest nodes use `raw` encoding and are implicitly a :ref[File]. They can
 be recognized because their CIDs are encoded using the `raw` (`0x55`) codec:
 
-- The file content is purely the block body.
+- The block is the file data. There is no protobuf envelope or metadata.
 - They never have any children nodes, and thus are also known as single block files.
 - Their size is the length of the block body (`Tsize` in parent is equal to `blocksize`).
 
-## `dag-pb` Nodes
+# `dag-pb` Node
 
 More complex nodes use the `dag-pb` (`0x70`) encoding. These nodes require two steps of
 decoding. The first step is to decode the outer container of the block. This is encoded using the IPLD [`dag-pb`][ipld-dag-pb] specification, which can be
@@ -111,7 +96,7 @@ message Data {
     Raw = 0;
     Directory = 1;
     File = 2;
-    Metadata = 3;
+    Metadata = 3; // reserved for future use
     Symlink = 4;
     HAMTShard = 5;
   }
@@ -141,17 +126,17 @@ whose `Data` field is a UnixFSV1 Protobuf message. For clarity, the specificatio
 document may represent these nested Protobufs as one object. In this representation,
 it is implied that the `PBNode.Data` field is encoded in a protobuf.
 
-### Data Types
+## `dag-pb` Types
 
 A `dag-pb` UnixFS node supports different types, which are defined in
 `decode(PBNode.Data).Type`. Every type is handled differently.
 
-#### `File` type
+### `dag-pb` `File`
 
 A :dfn[File] is a container over an arbitrary sized amount of bytes. Files are either
 single block or multi-block. A multi-block file is a concatenation of multiple child files.
 
-##### The _sister-lists_ `PBNode.Links` and `decode(PBNode.Data).blocksizes`
+#### The _sister-lists_ `PBNode.Links` and `decode(PBNode.Data).blocksizes`
 
 The _sister-lists_ are the key point of why IPLD `dag-pb` is important for files. They
 allow us to concatenate smaller files together.
@@ -195,14 +180,14 @@ In the example above, the offset list would be `[0, 20]`. Thus, we know we only 
 
 UnixFS parser MUST error if `blocksizes` or `Links` are not of the same length.
 
-##### `decode(PBNode.Data).Data`
+#### `decode(PBNode.Data).Data`
 
 An array of bytes that is the file content and is appended before
 the links. This must be taken into account when doing offset calculations; that is,
 the length of `decode(PBNode.Data).Data` defines the value of the zeroth element
 of the offset list when computing offsets.
 
-##### `PBNode.Links[].Name`
+#### `PBNode.Links[].Name`
 
 This field makes sense only in :ref[Directories] contexts and MUST be absent
 when creating a new file. For historical reasons, implementations parsing
@@ -211,24 +196,24 @@ third-party data SHOULD accept empty values here.
 If this field is present and non-empty, the file is invalid and the parser MUST
 error.
 
-##### `decode(PBNode.Data).Blocksize`
+#### `decode(PBNode.Data).Blocksize`
 
 This field is not directly present in the block, but rather a computable property
 of a `dag-pb`, which would be used in the parent node in `decode(PBNode.Data).blocksizes`.
 It is the sum of the length of `decode(PBNode.Data).Data` field plus the sum
 of all link's `blocksizes`.
 
-##### `decode(PBNode.Data).filesize`
+#### `decode(PBNode.Data).filesize`
 
 If present, this field MUST be equal to the `Blocksize` computation above.
 Otherwise, this file is invalid.
 
-##### Path Resolution
+#### `dag-pb` `File` Path Resolution
 
 A file terminates a UnixFS content path. Any attempt to resolve a path past a
 file MUST error.
 
-#### `Directory` Type
+### `dag-pb` `Directory`
 
 A :dfn[Directory], also known as folder, is a named collection of child :ref[Nodes]:
 
@@ -237,6 +222,8 @@ A :dfn[Directory], also known as folder, is a named collection of child :ref[Nod
 - Duplicate names are not allowed. Therefore, two elements of `PBNode.Link` CANNOT
   have the same `Name`. If two identical names are present in a directory, the
   decoder MUST fail.
+- Implementations SHOULD detect when directory becomes too big to fit in a single
+  `Directory` block and use [`HAMTDirectory`] type instead.
 
 The minimum valid `PBNode.Data` field for a directory is as follows:
 
@@ -246,9 +233,7 @@ The minimum valid `PBNode.Data` field for a directory is as follows:
 }
 ```
 
-The remaining relevant values are covered in [Metadata](#metadata).
-
-##### Link Ordering
+#### `dag-pb` `Directory` Link Ordering
 
 The canonical sorting order is lexicographical over the names.
 
@@ -261,7 +246,7 @@ it consumed those names. However, when some implementations decode, modify and t
 re-encode, the original link order loses it's original meaning, given that there
 is no way to indicate which sorting was used originally.
 
-##### Path Resolution
+#### `dag-pb` `Directory` Path Resolution
 
 Pop the left-most component of the path, and try to match it to the `Name` of
 a child under `PBNode.Links`. If you find a match, you can then remember the CID.
@@ -271,23 +256,7 @@ duplicate names are not allowed. <!--TODO: check Kubo does this-->
 Assuming no errors were raised, you can continue to the path resolution on the
 remaining components and on the CID you popped.
 
-#### `Symlink` type
-
-A :dfn[Symlink] represents a POSIX [symbolic link](https://pubs.opengroup.org/onlinepubs/9699919799/functions/symlink.html).
-A symlink MUST NOT have children. <!--TODO: check that this is true-->
-
-The `PBNode.Data.Data` field is a POSIX path that MAY be inserted in front of the
-currently remaining path component stack.
-
-##### Path Resolution
-
-There is no current consensus on how pathing over symlinks should behave. Some
-implementations return symlink objects and fail if a consumer tries to follow them
-through.
-
-Symlink path resolution SHOULD follow the POSIX specification, over the current UnixFS path context, as much as is applicable.
-
-#### `HAMTDirectory`
+### `dag-pb` `HAMTDirectory`
 
 A :dfn[HAMT Directory] is a [Hashed-Array-Mapped-Trie](https://en.wikipedia.org/wiki/Hash_array_mapped_trie)
 data structure representing a :ref[Directory]. It is generally used to represent
@@ -307,7 +276,7 @@ directories:, since they allow you to split large directories into multiple bloc
 The field `Name` of an element of `PBNode.Links` for a HAMT starts with an
 uppercase hex-encoded prefix, which is `log2(fanout)` bits wide.
 
-##### Path Resolution
+#### `dag-pb` `HAMTDirectory` Path Resolution
 
 To resolve the path inside a HAMT:
 
@@ -323,7 +292,27 @@ To resolve the path inside a HAMT:
    name you were trying to resolve, you have successfully resolved a path component.
    Everything past the hex encoded prefix is the name of that element, which is useful when listing children of this directory.
 
-### `TSize` (child DAG size hint)
+### `dag-pb` `Symlink`
+
+A :dfn[Symlink] represents a POSIX [symbolic link](https://pubs.opengroup.org/onlinepubs/9699919799/functions/symlink.html).
+A symlink MUST NOT have children. <!--TODO: check that this is true-->
+
+The `PBNode.Data.Data` field is a POSIX path that MAY be inserted in front of the
+currently remaining path component stack.
+
+#### `dag-pb` `Symlink` Path Resolution
+
+Symlink path resolution SHOULD follow the POSIX specification, over the current UnixFS path context, as much as is applicable.
+
+:::warning
+
+There is no current consensus on how pathing over symlinks should behave. Some
+implementations return symlink objects and fail if a consumer tries to follow them
+through.
+
+:::
+
+### `dag-pb` `TSize` (child DAG size hint)
 
 `Tsize` is an optional field in `PBNode.Links[]` which represents the precomputed size of the specific child DAG. It provides a performance optimization: a hint about the total size of child DAG can be read without having to fetch any child nodes.
 
@@ -347,20 +336,24 @@ Following the [Robustness Principle](https://specs.ipfs.tech/architecture/princi
 able to decode nodes where the `Tsize` field is wrong (not matching the sizes of  sub-DAGs), or
 partially or completely missing.
 
+:::
+
+:::warning
+
 When total data size is needed for important purposes such as accounting, billing, and cost estimation, the `Tsize` SHOULD NOT be used, and instead a full DAG walk SHOULD to be performed.
 
 :::
 
-### Metadata
+### `dag-pb` Optional Metadata
 
-UnixFS currently supports two optional metadata fields.
+UnixFS currently supports below optional metadata fields.
 
-#### `mode`
+#### `mode` Field
 
 The `mode` is for persisting the file permissions in [numeric notation](https://en.wikipedia.org/wiki/File_system_permissions#Numeric_notation)
 \[[spec](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_stat.h.html)\].
 
-- If unspecified, this defaults to
+- If unspecified, implementations MAY default to
   - `0755` for directories/HAMT shards
   - `0644` for all other types where applicable
 - The nine least significant bits represent  `ugo-rwx`
@@ -369,7 +362,7 @@ The `mode` is for persisting the file permissions in [numeric notation](https://
   - For future-proofing, the (de)serialization layer must preserve the entire uint32 value during clone/copy operations, modifying only bit values that have a well defined meaning: `clonedValue = ( modifiedBits & 07777 ) | ( originalValue & 0xFFFFF000 )`
   - Implementations of this spec must proactively mask off bits without a defined meaning in the implemented version of the spec: `interpretedValue = originalValue & 07777`
 
-#### `mtime`
+#### `mtime` Field
 
 A two-element structure ( `Seconds`, `FractionalNanoseconds` ) representing the
 modification time in seconds relative to the unix epoch `1970-01-01T00:00:00Z`.
@@ -405,7 +398,7 @@ non-IPFS target MUST observe the following:
     vs 64bit mismatch), implementations must assume the highest possible value
     in the targets range. In most cases, this would be `2038-01-19T03:14:07Z`.
 
-## Paths
+## UnixFS Paths
 
 Paths begin with a `<CID>/` or `/ipfs/<CID>/`, where `<CID>` is a [multibase]
 encoded [CID]. The CID encoding MUST NOT use a multibase alphabet that contains
@@ -421,21 +414,31 @@ inspired by POSIX paths.
 - Components SHOULD be UTF8 unicode.
 - Components are case-sensitive.
 
-### Escaping
+### Path Escaping
 
-The `\` may be used to trigger an escape sequence. However, it is currently
-broken and inconsistent across implementations. Until we agree on a specification
-for this, you SHOULD NOT use any escape sequences and/or non-ASCII characters.
+:::warning
+
+Behavior is not defined.
+
+Until we agree on a specification for this, implementations SHOULD NOT depend on any escape
+sequences and/or non-ASCII characters for mission-critical applications, or limit escaping to specific context.
+
+- HTTP interfaces such as Gateways have limited support for [percent-encoding](https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding).
+- The `\` may be used to trigger an escape sequence. However, it is currently broken and inconsistent across implementations.
+
+:::
 
 ### Relative Path Components
 
 Relative path components MUST be resolved before trying to work on the path:
 
-- `.` points to the current node and  MUST be removed.
+- `.` points to the current node and MUST be removed.
 - `..` points to the parent node and MUST be removed left to right. When removing
   a `..`, the path component on the left MUST also be removed. If there is no path
   component on the left, you MUST error to avoid out-of-bounds
   path resolution.
+- Implementations MUST error when resolving a relative path that attempts to go
+  beyond the root CID (example: `/ipfs/cid/../foo`).
 
 ### Restricted Names
 
@@ -448,16 +451,29 @@ The following names SHOULD NOT be used:
   terminations in some systems, such as C-compatible systems. Many unix
   file systems do not accept this character in path components.
 
-## Appendix: Design Decision Rationale
+# Appendix: Historical Design Decisions
 
-### `mtime` and `mode` Metadata Support in UnixFSv1.5
+:::warning
+Below section explains some of historical decisions. This is not part of specification,
+and is provided here only for extra context.
+:::
+
+## Design Considerations: Extra Metadata
 
 Metadata support in UnixFSv1.5 has been expanded to increase the number of possible
 use cases. These include `rsync` and filesystem-based package managers.
 
 Several metadata systems were evaluated, as discussed in the following sections.
 
-#### Separate Metadata Node
+:::note
+
+UnixFS 1.5 stores optional `mode` and `mtime` metadata in the `Data` fields of
+the root `dag-pb` node, however below analysis may be useful when additional
+metadata is being discussed, or UnixFS 1.5 approach is revisited.
+
+:::
+
+### Pros and Cons: Metadata in a Separate Metadata Node
 
 In this scheme, the existing `Metadata` message is expanded to include additional
 metadata types (`mtime`, `mode`, etc). It contains links to the actual file data,
@@ -474,7 +490,7 @@ This was ultimately rejected for a number of reasons:
   UnixFSv2, as mapping between metadata formats potentially requires multiple fetch
   operations.
 
-#### Metadata in the Directory
+### Pros and Cons: Metadata in the Directory
 
 Repeated `Metadata` messages are added to UnixFS `Directory` and `HAMTShard` nodes,
 the index of which indicates which entry they are to be applied to. Where entries are
@@ -498,7 +514,7 @@ This was rejected for the following reasons:
    benefit of including some metadata in the containing directory is negligible
    in this use case.
 
-#### Metadata in the File
+### Pros and Cons: Metadata in the File
 
 This adds new fields to the UnixFS `Data` message to represent the various metadata fields.
 
@@ -521,7 +537,7 @@ Downsides to this approach are:
    into [CID]s, so additional fetches will be required to load a given UnixFS
    entry.
 
-#### Side Trees
+### Pros and Cons: Metadata in Side Trees
 
 With this approach, we would maintain a separate data structure outside of the
 UnixFS tree to hold metadata.
@@ -530,7 +546,7 @@ This was rejected due to concerns about added complexity, recovery after system
 crashes while writing, and having to make extra requests to fetch metadata nodes
 when resolving [CID]s from peers.
 
-#### Side Database
+### Pros and Cons: Metadata in Side Database
 
 This scheme would see metadata stored in an external database.
 
@@ -538,9 +554,9 @@ The downsides to this are that metadata would not be transferred from one node
 to another when syncing, as [Bitswap] is not aware of the database and in-tree
 metadata.
 
-### UnixTime Protobuf Datatype Rationale
+## Design Decision: UnixTime Protobuf Datatype
 
-#### Seconds
+### UnixTime Seconds
 
 The integer portion of UnixTime is represented on the wire using a `varint` encoding.
 While this is inefficient for negative values, it avoids introducing zig-zag encoding.
@@ -548,7 +564,7 @@ Values before the year `1970` are exceedingly rare, and it would be handy having
 such cases stand out, while ensuring that the "usual" positive values are easily readable. The `varint` representing the time of writing this text is 5 bytes
 long. It will remain so until October 26, 3058 (34,359,738,367).
 
-#### FractionalNanoseconds
+### UnixTime FractionalNanoseconds
 
 Fractional values are effectively a random number in the range 1 to 999,999,999.
 In most cases, such values will exceed 2^28 (268,435,456) nanoseconds. Therefore,
@@ -559,7 +575,7 @@ the fractional part is represented as a 4-byte `fixed32`,
 
 This section and included subsections are not authoritative.
 
-## Implementations
+## Popular Implementations
 
 - JavaScript
   - [`@helia/unixfs`](https://www.npmjs.com/package/@helia/unixfs) implementation of a filesystem compatible with [Helia SDK](https://github.com/ipfs/helia#readme)
@@ -569,16 +585,19 @@ This section and included subsections are not authoritative.
 - Go
   - [Boxo SDK](https://github.com/ipfs/boxo#readme) includes implementation of UnixFS filesystem
     - Protocol Buffer Definitions - [`ipfs/boxo/../unixfs.proto`](https://github.com/ipfs/boxo/blob/v0.23.0/ipld/unixfs/pb/unixfs.proto)
-    - [`boxo/files`](https://github.com/ipfs/boxo/tree/main/files)
+    - [`ipfs/boxo/files`](https://github.com/ipfs/boxo/tree/main/files)
     - [`ipfs/boxo/ipld/unixfs`](https://github.com/ipfs/boxo/tree/main/ipld/unixfs/)
   - Alternative `go-ipld-prime` implementation: [`ipfs/go-unixfsnode`](https://github.com/ipfs/go-unixfsnode)
+
+<!-- TODO: Rust libraries seem to be abandoned, hiding them for now
 - Rust
   - [`iroh-unixfs`](https://github.com/n0-computer/iroh/tree/b7a4dd2b01dbc665435659951e3e06d900966f5f/iroh-unixfs)
   - [`unixfs-v1`](https://github.com/ipfs-rust/unixfsv1)
+-->
 
-## Simple `Raw` Example
+## Simple `raw` Example
 
-In this example, we will build a `Raw` file with the string `test` as its content.
+In this example, we will build a single `raw` block with the string `test` as its content.
 
 First, hash the data:
 
@@ -629,5 +648,5 @@ This will tell you which offset inside this node the children at the correspondi
 [CID]: https://github.com/multiformats/cid/
 [multicodec]: https://github.com/multiformats/multicodec
 [multihash]: https://github.com/multiformats/multihash
-[Bitswap]: https://github.com/ipfs/specs/blob/master/BITSWAP.md
+[Bitswap]: https://specs.ipfs.tech/bitswap-protocol/
 [ipld-dag-pb]: https://ipld.io/specs/codecs/dag-pb/spec/
