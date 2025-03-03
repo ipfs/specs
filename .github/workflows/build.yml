@@ -48,7 +48,7 @@ jobs:
         with:
           path: ${{ env.BUILD_PATH }}
 
-      - uses: ipfs/ipfs-deploy-action@v0.3
+      - uses: ipfs/ipfs-deploy-action@6b8f42e9e539bc5ab0624183eb31cd0383e59f5c
         name: Deploy to IPFS Mirror Providers
         id: deploy
         with:
