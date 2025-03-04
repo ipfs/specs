@@ -235,6 +235,25 @@ In case both are present in the request, the value from the [`Accept`](#accept-r
 
 Below MUST be implemented **in addition** to "HTTP Response" of :cite[path-gateway].
 
+## Response Status Codes
+
+### `200` OK
+
+The request succeeded.
+
+If the HTTP method was `GET`, then data is transmitted in the message body.
+
+### `404` Not Found
+
+Error to indicate that requested resource is not provided by the gateway.
+
+### `3XX` Redirects
+
+Non-recursive trustless gateway SHOULD NOT return HTTP redirects.
+Change of URL should occur by announcing it to the routing system.
+
+Clients SHOULD ignore redirects and interpret them the same way as `404`.
+
 ## Response Headers
 
 ### `Content-Type` (response header)
