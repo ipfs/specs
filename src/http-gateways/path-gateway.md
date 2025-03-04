@@ -314,8 +314,11 @@ A generic client error returned when it is not possible to return a better one
 
 ### `404` Not Found
 
-Error to indicate that request was formally correct, but traversal of the
-requested content path was not possible due to a invalid or missing DAG node.
+Error indicating that the request was syntactically valid, but traversal
+of the requested content path failed due to an invalid or missing DAG node.
+
+This error SHOULD occur when either the root CID is not provided by the gateway
+or a specified sub-path does not exist within the DAG referenced by the root CID.
 
 ### `410` Gone
 
