@@ -48,7 +48,7 @@ jobs:
         with:
           path: ${{ env.BUILD_PATH }}
 
-      - uses: ipfs/ipfs-deploy-action@e2e5165a7f94f351849e9a9182f2c24777300a8c
+      - uses: ipfs/ipfs-deploy-action@92ac587815ff60dd9c495201ebd3dc39fe21d9b0
         name: Deploy to IPFS Mirror Providers
         id: deploy
         with:
@@ -60,6 +60,7 @@ jobs:
           storacha-proof: ${{ secrets.STORACHA_PROOF }}
           #TODO pinata-jwt-token: ${{ secrets.PINATA_JWT_TOKEN }}
           github-token: ${{ github.token }}
+          pin-name: 'specs.ipfs.tech-${{ github.sha }}'
 
       - name: Update DNSLink
         if: false # TODO github.ref == 'refs/heads/main' # only update DNSLink for main branch
