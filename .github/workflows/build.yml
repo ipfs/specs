@@ -60,7 +60,6 @@ jobs:
           storacha-proof: ${{ secrets.STORACHA_PROOF }}
           #TODO pinata-jwt-token: ${{ secrets.PINATA_JWT_TOKEN }}
           github-token: ${{ github.token }}
-          cluster-pin-expire-in: 1h
 
       - name: Update DNSLink
         if: false # TODO github.ref == 'refs/heads/main' # only update DNSLink for main branch
