@@ -4,15 +4,21 @@ description: >
   The minimal subset of HTTP Gateway response types facilitates data retrieval
   via CID and ensures integrity verification, all while eliminating the need to
   trust the gateway itself.
-date: 2024-04-17
+date: 2025-03-06
 maturity: reliable
 editors:
   - name: Marcin Rataj
     github: lidel
-    url: https://lidel.org/
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
   - name: Henrique Dias
     github: hacdias
-    url: https://hacdias.com/
+  - name: Héctor Sanjuán
+    github: hsanjuan
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
 xref:
   - url
   - path-gateway
@@ -469,7 +475,4 @@ identity CIDs MAY not be handled.
 `bafkqaaa` is the identity empty CID. If this endpoint is enabled, the gateway
 MUST support [`HEAD` requests](#head-ipfs-cid-path-params).
 
-It must return `200 OK` in all cases.
-
-This specific identity CID is special for probing. Other random
-identity CIDs MAY not be handled.
+The response is the same as [`GET`](#get-ipfs-bafkqaaa) but without body and all headers are optional.
