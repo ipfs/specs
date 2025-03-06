@@ -445,7 +445,7 @@ A Client MUST confirm the record signature match `libp2p-key` from the requested
 
 A Client MUST [perform additional record verification according to the IPNS specification](https://specs.ipfs.tech/ipns/ipns-record/#record-verification).
 
-# Notes for implementers
+# Appendix: Notes for implementers
 
 ## Dedicated Probe Paths
 
@@ -456,13 +456,13 @@ Trustless gateways SHOULD provide probing endpoints as described below.
 `bafkqaaa` is the identity empty CID. This endpoint can be used to probe that
 that the endpoint corresponds to a trustless gateway.
 
-For block requests (`?format=raw`), when supported, it MUST return `200 OK`
+For block requests (signaled by `?format=raw` and `Accept: application/vnd.ipld.raw`), when supported, it MUST return `200 OK`
 and an empty body.
 
-For CAR requests (`?format=car`), when supported, it MUST return `200 OK` and a valid CAR file with CAR Header `roots` set to `bafkqaaa`. Identity block MAY be skipped in the CAR Data section.
+For CAR requests (signaled by `?format=car` and `Accept: application/vnd.ipld.car`), when supported, it MUST return `200 OK` and a valid CAR file with CAR Header `roots` set to `bafkqaaa`. Identity block MAY be skipped in the CAR Data section.
 
 This specific identity CID is special for probing. Other random
-identity CIDs SHOULD not be handled.
+identity CIDs MAY not be handled.
 
 ### `HEAD /ipfs/bafkqaaa`
 
@@ -472,4 +472,4 @@ MUST support [`HEAD` requests](#head-ipfs-cid-path-params).
 It must return `200 OK` in all cases.
 
 This specific identity CID is special for probing. Other random
-identity CIDs SHOULD not be handled.
+identity CIDs MAY not be handled.

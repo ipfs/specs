@@ -682,8 +682,6 @@ Gateway SHOULD return this header with error responses such as [`429 Too Many Re
 The "Retry-After" header indicates how long the user agent ought to wait before making a follow-up request. It uses the following syntax:
 
 ```
-Retry-After: <http-date>
-// or
 Retry-After: <delay-seconds>
 ```
 
