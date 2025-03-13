@@ -61,17 +61,18 @@ jobs:
           #TODO pinata-jwt-token: ${{ secrets.PINATA_JWT_TOKEN }}
           github-token: ${{ github.token }}
 
-      - name: Update DNSLink
-        if: false # TODO github.ref == 'refs/heads/main' # only update DNSLink for main branch
-        uses: ipfs/dnslink-action@v0.1
-        with:
-          cid: ${{ steps.deploy.outputs.cid }}
-          dnslink_domain: 'specs.ipfs.tech'
-          cf_record_id: ${{ secrets.CF_RECORD_ID }}
-          cf_zone_id: ${{ secrets.CF_ZONE_ID }}
-          cf_auth_token: ${{ secrets.CF_AUTH_TOKEN }}
-          github_token: ${{ github.token }}
-          set_github_status: true
+      # TODO: right now, DNSLink is controlled by Fleek, and we use ipfs/ipfs-deploy-action for PR previews
+      #- name: Update DNSLink
+      #  if: false # TODO github.ref == 'refs/heads/main' # only update DNSLink for main branch
+      #  uses: ipfs/dnslink-action@v0.1
+      #  with:
+      #    cid: ${{ steps.deploy.outputs.cid }}
+      #    dnslink_domain: 'specs.ipfs.tech'
+      #    cf_record_id: ${{ secrets.CF_RECORD_ID }}
+      #    cf_zone_id: ${{ secrets.CF_ZONE_ID }}
+      #    cf_auth_token: ${{ secrets.CF_AUTH_TOKEN }}
+      #    github_token: ${{ github.token }}
+      #    set_github_status: true
 
 
   gh-pages:
