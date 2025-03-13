@@ -65,14 +65,14 @@ A reference `.well-known/libp2p/protocols` JSON body with mapping that assumes t
 
 [Peer ID Authentication over HTTP](https://github.com/libp2p/specs/blob/master/http/peer-id-auth.md) is optional and SHOULD NOT be required by [Trustless Gateway](https://specs.ipfs.tech/http-gateways/trustless-gateway/)  HTTP endpoint defined for `/ipfs/gateway` handler.
 
-Client following the Trustless Gateway specification MUST verify each CID individually, without being concerned with peer identity.
+Clients following the Trustless Gateway specification MUST verify each CID individually, without being concerned with peer identity.
 PeerID authentication is not required for trustless retrieval and HTTP-only clients SHOULD work without it.
 
 # Gateway Type Detection
 
 The `/ipfs/gateway` protocol identifier is shared among all Gateway specifications.
 
-HTTP server mounted behind the `/ipfs/gateway` identifier MUST expose the most basic [block (application/vnd.ipld.raw)](https://specs.ipfs.tech/http-gateways/trustless-gateway/#block-responses-application-vnd-ipld-raw)
+An HTTP server mounted behind the `/ipfs/gateway` identifier MUST expose the most basic [block (application/vnd.ipld.raw)](https://specs.ipfs.tech/http-gateways/trustless-gateway/#block-responses-application-vnd-ipld-raw)
 responses from :cite[trustless-gateway], but MAY also support other gateway types and features.
 
 Client implementations SHOULD [perform feature detection](https://specs.ipfs.tech/http-gateways/trustless-gateway/#dedicated-probe-paths) on their own,
