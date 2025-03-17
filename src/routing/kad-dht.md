@@ -27,11 +27,17 @@ requirements.
 
 ## Introduction
 
-FIXME:
+`FIXME:`
 
 Distributed Key-Value Store
 
 Goal of DHT is to find the closest peers to some key (in a specific geometry). Once this routing to the closest nodes is possible, nodes can interact with these nodes in various ways, including in asking them to store and serve data.
+
+### DHT Operations
+
+* Peer Routing
+* Value storage and retrieval
+* Content provider advertisement and dsicovery
 
 ### Relation to [libp2p kad-dht](https://github.com/libp2p/specs/tree/master/kad-dht)
 
@@ -170,9 +176,7 @@ the most stable peers are eventually retained in the Routing Table.
 
 #### IP Diversity Filter
 
-SHOULD implement
-
-FIXME:
+`FIXME:` DHT Servers SHOULD implement an [IP Diversity Filter](https://github.com/libp2p/go-libp2p-kbucket/blob/ddb36fa029a18ea0fd5a2b61eeb7235913749615/peerdiversity/filter.go#L45).
 
 ### Routing Table Refresh
 
@@ -198,31 +202,90 @@ information on its closest peers.
 
 ## Lookup Process
 
-Iterative vs Recursive
+When performing a lookup for a Kademlia Identifier in the DHT, a node begins by
+sending requests to known DHT servers whose identifiers are close to the
+target. Each response provides information on peers that are even closer to the
+target identifier, and the process continues iteratively until the absolute
+closest peers are discovered.
+
+### Iterative vs Recursive Lookup
+
+In an iterative lookup, the querying node sends requests to several known DHT
+servers. Each server returns a list of peers that are closer to the target
+Kademlia Identifier, but does not continue the lookup process. The querying
+node then directly contacts these closer peers, repeating the process until the
+closest nodes are found.
+
+In a recursive lookup, the querying node delegates the task to a peer that is
+closer to the target. That peer then queries its own closer peers on behalf of
+the original node, and this delegation continues recursively until the target
+is reached.
+
+The IPFS Kademlia DHT uses an iterative lookup approach because recursive
+lookups can enable [amplification
+attacks](https://en.wikipedia.org/wiki/Denial-of-service_attack#Amplification)
+and make error handling more complex.
 
 ### Server behavior
 
-In public DHT swarms, DHT Servers MUST never respond with private or loopback multiaddresses.
+Upon receiving a lookup request for a Kademlia Identifier, a DHT Server MUST
+return the Peer ID and multiaddresses of the `k` closest nodes to the requested
+Kademlia Identifier that are stored in its Routing Table. DHT Servers SHOULD
+NOT return any information about unresponsive nodes.
 
-Should Server tell Client about Server? And about Client?
+In public DHT swarms, DHT Servers MUST filter out private and loopback
+multiaddresses, and MUST NOT include peers whose only addresses are private or
+loopback.
 
-### Concurrency
+`FIXME:` Define whether DHT Server should return information about itself and
+about requester.
 
-Implementation specific. Recommendation is `10`
+### Client behavior
 
-### Lookup termination
+When a client initiates a lookup for a Kademlia Identifier `kid` (DHT Servers
+can initiate lookups as clients), it starts by selecting the closest nodes to
+`kid` in XOR distance, and put them in a list/set. Then it sends requests for
+`kid` to the closest nodes (see [concurrency](#concurrency)) to `kid` from the
+list.
 
-This is hard
+Upon receiving a response, the client adds freshly received peers to the list
+of closest peers. It sends a request to the closest peer to `kid` that hasn't
+been queried yet. The client ignores timeouts and invalid responses.
 
-#### Resiliency
+When a client (or a DHT server acting as a client) initiates a lookup for a
+Kademlia Identifier `kid`, it begins by selecting the known nodes closest to
+`kid` in terms of XOR distance, and adds them to a candidate list. It then
+sends lookup requests to the closest nodes from that list.
 
-Implementation specific. Recommendation is `3`
+As responses are received, any newly discovered peers are added to the
+candidate list. The client proceeds by sending a request to the nearest peer to
+`kid` that has not yet been queried. Invalid responses and timeouts are simply
+discarded.
+
+#### Termination
+
+The lookup process continues until the `k` closest reachable peers to `kid`
+have been successfully queried. The process may also be terminated early if the
+request-specific success criteria are met. Additionally, if every candidate
+peer has been queried without discovering any new ones, the lookup will
+terminate.
+
+#### Concurrency
+
+A client MAY have multiple concurrent in-flight queries to distinct nodes for
+the same lookup. This behavior is specific to the client and does not affect
+how DHT servers operate.
+
+It is recommended that the maximum number of in-flight requests (denoted by
+`α`) be set to `10`.
 
 ## Peer Routing
 
 DHT Clients that want to be routable must make sure they are in the peerstore of the closest DHT servers to their own PeerID.
 
 When performing a `FIND_NODE` lookup, the client will converge to the closest nodes in XOR distance to the requested PeerID. These nodes are expected to know the multiaddrs of the target peer. The
+
+### `FIND_NODE` Termination
 
 ### Routing to non-DHT Servers
 
@@ -233,6 +296,10 @@ When performing a `FIND_NODE` lookup, the client will converge to the closest no
 ### Content Kademlia Identifier
 
 sha256
+
+### Lookup Termination and Resiliency
+
+Resiliency: Implementation specific. Recommendation is `3`
 
 ### Provider Records
 
