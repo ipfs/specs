@@ -327,11 +327,141 @@ for the Client
 
 ### Validators
 
-## Wire format
+## RPC Messages
 
-Currently same as libp2p kad-dht
+Remote procedure calls are performed by:
 
-Profobuf
+1. Opening a new stream.
+2. Sending the RPC request message.
+3. Listening for the RPC response message.
+4. Closing the stream.
+
+On any error, the stream is reset.
+
+Implementations MAY re-use streams by sending one or more RPC request messages
+on a single outgoing stream before closing it. Implementations MUST handle
+additional RPC request messages on an incoming stream.
+
+All RPC messages sent over a stream are prefixed with the message length in
+bytes, encoded as an unsigned variable length integer as defined by the
+[multiformats unsigned-varint
+spec](https://github.com/multiformats/unsigned-varint).
+
+All RPC messages conform to the following protobuf:
+
+```protobuf
+syntax = "proto3";
+
+// Record represents a dht record that contains a value
+// for a key value pair
+message Record {
+    // The key that references this record
+    bytes key = 1;
+
+    // The actual value this record is storing
+    bytes value = 2;
+
+    // Note: These fields were removed from the Record message
+    //
+    // Hash of the authors public key
+    // optional string author = 3;
+    // A PKI signature for the key+value+author
+    // optional bytes signature = 4;
+
+    // Time the record was received, set by receiver
+    // Formatted according to https://datatracker.ietf.org/doc/html/rfc3339
+    string timeReceived = 5;
+};
+
+message Message {
+    enum MessageType {
+        PUT_VALUE = 0;
+        GET_VALUE = 1;
+        ADD_PROVIDER = 2;
+        GET_PROVIDERS = 3;
+        FIND_NODE = 4;
+        PING = 5;
+    }
+
+    enum ConnectionType {
+        // sender does not have a connection to peer, and no extra information (default)
+        NOT_CONNECTED = 0;
+
+        // sender has a live connection to peer
+        CONNECTED = 1;
+
+        // sender recently connected to peer
+        CAN_CONNECT = 2;
+
+        // sender recently tried to connect to peer repeatedly but failed to connect
+        // ("try" here is loose, but this should signal "made strong effort, failed")
+        CANNOT_CONNECT = 3;
+    }
+
+    message Peer {
+        // ID of a given peer.
+        bytes id = 1;
+
+        // multiaddrs for a given peer
+        repeated bytes addrs = 2;
+
+        // used to signal the sender's connection capabilities to the peer
+        ConnectionType connection = 3;
+    }
+
+    // defines what type of message it is.
+    MessageType type = 1;
+
+    // defines what coral cluster level this query/response belongs to.
+    // in case we want to implement coral's cluster rings in the future.
+    int32 clusterLevelRaw = 10; // NOT USED
+
+    // Used to specify the key associated with this message.
+    // PUT_VALUE, GET_VALUE, ADD_PROVIDER, GET_PROVIDERS
+    bytes key = 2;
+
+    // Used to return a value
+    // PUT_VALUE, GET_VALUE
+    Record record = 3;
+
+    // Used to return peers closer to a key in a query
+    // GET_VALUE, GET_PROVIDERS, FIND_NODE
+    repeated Peer closerPeers = 8;
+
+    // Used to return Providers
+    // GET_VALUE, ADD_PROVIDER, GET_PROVIDERS
+    repeated Peer providerPeers = 9;
+}
+```
+
+These are the requirements for each `MessageType`:
+
+* `FIND_NODE`: In the request `key` must be set to the binary `PeerId` of the
+node to be found. In the response `closerPeers` is set to the DHT Server's `k`
+closest `Peer`s.
+
+* `GET_VALUE`: In the request `key` is an unstructured array of bytes.
+`closerPeers` is set to the `k` closest peers. If `key` is found in the
+datastore `record` is set to the value for the given key.
+
+* `PUT_VALUE`: In the request `record` is set to the record to be stored and
+`key` on `Message` is set to equal `key` of the `Record`. The target node
+validates `record`, and if it is valid, it stores it in the datastore and as a
+response echoes the request.
+
+* `GET_PROVIDERS`: In the request `key` is set to the multihash contained in
+the target CID. The target node returns the known `providerPeers` (if any) and
+the `k` closest known `closerPeers`.
+
+* `ADD_PROVIDER`: In the request `key` is set to the multihash contained in the
+target CID. The target node verifies `key` is a valid multihash, all
+`providerPeers` matching the RPC sender's PeerID are recorded as providers.
+
+* `PING`: Deprecated message type replaced by the dedicated [ping
+protocol](https://github.com/libp2p/specs/blob/master/ping/ping.md).
+
+If a DHT server receives an invalid request, it simply closes the libp2p stream
+without responding.
 
 ## Backpressure
 
