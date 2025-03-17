@@ -113,8 +113,8 @@ identifier for incoming streams.
 
 ## Kademlia Keyspace
 
-Kademlia [0] operates on a binary keyspace defined as $\{0, 1\}^m$. In
-particular, the IPFS Kademlia DHT uses a keyspace of length $m=256, containing
+Kademlia [0] operates on a binary keyspace defined as $\lbrace 0,1 \rbrace^m$. In
+particular, the IPFS Kademlia DHT uses a keyspace of length $m=256$, containing
 all bitstrings of 256 bits. The distance between any pair of keys is defined as
 the bitwise XOR of the two keys, resulting in a new key representing the
 distance between the two keys. This keyspace is used for indexing both nodes
