@@ -281,15 +281,42 @@ It is recommended that the maximum number of in-flight requests (denoted by
 
 ## Peer Routing
 
-DHT Clients that want to be routable must make sure they are in the peerstore of the closest DHT servers to their own PeerID.
+Implementations typically provide two interfaces for peer routing using the
+`FIND_NODE` RPC: `FindPeer`, which locates a specific Peer ID, and
+`GetClosestPeers`, which finds the `k` closest peers to a given key.
 
-When performing a `FIND_NODE` lookup, the client will converge to the closest nodes in XOR distance to the requested PeerID. These nodes are expected to know the multiaddrs of the target peer. The
+### `FindPeer`
 
-### `FIND_NODE` Termination
+`FindPeer` is the process of discovering the multiaddresses of a given Peer ID.
+The requester uses the `FIND_NODE` RPC, including the bytes representation of
+the target Peer ID in the `key` field. The lookup eventually converges on the
+target Peer ID. The lookup process terminates early if the requester has
+established a connection to the target Peer ID.
 
-### Routing to non-DHT Servers
+#### Discovering non-DHT Servers
+
+DHT clients that want to remain routable must ensure their multiaddresses are
+stored in the peerstore of the DHT Servers closest to them in XOR distance.
+Since peerstore entries expire over time, DHT Clients SHOULD periodically
+reconnect to their closest DHT servers to prevent their information from being
+removed. It is recommended to perform this reconnection every 10 minutes.
+
+When receiving a `FIND_NODE` request for a given Peer ID, DHT Servers MUST
+always respond with the information of that Peer ID, if it is included in their
+peerstore, even if the target node isn't a DHT Server or only advertises
+private addresses.
+
+### `GetClosestPeers`
+
+`GetClosestPeers` also makes use of the `FIND_NODE` RPC, but allows the sender
+to look for the `k` closest peers to any key. The `key` provided to `FIND_NODE`
+corresponds to the preimage of the Kademlia Identifier.
+
+`GetClosestPeers` is used for Content Routing.
 
 ### Signed Peer Records
+
+`FIXME`: Signed Peer Records are not yet implemented in the IPFS Kademlia DHT.
 
 ## Content Routing
 
