@@ -6,7 +6,7 @@ description: >
   InterPlanetary File System (IPFS). It extends the libp2p Kademlia DHT
   specification, adapting and adding features to support IPFS-specific
   requirements.
-date: FIXME
+date: 2025-03-18
 maturity: reliable
 editors:
   - name: Guillaume Michel
@@ -639,20 +639,28 @@ TBD
 
 ### LAN DHT Swarms
 
-Fine to store private multiaddresses in the routing table and serve them to other nodes in the same LAN DHT swarm.
+Fine to store private multiaddresses in the routing table and serve them to
+other nodes in the same LAN DHT swarm.
 
 ### Checking peer behaviour before adding to routing table
 
-Make a `FIND_NODE` request and inspect response before adding node to RT. Followed https://blog.ipfs.tech/2023-ipfs-unresponsive-nodes/
+Make a `FIND_NODE` request and inspect response before adding node to RT.
+Followed https://blog.ipfs.tech/2023-ipfs-unresponsive-nodes/
 
 ## libp2p Kademlia DHT Implementations
 
 * Go: [`libp2p/go-libp2p-kad-dht`](https://github.com/libp2p/go-libp2p-kad-dht)
-* JS: [libp2p/kad-dht](https://github.com/libp2p/js-libp2p/tree/main/packages/kad-dht)
-* Rust: [libp2p-kad](https://github.com/libp2p/rust-libp2p/tree/master/protocols/kad)
+* JS:
+[libp2p/kad-dht](https://github.com/libp2p/js-libp2p/tree/main/packages/kad-dht)
+* Rust:
+[libp2p-kad](https://github.com/libp2p/rust-libp2p/tree/master/protocols/kad)
 
 ---
 
 ## References
 
-[0]: Maymounkov, P., & Mazières, D. (2002). Kademlia: A Peer-to-Peer Information System Based on the XOR Metric. In P. Druschel, F. Kaashoek, & A. Rowstron (Eds.), Peer-to-Peer Systems (pp. 53–65). Berlin, Heidelberg: Springer Berlin Heidelberg. [DOI](https://doi.org/10.1007/3-540-45748-8_5) [pdf](https://www.scs.stanford.edu/~dm/home/papers/kpos.pdf)
+[0]: Maymounkov, P., & Mazières, D. (2002). Kademlia: A Peer-to-Peer
+Information System Based on the XOR Metric. In P. Druschel, F. Kaashoek, & A.
+Rowstron (Eds.), Peer-to-Peer Systems (pp. 53–65). Berlin, Heidelberg: Springer
+Berlin Heidelberg. [DOI](https://doi.org/10.1007/3-540-45748-8_5)
+[pdf](https://www.scs.stanford.edu/~dm/home/papers/kpos.pdf)
