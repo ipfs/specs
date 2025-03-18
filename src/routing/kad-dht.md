@@ -264,11 +264,15 @@ discarded.
 
 #### Termination
 
-The lookup process continues until the `k` closest reachable peers to `kid`
-have been successfully queried. The process may also be terminated early if the
-request-specific success criteria are met. Additionally, if every candidate
-peer has been queried without discovering any new ones, the lookup will
-terminate.
+The resilience parameter (`β`) defines the number of closest reachable peers
+that must be successfully queried before a lookup is considered complete. It is
+recommended to set `β` to `3`, ensuring that multiple nodes confirm the lookup
+result for increased reliability.
+
+The lookup process continues until the `β` closest reachable peers to `kid`
+have been queried. However, the process MAY terminate earlier if the
+request-specific success criteria are met. Additionally, if all candidate peers
+have been queried without discovering any new ones, the lookup MUST terminate.
 
 #### Concurrency
 
@@ -310,30 +314,71 @@ private addresses.
 
 `GetClosestPeers` also makes use of the `FIND_NODE` RPC, but allows the sender
 to look for the `k` closest peers to any key. The `key` provided to `FIND_NODE`
-corresponds to the preimage of the Kademlia Identifier.
+corresponds to the preimage of the Kademlia Identifier, as described
+[below](#content-kademlia-identifier).
 
-`GetClosestPeers` is used for Content Routing.
+`GetClosestPeers` is used for the purpose of Content Routing.
 
 ### Signed Peer Records
 
 `FIXME`: Signed Peer Records are not yet implemented in the IPFS Kademlia DHT.
 
-## Content Routing
+## Provider Record Routing
+
+Provider Record Routing is the process of locating peers that provide a
+specific piece of content, identified by its CID. This is achieved by storing
+and retrieving Provider Records in the DHT.
+
+### Provider Records
+
+A Provider Record is an entry stored in the DHT associating a CID with one or
+more Peer IDs providing the corresponding content. Instead of storing the
+content itself, the DHT stores provider records pointing to the peers hosting
+the content.
+
+A Provider Record is identified by the multihash contained by the CID.
 
 ### Content Kademlia Identifier
 
-sha256
+The Kademlia Identifier associated with a CID is derived from the multihash
+contained by the CID, by hashing it with the SHA256 hash function. The
+resulting 256-bit digest is used as the Kademlia Identifier for the content.
 
-### Lookup Termination and Resiliency
+Example:
 
-Resiliency: Implementation specific. Recommendation is `3`
+```sh
+CIDv1 (base32)           : bafybeihfg3d7rdltd43u3tfvncx7n5loqofbsobojcadtmokrljfthuc7y
+CID contained hash (hex) : 1220e536c7f88d731f374dccb568aff6f56e838a19382e488039b1ca8ad2599e82fe
+Kademlia Identifier (hex): d623250f3f660ab4c3a53d3c97b3f6a0194c548053488d093520206248253bcb
+```
 
-### Provider Records
+### Content Provider Advertisement
+
+When a node wants to indicate that it provides the content associated with a
+given CID, it first finds the `k` closest DHT Servers to the Kademlia
+Identifier associated with the CID using [`GetClosestPeers`](#getclosestpeers).
+The `key` in the `FIND_NODE` payload is set to the multihash contained in the
+CID.
+
+Once the `k` closest DHT Servers are found, the node sends each of them an
+`ADD_PROVIDER` RPC, using the same `key` and setting its own Peer ID as
+`providerPeers`.
+
+The DHT Servers MUST make 2 checks before adding the provided `record` to their
+datastore:
+1. Verify that `key` is set, and doesn't exceed `80` bytes in size
+2. Discard `providerPeers` whose Peer ID is not matching the sender's Peer ID
+
+Upon successful verification, the DHT Server stores the Provider Record in its
+datastore, and responds by echoing the request to confirm success. If
+verification fails, the server MUST close the stream without sending a
+response.
 
 #### Provide Validity
 
 Provide Validity defines the time-to-live (TTL) of a Provider Record on a DHT
-Server. DHT Servers MUST implement a Provide Validity of `48h`.
+Server. DHT Servers MUST implement a Provide Validity of `48h`, and discard the
+record after expiration.
 
 #### Provider Record Republish Interval
 
@@ -350,7 +395,23 @@ content provider alongside the provide record, avoiding an additional DHT walk
 for the Client
 ([rationale](https://github.com/probe-lab/network-measurements/blob/master/results/rfm17.1-sharing-prs-with-multiaddresses.md)).
 
+### Content Provider Lookup
+
+To find providers for a given CID, a node initiates a lookup using the
+GET_PROVIDERS RPC. This process follows the same approach as a FIND_NODE
+lookup, but with one key difference: if a DHT server holds a matching provider
+record, it MUST include it in the response.
+
+Clients MAY terminate the lookup early if they are satisfied with the returned
+providers. If a node does not find any provider records and is unable to
+discover closer DHT servers after querying the β closest reachable servers, the
+request is considered a failure.
+
+## DHT Record Storage
+
 ### IPNS
+
+### Resiliency
 
 ### Validators
 
