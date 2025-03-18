@@ -336,7 +336,12 @@ more Peer IDs providing the corresponding content. Instead of storing the
 content itself, the DHT stores provider records pointing to the peers hosting
 the content.
 
-A Provider Record is identified by the multihash contained by the CID.
+A Provider Record is identified by the multihash contained by the CID. It
+functions as an append-only list, where multiple providers can add themselves
+as content hosts. Since strict consistency across the network is not required,
+different DHT servers MAY store slightly different sets of providers, but the
+lookup mechanism ensures that clients can still discover multiple sources
+efficiently.
 
 ### Content Kademlia Identifier
 
@@ -398,22 +403,97 @@ for the Client
 ### Content Provider Lookup
 
 To find providers for a given CID, a node initiates a lookup using the
-GET_PROVIDERS RPC. This process follows the same approach as a FIND_NODE
+`GET_PROVIDERS` RPC. This process follows the same approach as a `FIND_NODE`
 lookup, but with one key difference: if a DHT server holds a matching provider
 record, it MUST include it in the response.
 
 Clients MAY terminate the lookup early if they are satisfied with the returned
 providers. If a node does not find any provider records and is unable to
-discover closer DHT servers after querying the β closest reachable servers, the
-request is considered a failure.
+discover closer DHT servers after querying the `β` closest reachable servers,
+the request is considered a failure.
 
-## DHT Record Storage
+## Value Storage and Retrieval
+
+The IPFS Kademlia DHT allows users to store and retrieve records directly
+within the DHT. These records serve as key-value mappings, where the key and
+value are defined as arrays of bytes. Each record belongs to a specific
+keyspace, which defines its type and structure.
+
+The IPFS Kademlia DHT supports two types of records, each stored in its own
+keyspace:
+
+1. **Public Key Records** (`/pk/`) – Used to store public keys that cannot be
+   derived from Peer IDs.
+2. **IPNS Records** (`/ipns/`) – Used for decentralized naming and content
+   resolution.
+
+Records MUST meet validity criteria specific to their record type before being
+stored or updated. DHT Servers MUST verify the validity of each record before
+accepting it.
+
+### Routing
+
+The Kademlia Identifier of a record is derived by applying the SHA256 hash
+function to the record’s key and using the resulting digest in binary format.
+
+To store a value in the DHT, a client first finds the `k` closest peers to the
+record’s Kademlia Identifier using `GetClosestPeers`. The client then sends a
+`PUT_VALUE` RPC to each of these peers, including the `key` and the `record`.
+DHT servers MUST validate the record based on its type before accepting it.
+
+Retrieving values from the DHT follows a process similar to provider record
+lookups. Clients send a `GET_VALUE` RPC, which directs the search toward the
+`k` closest nodes to the target `key`. If a DHT Server holds a matching
+`record`, it MUST include it in its response. The conditions for terminating
+the lookup depend on the specific record type.
+
+### Public Keys
+
+Some public keys are too large to be embedded within libp2p Peer IDs ([keys
+larger than 42
+bytes](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#peer-ids)).
+In such cases, the Peer ID is derived from the hash of the public key, but the
+full key still needs to be accessible. To facilitate retrieval, public keys MAY
+be stored directly in the DHT under the `/pk/` keyspace.
+
+1. Key: `/pk/<PeerID>` (binary Peer ID format).
+2. Value: The full public key (in binary format).
+
+#### Validation
+
+DHT servers MUST verify that the Peer ID derived from the full public key
+matches the Peer ID encoded in the key. If the derived Peer ID does not match,
+the record MUST be rejected.
 
 ### IPNS
 
-### Resiliency
+IPNS (InterPlanetary Naming System) allows peers to publish mutable records
+that point to content in IPFS. These records MAY be stored in the DHT under the
+`/ipns/` namespace.
 
-### Validators
+Record format and validation is documented in the [IPNS
+specification](https://specs.ipfs.tech/ipns/ipns-record/). IPNS records are
+limited in size to
+[10KiB]((https://specs.ipfs.tech/ipns/ipns-record/#record-size-limit)).
+
+#### Quorum
+
+A quorum is the minimum number of distinct responses a client must collect from
+DHT Servers to determine a valid result. Since different DHT Servers may store
+different versions of an IPNS record, a client fetches the record from multiple
+DHT Servers to increase the likelihood of retrieving the most recent version.
+
+For IPNS lookups, the default quorum value is `16`, meaning the client attempts
+to collect responses from at least `16` DHT Servers out of `20` before
+determining the best available record.
+
+#### Entry Correction
+
+Because some DHT servers may store outdated versions of a record, clients need
+to ensure that the latest valid version is propagated. After obtaining a
+quorum, the client MUST send the most recent valid record to any of the `k`
+closest DHT Servers to the record’s Kademlia Identifier that did not return the
+latest version.
 
 ## RPC Messages
 
@@ -570,6 +650,8 @@ Make a `FIND_NODE` request and inspect response before adding node to RT. Follow
 * Go: [`libp2p/go-libp2p-kad-dht`](https://github.com/libp2p/go-libp2p-kad-dht)
 * JS: [libp2p/kad-dht](https://github.com/libp2p/js-libp2p/tree/main/packages/kad-dht)
 * Rust: [libp2p-kad](https://github.com/libp2p/rust-libp2p/tree/master/protocols/kad)
+
+---
 
 ## References
 
