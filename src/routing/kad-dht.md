@@ -5,7 +5,7 @@ description: >
   overlay network used for peer and content routing in the InterPlanetary File
   System (IPFS). It extends the libp2p Kademlia DHT specification, adapting and
   adding features to support IPFS-specific requirements.
-date: 2025-03-18
+date: 2025-03-19
 maturity: reliable
 editors:
   - name: Guillaume Michel
@@ -25,17 +25,18 @@ adding features to support IPFS-specific requirements.
 
 ## Introduction
 
-`FIXME:`
+The Kademlia Distributed Hash Table (DHT) is a decentralized key-value store
+designed to enable efficient and scalable peer-to-peer routing. It provides a
+structured overlay network that allows nodes to locate peers and content in a
+distributed system without relying on centralized servers.
 
-Distributed Key-Value Store
+The primary goal of the Kademlia routing algorithm is to progressively discover
+and interact with nodes that are closest to a given key based on the network's
+distance metric. Once a node has identified the closest peers, it can either:
 
-Goal of DHT is to find the closest peers to some key (in a specific geometry). Once this routing to the closest nodes is possible, nodes can interact with these nodes in various ways, including in asking them to store and serve data.
-
-### DHT Operations
-
-* Peer Routing
-* Content provider advertisement and discovery
-* Value storage and retrieval
+* **Locate a specific peer** in the network
+* **Find content providers** serving content associated with a CID
+* **Store and retrieve values** directly within the DHT, such as IPNS names
 
 ### Relation to [libp2p kad-dht](https://github.com/libp2p/specs/tree/master/kad-dht)
 
@@ -347,10 +348,6 @@ corresponds to the preimage of the Kademlia Identifier, as described
 
 `GetClosestPeers` is used for the purpose of Content Routing.
 
-### Signed Peer Records
-
-`FIXME`: Signed Peer Records are not yet implemented in the IPFS Kademlia DHT.
-
 ## Provider Record Routing
 
 Provider Record Routing is the process of locating peers that provide a
@@ -658,10 +655,6 @@ protocol](https://github.com/libp2p/specs/blob/master/ping/ping.md).
 
 If a DHT server receives an invalid request, it simply closes the libp2p stream
 without responding.
-
-## Backpressure
-
-TBD
 
 ## Client Optimizations
 
