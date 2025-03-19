@@ -2,10 +2,9 @@
 title: Kademlia DHT
 description: >
   The IPFS Distributed Hash Table (DHT) specification defines a structured
-  overlay network used for peer routing and content routing in the
-  InterPlanetary File System (IPFS). It extends the libp2p Kademlia DHT
-  specification, adapting and adding features to support IPFS-specific
-  requirements.
+  overlay network used for peer and content routing in the InterPlanetary File
+  System (IPFS). It extends the libp2p Kademlia DHT specification, adapting and
+  adding features to support IPFS-specific requirements.
 date: 2025-03-18
 maturity: reliable
 editors:
@@ -20,10 +19,9 @@ order: 1
 ---
 
 The IPFS Distributed Hash Table (DHT) specification defines a structured
-overlay network used for peer routing and content routing in the
-InterPlanetary File System (IPFS). It extends the libp2p Kademlia DHT
-specification, adapting and adding features to support IPFS-specific
-requirements.
+overlay network used for peer and content routing in the InterPlanetary File
+System (IPFS). It extends the libp2p Kademlia DHT specification, adapting and
+adding features to support IPFS-specific requirements.
 
 ## Introduction
 
@@ -36,8 +34,8 @@ Goal of DHT is to find the closest peers to some key (in a specific geometry). O
 ### DHT Operations
 
 * Peer Routing
+* Content provider advertisement and discovery
 * Value storage and retrieval
-* Content provider advertisement and dsicovery
 
 ### Relation to [libp2p kad-dht](https://github.com/libp2p/specs/tree/master/kad-dht)
 
@@ -58,7 +56,10 @@ used in other DHT swarms as well.
 
 ## DHT Swarms
 
-A DHT swarm is a group of interconnected nodes running the IPFS Kademlia DHT protocol, collectively identified by a unique protocol identifier. IPFS nodes MAY participate in multiple DHT swarms simultaneously. DHT swarms can be either public or private.
+A DHT swarm is a group of interconnected nodes running the IPFS Kademlia DHT
+protocol, collectively identified by a unique protocol identifier. IPFS nodes
+MAY participate in multiple DHT swarms simultaneously. DHT swarms can be either
+public or private.
 
 ### Protocol Identifier
 
@@ -639,13 +640,26 @@ TBD
 
 ### LAN DHT Swarms
 
-Fine to store private multiaddresses in the routing table and serve them to
-other nodes in the same LAN DHT swarm.
+Implementations MAY support private or LAN-specific DHT swarms, which operate
+within a local network and remain isolated from the public DHT. Nodes MAY
+participate in multiple DHT swarms simultaneously, provided that each swarm has
+a unique protocol identifier.
 
-### Checking peer behaviour before adding to routing table
+Private DHT swarms MAY store and serve private multiaddresses, as they are not
+exposed to the public network.
 
-Make a `FIND_NODE` request and inspect response before adding node to RT.
-Followed https://blog.ipfs.tech/2023-ipfs-unresponsive-nodes/
+### Verifying DHT Server
+
+Implementations MAY perform additional checks to ensure that DHT servers behave
+correctly before adding them to the routing table. In the past, misconfigured
+nodes have been added to routing tables, leading to [network
+slowdowns](https://blog.ipfs.tech/2023-ipfs-unresponsive-nodes/).
+
+For example, kubo verifies a DHT server by sending a FIND_NODE request for its
+own Peer ID before adding it to the routing table
+([reference](https://github.com/libp2p/go-libp2p-kad-dht/blob/master/optimizations.md#checking-before-adding)).
+The server is only added if its response contains at least one peer. This check
+is skipped during the initial routing table setup.
 
 ## libp2p Kademlia DHT Implementations
 
