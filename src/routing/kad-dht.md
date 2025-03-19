@@ -177,7 +177,28 @@ the most stable peers are eventually retained in the Routing Table.
 
 #### IP Diversity Filter
 
-`FIXME:` DHT Servers SHOULD implement an [IP Diversity Filter](https://github.com/libp2p/go-libp2p-kbucket/blob/ddb36fa029a18ea0fd5a2b61eeb7235913749615/peerdiversity/filter.go#L45).
+DHT servers SHOULD implement an IP Diversity Filter to ensure that nodes in
+their routing table originate from a diverse set of Autonomous System Numbers
+(ASNs). This measure helps mitigate Sybil attacks and enhances the network’s
+resilience.
+
+A recommended approach is to impose the following limits:
+
+* **Globally**, a maximum of `3` nodes sharing the same IP grouping should be
+allowed in the routing table.
+* **Per routing table bucket**, a maximum of `2` nodes from the same IP
+grouping should be permitted.
+
+For IP grouping:
+
+* **IPv6 addresses** are grouped by ASN.
+* **IPv4 addresses** are grouped by `/16` prefixes, except for [legacy Class A
+blocks](https://en.wikipedia.org/wiki/List_of_assigned_/8_IPv4_address_blocks),
+which are grouped by `/8` prefixes.
+
+Since a single node can advertise multiple addresses, a peer MUST NOT be added
+to the routing table if any of its addresses already exceed the allowed
+representation within the table.
 
 ### Routing Table Refresh
 
@@ -238,8 +259,14 @@ In public DHT swarms, DHT Servers MUST filter out private and loopback
 multiaddresses, and MUST NOT include peers whose only addresses are private or
 loopback.
 
-`FIXME:` Define whether DHT Server should return information about itself and
-about requester.
+DHT Servers SHOULD NOT return their own Peer ID in responses to `FIND_NODE`
+queries. However, they MUST include information about the requester, if and
+only if the requester is a DHT Server in its routing table and it is among the
+`k` closest nodes to the target key.
+
+A DHT Server SHOULD always return information about its known `k` closest
+peers, provided its routing table contains at least `k` peers, even if those
+peers are not closer to the target key than itself.
 
 ### Client behavior
 
