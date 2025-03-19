@@ -3,7 +3,7 @@ title: Web _redirects File Specification
 description: >
   Defines how URL redirects and rewrites can be implemented by adding rules to
   a plain text file stored underneath the root CID of a website.
-date: 2023-11-09
+date: 2025-03-19
 maturity: reliable
 editors:
   - name: Justin Johnson
@@ -13,10 +13,9 @@ editors:
       url: https://fission.codes/
   - name: Marcin Rataj
     github: lidel
-    url: https://lidel.org/
     affiliation:
-      name: Protocol Labs
-      url: https://protocol.ai/
+      name: Shipyard
+      url: https://ipshipyard.com
 tags: ['httpGateways', 'webHttpGateways']
 order: 5
 ---
@@ -140,13 +139,23 @@ and also applies to a web browser with native `ipfs://` and `ipns://` scheme han
 
 Rules MUST be evaluated in order, redirecting or rewriting using the first matching rule.
 
+The non-existent paths that are being requested should be intercepted and redirected to the destination path and the specified HTTP status code returned. The rules are evaluated in the order they appear in the file.
+
+Any request for an existing file should be returned as is, and not intercepted by the last catch all rule.
+
 ## No Forced Redirects
 
 All redirect logic MUST only be evaluated if the requested path is not present in the DAG.  This means that any performance impact associated with checking for the existence of a `_redirects` file or evaluating redirect rules will only be incurred for non-existent paths.
 
-# Error Handling
+## Error Handling
 
 If the `_redirects` file exists but there is an error reading or parsing it, the errors MUST be returned to the user with a 500 HTTP status code.
+
+## Query Parameters
+
+Implementations SHOULD retain any dynamic query parameters supplied by the user and pass them along in the `Location` header of the HTTP redirect response.
+
+When merging these user-provided parameters with any static ones defined in the [`To`](#to) field, the user’s dynamic values take precedence, overriding static ones in case of a conflict.
 
 # Security
 
@@ -205,6 +214,17 @@ $ ipfs cat /ipfs/QmYBhLYDwVFvxos9h8CGU2ibaY66QNgv8hpfewxaQrPiZj/_redirects
 /* /index.html 200
 ```
 
-The non-existent paths that are being requested should be intercepted and redirected to the destination path and the specified HTTP status code returned. The rules are evaluated in the order they appear in the file.
+A dedicated test vector with URL query parameter behavior can be found in `bafybeiee3ltldvmfgsxiqazbatrkbvkl34eanbourajwnavhupb64nnbxa`.
+Implementations SHOULD use it for internal testing when [query parameter support](#query-parameters) is desired.
 
-Any request for an existing file should be returned as is, and not intercepted by the last catch all rule.
+```
+$ ipfs cat bafybeiee3ltldvmfgsxiqazbatrkbvkl34eanbourajwnavhupb64nnbxa/_redirects
+# redirect to URL with some static query parameters
+/source1/* /target-file?static-query1=static-val1&static-query2=static-val2 301
+
+# redirect to URL where path segments are converted to query parameters
+/source2/:code/:name /target-file?code=:code&name=:name 301
+
+# catch-all redirect (test should make request with query parameters, and confirm response preserved them in returned Location header)
+/source3/* https://example.net/target3/:splat 301
+```
