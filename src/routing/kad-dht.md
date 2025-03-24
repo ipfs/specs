@@ -121,7 +121,7 @@ identifier for incoming streams.
 ## Kademlia Keyspace
 
 <!-- TODO: add LaTeX or MathML support and fix below paragraph -->
-Kademlia [0] operates on a binary keyspace defined as $\lbrace 0,1 \rbrace^m$. In
+Kademlia [`[0]`](#bibliography) operates on a binary keyspace defined as $\lbrace 0,1 \rbrace^m$. In
 particular, the IPFS Kademlia DHT uses a keyspace of length $m=256$, containing
 all bitstrings of 256 bits. The distance between any pair of keys is defined as
 the bitwise XOR of the two keys, resulting in a new key representing the
@@ -167,7 +167,7 @@ prefix with the local node. For more information see [bucket population
 measurements](https://github.com/probe-lab/network-measurements/blob/master/results/rfm19-dht-routing-table-health.md#peers-distribution-in-the-k-buckets).
 
 The IPFS Kademlia DHT uses a bucket size of `k = 20`. This corresponds to the
-`k` value as defined in the original Kademlia paper [0]. The `k` value is also
+`k` value as defined in the original Kademlia paper [`[0]`](#bibliography). The `k` value is also
 used as a replication factor and defines how many peers are returned to a
 lookup request.
 
