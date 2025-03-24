@@ -1,2 +1,3 @@
 out/
 super-linter.log
+node_modules/

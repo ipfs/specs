@@ -36,7 +36,7 @@ editors:
       url: https://ipshipyard.com
 xref:
   - ipns-record
-order: 0
+order: 3
 tags: ['routing']
 ---
 

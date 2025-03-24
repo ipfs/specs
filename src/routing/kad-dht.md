@@ -1,11 +1,11 @@
 ---
-title: Kademlia DHT
+title: IPFS Kademlia DHT
 description: >
   The IPFS Distributed Hash Table (DHT) specification defines a structured
   overlay network used for peer and content routing in the InterPlanetary File
   System (IPFS). It extends the libp2p Kademlia DHT specification, adapting and
   adding features to support IPFS-specific requirements.
-date: 2025-03-19
+date: 2025-03-24
 maturity: reliable
 editors:
   - name: Guillaume Michel
@@ -38,9 +38,9 @@ distance metric. Once a node has identified the closest peers, it can either:
 * **Find content providers** serving content associated with a CID
 * **Store and retrieve values** directly within the DHT, such as IPNS names
 
-### Relation to [libp2p kad-dht](https://github.com/libp2p/specs/tree/master/kad-dht)
+### Relation to libp2p kad-dht
 
-The IPFS Kademlia DHT specification is a specialization of the libp2p Kademlia DHT.
+The IPFS Kademlia DHT specification is a specialization of the [libp2p Kademlia DHT](https://github.com/libp2p/specs/tree/master/kad-dht).
 
 It is possible to use an alternative DHT specification alongside an IPFS
 implementation, rather than the one detailed here. This document specifically
@@ -49,20 +49,20 @@ in the [Amino DHT](#relation-to-the-amino-dht). If you're designing a new
 Kademlia-based DHT for use with IPFS, some details in this specification may
 appear overly specific or prescriptive.
 
-### Relation to the [Amino DHT](#amino-dht)
+### Relation to the Amino DHT
 
-Nodes participating in the [Amino DHT Swarm](#amino-dht) MUST implement the
+Nodes participating in the public [Amino DHT Swarm](#amino-dht) MUST implement the
 IPFS Kademlia DHT specification. The IPFS Kademlia DHT specification MAY be
 used in other DHT swarms as well.
 
 ## DHT Swarms
 
 A DHT swarm is a group of interconnected nodes running the IPFS Kademlia DHT
-protocol, collectively identified by a unique protocol identifier. IPFS nodes
+protocol, collectively identified by a unique libp2p protocol identifier. IPFS nodes
 MAY participate in multiple DHT swarms simultaneously. DHT swarms can be either
 public or private.
 
-### Protocol Identifier
+### libp2p Protocol Identifier
 
 All nodes participating in the same DHT swarm MUST use the same libp2p protocol
 identifier. The libp2p protocol identifier uniquely identifies a DHT swarm. It
@@ -73,6 +73,7 @@ DHT swarm.
 Note that there could be multiple distinct DHT swarms using the same libp2p
 protocol identifier as long as they don't have any common peers. This practice
 is discouraged as networks will immediately merge if they enter in contact.
+
 Each DHT swarm SHOULD have a dedicated protocol identifier.
 
 ### Amino DHT
@@ -80,12 +81,14 @@ Each DHT swarm SHOULD have a dedicated protocol identifier.
 The [Amino DHT](https://blog.ipfs.tech/2023-09-amino-refactoring/#why-amino) is
 the swarm of peers also referred to as the _Public IPFS DHT_. It implements the
 IPFS Kademlia DHT specification and uses the protocol identifier
-`/ipfs/kad/1.0.0`. The Amino DHT can be joined by using the [Amino DHT
-Bootstrappers](https://docs.ipfs.tech/concepts/public-utilities/#amino-dht-bootstrappers).
+`/ipfs/kad/1.0.0`.
 
+:::note
 The Amino DHT is utilized by multiple IPFS implementations, including
 [`kubo`](https://github.com/ipfs/kubo) and
-[`helia`](https://github.com/ipfs/helia).
+[`helia`](https://github.com/ipfs/helia)
+and can be joined by using the [public good Amino DHT Bootstrappers](https://docs.ipfs.tech/concepts/public-utilities/#amino-dht-bootstrappers).
+:::
 
 ### Client and Server Mode
 
@@ -103,18 +106,21 @@ operate in Server Mode if they are publicly reachable and have sufficient
 resources. Conversely, nodes behind NATs or firewalls, or with intermittent
 availability, low bandwidth, or limited CPU, RAM, or storage resources, SHOULD
 operate in Client Mode. Operating a DHT server without the capacity to respond
-quickly to queries negatively impacts network performance.
+quickly to queries negatively impacts network performance and SHOULD be avoided.
 
-DHT Servers advertise the libp2p Kademlia protocol identifier via the [libp2p
+DHT Servers MUST advertise the libp2p Kademlia protocol identifier via the [libp2p
 identify
 protocol](https://github.com/libp2p/specs/blob/master/identify/README.md). In
-addition DHT Servers accept incoming streams using the Kademlia protocol
-identifier. DHT Clients do not advertise support for the libp2p Kademlia
-protocol identifier. In addition they do not offer the Kademlia protocol
+addition DHT Servers MUST accept incoming streams using the libp2p Kademlia protocol
+identifier.
+
+DHT Clients MUST NOT advertise support for the libp2p Kademlia
+protocol identifier nor offer the libp2p Kademlia protocol
 identifier for incoming streams.
 
 ## Kademlia Keyspace
 
+<!-- TODO: add LaTeX or MathML support and fix below paragraph -->
 Kademlia [0] operates on a binary keyspace defined as $\lbrace 0,1 \rbrace^m$. In
 particular, the IPFS Kademlia DHT uses a keyspace of length $m=256$, containing
 all bitstrings of 256 bits. The distance between any pair of keys is defined as
@@ -122,7 +128,7 @@ the bitwise XOR of the two keys, resulting in a new key representing the
 distance between the two keys. This keyspace is used for indexing both nodes
 and content.
 
-The Kademlia node identifier is derived from the node's [Peer
+The Kademlia node identifier is derived from the libp2p node's [Peer
 ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md). The
 Kademlia node identifier is computed as the digest of the SHA256 hash function
 of the binary representation of the Peer ID. The Kademlia identifier is a
@@ -133,6 +139,7 @@ Example:
 
 ```sh
 PeerID b58 representation: 12D3KooWKudojFn6pff7Kah2Mkem3jtFfcntpG9X3QBNiggsYxK2
+PeerID CID representation: k51qzi5uqu5djx47o56x8r9lvy85co0sdf1yfbzxlukdq4irr8ssn3o7dpfasp
 PeerID hex representation: 0024080112209e3b433cbd31c2b8a6ebbdca998bd0f4c2141c9c9af5422e976051b1e63af14d
 Kademlia identifier (hex): e43d28f0996557c0d5571d75c62a57a59d7ac1d30a51ecedcdb9d5e4afa56100
 ```
@@ -143,6 +150,8 @@ The Kademlia Routing Table maintains contact information about other DHT
 Servers in the network. It has knowledge about all nearby nodes and
 progressively fewer nodes as the XOR distance increases. This structure allows
 efficient and rapid navigation of the network during lookups.
+
+### Bucket Size
 
 The Routing Table MUST contain information about at least `k` DHT Servers whose
 Kademlia Identifier shares a common prefix of length `l` with the local node,
@@ -167,7 +176,7 @@ Note that DHT Clients are never included in a Routing Table.
 Each DHT Server MUST store the public
 [multiaddresses](https://github.com/libp2p/specs/blob/master/addressing/README.md)
 for every node in its Routing Table. DHT Servers MUST discard nodes with only
-private and/or relay multiaddresses. Additionally, DHT Servers must verify that
+private and/or relay multiaddresses. Additionally, DHT Servers MUST verify that
 these nodes are reachable and replace any nodes that are no longer accessible.
 
 ### Replacement Policy
@@ -315,8 +324,9 @@ It is recommended that the maximum number of in-flight requests (denoted by
 ## Peer Routing
 
 Implementations typically provide two interfaces for peer routing using the
-`FIND_NODE` RPC: `FindPeer`, which locates a specific Peer ID, and
-`GetClosestPeers`, which finds the `k` closest peers to a given key.
+`FIND_NODE` RPC:
+- [`FindPeer`](#findpeer), which locates a specific Peer ID, and
+- [`GetClosestPeers`](#getclosestpeers), which finds the `k` closest peers to a given key.
 
 ### `FindPeer`
 
@@ -346,11 +356,12 @@ to look for the `k` closest peers to any key. The `key` provided to `FIND_NODE`
 corresponds to the preimage of the Kademlia Identifier, as described
 [below](#content-kademlia-identifier).
 
-`GetClosestPeers` is used for the purpose of Content Routing.
+`GetClosestPeers` is used for the purpose of Content Routing
+([Provider Record Routing](#provider-record-routing)).
 
 ## Provider Record Routing
 
-Provider Record Routing is the process of locating peers that provide a
+Provider Record Routing is IPFS-specific process of locating peers that provide a
 specific piece of content, identified by its CID. This is achieved by storing
 and retrieving Provider Records in the DHT.
 
@@ -361,6 +372,7 @@ more Peer IDs providing the corresponding content. Instead of storing the
 content itself, the DHT stores provider records pointing to the peers hosting
 the content.
 
+<!-- TODO: link to Multihash and CID specs -->
 A Provider Record is identified by the multihash contained by the CID. It
 functions as an append-only list, where multiple providers can add themselves
 as content hosts. Since strict consistency across the network is not required,
@@ -450,13 +462,15 @@ keyspace:
 1. **Public Key Records** (`/pk/`) – Used to store public keys that cannot be
    derived from Peer IDs.
 2. **IPNS Records** (`/ipns/`) – Used for decentralized naming and content
-   resolution.
+   resolution. See
+   [IPNS Routing Record](https://specs.ipfs.tech/ipns/ipns-record/#routing-record)
+   and [IPNS Record Verification](https://specs.ipfs.tech/ipns/ipns-record/#record-verification).
 
 Records MUST meet validity criteria specific to their record type before being
 stored or updated. DHT Servers MUST verify the validity of each record before
 accepting it.
 
-### Routing
+### Record Routing
 
 The Kademlia Identifier of a record is derived by applying the SHA256 hash
 function to the record’s key and using the resulting digest in binary format.
@@ -497,9 +511,11 @@ that point to content in IPFS. These records MAY be stored in the DHT under the
 `/ipns/` namespace.
 
 Record format and validation is documented in the [IPNS
-specification](https://specs.ipfs.tech/ipns/ipns-record/). IPNS records are
-limited in size to
-[10KiB]((https://specs.ipfs.tech/ipns/ipns-record/#record-size-limit)).
+specification](https://specs.ipfs.tech/ipns/ipns-record/).
+
+IPNS implementations MUST follow [IPNS Routing Record](https://specs.ipfs.tech/ipns/ipns-record/#routing-record),
+[IPNS Record Verification](https://specs.ipfs.tech/ipns/ipns-record/#record-verification),
+and [IPNS Record Size Limit](https://specs.ipfs.tech/ipns/ipns-record/#record-size-limit).
 
 #### Quorum
 
@@ -656,6 +672,8 @@ protocol](https://github.com/libp2p/specs/blob/master/ping/ping.md).
 If a DHT server receives an invalid request, it simply closes the libp2p stream
 without responding.
 
+# Appendix: Notes for Implementers
+
 ## Client Optimizations
 
 ### LAN DHT Swarms
@@ -689,12 +707,10 @@ is skipped during the initial routing table setup.
 * Rust:
 [libp2p-kad](https://github.com/libp2p/rust-libp2p/tree/master/protocols/kad)
 
----
-
-## References
+# Bibliography <!-- TODO: handle citations better - xref is not enough, does not support DOI papers -->
 
 [0]: Maymounkov, P., & Mazières, D. (2002). Kademlia: A Peer-to-Peer
 Information System Based on the XOR Metric. In P. Druschel, F. Kaashoek, & A.
 Rowstron (Eds.), Peer-to-Peer Systems (pp. 53–65). Berlin, Heidelberg: Springer
 Berlin Heidelberg. [DOI](https://doi.org/10.1007/3-540-45748-8_5)
-[pdf](https://www.scs.stanford.edu/~dm/home/papers/kpos.pdf)
+[PDF](https://www.scs.stanford.edu/~dm/home/papers/kpos.pdf)
