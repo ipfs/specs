@@ -1,0 +1,15 @@
+{
+  "name": "ipfs-specs-website",
+  "version": "1.0.0",
+  "description": "> This repository contains the specs for the IPFS Protocol and associated subsystems.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "",
+  "private": true,
+  "devDependencies": {
+    "spec-generator": "^1.5.0"
+  }
+}
