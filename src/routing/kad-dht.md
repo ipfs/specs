@@ -130,9 +130,9 @@ and content.
 
 The Kademlia node identifier is derived from the libp2p node's [Peer
 ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md). The
-Kademlia node identifier is computed as the digest of the SHA256 hash function
-of the binary representation of the Peer ID. The Kademlia identifier is a
-256-bit number, which is used as the node's identifier in the Kademlia
+Kademlia node identifier is computed as the digest of the SHA2-256 hash
+function of the binary representation of the Peer ID. The Kademlia identifier
+is a 256-bit number, which is used as the node's identifier in the Kademlia
 keyspace.
 
 Example:
@@ -224,9 +224,10 @@ removed from the Routing Table.
 
 After removing unresponsive peers, any buckets that are not full MUST be
 replenished with fresh, online peers. This can be accomplished by either adding
-recently connected peers or by executing a `FIND_NODE` request with a randomly
-generated Peer ID matching the bucket. `FIND_NODE` requests should only be run
-for buckets up to the last non-empty bucket.
+recently connected peers or by executing a `FIND_NODE` [RPC
+message](#rpc-messages) with a randomly generated Peer ID matching the bucket.
+`FIND_NODE` requests should only be run for buckets up to the last non-empty
+bucket.
 
 Finally, the refresh process concludes by executing a `FIND_NODE` request for
 the local node's Peer ID, ensuring the DHT Server maintains up-to-date
@@ -383,14 +384,14 @@ efficiently.
 ### Content Kademlia Identifier
 
 The Kademlia Identifier associated with a CID is derived from the multihash
-contained by the CID, by hashing it with the SHA256 hash function. The
+contained by the CID, by hashing it with the SHA2-256 hash function. The
 resulting 256-bit digest is used as the Kademlia Identifier for the content.
 
 Example:
 
 ```sh
 CIDv1 (base32)           : bafybeihfg3d7rdltd43u3tfvncx7n5loqofbsobojcadtmokrljfthuc7y
-CID contained hash (hex) : 1220e536c7f88d731f374dccb568aff6f56e838a19382e488039b1ca8ad2599e82fe
+Multihash from CID (hex) : 1220e536c7f88d731f374dccb568aff6f56e838a19382e488039b1ca8ad2599e82fe
 Kademlia Identifier (hex): d623250f3f660ab4c3a53d3c97b3f6a0194c548053488d093520206248253bcb
 ```
 
@@ -466,13 +467,14 @@ keyspace:
    [IPNS Routing Record](https://specs.ipfs.tech/ipns/ipns-record/#routing-record)
    and [IPNS Record Verification](https://specs.ipfs.tech/ipns/ipns-record/#record-verification).
 
-Records MUST meet validity criteria specific to their record type before being
-stored or updated. DHT Servers MUST verify the validity of each record before
-accepting it.
+Records with the above prefixes MUST meet validity criteria specific to their
+record type before being stored or updated. DHT Servers MUST verify the
+validity of each record before accepting it. Records with other prefixes are
+not supported by the IPFS Kademlia DHT and MUST be rejected.
 
 ### Record Routing
 
-The Kademlia Identifier of a record is derived by applying the SHA256 hash
+The Kademlia Identifier of a record is derived by applying the SHA2-256 hash
 function to the record’s key and using the resulting digest in binary format.
 
 To store a value in the DHT, a client first finds the `k` closest peers to the
