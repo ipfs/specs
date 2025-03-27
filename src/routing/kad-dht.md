@@ -405,7 +405,8 @@ CID.
 
 Once the `k` closest DHT Servers are found, the node sends each of them an
 `ADD_PROVIDER` RPC, using the same `key` and setting its own Peer ID as
-`providerPeers`.
+`providerPeers`. Providers MUST indicate their listen multiaddresses to be
+cached and served with the provider record.
 
 The DHT Servers MUST make 2 checks before adding the provided `record` to their
 datastore:
@@ -413,9 +414,9 @@ datastore:
 2. Discard `providerPeers` whose Peer ID is not matching the sender's Peer ID
 
 Upon successful verification, the DHT Server stores the Provider Record in its
-datastore, and responds by echoing the request to confirm success. If
-verification fails, the server MUST close the stream without sending a
-response.
+datastore, and caches the provided public multiaddresses. It responds by
+echoing the request to confirm success. If verification fails, the server MUST
+close the stream without sending a response.
 
 #### Provide Validity
 
