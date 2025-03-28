@@ -40,7 +40,8 @@ distance metric. Once a node has identified the closest peers, it can either:
 
 ### Relation to libp2p kad-dht
 
-The IPFS Kademlia DHT specification is a specialization of the [libp2p Kademlia DHT](https://github.com/libp2p/specs/tree/master/kad-dht).
+The IPFS Kademlia DHT specification is an instantiation of the [libp2p Kademlia
+DHT](https://github.com/libp2p/specs/tree/master/kad-dht).
 
 It is possible to use an alternative DHT specification alongside an IPFS
 implementation, rather than the one detailed here. This document specifically
@@ -58,9 +59,9 @@ used in other DHT swarms as well.
 ## DHT Swarms
 
 A DHT swarm is a group of interconnected nodes running the IPFS Kademlia DHT
-protocol, collectively identified by a unique libp2p protocol identifier. IPFS nodes
-MAY participate in multiple DHT swarms simultaneously. DHT swarms can be either
-public or private.
+protocol, collectively identified by a unique libp2p protocol identifier. IPFS
+nodes MAY participate in multiple DHT swarms simultaneously. DHT swarms can be
+either public or private.
 
 ### libp2p Protocol Identifier
 
@@ -97,10 +98,10 @@ to lookup queries from other nodes and storing records. It stores a share of
 the global DHT state, and needs to ensure that this state is up-to-date.
 
 A node operating in Client Mode (or DHT Client) is simply a client able to make
-requests to DHT Servers. DHT Client don't answer to queries and don't store
+requests to DHT Servers. DHT Clients don't answer to queries and don't store
 records.
 
-Having a large number of reliable DHT servers benefits the network by
+Having a large number of reliable DHT Servers benefits the network by
 distributing the load of handling queries and storing records. Nodes SHOULD
 operate in Server Mode if they are publicly reachable and have sufficient
 resources. Conversely, nodes behind NATs or firewalls, or with intermittent
@@ -114,9 +115,43 @@ protocol](https://github.com/libp2p/specs/blob/master/identify/README.md). In
 addition DHT Servers MUST accept incoming streams using the libp2p Kademlia protocol
 identifier.
 
-DHT Clients MUST NOT advertise support for the libp2p Kademlia
-protocol identifier nor offer the libp2p Kademlia protocol
-identifier for incoming streams.
+DHT Clients MUST NOT advertise support for the libp2p Kademlia protocol
+identifier nor offer the libp2p Kademlia protocol identifier for incoming
+streams.
+
+DHT Clients MAY Provide [Content](#provider-record-routing) and
+[Records](#value-storage-and-retrieval) to the network, content providing is
+not exclusive to DHT Servers.
+
+### Transports
+
+All nodes MUST run the libp2p network stack.
+
+DHT Servers MUST support both
+[`QUIC`](https://github.com/libp2p/specs/blob/master/quic/README.md) and
+`TCP`+[`Yamux`](https://github.com/libp2p/specs/blob/master/yamux/README.md)+[`Noise`](https://github.com/libp2p/specs/blob/master/noise/README.md).
+It is essential that all DHT Servers are able to open a connection to each
+other. Additionally, DHT Servers SHOULD support
+[`TLS``](https://github.com/libp2p/specs/blob/master/tls/tls.md) as an
+alternative to Noise, [`WebRTC
+direct`](https://github.com/libp2p/specs/blob/master/webrtc/webrtc-direct.md),
+[Secure
+`WebSockets`](https://github.com/libp2p/specs/blob/master/websockets/README.md)
+and
+[`WebTransport`](https://github.com/libp2p/specs/blob/master/webtransport/README.md).
+DHT Servers adoption of browser-based transports is encouraged to allow for
+browser-based DHT Clients to interact with the DHT.
+
+DHT Clients SHOULD support
+[`QUIC`](https://github.com/libp2p/specs/blob/master/quic/README.md) and
+`TCP`+[`Yamux`](https://github.com/libp2p/specs/blob/master/yamux/README.md)+[`Noise`](https://github.com/libp2p/specs/blob/master/noise/README.md)
+whenever possible. They MAY also support additional libp2p transports. However,
+to guarantee discovery of existing records in the DHT, a client MUST implement
+at least one of these: `QUIC` or `TCP`+`Yamux`+`Noise`.
+
+Clients that cannot support either `QUIC` or `TCP`+`Yamux`+`Noise` (e.g.,
+browser-based nodes) MAY still act as DHT Clients, but their ability to find
+records in the DHT will be limited.
 
 ## Kademlia Keyspace
 
