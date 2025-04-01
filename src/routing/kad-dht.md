@@ -63,26 +63,21 @@ protocol, collectively identified by a unique libp2p protocol identifier. IPFS
 nodes MAY participate in multiple DHT swarms simultaneously. DHT swarms can be
 either public or private.
 
-### libp2p Protocol Identifier
+### Identifiers & Existing Swarms
 
-All nodes participating in the same DHT swarm MUST use the same libp2p protocol
-identifier. The libp2p protocol identifier uniquely identifies a DHT swarm. It
-follows the format `/<swarm-prefix>/kad/<version>`, e.g `/ipfs/kad/1.0.0` for
-the Amino DHT protocol version `1.0.0`, or `/ipfs/lan/kad/1.0.0` for a local
-DHT swarm.
+Every DHT swarm is associated with a specific libp2p protocol identifier, and
+all nodes within that swarm must use it. Public DHT swarms MUST use a unique
+libp2p protocol identifier, whereas private swarms SHOULD use a distinct
+identifier. Although private swarms may reuse an identifier if their networks
+remain isolated, they will merge upon interaction. Therefore, unique
+identifiers are recommended.
 
-Note that there could be multiple distinct DHT swarms using the same libp2p
-protocol identifier as long as they don't have any common peers. This practice
-is discouraged as networks will immediately merge if they enter in contact.
+#### Amino DHT
 
-Each DHT swarm SHOULD have a dedicated protocol identifier.
-
-### Amino DHT
-
-The [Amino DHT](https://blog.ipfs.tech/2023-09-amino-refactoring/#why-amino) is
-the swarm of peers also referred to as the _Public IPFS DHT_. It implements the
-IPFS Kademlia DHT specification and uses the protocol identifier
-`/ipfs/kad/1.0.0`.
+[_Amino DHT_]((https://blog.ipfs.tech/2023-09-amino-refactoring/#why-amino)) is
+a public instance of the _IPFS Kademlia DHT_ spec mounted under
+`/ipfs/kad/1.0.0` libp2p protocol, it is also referred to as the _Public IPFS
+DHT_.
 
 :::note
 The Amino DHT is utilized by multiple IPFS implementations, including
@@ -90,6 +85,39 @@ The Amino DHT is utilized by multiple IPFS implementations, including
 [`helia`](https://github.com/ipfs/helia)
 and can be joined by using the [public good Amino DHT Bootstrappers](https://docs.ipfs.tech/concepts/public-utilities/#amino-dht-bootstrappers).
 :::
+
+#### IPFS LAN DHTs
+
+_IPFS LAN DHTs_ are DHT swarms operating exclusively within a local network.
+Thy are accessible only to nodes within the same network and are identified by
+the libp2p protocol `/ipfs/lan/kad/1.0.0`.
+
+In a LAN DHT:
+* Only hosts on the local network MAY be added to the routing table.
+* By default, all hosts operate in [server mode](#client-and-server-mode).
+
+Although many IPFS LAN DHTs use the same protocol identifier, each swarm is
+distinct because its scope is limited to its own local network.
+
+Nodes MAY participate in LAN DHTs, enabling fast peer and content discovery in
+their local network.
+
+#### Creating a Custom DHT Swarm
+
+Custom DHT swarms can be created to serve specific use cases by meeting these
+requirements:
+* **Unique libp2p Protocol Identifier**: All nodes in a DHT swarm MUST use the
+same libp2p protocol identifier. A suggested format is
+`/<swarm-prefix>/kad/<version>`. Note that if two public swarms share the same
+protocol identifier and encounter each other, they will merge.
+* **Consistent Protocol Implementation**: All nodes participating in the swarm
+MUST implement the same DHT protocol, including support for all defined RPC
+messages and behaviors.
+* **Bootstrapper Nodes**: To join a swarm, a new node MUST know the
+multiaddresses of at least one existing node participating in the swarm.
+Dedicated bootstrapper nodes MAY be used to facilitate this process. They
+SHOULD be publicly reachable, maintain high availability and possess sufficient
+resources to support the network.
 
 ### Client and Server Mode
 
@@ -714,15 +742,15 @@ without responding.
 
 ## Client Optimizations
 
-### LAN DHT Swarms
+### Dual DHTs
 
-Implementations MAY support private or LAN-specific DHT swarms, which operate
-within a local network and remain isolated from the public DHT. Nodes MAY
-participate in multiple DHT swarms simultaneously, provided that each swarm has
-a unique protocol identifier.
+Implementations MAY join multiple DHT swarms simultaneously—for example, both a
+local and a public swarm. Typically, write operations are executed on both
+swarms, while read operations are performed in parallel, returning the result
+from whichever responds first.
 
-Private DHT swarms MAY store and serve private multiaddresses, as they are not
-exposed to the public network.
+Using a local DHT alongside a global one enables faster discovery of peers and
+content within the same network.
 
 ### Verifying DHT Server
 
