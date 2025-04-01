@@ -40,8 +40,9 @@ distance metric. Once a node has identified the closest peers, it can either:
 
 ### Relation to libp2p kad-dht
 
-The IPFS Kademlia DHT specification is an instantiation of the [libp2p Kademlia
-DHT](https://github.com/libp2p/specs/tree/master/kad-dht).
+The IPFS Kademlia DHT specification extends the [libp2p Kademlia
+DHT](https://github.com/libp2p/specs/tree/master/kad-dht), with practical
+details related to CID, IPNS, and content providing.
 
 It is possible to use an alternative DHT specification alongside an IPFS
 implementation, rather than the one detailed here. This document specifically
