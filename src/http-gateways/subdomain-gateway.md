@@ -245,13 +245,13 @@ should return HTTP 400 Bad Request for CIDs longer than 63.
 
 ### Wildcard TLS certificates
 
-Wildcard TLS certificates should be set for `*.ipfs.example.net`
+Wildcard TLS certificates SHOULD be set for `*.ipfs.example.net`
 and `*.ipns.example.net` if a subdomain gateway is to be exposed on the public
 internet.
 
 If TLS termination takes place outside of gateway implementation, then setting
 [`X-Forwarded-Proto`](#x-forwarded-proto-request-header) at a reverse HTTP
-proxy can be used for preserving `https` protocol.
+proxy is RECOMMENDED for preserving `https` protocol.
 
 ### Public Suffix List and eTLD enforcement
 
@@ -263,7 +263,7 @@ software like Safe Browsing
 ([incident example](https://web.archive.org/web/20230930054837/https://blog.nft.storage/posts/2022-04-29-gateways-and-gatekeepers)).
 
 To mitigate this and align with the web’s Same-origin security model, operators
-should register a wildcard entry like `*.example.net`
+SHOULD register a wildcard entry like `*.example.net`
 with the [Public Suffix List (PSL)](https://publicsuffix.org/).
 
 This will make `ipfs.example.net` and `ipns.example.net` eTLDs, treating each
@@ -271,7 +271,7 @@ identifier (e.g., `cid.ipfs.example.net`) as a distinct top-level Origin.
 The [public good gateway](https://docs.ipfs.tech/concepts/public-utilities/#public-ipfs-gateways),
 listed as `*.dweb.link` and `*.inbrowser.link` on the PSL, exemplifies this approach.
 
-Browsers supporting IPFS natively should detect patterns such as
+Browsers supporting IPFS natively SHOULD detect URI patterns such as
 `https://{content-root-id}.ip[f|n]s.example.net` and dynamically update their
 internal PSL, bolstering security and compatibility without relying solely on
 operator action.
