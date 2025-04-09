@@ -656,7 +656,7 @@ message Message {
         ADD_PROVIDER = 2;
         GET_PROVIDERS = 3;
         FIND_NODE = 4;
-        PING = 5;
+        PING = 5; // DEPRECATED
     }
 
     enum ConnectionType {
