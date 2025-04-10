@@ -152,16 +152,20 @@ DHT Clients MAY Provide [Content](#provider-record-routing) and
 [Records](#value-storage-and-retrieval) to the network, content providing is
 not exclusive to DHT Servers.
 
-### Transports
+### Networking
 
 All nodes MUST run the libp2p network stack.
+
+DHT Servers MUST support the [libp2p ping
+protocol](https://github.com/libp2p/specs/blob/master/ping/ping.md) to allow
+probing by other DHT nodes.
 
 DHT Servers MUST support both
 [`QUIC`](https://github.com/libp2p/specs/blob/master/quic/README.md) and
 `TCP`+[`Yamux`](https://github.com/libp2p/specs/blob/master/yamux/README.md)+[`Noise`](https://github.com/libp2p/specs/blob/master/noise/README.md).
 It is essential that all DHT Servers are able to open a connection to each
 other. Additionally, DHT Servers SHOULD support
-[`TLS``](https://github.com/libp2p/specs/blob/master/tls/tls.md) as an
+[`TLS`](https://github.com/libp2p/specs/blob/master/tls/tls.md) as an
 alternative to Noise, [`WebRTC
 direct`](https://github.com/libp2p/specs/blob/master/webrtc/webrtc-direct.md),
 [Secure
