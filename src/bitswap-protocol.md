@@ -29,7 +29,7 @@ editors:
       name: Protocol Labs
       url: https://protocol.ai/
 tags: ['exchange', 'routing']
-order: 1
+order: 2
 ---
 
 Bitswap is a libp2p data exchange protocol for sending and receiving content
