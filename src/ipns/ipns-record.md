@@ -275,7 +275,7 @@ legacy logic.
 
 ### Overview
 
-![IPNS overview](/img/ipns-overview.png)
+![IPNS overview](/src/img/ipns-overview.png)
 
 Taking into consideration a p2p network, each peer should be able to publish [IPNS records](#ipns-record) to the network, as well as to resolve the IPNS records published by other peers.
 
