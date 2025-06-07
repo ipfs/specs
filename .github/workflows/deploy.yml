@@ -2,9 +2,7 @@ name: Deploy
 
 # Explicitly declare permissions
 permissions:
-  contents: read
-  pull-requests: write
-  statuses: write
+  actions: read
 
 on:
   workflow_run:
