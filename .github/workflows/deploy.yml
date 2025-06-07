@@ -23,6 +23,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       actions: read
+      pull-requests: write
+      statuses: write
     steps:
       - uses: actions/download-artifact@v4
         with:
