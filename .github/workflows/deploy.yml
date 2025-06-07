@@ -29,6 +29,7 @@ jobs:
         with:
           name: github-pages
           path: ${{ env.BUILD_PATH }}
+          github-token: ${{ github.token }}
           run-id: ${{ github.event.workflow_run.id }}
 
       - uses: ipfs/ipfs-deploy-action@v1
