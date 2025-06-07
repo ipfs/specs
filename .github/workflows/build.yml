@@ -50,6 +50,8 @@ jobs:
         with:
           name: github-event
           path: ${{ github.event_path }}
+          retention-days: 1
+          if-no-files-found: error
 
   gh-pages:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' # only deploy to gh-pages on push to the main branch
