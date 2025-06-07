@@ -40,11 +40,16 @@ jobs:
         run: make website
 
       - name: Upload static files as artifact
-        id: upload-artifact
         uses: actions/upload-pages-artifact@v3
         with:
           name: github-pages
           path: ${{ env.BUILD_PATH }}
+
+      - name: Upload event as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-event
+          path: ${{ github.event_path }}
 
   gh-pages:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' # only deploy to gh-pages on push to the main branch

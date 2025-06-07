@@ -31,7 +31,18 @@ jobs:
           github-token: ${{ github.token }}
           run-id: ${{ github.event.workflow_run.id }}
 
-      - uses: ipfs/ipfs-deploy-action@v1
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-event
+          path: event.json
+
+      - id: github
+        run: |
+          echo "event<<EOF" >> $GITHUB_OUTPUT
+          jq . event.json | tee -a $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - uses: ipfs/ipfs-deploy-action@workflow-run
         name: Deploy to IPFS Mirror Providers
         id: deploy
         with:
@@ -43,6 +54,8 @@ jobs:
           storacha-proof: ${{ secrets.STORACHA_PROOF }}
           #TODO pinata-jwt-token: ${{ secrets.PINATA_JWT_TOKEN }}
           github-token: ${{ github.token }}
+          set-github-status: ${{ fromJson(steps.github.outputs.event).head.sha || fromJson(steps.github.outputs.event).sha }}
+          set-pr-comment: ${{ fromJson(steps.github.outputs.event).number }}
 
       # TODO: right now, DNSLink is controlled by Fleek, and we use ipfs/ipfs-deploy-action for PR previews
       #- name: Update DNSLink
