@@ -1,8 +1,7 @@
 name: Deploy
 
 # Explicitly declare permissions
-permissions:
-  actions: read
+permissions: {}
 
 on:
   workflow_run:
@@ -22,8 +21,8 @@ jobs:
   deploy:
     if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    outputs:
-      cid: ${{ steps.deploy.outputs.cid }}
+    permissions:
+      actions: read
     steps:
       - uses: actions/download-artifact@v4
         with:

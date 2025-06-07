@@ -1,10 +1,7 @@
 name: Build
 
 # Explicitly declare permissions
-permissions:
-  contents: read
-  pull-requests: write
-  statuses: write
+permissions: {}
 
 on:
   push:
@@ -24,6 +21,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
