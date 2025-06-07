@@ -9,6 +9,12 @@ on:
       - Build
     types:
       - completed
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'Build workflow run ID'
+        required: true
+        type: string
 
 env:
   BUILD_PATH: 'out'
@@ -31,13 +37,13 @@ jobs:
           name: github-pages
           path: ${{ env.BUILD_PATH }}
           github-token: ${{ github.token }}
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ inputs.run_id || github.event.workflow_run.id }}
 
       - uses: actions/download-artifact@v4
         with:
           name: github-event
           github-token: ${{ github.token }}
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ inputs.run_id || github.event.workflow_run.id }}
 
       - id: github
         run: |
