@@ -1,29 +1,80 @@
 name: lint
+
+# Explicitly declare permissions
+permissions: {}
+
 on:
+  workflow_run:
+    workflows:
+      - Build
+    types:
+      - completed
   workflow_dispatch:
-  push:
+    inputs:
+      run_id:
+        description: 'Build workflow run ID'
+        required: true
+        type: string
+
+env:
+  BUILD_PATH: 'out'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true # Cancel in progress runs if a new run is started
 
 jobs:
-  #markdownlint:
-  #  runs-on: ubuntu-latest
-  #  steps:
-  #    - uses: actions/checkout@v2
-  #    - uses: xt0rted/markdownlint-problem-matcher@b643b0751c371f357690337d4549221347c0e1bc # v1.0
-  #    - run: npx markdownlint **/*.md --ignore node_modules
-  super-linter:
+  deploy:
+    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      pull-requests: write
+      statuses: write
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - uses: actions/download-artifact@v4
         with:
-          # Full git history is needed to get a proper list of changed files within `super-linter`
-          fetch-depth: 0
-      - name: Lint
-        uses: super-linter/super-linter/slim@v7
-        env:
-          LINTER_RULES_PATH: '.'
-          MARKDOWN_CONFIG_FILE: .markdownlint.json
-          VALIDATE_ALL_CODEBASE: false
-          VALIDATE_MARKDOWN: true
-          DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: github-pages
+          path: ${{ env.BUILD_PATH }}
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.run_id || github.event.workflow_run.id }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-event
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.run_id || github.event.workflow_run.id }}
+
+      - id: github
+        run: |
+          echo "event<<EOF" >> $GITHUB_OUTPUT
+          jq . event.json | tee -a $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - uses: ipfs/ipfs-deploy-action@workflow-run
+        name: Deploy to IPFS Mirror Providers
+        id: deploy
+        with:
+          path-to-deploy: ${{ env.BUILD_PATH }}
+          cluster-url: "/dnsaddr/ipfs-websites.collab.ipfscluster.io"
+          cluster-user: ${{ secrets.CLUSTER_USER }}
+          cluster-password: ${{ secrets.CLUSTER_PASSWORD }}
+          storacha-key: ${{ secrets.STORACHA_KEY }}
+          storacha-proof: ${{ secrets.STORACHA_PROOF }}
+          #TODO pinata-jwt-token: ${{ secrets.PINATA_JWT_TOKEN }}
+          github-token: ${{ github.token }}
+          set-github-status: ${{ fromJson(steps.github.outputs.event).head.sha || fromJson(steps.github.outputs.event).sha }}
+          set-pr-comment: ${{ fromJson(steps.github.outputs.event).number }}
+
+      # TODO: right now, DNSLink is controlled by Fleek, and we use ipfs/ipfs-deploy-action for PR previews
+      #- name: Update DNSLink
+      #  if: false # TODO github.ref == 'refs/heads/main' # only update DNSLink for main branch
+      #  uses: ipfs/dnslink-action@v0.1
+      #  with:
+      #    cid: ${{ steps.deploy.outputs.cid }}
+      #    dnslink_domain: 'specs.ipfs.tech'
+      #    cf_record_id: ${{ secrets.CF_RECORD_ID }}
+      #    cf_zone_id: ${{ secrets.CF_ZONE_ID }}
+      #    cf_auth_token: ${{ secrets.CF_AUTH_TOKEN }}
+      #    github_token: ${{ github.token }}
+      #    set_github_status: true
