@@ -36,7 +36,6 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: github-event
-          path: event.json
           github-token: ${{ github.token }}
           run-id: ${{ github.event.workflow_run.id }}
 
