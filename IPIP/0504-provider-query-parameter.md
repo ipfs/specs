@@ -206,36 +206,59 @@ and discuss important objections or concerns raised during discussion.
 
 ### User benefit
 
-TODO
+The proposed **Provider-Hinted URI** format aims to enable "non interactive" content-addressable retrieval by enabling smart clients to fetch bytes directly from specified providers. This allows for reduced latency, lower load on discovery systems, and improved resiliency. his brings several concrete benefits to users across different contexts:
 
-How will end users benefit from this work?
+#### 🧑‍💻 Power Users & Developers
+
+- **Improved Resilience for Data Migration & Recovery**
+  - Enables seamless data exfiltration or migration from providers that do not participate in public discovery systems (e.g., not on Amino DHT or cid.contact). - Useful during outages or vendor lock-in scenarios.
+- **Custom Provider Prioritization**
+  - Developers can craft links that prefer self-hosted providers (e.g., local gateways, corporate infra) before falling back to public gateways or network discovery.
+
+#### 🚀 Performance-Sensitive Applications
+
+- **Reduced Latency on First Fetch**
+  - By embedding direct provider hints, clients can skip discovery lookups and go straight to fetching bytes—significantly lowering time to first byte, especially in cold-start scenarios.
+-	**Faster Initial Seeding**
+  - Clients like IPFS Desktop can opportunistically add hints to links they generate (e.g., using their peer ID or trusted gateway), enabling faster and more deterministic bootstrapping when others use those links.
+  - No need to wait until provider records are propagated in the discovery systems
+-	**Protocol-Aware Connection Optimization**
+  - Clients can skip trial-and-error protocol negotiation by targeting providers with clearly tagged protocol support, reducing failed dials and wasted roundtrips.
+
+#### 🌍 Content Publishers & Infra Operators
+
+-	**Edge Caching & Locality-Based Optimization**
+  - Content can be pre-cached at the edge or in specific geographies. Hints can prioritize nearby locations (e.g. /dns/cache-berlin.example.com/tcp/443/https) to improve latency and reliability.
+-	**Compatibility with Static Hosting**
+  - Allows use of static CDNs or S3-like storage for verifiable delivery. Hints like https://foo.bar/example.js combined with CID verification unlock content-addressed [SRI](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity)-like guarantees, even from legacy infra.
 
 ### Compatibility
 
-TODO
-
-Explain the upgrade considerations for existing implementations.
+These are optional hints, clients may opt to not use them. Therefore, there is no need to account for legacy compatibility or upgrade paths.
 
 ### Security
 
-TODO
+While guiding client-side resolution, there are no relevant security considerations to have. However, there may be privacy implications if these hints are forwarded to the servers under certain circumstances. The semantics of hint placement influence visibility and use:
 
-Explain the security implications/considerations relevant to the proposed change.
+- If the `provider` parameter is included in the **query** (`?...`), it MAY be communicated to the server depending on the client parsing the parameter.
+- If the `provider` is encoded as a **fragment** (`#...`), it is only accessible to the client (browsers do not send fragments to the server).
+
+This distinction allows URI publishers to tailor behavior:
+
+- **Client-only mode:** Use a fragment (`#provider=...`) to ensure the server remains unaware of hint data. This is useful for privacy-preserving client apps or when hints are intended to guide only the client.
+- **Server-assisted mode:** Use query parameters (`?provider=...`) to allow the server to parse and act on provider hints. This may enable proxy behavior, similar to existing IPFS gateways like `ipfs.io` or `dweb.link`.
+
+Publishers of such URIs should consider the **security profile** and **trust assumptions** of their environment when deciding how to encode hints.
+
+This flexibility supports a spectrum of use cases—from fully local client-side fetch strategies to cooperative client-server resolution pipelines.
 
 ### Alternatives
 
-TODO
-
-Describe alternate designs that were considered and related work.
+There were considered other alternatives, but they typically fail to address all the goals/requirements above. Some of these can be seen at [hackmd.io/@vasco-santos/S1IKn51-eg](https://hackmd.io/@vasco-santos/S1IKn51-eg).
 
 ## Test fixtures
 
-TODO
-
-List relevant CIDs. Describe how implementations can use them to determine
-specification compliance. This section can be skipped if IPIP does not deal
-with the way IPFS handles content-addressed data, or the modified specification
-file already includes this information.
+N/A
 
 ### Copyright
 
