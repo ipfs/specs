@@ -82,6 +82,10 @@ This data is serialized and placed inside the 'Data' field of the outer merkleda
 
 For files comprised of a single block, the 'Type' field will be set to 'File', 'filesize' will be set to the total number of bytes in the file and the file data will be stored in the 'Data' field.
 
+For HAMT Sharded directories the 'Type' field will be set to 'HAMTShard', 'hashType' will be set to a codec value from the [multicodec table](https://github.com/multiformats/multicodec/blob/master/table.csv) and 'fanout' will be set to the bit size of the hash.
+
+Although 'fanout' may have a value of 0-1.8×10^19 it is recommended that implementations limit the values they will accept during deserialization to a smaller number such as 1024 to prevent abuse.
+
 ## Metadata
 
 UnixFS currently supports two optional metadata fields:
