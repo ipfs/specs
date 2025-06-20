@@ -272,6 +272,8 @@ Publishers of such URIs should consider the **security profile** and **trust ass
 
 This flexibility supports a spectrum of use cases—from fully local client-side fetch strategies to cooperative client-server resolution pipelines.
 
+Finally, there MAY exist additional privacy concerns while using a provider query parameter that make a single client easily tracked. For instance, if a malicious or noisy tracking entity starts encoded provider hints into all their URLs.
+
 ### Alternatives
 
 There were considered other alternatives, but they typically fail to address all the goals/requirements above. Some of these can be seen at [hackmd.io/@vasco-santos/S1IKn51-eg](https://hackmd.io/@vasco-santos/S1IKn51-eg).
