@@ -129,15 +129,26 @@ If a CID is present in both a multi-dotted origin and in the path (even if they 
 - Value: Multiaddr string (`?provider=multiaddr`).
 - Interpretation: Optional hint for how to fetch and locate the content identified by the CID
 
+ Name: `provider`
+- Type: URI Query Parameter (repeating allowed)
+- Value: Either a Multiaddr string (`?provider=multiaddr`) or HTTP URL string (`?provider=http-url`) that can be transformed to Multiaddr.
+- Interpretation: An optional hint for how to locate and fetch the content identified by the CID
+- When using a `multiaddr`, the address MAY rely on non HTTP transports.
+- Alternatively, a `HTTP URL String` may be used to simplify usage and not directly be tied with multiaddr, especially for content providers without protocol specific infrastructure or multiaddr knowledge. While this approach is easy to adopt, it trades off flexibility:
+  - Only HTTP(S) is supported as the transport layer.
+  - Protocols available to fetch data cannot be specified explicitly.
+  - It is implicitly assumed that the server responds with raw bytes hashed using SHA-256, for verification purposes against the CID provided.
+
 #### Query Parsing (`provider` Parameters)
 
-Once a CID has been successfully extracted, clients MAY parse `provider` parameters from the query string. Each `provider` value represents a provider hint, encoded as a multiaddr string.
+Once a CID has been successfully extracted, clients MAY parse `provider` parameters from the query string. Each `provider` value represents a provider hint, encoded as either a Multiaddr string (`?provider=multiaddr`) or HTTP URL string (`?provider=http-url`) that can be transformed to Multiaddr
 
 **1. Parsing Rules**
 
 - The `provider` query parameter MAY appear multiple times.
+- If the provider value starts with a `/` it MUST be parsed as a `multiaddr`. Otherwise, it should be parsed as a `http(s)` like URL and, therefore transformable to `multiaddr` behind the scenes.
 - Each `provider` parameter MUST be treated as an independent, optional provider hint.
-- Clients MAY ignore hints with invalid multiaddrs.
+- Clients MAY ignore hints with invalid multiaddrs or HTTP URLs.
 
 **2. Evaluate hints**
 
@@ -165,7 +176,7 @@ Note that the `multiaddr` string should point to the `origin` server where given
 
 1. `/dns4/hash-stream-like-server.io/tcp/443/https` using `http`
 2. `/ip4/192.0.2.1/tcp/4001/ws` using `libp2p`
-   → Attempt connections via hints or fall back to default resolution.
+   → Attempt connections via hints.
 
 **Input URI:**
 `https://dweb.link/ipfs/bafy...?provider=/dns4/hash-stream-like-server.io/tcp/443/https`
@@ -174,7 +185,16 @@ Note that the `multiaddr` string should point to the `origin` server where given
 → Parse `provider` params:
 
 1. `/dns4/hash-stream-like-server.io/tcp/443/https` using `http`
-   → Attempt connections via hints or fall back to default resolution.
+   → Attempt connections via hints.
+
+**Input URI:**
+`ipfs://bafk...?provider=https://foo.bar/example-framework.js`
+
+→ Extract CID: `bafk...`
+→ Parse `provider` params:
+
+1. After verifying it is not a multiaddr, parse it as a URL and transform it to a valid multiaddr
+   → Attempt connections via hints.
 
 ---
 
