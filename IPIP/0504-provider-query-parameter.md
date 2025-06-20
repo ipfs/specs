@@ -242,6 +242,7 @@ The proposed **Provider-Hinted URI** format aims to enable "non interactive" con
 -	**Faster Initial Seeding**
   - Clients like IPFS Desktop can opportunistically add hints to links they generate (e.g., using their peer ID or trusted gateway), enabling faster and more deterministic bootstrapping when others use those links.
   - No need to wait until provider records are propagated in the discovery systems
+  - Alternative approach for this use case is for IPFS Desktop to do manual provide on Amino DHT of the CID that is being shared. This would not require hardcoding anything in shared URL, but Provider Record will still be available until expiration if node goes offline.
 -	**Protocol-Aware Connection Optimization**
   - Clients can skip trial-and-error protocol negotiation by targeting providers with clearly tagged protocol support, reducing failed dials and wasted roundtrips.
 
