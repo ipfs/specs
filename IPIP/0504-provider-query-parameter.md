@@ -156,9 +156,98 @@ Once a CID has been successfully extracted, clients MAY parse `provider` paramet
   - Ignore all `provider` parameters (if unsupported).
   - Evaluate hints in order of appearance (left-to-right).
   - Evaluate hints in parallel.
-  - Apply their own prioritization or fallback strategies. If all hints fail, clients SHOULD fall back to default discovery strategies (e.g., DHT/IPNI), if available. Or even rely on discovery strategies in parallel.
 
 Note that the `multiaddr` string should point to the `origin` server where given CID is provided, and not include the actual CID in the Hint multiaddr as a subdomain/path.
+
+### Provider Hint as complement to Regular Routing
+
+#### Overview
+
+The `provider` query parameter is designed to enhance content retrieval by providing optional hints to clients about where content might be available. However, the order in which these hints are evaluated relative to regular routing systems (DHT, IPNI, etc.) MAY have implications for the long-term health of user experience, in the event that providers do not provide given content anymore, while the content is available in other providers.
+
+---
+
+#### Strategies and their Implications
+
+**Strategy A: Provider Hints First (Sequential Fallback)**
+
+In this approach, clients attempt to fetch content from `provider` hints first, only falling back to regular routing systems if all hints fail.
+
+**Implementation:** `provider` → (on failure) → regular routing
+
+**Trade-offs:**
+- 🔴 **User-hostile latency:** Every access to a URL with outdated or offline provider hints incurs unnecessary delay while waiting for failed requests to timeout
+- 🔴 **Economic hostage situation:** Creates perverse incentives where someone must continue paying for storage at specific providers to maintain good user experience if they can't update the URLs, even if better alternatives exist in the network
+- 🔴 **Permanent degradation:** If a hardcoded provider goes offline, the latency penalty persists forever
+- 🔴 **Discovery system stagnation:** Reduces incentives to improve and invest in decentralized routing systems since they're only used as a "last resort"
+- ✅ **Non-interactive retrievals are possible:** Content MAY be retrieval without any extra request
+- ✅ **Immediate latency benefits in cold-start**
+
+**Example scenario:** A viral piece of content is shared with `?provider=https://expensive-storage.com`. The content becomes embedded in blog posts, Wikipedia citations, and web crawlers index it. When the publisher stops paying for storage, every subsequent access experiences a timeout delay before falling back to the DHT/IPNI.
+
+---
+
+**Strategy B: Parallel Evaluation**
+
+In this approach, clients simultaneously attempt to fetch from provider hints and query regular routing systems, using whichever responds first.
+
+**Implementation:** `provider` ∥ regular routing → use fastest response
+
+**Trade-offs:**
+- 🟠 **Wasted bandwidth:** Always sends requests to potentially offline providers, consuming bandwidth and resources
+- 🟠 **Provider overhead:** Storage providers continue receiving requests for content they no longer host, creating ongoing operational costs
+- ✅ **No latency penalty:** Users don't experience delays from failed hint attempts
+- ✅ **Graceful degradation:** Still works when hints become stale
+
+---
+
+**Strategy C: Provider Hints as Fallback**
+
+In this approach, clients first attempt regular routing discovery, only trying provider hints if the routing system fails to find suitable providers or after a reasonable delay.
+
+**Implementation:** regular routing → (on failure or delay) → `provider` hints
+
+**Trade-offs:**
+- 🔴 **Non-interactive retrievals are not possible:** Several hops are required before bytes can start to be served
+- 🔴 **No immediate latency benefits in cold-start**
+- 🔴 **Requires robust timeout and retry logic:** Ensuring hints are eventually tried
+- ✅ **Ecosystem-friendly:** Reduces unnecessary load on hardcoded providers
+- ✅ **Encourages routing investment:** Maintains incentives to improve DHT, IPNI, and other discovery mechanisms
+- ✅ **Resource efficient:** Minimizes wasted requests to offline providers
+- ✅ **Natural load balancing:** Distributes requests across the network rather than concentrating them on hinted providers
+
+---
+
+#### Specification Recommendations
+
+The recommended approach (Strategy C) balances several competing concerns:
+
+1. **Long-term ecosystem sustainability:** By not making provider hints the primary resolution mechanism, we avoid creating dependencies on specific commercial providers
+2. **Decentralization preservation:** Regular routing systems remain the primary mechanism, preserving IPFS's decentralized nature
+3. **Economic fairness:** Prevents situations where specific entities bear disproportionate costs for serving popular content
+4. **User experience:** While not optimizing for immediate latency in all cases, provides better long-term user experience by avoiding permanent degradation
+
+---
+
+**Gateway Implementations**
+
+Gateway implementations that support the `provider` query parameter:
+
+- **SHOULD** evaluate provider hints as a fallback mechanism after attempting regular routing discovery
+- **MAY** implement parallel evaluation if they document the associated costs and implement appropriate rate limiting
+- **MUST NOT** implement provider-first evaluation as it MAY create long-term ecosystem harm
+
+---
+
+**Client Implementations**
+
+Client implementations that support the `provider` query parameter:
+
+- **SHOULD** prioritize regular routing systems (DHT, IPNI) over provider hints to maintain ecosystem health
+- **MAY** use provider hints in parallel with regular routing if they implement proper resource management
+- **MAY** allow a different strategy to be used via configuration out of the default path
+- **SHOULD** implement reasonable timeouts and retry logic when falling back to provider hints
+- **MUST** continue to function correctly when provider hints are ignored or fail
 
 ---
 
@@ -213,16 +302,6 @@ This distinction allows URI publishers to tailor behavior:
 Publishers of such URIs should consider the **security profile** and **trust assumptions** of their environment when deciding how to encode hints.
 
 This flexibility supports a spectrum of use cases—from fully local client-side fetch strategies to cooperative client-server resolution pipelines.
-
-## Design rationale
-
-TODO
-
-The rationale fleshes out the specification by describing what motivated
-the design and why particular design decisions were made.
-
-Provide evidence of rough consensus and working code within the community,
-and discuss important objections or concerns raised during discussion.
 
 ### User benefit
 
