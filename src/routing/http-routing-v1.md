@@ -106,7 +106,7 @@ Each object in the `Providers` list is a record conforming to a schema, usually 
 
 ## Peer Routing API
 
-### `GET /routing/v1/closest-peers/{peer-id}?[closerThan]&[count]`
+### `GET /routing/v1/dht/closest/{peer-id}?[closerThan]&[count]`
 
 #### Path Parameters
 
