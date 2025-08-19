@@ -200,6 +200,50 @@ The client SHOULD be able to make a request with `Accept: application/x-ndjson` 
 
 Each object in the `Peers` list is a record conforming to the [Peer Schema](#peer-schema).
 
+## IPNS API
+
+### `GET /routing/v1/ipns/{name}`
+
+#### Path Parameters
+
+- `name` is the :ref[IPNS Name] to resolve, encoded as CIDv1.
+
+#### Response Status Codes
+
+- `200` (OK): the response body contains the :ref[IPNS Record] for the given :ref[IPNS Name].
+- `404` (Not Found): must be returned if no matching records are found.
+- `406` (Not Acceptable): requested content type is missing or not supported. Error message returned in body should inform the user to retry with `Accept: application/vnd.ipfs.ipns-record`.
+
+#### Response Headers
+
+- `Etag`: a globally unique opaque string used for HTTP caching. MUST be derived from the protobuf record returned in the body.
+- `Cache-Control: public, max-age={ttl}, public, stale-while-revalidate={sig-ttl}, stale-if-error={sig-ttl}`: meaningful cache TTL returned with :ref[IPNS Record]
+  - The `max-age` value in seconds SHOULD match duration from `IpnsEntry.data[TTL]`, if present and bigger than `0`. Otherwise, implementation SHOULD default to `max-age=60`.
+  - Implementations SHOULD include `sig-ttl`, set to the remaining number of seconds the returned IPNS Record is valid.
+- `Expires:`: an HTTP-date timestamp ([RFC9110, Section 5.6.7](https://www.rfc-editor.org/rfc/rfc9110#section-5.6.7)) when the validity of IPNS Record expires (if `ValidityType=0`, when signature expires)
+- `Last-Modified`: an HTTP-date timestamp of when cacheable resolution occurred: allows HTTP proxies and CDNs to support inexpensive update checks via `If-Modified-Since`
+- `Vary: Accept`: allows intermediate caches to play nicely with the different possible content types.
+
+#### Response Body
+
+The response body contains a :ref[IPNS Record] serialized using the verifiable [`application/vnd.ipfs.ipns-record`](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record) protobuf format.
+
+### `PUT /routing/v1/ipns/{name}`
+
+#### Path Parameters
+
+- `name` is the :ref[IPNS Name] to publish, encoded as CIDv1.
+
+#### Request Body
+
+The content body must be a [`application/vnd.ipfs.ipns-record`][application/vnd.ipfs.ipns-record] serialized :ref[IPNS Record], with a valid signature matching the `name` path parameter.
+
+#### Response Status Codes
+
+- `200` (OK): the provided :ref[IPNS Record] was published.
+- `400` (Bad Request): the provided :ref[IPNS Record] or :ref[IPNS Name] are not valid.
+- `406` (Not Acceptable): submitted content type is not supported. Error message returned in body should inform the user to retry with `Content-Type: application/vnd.ipfs.ipns-record`.
+
 ## DHT Routing API
 
 ### `GET /routing/v1/dht/closest/peers/{peer-id}?[closerThan]&[count]`
@@ -255,50 +299,6 @@ The number of peer records in the responses SHOULD be limited to the `count` que
 The client SHOULD be able to make a request with `Accept: application/x-ndjson` and get a [stream](#streaming) with more results.
 
 Each object in the `Peers` list is a record conforming to the [Peer Schema](#peer-schema).
-
-## IPNS API
-
-### `GET /routing/v1/ipns/{name}`
-
-#### Path Parameters
-
-- `name` is the :ref[IPNS Name] to resolve, encoded as CIDv1.
-
-#### Response Status Codes
-
-- `200` (OK): the response body contains the :ref[IPNS Record] for the given :ref[IPNS Name].
-- `404` (Not Found): must be returned if no matching records are found.
-- `406` (Not Acceptable): requested content type is missing or not supported. Error message returned in body should inform the user to retry with `Accept: application/vnd.ipfs.ipns-record`.
-
-#### Response Headers
-
-- `Etag`: a globally unique opaque string used for HTTP caching. MUST be derived from the protobuf record returned in the body.
-- `Cache-Control: public, max-age={ttl}, public, stale-while-revalidate={sig-ttl}, stale-if-error={sig-ttl}`: meaningful cache TTL returned with :ref[IPNS Record]
-  - The `max-age` value in seconds SHOULD match duration from `IpnsEntry.data[TTL]`, if present and bigger than `0`. Otherwise, implementation SHOULD default to `max-age=60`.
-  - Implementations SHOULD include `sig-ttl`, set to the remaining number of seconds the returned IPNS Record is valid.
-- `Expires:`: an HTTP-date timestamp ([RFC9110, Section 5.6.7](https://www.rfc-editor.org/rfc/rfc9110#section-5.6.7)) when the validity of IPNS Record expires (if `ValidityType=0`, when signature expires)
-- `Last-Modified`: an HTTP-date timestamp of when cacheable resolution occurred: allows HTTP proxies and CDNs to support inexpensive update checks via `If-Modified-Since`
-- `Vary: Accept`: allows intermediate caches to play nicely with the different possible content types.
-
-#### Response Body
-
-The response body contains a :ref[IPNS Record] serialized using the verifiable [`application/vnd.ipfs.ipns-record`](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record) protobuf format.
-
-### `PUT /routing/v1/ipns/{name}`
-
-#### Path Parameters
-
-- `name` is the :ref[IPNS Name] to publish, encoded as CIDv1.
-
-#### Request Body
-
-The content body must be a [`application/vnd.ipfs.ipns-record`][application/vnd.ipfs.ipns-record] serialized :ref[IPNS Record], with a valid signature matching the `name` path parameter.
-
-#### Response Status Codes
-
-- `200` (OK): the provided :ref[IPNS Record] was published.
-- `400` (Bad Request): the provided :ref[IPNS Record] or :ref[IPNS Name] are not valid.
-- `406` (Not Acceptable): submitted content type is not supported. Error message returned in body should inform the user to retry with `Content-Type: application/vnd.ipfs.ipns-record`.
 
 ## Pagination
 
