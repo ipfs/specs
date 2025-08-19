@@ -106,60 +106,6 @@ Each object in the `Providers` list is a record conforming to a schema, usually 
 
 ## Peer Routing API
 
-### `GET /routing/v1/dht/closest/{peer-id}?[closerThan]&[count]`
-
-#### Path Parameters
-
-- `peer-id` is a [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md) represented as a CIDv1 encoded with `libp2p-key` codec.
-
-#### Query Paramters
-
-- `closerThan` is an optional [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md) represented as a CIDv1 encoded with `libp2p-key` codec.
-  - Returned peer records must be closer to `peer-id` than `closerThan`.
-  - If omitted the routing implementation should use its own [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md).
-- `count` is an optional number that specifies how many peer records the requester desires.
-  - Minimum 1, maximum 100, default 20.
-
-#### Response Status Codes
-
-- `200` (OK): the response body contains peer records.
-- `404` (Not Found): must be returned if no matching records are found.
-- `422` (Unprocessable Entity): request does not conform to schema or semantic constraints.
-
-#### Response Headers
-
-- `Content-Type`: the content type of this response, which MUST be `application/json` or `application/x-ndjson` (see [streaming](#streaming)).
-- `Last-Modified`: an HTTP-date timestamp ([RFC9110, Section 5.6.7](https://www.rfc-editor.org/rfc/rfc9110#section-5.6.7)) of the resolution, allowing HTTP proxies and CDNs to support inexpensive update checks via `If-Modified-Since`
-- `Cache-Control: public, max-age={ttl}, public, stale-while-revalidate={max-ttl}, stale-if-error={max-ttl}`: meaningful cache TTL returned with the response.
-  - When present, `ttl` SHOULD be shorter for responses whose resolution ended in no results (e.g. 15 seconds),
-    and longer for responses that have results (e.g. 5 minutes).
-  - Implementations SHOULD include `max-ttl`, set to the maximum cache window of the underlying routing system.
-    For example, if Amino DHT results are returned, `stale-while-revalidate` SHOULD be set to `79200` (22h, which at the time of writing this specification, is the [Provider Record Republish Interval](https://github.com/libp2p/specs/tree/master/kad-dht#content-provider-advertisement-and-discovery)).
-- `Vary: Accept`: allows intermediate caches to play nicely with the different possible content types.
-
-#### Response Body
-
-```json
-{
-  "Peers": [
-    {
-      "Schema": "<schema>",
-      "Protocols": ["<protocol-a>", "<protocol-b>", ...],
-      "ID": "bafz...",
-      "Addrs": ["/ip4/..."],
-      ...
-    },
-    ...
-  ]
-}
-```
-
-The number of peer records in the responses SHOULD be limited to the `count` query parameter, which defaults to 20 if unspecified.
-
-The client SHOULD be able to make a request with `Accept: application/x-ndjson` and get a [stream](#streaming) with more results.
-
-Each object in the `Peers` list is a record conforming to the [Peer Schema](#peer-schema).
-
 ### `GET /routing/v1/peers/{peer-id}`
 
 #### Path Parameters
@@ -202,6 +148,62 @@ represented as a CIDv1 encoded with `libp2p-key` codec.
 ```
 
 The `application/json` responses SHOULD be limited to 100 peers.
+
+The client SHOULD be able to make a request with `Accept: application/x-ndjson` and get a [stream](#streaming) with more results.
+
+Each object in the `Peers` list is a record conforming to the [Peer Schema](#peer-schema).
+
+## DHT Routing API
+
+### `GET /routing/v1/dht/closest/{peer-id}?[closerThan]&[count]`
+
+#### Path Parameters
+
+- `peer-id` is a [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md) represented as a CIDv1 encoded with `libp2p-key` codec.
+
+#### Query Parameters
+
+- `closerThan` is an optional [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md) represented as a CIDv1 encoded with `libp2p-key` codec.
+  - Returned peer records must be closer to `peer-id` than `closerThan`.
+  - If omitted the routing implementation should use its own [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md).
+- `count` is an optional number that specifies how many peer records the requester desires.
+  - Minimum 1, maximum 100, default 20.
+
+#### Response Status Codes
+
+- `200` (OK): the response body contains peer records.
+- `404` (Not Found): must be returned if no matching records are found.
+- `422` (Unprocessable Entity): request does not conform to schema or semantic constraints.
+
+#### Response Headers
+
+- `Content-Type`: the content type of this response, which MUST be `application/json` or `application/x-ndjson` (see [streaming](#streaming)).
+- `Last-Modified`: an HTTP-date timestamp ([RFC9110, Section 5.6.7](https://www.rfc-editor.org/rfc/rfc9110#section-5.6.7)) of the resolution, allowing HTTP proxies and CDNs to support inexpensive update checks via `If-Modified-Since`
+- `Cache-Control: public, max-age={ttl}, public, stale-while-revalidate={max-ttl}, stale-if-error={max-ttl}`: meaningful cache TTL returned with the response.
+  - When present, `ttl` SHOULD be shorter for responses whose resolution ended in no results (e.g. 15 seconds),
+    and longer for responses that have results (e.g. 5 minutes).
+  - Implementations SHOULD include `max-ttl`, set to the maximum cache window of the underlying routing system.
+    For example, if Amino DHT results are returned, `stale-while-revalidate` SHOULD be set to `172800` (48h, which at the time of writing this specification, is the provider record expiration window).
+- `Vary: Accept`: allows intermediate caches to play nicely with the different possible content types.
+
+#### Response Body
+
+```json
+{
+  "Peers": [
+    {
+      "Schema": "<schema>",
+      "Protocols": ["<protocol-a>", "<protocol-b>", ...],
+      "ID": "bafz...",
+      "Addrs": ["/ip4/..."],
+      ...
+    },
+    ...
+  ]
+}
+```
+
+The number of peer records in the responses SHOULD be limited to the `count` query parameter, which defaults to 20 if unspecified.
 
 The client SHOULD be able to make a request with `Accept: application/x-ndjson` and get a [stream](#streaming) with more results.
 
