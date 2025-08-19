@@ -4,15 +4,21 @@ description: >
   The minimal subset of HTTP Gateway response types facilitates data retrieval
   via CID and ensures integrity verification, all while eliminating the need to
   trust the gateway itself.
-date: 2024-04-17
+date: 2025-03-06
 maturity: reliable
 editors:
   - name: Marcin Rataj
     github: lidel
-    url: https://lidel.org/
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
   - name: Henrique Dias
     github: hacdias
-    url: https://hacdias.com/
+  - name: Héctor Sanjuán
+    github: hsanjuan
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
 xref:
   - url
   - path-gateway
@@ -47,9 +53,13 @@ Optional `path` is permitted for requests that specify CAR format (`?format=car`
 
 For block requests (`?format=raw` or `Accept: application/vnd.ipld.raw`), only `GET /ipfs/{cid}[?{params}]` is supported.
 
+Client and Server implementations SHOULD include support for the [`GET` probe path](#dedicated-probe-paths).
+
 ## `HEAD /ipfs/{cid}[/{path}][?{params}]`
 
 Same as GET, but does not return any payload.
+
+Client and Server implementations SHOULD include support for the [`HEAD` probe path](#dedicated-probe-paths).
 
 ## `GET /ipns/{key}[?{params}]`
 
@@ -88,6 +98,15 @@ Below response types SHOULD be supported:
 A Gateway SHOULD return HTTP 400 Bad Request when running in strict trustless
 mode (no deserialized responses) and `Accept` header is missing.
 
+:::note
+
+A Client SHOULD include the [`format` query parameter](#format-request-query-parameter)
+in the request URL, in addition to the `Accept` header. This provides the best
+interoperability and ensures consistent HTTP cache behavior across various
+gateway implementations.
+
+:::
+
 ## Request Query Parameters
 
 ### :dfn[`format`] (request query parameter)
@@ -97,9 +116,13 @@ Same as [`format`](https://specs.ipfs.tech/http-gateways/path-gateway/#format-re
 - `format=car` → `application/vnd.ipld.car`
 - `format=ipns-record` → `application/vnd.ipfs.ipns-record`
 
+:::note
+
 A Client SHOULD include the `format` query parameter in the request URL, in
 addition to the `Accept` header. This provides the best interoperability and
 ensures consistent HTTP cache behavior across various gateway implementations.
+
+:::
 
 ### :dfn[`dag-scope`] (request query parameter)
 
@@ -220,7 +243,9 @@ In case both are present in the request, the value from the [`Accept`](#accept-r
 
 # HTTP Response
 
-Below MUST be implemented **in addition** to "HTTP Response" of :cite[path-gateway].
+Below MUST be implemented **in addition** to "HTTP Response" of
+:cite[path-gateway], with special attention to the "Response Status Codes" and
+the "Recursive vs non-recursive gateways" sections.
 
 ## Response Headers
 
@@ -425,3 +450,29 @@ returned as [application/vnd.ipfs.ipns-record](https://www.iana.org/assignments/
 A Client MUST confirm the record signature match `libp2p-key` from the requested IPNS Name.
 
 A Client MUST [perform additional record verification according to the IPNS specification](https://specs.ipfs.tech/ipns/ipns-record/#record-verification).
+
+# Appendix: Notes for implementers
+
+## Dedicated Probe Paths
+
+Trustless gateways SHOULD provide probing endpoints as described below.
+
+### `GET /ipfs/bafkqaaa`
+
+`bafkqaaa` is the identity empty CID. This endpoint can be used to probe that
+that the endpoint corresponds to a trustless gateway.
+
+For block requests (signaled by `?format=raw` and `Accept: application/vnd.ipld.raw`), when supported, it MUST return `200 OK`
+and an empty body.
+
+For CAR requests (signaled by `?format=car` and `Accept: application/vnd.ipld.car`), when supported, it MUST return `200 OK` and a valid CAR file with CAR Header `roots` set to `bafkqaaa`. Identity block MAY be skipped in the CAR Data section.
+
+This specific identity CID is special for probing. Other random
+identity CIDs MAY not be handled.
+
+### `HEAD /ipfs/bafkqaaa`
+
+`bafkqaaa` is the identity empty CID. If this endpoint is enabled, the gateway
+MUST support [`HEAD` requests](#head-ipfs-cid-path-params).
+
+The response is the same as [`GET`](#get-ipfs-bafkqaaa) but without body and all headers are optional.

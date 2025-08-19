@@ -21,14 +21,19 @@ editors:
     url: https://hacdias.com/
     github: hacdias
     affiliation:
-      name: Protocol Labs
-      url: https://protocol.ai/
+      name: Shipyard
+      url: https://ipshipyard.com
   - name: Marcin Rataj
     github: lidel
     url: https://lidel.org/
     affiliation:
-      name: Protocol Labs
-      url: https://protocol.ai/
+      name: Shipyard
+      url: https://ipshipyard.com
+  - name: Daniel Norman
+    github: 2color
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
 xref:
   - ipns-record
 order: 0
@@ -47,7 +52,7 @@ As such, human-readable encodings of types are preferred. This specification may
 
 - CIDs are always string-encoded using a [multibase]-encoded [CIDv1].
 - Multiaddrs are string-encoded according to the [human-readable multiaddr specification][multiaddr].
-- Peer IDs are string-encoded according [PeerID string representation specification][peer-id-representation]: either a Multihash in Base58btc, or a CIDv1 with libp2p-key (`0x72`) codec.
+- Peer IDs are string-encoded according [PeerID string representation specification][peer-id-representation]: either a Multihash in Base58btc, or a CIDv1 with libp2p-key (`0x72`) codec in Base36 or Base32.
 - Multibase bytes are string-encoded according to [the Multibase spec][multibase], and SHOULD use base64.
 - Timestamps are Unix millisecond epoch timestamps.
 
@@ -63,7 +68,39 @@ This API uses a standard version prefix in the path, such as `/v1/...`. If a bac
 
 #### Path Parameters
 
-- `cid` is the [CID](https://github.com/multiformats/cid) to fetch provider records for.
+- `cid` is the [CID](https://github.com/multiformats/cid) to fetch provider records for (preferably normalized to a CIDv1 in Base32, to maximize HTTP cache hits).
+
+#### Request Query Parameters
+
+##### `filter-addrs` (providers request query parameter)
+
+Optional `?filter-addrs` to apply Network Address Filtering from [IPIP-484](https://specs.ipfs.tech/ipips/ipip-0484/).
+
+- `?filter-addrs=<comma-separated-list>` optional parameter that indicates which network transports to return by filtering the multiaddrs in the `Addrs` field of the [Peer schema](#peer-schema).
+- The value of the `filter-addrs` parameter is a comma-separated (`,` or `%2C`) list of network transport protocol _name strings_ as defined in the [multiaddr protocol registry](https://github.com/multiformats/multiaddr/blob/master/protocols.csv), e.g. `?filter-addrs=tls,webrtc-direct,webtransport`.
+- `unknown` can be be passed to include providers whose multiaddrs are unknown, e.g. `?filter-addrs=unknown`. This allows for not removing providers whose multiaddrs are unknown at the time of filtering (e.g. keeping DHT results that require additional peer lookup).
+- Multiaddrs are filtered by checking if the protocol name appears in any of the multiaddrs (logical OR).
+- Negative filtering is done by prefixing the protocol name with `!`, e.g. to skip IPv6 and QUIC addrs: `?filter-addrs=!ip6,!quic-v1`. Note that negative filtering is done by checking if the protocol name does not appear in any of the multiaddrs (logical AND).
+- If no parameter is passed, the default behavior is to return the original list of addresses unchanged.
+- If only negative filters are provided, addresses not passing any of the negative filters are included.
+- If positive filters are provided, only addresses passing at least one positive filter (and no negative filters) are included.
+- If both positive and negative filters are provided, the address must pass all negative filters and at least one positive filter to be included.
+- If there are no multiaddrs that match the passed transports, the provider is omitted from the response.
+- Filtering is case-insensitive.
+
+##### `filter-protocols` (providers request query parameter)
+
+Optional `?filter-protocols` to apply IPFS Protocol Filtering from [IPIP-484](https://specs.ipfs.tech/ipips/ipip-0484/).
+
+- The `filter-protocols` parameter is a comma-separated (`,` or `%2C`) list of transfer protocol names, e.g. `?filter-protocols=unknown,transport-bitswap,transport-ipfs-gateway-http`.
+- Transfer protocols names should be treated as opaque strings and have a max length of 63 characters. A non-exhaustive list of transfer protocols are defined per convention in the [multicodec registry](https://github.com/multiformats/multicodec/blob/3b7b52deb31481790bc4bae984d8675bda4e0c82/table.csv#L149-L151).
+- Implementations MUST preserve all transfer protocol names when returning a positive result that matches one or more of them.
+- A special `unknown` name can be be passed to include providers whose transfer protocol list is empty (unknown), e.g. `?filter-protocols=unknown`. This allows for including providers returned from the DHT that do not contain explicit transfer protocol information.
+- Providers are filtered by checking if the transfer protocol name appears in the `Protocols` array (logical OR).
+- If the provider doesn't match any of the passed transfer protocols, the provider is omitted from the response.
+- If a provider passes the filter, it is returned unchanged, i.e. the full set of protocols is returned including protocols that not included in the filter. (note that this is different from `filter-addrs` where only the multiaddrs that pass the filter are returned)
+- Filtering is case-insensitive.
+- If no parameter is passed, the default behavior is to not filter by transfer protocol.
 
 #### Response Status Codes
 
@@ -111,7 +148,17 @@ Each object in the `Providers` list is a record conforming to a schema, usually 
 #### Path Parameters
 
 - `peer-id` is the [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md) to fetch peer records for,
-represented as a CIDv1 encoded with `libp2p-key` codec.
+represented as either a Multihash in Base58btc, or a CIDv1 with libp2p-key (`0x72`) codec (in Base36 or Base32).
+
+#### Request Query Parameters
+
+##### `filter-addrs` (peers request query parameter)
+
+Optional, same rules as [`filter-addrs` providers request query parameter](#filter-addrs-providers-request-query-parameter).
+
+##### `filter-protocols` (peers request query parameter)
+
+Optional, same rules as [`filter-protocols` providers request query parameter](#filter-protocols-providers-request-query-parameter).
 
 #### Response Status Codes
 
@@ -230,7 +277,7 @@ Each object in the `Peers` list is a record conforming to the [Peer Schema](#pee
   - The `max-age` value in seconds SHOULD match duration from `IpnsEntry.data[TTL]`, if present and bigger than `0`. Otherwise, implementation SHOULD default to `max-age=60`.
   - Implementations SHOULD include `sig-ttl`, set to the remaining number of seconds the returned IPNS Record is valid.
 - `Expires:`: an HTTP-date timestamp ([RFC9110, Section 5.6.7](https://www.rfc-editor.org/rfc/rfc9110#section-5.6.7)) when the validity of IPNS Record expires (if `ValidityType=0`, when signature expires)
-- `Last-Modified`: an HTTP-date timestamp of when cacheable resolution occured: allows HTTP proxies and CDNs to support inexpensive update checks via `If-Modified-Since`
+- `Last-Modified`: an HTTP-date timestamp of when cacheable resolution occurred: allows HTTP proxies and CDNs to support inexpensive update checks via `If-Modified-Since`
 - `Vary: Accept`: allows intermediate caches to play nicely with the different possible content types.
 
 #### Response Body
