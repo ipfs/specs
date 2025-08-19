@@ -4,7 +4,7 @@ description: >
   Delegated routing is a mechanism for IPFS implementations to use for offloading
   content routing, peer routing and naming to another process/server. This specification describes
   an HTTP API for delegated routing of content, peers, and IPNS.
-date: 2024-03-22
+date: 2025-08-19
 maturity: reliable
 editors:
   - name: Gus Eggert
@@ -155,7 +155,7 @@ Each object in the `Peers` list is a record conforming to the [Peer Schema](#pee
 
 ## DHT Routing API
 
-### `GET /routing/v1/dht/closest/{peer-id}?[closerThan]&[count]`
+### `GET /routing/v1/dht/closest/peers/{peer-id}?[closerThan]&[count]`
 
 #### Path Parameters
 
