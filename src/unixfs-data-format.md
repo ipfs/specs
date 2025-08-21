@@ -6,10 +6,29 @@ description: >
 date: 2025-03-01
 maturity: draft
 editors:
-  - name: David Dias
-    github: daviddias
+  - name: Marcin Rataj
+    github: lidel
+    affiliation:
+      name: Interplanetary Shipyard
+      url: https://ipshipyard.com/
+contributors:
+  - name: Hugo Valtier
+    github: jorropo
+    affiliation:
+      name: Interplanetary Shipyard
+      url: https://ipshipyard.com/
+thanks:
   - name: Jeromy Johnson
     github: whyrusleeping
+  - name: Steven Allen
+    github: Stebalien
+  - name: Hector Sanjuan
+    github: hsanjuan
+    affiliation:
+      name: Interplanetary Shipyard
+      url: https://ipshipyard.com/
+  - name: Łukasz Magiera
+    github: magik6k
   - name: Alex Potsides
     github: achingbrain
     affiliation:
@@ -17,10 +36,8 @@ editors:
       url: https://ipshipyard.com/
   - name: Peter Rabbitson
     github: ribasushi
-  - name: Hugo Valtier
-    github: jorropo
-  - name: Marcin Rataj
-    github: lidel
+  - name: Henrique Dias
+    github: hacdias
     affiliation:
       name: Interplanetary Shipyard
       url: https://ipshipyard.com/
