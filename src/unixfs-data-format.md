@@ -69,7 +69,7 @@ In UnixFS, a node can be encoded using two different multicodecs, listed below. 
 
 # `raw` Node
 
-The simplest nodes use `raw` encoding and are implicitly a :ref[File]. They can
+The simplest nodes use `raw` encoding and are implicitly a [File](#dag-pb-file). They can
 be recognized because their CIDs are encoded using the `raw` (`0x55`) codec:
 
 - The block is the file data. There is no protobuf envelope or metadata.
@@ -79,7 +79,7 @@ be recognized because their CIDs are encoded using the `raw` (`0x55`) codec:
 # `dag-pb` Node
 
 More complex nodes use the `dag-pb` (`0x70`) encoding. These nodes require two steps of
-decoding. The first step is to decode the outer container of the block. This is encoded using the IPLD [`dag-pb`][ipld-dag-pb] specification, which can be
+decoding. The first step is to decode the outer container of the block. This is encoded using the [`dag-pb`][ipld-dag-pb] specification, which can be
 summarized as follows:
 
 ```protobuf
@@ -138,7 +138,7 @@ message UnixTime {
 }
 ```
 
-Summarizing, a `dag-pb` UnixFS node is an IPLD [`dag-pb`][ipld-dag-pb] protobuf,
+Summarizing, a `dag-pb` UnixFS node is a [`dag-pb`][ipld-dag-pb] protobuf,
 whose `Data` field is a UnixFSV1 Protobuf message. For clarity, the specification
 document may represent these nested Protobufs as one object. In this representation,
 it is implied that the `PBNode.Data` field is encoded in a protobuf.
@@ -155,13 +155,13 @@ single block or multi-block. A multi-block file is a concatenation of multiple c
 
 #### The _sister-lists_ `PBNode.Links` and `decode(PBNode.Data).blocksizes`
 
-The _sister-lists_ are the key point of why IPLD `dag-pb` is important for files. They
+The _sister-lists_ are the key point of why `dag-pb` is important for files. They
 allow us to concatenate smaller files together.
 
 Linked files would be loaded recursively with the same process following a DFS
 (Depth-First-Search) order.
 
-Child nodes must be of type File; either a `dag-pb`:ref[File], or a
+Child nodes must be of type File; either a `dag-pb` [File](#dag-pb-file), or a
 [`raw` block](#raw-blocks).
 
 For example, consider this pseudo-json block:
@@ -206,7 +206,7 @@ of the offset list when computing offsets.
 
 #### `PBNode.Links[].Name`
 
-This field makes sense only in :ref[Directories] contexts and MUST be absent
+This field makes sense only in [Directories](#dag-pb-directory) contexts and MUST be absent
 when creating a new file. For historical reasons, implementations parsing
 third-party data SHOULD accept empty values here.
 
@@ -232,7 +232,7 @@ file MUST error.
 
 ### `dag-pb` `Directory`
 
-A :dfn[Directory], also known as folder, is a named collection of child :ref[Nodes]:
+A :dfn[Directory], also known as folder, is a named collection of child [Nodes](#dag-pb-node):
 
 - Every link in `PBNode.Links` is an entry (child) of the directory, and
   `PBNode.Links[].Name` gives you the name of that child.
@@ -276,7 +276,7 @@ remaining components and on the CID you popped.
 ### `dag-pb` `HAMTDirectory`
 
 A :dfn[HAMT Directory] is a [Hashed-Array-Mapped-Trie](https://en.wikipedia.org/wiki/Hash_array_mapped_trie)
-data structure representing a :ref[Directory]. It is generally used to represent
+data structure representing a [Directory](#dag-pb-directory). It is generally used to represent
 directories that cannot fit inside a single block. These are also known as "sharded
 directories:, since they allow you to split large directories into multiple blocks, known as "shards".
 
@@ -468,6 +468,413 @@ The following names SHOULD NOT be used:
   terminations in some systems, such as C-compatible systems. Many unix
   file systems do not accept this character in path components.
 
+# Appendix: Test Vectors
+
+:::warning
+**Implementations SHOULD validate against these test vectors and reference implementations before production use.**
+:::
+
+This section provides test vectors organized by UnixFS structure type, progressing from simple to complex within each category.
+
+## File Test Vectors
+
+Test vectors for UnixFS file structures, progressing from simple single-block files to complex multi-block files.
+
+### Single `raw` Block File
+
+- Fixture: [`dir-with-files.car`](https://github.com/ipfs/gateway-conformance/raw/refs/tags/v0.8.1/fixtures/path_gateway_unixfs/dir-with-files.car)
+  - CID: `bafkreifjjcie6lypi6ny7amxnfftagclbuxndqonfipmb64f2km2devei4` (hello.txt)
+  - Type: [`raw` Node](#raw-node)
+  - Content: "hello world\n" (12 bytes)
+  - Block Analysis:
+    - Block size (`ipfs block stat`): 12 bytes
+    - Data size (`ipfs cat`): 12 bytes
+    - DAG-PB envelope: N/A (raw blocks have no envelope overhead)
+  - Purpose: Single block using `raw` codec, no protobuf wrapper
+  - Validation: Block content IS the file content, no UnixFS metadata
+
+### Single `dag-pb` Block File
+
+- Fixture: Well-known test CID from IPFS Gateway Checker
+- CID: `bafybeifx7yeb55armcsxwwitkymga5xf53dxiarykms3ygqic223w5sk3m`
+- Type: [`dag-pb` File](#dag-pb-file) with data in the same block
+- Content: "Hello from IPFS Gateway Checker\n" (32 bytes)
+- Block Analysis:
+  - Block size (`ipfs block stat`): 40 bytes
+  - Data size (`ipfs cat`): 32 bytes
+  - DAG-PB envelope: 8 bytes (40 - 32)
+- Structure:
+  ```
+  📄 small-file.txt      # bafybeifx7yeb55armcsxwwitkymga5xf53dxiarykms3ygqic223w5sk3m (dag-pb)
+      └── 📦 Data.Data   # "Hello from IPFS Gateway Checker\n" (32 bytes, stored inline in UnixFS protobuf)
+  ```
+- Purpose: Small file stored within dag-pb Data field
+- Validation: File content extracted from UnixFS Data.Data field
+
+### Multi-block File
+
+- Fixture: [`dir-with-files.car`](https://github.com/ipfs/gateway-conformance/raw/refs/tags/v0.8.1/fixtures/path_gateway_unixfs/dir-with-files.car)
+  - CID: `bafybeigcisqd7m5nf3qmuvjdbakl5bdnh4ocrmacaqkpuh77qjvggmt2sa` (multiblock.txt)
+  - Type: [`dag-pb` File](#dag-pb-file) with multiple [`raw` Node](#raw-node) leaves
+  - Content: Lorem ipsum text (1026 bytes total)
+  - Block Analysis:
+    - Root block size (`ipfs block stat`): 245 bytes (dag-pb)
+    - Total data size (`ipfs cat`): 1026 bytes
+    - Child blocks:
+      - Block 1: 256 bytes (raw)
+      - Block 2: 256 bytes (raw)
+      - Block 3: 256 bytes (raw)
+      - Block 4: 256 bytes (raw)
+      - Block 5: 2 bytes (raw)
+    - DAG-PB envelope: 245 bytes (root block containing metadata + links)
+  - Structure:
+    ```
+    📄 multiblock.txt    # bafybeigcisqd7m5nf3qmuvjdbakl5bdnh4ocrmacaqkpuh77qjvggmt2sa (dag-pb root)
+    ├── 📦 [0-255]       # bafkreie5noke3mb7hqxukzcy73nl23k6lxszxi5w3dtmuwz62wnvkpsscm (raw, 256 bytes)
+    ├── 📦 [256-511]     # bafkreih4ephajybraj6wnxsbwjwa77fukurtpl7oj7t7pfq545duhot7cq (raw, 256 bytes)
+    ├── 📦 [512-767]     # bafkreigu7buvm3cfunb35766dn7tmqyh2um62zcio63en2btvxuybgcpue (raw, 256 bytes)
+    ├── 📦 [768-1023]    # bafkreicll3huefkc3qnrzeony7zcfo7cr3nbx64hnxrqzsixpceg332fhe (raw, 256 bytes)
+    └── 📦 [1024-1025]   # bafkreifst3pqztuvj57lycamoi7z34b4emf7gawxs74nwrc2c7jncmpaqm (raw, 2 bytes)
+    ```
+  - Purpose: File chunking and reassembly
+  - Validation:
+    - Links have no Names (must be absent)
+    - Blocksizes array matches Links array length
+    - Reassembled content matches original
+
+### File with Missing Blocks
+
+- Fixture: [`bafybeibfhhww5bpsu34qs7nz25wp7ve36mcc5mxd5du26sr45bbnjhpkei.dag-pb`](https://github.com/ipld/codec-fixtures/raw/381e762b85862b2bbdb6ef2ba140b3c505e31a44/fixtures/dagpb_7unnamedlinks%2Bdata/bafybeibfhhww5bpsu34qs7nz25wp7ve36mcc5mxd5du26sr45bbnjhpkei.dag-pb)
+  - CID: `bafybeibfhhww5bpsu34qs7nz25wp7ve36mcc5mxd5du26sr45bbnjhpkei`
+  - Type: [`dag-pb` File](#dag-pb-file) with 7 links to child blocks
+  - Size: 306MB total (from metadata)
+  - Structure:
+    ```
+    📄 large-file        # bafybeibfhhww5bpsu34qs7nz25wp7ve36mcc5mxd5du26sr45bbnjhpkei (dag-pb root)
+    ├── ⚠️ block[0]      # (missing child block)
+    ├── ⚠️ block[1]      # (missing child block)
+    ├── ⚠️ block[2]      # (missing child block)
+    ├── ⚠️ block[3]      # (missing child block)
+    ├── ⚠️ block[4]      # (missing child block)
+    ├── ⚠️ block[5]      # (missing child block)
+    └── ⚠️ block[6]      # (missing child block)
+    ```
+  - Note: Child blocks are NOT included - they may be unavailable locally or missing entirely
+  - Purpose:
+    - Reading UnixFS file metadata should require only the root block
+    - File size and structure can be determined without fetching children
+    - Operations should not block waiting for child blocks unless content is actually requested
+  - Validation: Can extract file size and chunking info from root block alone
+
+### Range Requests with Missing Blocks
+
+- Fixture: [`file-3k-and-3-blocks-missing-block.car`](https://github.com/ipfs/gateway-conformance/raw/refs/tags/v0.8.1/fixtures/trustless_gateway_car/file-3k-and-3-blocks-missing-block.car)
+  - CID: `QmYhmPjhFjYFyaoiuNzYv8WGavpSRDwdHWe5B4M5du5Rtk`
+  - Type: [`dag-pb` File](#dag-pb-file) with 3 links but middle block intentionally missing
+  - Structure:
+    ```
+    📄 file-3k           # QmYhmPjhFjYFyaoiuNzYv8WGavpSRDwdHWe5B4M5du5Rtk (dag-pb root)
+    ├── 📦 [0-1023]      # QmPKt7ptM2ZYSGPUc8PmPT2VBkLDK3iqpG9TBJY7PCE9rF (raw, 1024 bytes)
+    ├── ⚠️ [1024-2047]   # (missing block - intentionally removed)
+    └── 📦 [2048-3071]   # QmWXY482zQdwecnfBsj78poUUuPXvyw2JAFAEMw4tzTavV (raw, 1024 bytes)
+    ```
+  - Critical requirement: Must support seeking without all blocks available
+  - Purpose:
+    - Fetch only required blocks for byte range requests (e.g., bytes=0-1023 or bytes=2048-3071)
+    - Gateway conformance tests verify that first block (`QmPKt7ptM2ZYSGPUc8PmPT2VBkLDK3iqpG9TBJY7PCE9rF`) and third block (`QmWXY482zQdwecnfBsj78poUUuPXvyw2JAFAEMw4tzTavV`) can be fetched independently
+    - Requests for middle block or byte ranges requiring it should fail gracefully
+
+## Directory Test Vectors
+
+Test vectors for UnixFS directory structures, progressing from simple flat directories to complex HAMT-sharded directories.
+
+### Simple Directory
+
+- Fixture: [`dir-with-files.car`](https://github.com/ipfs/gateway-conformance/raw/refs/tags/v0.8.1/fixtures/path_gateway_unixfs/dir-with-files.car)
+  - CID: `bafybeihchr7vmgjaasntayyatmp5sv6xza57iy2h4xj7g46bpjij6yhrmy`
+  - Type: [`dag-pb` Directory](#dag-pb-directory)
+  - Block Analysis:
+    - Directory block size (`ipfs block stat`): 185 bytes
+    - Contains UnixFS Type=Directory metadata + 4 links
+  - Structure:
+    ```
+    📁 /                    # bafybeihchr7vmgjaasntayyatmp5sv6xza57iy2h4xj7g46bpjij6yhrmy
+    ├── 📄 ascii-copy.txt  # bafkreifkam6ns4aoolg3wedr4uzrs3kvq66p4pecirz6y2vlrngla62mxm (raw, 31 bytes) "hello application/vnd.ipld.car"
+    ├── 📄 ascii.txt       # bafkreifkam6ns4aoolg3wedr4uzrs3kvq66p4pecirz6y2vlrngla62mxm (raw, 31 bytes) "hello application/vnd.ipld.car"
+    ├── 📄 hello.txt       # bafkreifjjcie6lypi6ny7amxnfftagclbuxndqonfipmb64f2km2devei4 (raw, 12 bytes) "hello world\n"
+    └── 📄 multiblock.txt  # bafybeigcisqd7m5nf3qmuvjdbakl5bdnh4ocrmacaqkpuh77qjvggmt2sa (dag-pb, 1026 bytes) Lorem ipsum text
+    ```
+  - Purpose: Directory listing, link sorting, deduplication (ascii.txt and ascii-copy.txt share same CID)
+  - Validation: Links sorted lexicographically by Name, each has valid Tsize
+
+### Nested Directories
+
+- Fixture: [`subdir-with-two-single-block-files.car`](https://github.com/ipfs/gateway-conformance/raw/refs/tags/v0.8.1/fixtures/trustless_gateway_car/subdir-with-two-single-block-files.car)
+  - CID: `bafybeietjm63oynimmv5yyqay33nui4y4wx6u3peezwetxgiwvfmelutzu`
+  - Type: [`dag-pb` Directory](#dag-pb-directory) containing another Directory
+  - Block Analysis:
+    - Root directory block size: 55 bytes
+    - Subdirectory block size: 110 bytes
+  - Structure:
+    ```
+    📁 /                    # bafybeietjm63oynimmv5yyqay33nui4y4wx6u3peezwetxgiwvfmelutzu
+    └── 📁 subdir/         # bafybeiggghzz6dlue3m6nb2dttnbrygxh3lrjl5764f2m4gq7dgzdt55o4 (dag-pb Directory)
+        ├── 📄 ascii.txt   # bafkreifkam6ns4aoolg3wedr4uzrs3kvq66p4pecirz6y2vlrngla62mxm (raw, 31 bytes) "hello application/vnd.ipld.car"
+        └── 📄 hello.txt   # bafkreifjjcie6lypi6ny7amxnfftagclbuxndqonfipmb64f2km2devei4 (raw, 12 bytes) "hello world\n"
+    ```
+  - Purpose: Path traversal through directory hierarchy
+  - Validation: Can traverse `/subdir/hello.txt` path correctly
+
+- Fixture: [`dag-pb.car`](https://github.com/ipfs/gateway-conformance/raw/refs/tags/v0.8.1/fixtures/path_gateway_dag/dag-pb.car)
+  - CID: `bafybeiegxwlgmoh2cny7qlolykdf7aq7g6dlommarldrbm7c4hbckhfcke`
+  - Type: [`dag-pb` Directory](#dag-pb-directory)
+  - Structure:
+    ```
+    📁 /                    # bafybeiegxwlgmoh2cny7qlolykdf7aq7g6dlommarldrbm7c4hbckhfcke
+    ├── 📁 foo/            # bafybeidryarwh34ygbtyypbu7qjkl4euiwxby6cql6uvosonohkq2kwnkm (dag-pb Directory)
+    │   └── 📄 bar.txt     # bafkreigzafgemjeejks3vqyuo46ww2e22rt7utq5djikdofjtvnjl5zp6u (raw, 14 bytes) "Hello, world!"
+    └── 📄 foo.txt         # bafkreic3ondyhizrzeoufvoodehinugpj3ecruwokaygl7elezhn2khqfa (raw, 13 bytes) "Hello, IPFS!"
+    ```
+  - Purpose: Another example of standard UnixFS directory with raw leaf blocks
+
+### Special Characters in Filenames
+
+- Fixture: [`path_gateway_tar/fixtures.car`](https://github.com/ipfs/gateway-conformance/raw/refs/tags/v0.8.1/fixtures/path_gateway_tar/fixtures.car)
+  - CID: `bafybeig6ka5mlwkl4subqhaiatalkcleo4jgnr3hqwvpmsqfca27cijp3i`
+  - Type: [`dag-pb` Directory](#dag-pb-directory) with nested subdirectories
+  - Structure:
+    ```
+    📁 /                    # bafybeig6ka5mlwkl4subqhaiatalkcleo4jgnr3hqwvpmsqfca27cijp3i
+    └── 📁 ą/              # (dag-pb Directory)
+        └── 📁 ę/          # (dag-pb Directory)
+            └── 📄 file-źł.txt  # (raw, 34 bytes) "I am a txt file on path with utf8"
+    ```
+  - Path with Polish diacritics: `/ipfs/bafybeig6ka5mlwkl4subqhaiatalkcleo4jgnr3hqwvpmsqfca27cijp3i/ą/ę/file-źł.txt`
+  - Purpose: UTF-8 characters in directory and file names (ą, ę, ź, ł)
+  - Validation: Directory traversal works with UTF-8 paths
+
+- Fixture: [`dir-with-percent-encoded-filename.car`](https://github.com/ipfs/gateway-conformance/raw/refs/tags/v0.8.1/fixtures/path_gateway_unixfs/dir-with-percent-encoded-filename.car)
+  - CID: `bafybeig675grnxcmshiuzdaz2xalm6ef4thxxds6o6ypakpghm5kghpc34`
+  - Type: [`dag-pb` Directory](#dag-pb-directory)
+  - Structure:
+    ```
+    📁 /                    # bafybeig675grnxcmshiuzdaz2xalm6ef4thxxds6o6ypakpghm5kghpc34
+    └── 📄 Portugal%2C+España=Peninsula Ibérica.txt  # bafkreihfmctcb2kuvoljqeuphqr2fg2r45vz5cxgq5c2yrxnqg5erbitmq (raw, 38 bytes) "hello from a percent encoded filename"
+    ```
+  - Purpose: Filenames with percent-encoding (`%2C`), plus signs, equals, and non-ASCII characters
+  - Validation:
+    - Implementations MUST preserve the original filename exactly as stored in UnixFS
+    - Must not be confused by filenames mixing Unicode characters with percent-encoding
+    - Gateway example: In gateway-conformance, accessing this file from a web browser requires double-encoding the `%2C` as `%252C` in the URL path (`/ipfs/{{CID}}/Portugal%252C+España=Peninsula%20Ibérica.txt`)
+    - Browser implementations should preserve `%2C` in the filename to avoid conflicts with URL encoding
+
+### Directory with Missing Blocks
+
+- Fixture: [`bafybeigcsevw74ssldzfwhiijzmg7a35lssfmjkuoj2t5qs5u5aztj47tq.dag-pb`](https://github.com/ipld/codec-fixtures/raw/381e762b85862b2bbdb6ef2ba140b3c505e31a44/fixtures/dagpb_4namedlinks%2Bdata/bafybeigcsevw74ssldzfwhiijzmg7a35lssfmjkuoj2t5qs5u5aztj47tq.dag-pb)
+  - CID: `bafybeigcsevw74ssldzfwhiijzmg7a35lssfmjkuoj2t5qs5u5aztj47tq`
+  - Type: [`dag-pb` Directory](#dag-pb-directory)
+  - Structure:
+    ```
+    📁 /                    # bafybeigcsevw74ssldzfwhiijzmg7a35lssfmjkuoj2t5qs5u5aztj47tq
+    ├── ⚠️  audio_only.m4a   # (link to missing block, ~24MB)
+    ├── ⚠️  chat.txt         # (link to missing block, ~1KB)
+    ├── ⚠️  playback.m3u     # (link to missing block, ~116 bytes)
+    └── ⚠️  zoom_0.mp4       # (link to missing block)
+    ```
+  - Note: Child blocks are NOT included - they may be unavailable locally or missing entirely
+  - Purpose:
+    - Directory enumeration should require only the root block
+    - Can list all filenames and their CIDs without fetching child blocks
+    - Operations should not block waiting for child blocks unless content is actually requested
+  - Validation: Can enumerate directory contents from root block alone
+
+### HAMT Sharded Directory
+
+- Fixture: [`single-layer-hamt-with-multi-block-files.car`](https://github.com/ipfs/gateway-conformance/raw/refs/tags/v0.8.1/fixtures/trustless_gateway_car/single-layer-hamt-with-multi-block-files.car)
+  - CID: `bafybeidbclfqleg2uojchspzd4bob56dqetqjsj27gy2cq3klkkgxtpn4i`
+  - Type: [`dag-pb` HAMTDirectory](#dag-pb-hamtdirectory)
+  - Block Analysis:
+    - Root HAMT block size (`ipfs block stat`): 12046 bytes
+    - Contains UnixFS Type=HAMTShard metadata with fanout=256
+    - Links use 2-character hex prefixes for hash buckets (00-FF)
+  - Structure:
+    ```
+    📂 /                    # bafybeidbclfqleg2uojchspzd4bob56dqetqjsj27gy2cq3klkkgxtpn4i (HAMT root)
+    ├── 📄 1.txt           # (dag-pb file, multi-block)
+    ├── 📄 2.txt           # (dag-pb file, multi-block)
+    ├── ...
+    └── 📄 1000.txt        # (dag-pb file, multi-block)
+    ```
+  - Contents: 1000 numbered files (1.txt through 1000.txt), each containing Lorem ipsum text
+  - Purpose: HAMT sharding for large directories
+  - Validation:
+    - Fanout field = 256
+    - Link Names in HAMT have 2-character hex prefix (hash buckets)
+    - Can retrieve any file by name through hash bucket calculation
+
+## Special Cases and Advanced Features
+
+Test vectors for special UnixFS features and edge cases.
+
+### Symbolic Links
+
+- Fixture: [`symlink.car`](https://github.com/ipfs/gateway-conformance/raw/refs/tags/v0.8.1/fixtures/path_gateway_unixfs/symlink.car)
+  - CID: `QmWvY6FaqFMS89YAQ9NAPjVP4WZKA1qbHbicc9HeSKQTgt`
+  - Types: [`dag-pb` Directory](#dag-pb-directory) containing [`dag-pb` Symlink](#dag-pb-symlink)
+  - Block Analysis:
+    - Root directory block: Not measured (V0 CID)
+    - Symlink block (`QmTB8BaCJdCH5H3k7GrxJsxgDNmNYGGR71C58ERkivXoj5`): 9 bytes
+    - Target file block (`Qme2y5HA5kvo2jAx13UsnV5bQJVijiAJCPvaW3JGQWhvJZ`): 16 bytes
+  - Structure:
+    ```
+    📁 /                    # QmWvY6FaqFMS89YAQ9NAPjVP4WZKA1qbHbicc9HeSKQTgt
+    ├── 📄 foo           # Qme2y5HA5kvo2jAx13UsnV5bQJVijiAJCPvaW3JGQWhvJZ - file containing "content"
+    └── 🔗 bar           # QmTB8BaCJdCH5H3k7GrxJsxgDNmNYGGR71C58ERkivXoj5 - symlink pointing to "foo"
+    ```
+  - Purpose: UnixFS symlink resolution
+  - Security note: Critical for preventing path traversal vulnerabilities
+
+### Mixed Block Sizes
+
+- Fixture: [`subdir-with-mixed-block-files.car`](https://github.com/ipfs/gateway-conformance/raw/refs/tags/v0.8.1/fixtures/trustless_gateway_car/subdir-with-mixed-block-files.car)
+  - CID: `bafybeidh6k2vzukelqtrjsmd4p52cpmltd2ufqrdtdg6yigi73in672fwu`
+  - Type: [`dag-pb` Directory](#dag-pb-directory) with subdirectory
+  - Structure:
+    ```
+    📁 /                    # bafybeidh6k2vzukelqtrjsmd4p52cpmltd2ufqrdtdg6yigi73in672fwu
+    └── 📁 subdir/         # bafybeicnmple4ehlz3ostv2sbojz3zhh5q7tz5r2qkfdpqfilgggeen7xm
+        ├── 📄 ascii.txt   # bafkreifkam6ns4aoolg3wedr4uzrs3kvq66p4pecirz6y2vlrngla62mxm (raw, 31 bytes) "hello application/vnd.ipld.car"
+        ├── 📄 hello.txt   # bafkreifjjcie6lypi6ny7amxnfftagclbuxndqonfipmb64f2km2devei4 (raw, 12 bytes) "hello world\n"
+        └── 📄 multiblock.txt  # bafybeigcisqd7m5nf3qmuvjdbakl5bdnh4ocrmacaqkpuh77qjvggmt2sa (dag-pb, 1271 bytes total)
+    ```
+  - Purpose: Directories containing both single-block raw files and multi-block dag-pb files
+  - Validation: Can handle mixed file types in same directory
+
+### Deduplication
+
+- Fixture: [`dir-with-duplicate-files.car`](https://github.com/ipfs/gateway-conformance/raw/refs/tags/v0.8.1/fixtures/trustless_gateway_car/dir-with-duplicate-files.car)
+  - CID: `bafybeihchr7vmgjaasntayyatmp5sv6xza57iy2h4xj7g46bpjij6yhrmy`
+  - Type: [`dag-pb` Directory](#dag-pb-directory)
+  - Structure:
+    ```
+    📁 /                    # bafybeihchr7vmgjaasntayyatmp5sv6xza57iy2h4xj7g46bpjij6yhrmy
+    ├── 🔗 ascii-copy.txt  # bafkreifkam6ns4aoolg3wedr4uzrs3kvq66p4pecirz6y2vlrngla62mxm (same CID as ascii.txt)
+    ├── 📄 ascii.txt       # bafkreifkam6ns4aoolg3wedr4uzrs3kvq66p4pecirz6y2vlrngla62mxm (raw, 31 bytes) "hello application/vnd.ipld.car"
+    ├── 📄 hello.txt       # bafkreifjjcie6lypi6ny7amxnfftagclbuxndqonfipmb64f2km2devei4 (raw, 12 bytes) "hello world\n"
+    └── 📄 multiblock.txt  # bafybeigcisqd7m5nf3qmuvjdbakl5bdnh4ocrmacaqkpuh77qjvggmt2sa (dag-pb, multi-block)
+    ```
+  - Purpose: Multiple directory entries pointing to the same content CID (deduplication)
+  - Validation: Both ascii.txt and ascii-copy.txt resolve to the same content block
+
+### Invalid Test Cases
+
+These fixtures test raw dag-pb codec capabilities and serve as invalid test vectors for UnixFS implementations. Most lack UnixFS metadata - meaning their dag-pb Data field either doesn't exist, is empty, or contains bytes that aren't a valid UnixFS protobuf (which requires at minimum a `Type` field specifying File/Directory/Symlink etc).
+
+These validate that implementations properly reject malformed or non-UnixFS dag-pb nodes rather than crashing or behaving unpredictably:
+
+- 💢 [`bafybeihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku.dag-pb`](https://github.com/ipld/codec-fixtures/raw/381e762b85862b2bbdb6ef2ba140b3c505e31a44/fixtures/dagpb_empty/bafybeihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku.dag-pb) - Empty dag-pb node, 0 bytes (no UnixFS metadata)
+- 💢 [`bafybeihyivpglm6o6wrafbe36fp5l67abmewk7i2eob5wacdbhz7as5obe.dag-pb`](https://github.com/ipld/codec-fixtures/raw/381e762b85862b2bbdb6ef2ba140b3c505e31a44/fixtures/dagpb_1link/bafybeihyivpglm6o6wrafbe36fp5l67abmewk7i2eob5wacdbhz7as5obe.dag-pb) - Single link without data, bytes: `12240a2212207521fe19c374a97759226dc5c0c8e674e73950e81b211f7dd3b6b30883a08a51` (no UnixFS metadata)
+- 💢 [`bafybeibh647pmxyksmdm24uad6b5f7tx4dhvilzbg2fiqgzll4yek7g7y4.dag-pb`](https://github.com/ipld/codec-fixtures/raw/381e762b85862b2bbdb6ef2ba140b3c505e31a44/fixtures/dagpb_2link%2Bdata/bafybeibh647pmxyksmdm24uad6b5f7tx4dhvilzbg2fiqgzll4yek7g7y4.dag-pb) - Two links with data, bytes: `12340a2212208ab7a6c5e74737878ac73863cb76739d15d4666de44e5756bf55a2f9e9ab5f431209736f6d65206c696e6b1880c2d72f12370a2212208ab7a6c5e74737878ac73863cb76739d15d4666de44e5756bf55a2f9e9ab5f44120f736f6d65206f74686572206c696e6b18080a09736f6d652064617461` (invalid UnixFS protobuf)
+- 💢 [`bafybeie7xh3zqqmeedkotykfsnj2pi4sacvvsjq6zddvcff4pq7dvyenhu.dag-pb`](https://github.com/ipld/codec-fixtures/raw/381e762b85862b2bbdb6ef2ba140b3c505e31a44/fixtures/dagpb_11unnamedlinks%2Bdata/bafybeie7xh3zqqmeedkotykfsnj2pi4sacvvsjq6zddvcff4pq7dvyenhu.dag-pb) - Eleven unnamed links with data (invalid UnixFS protobuf)
+- 💢 [`bafybeibazl2z4vqp2tmwcfag6wirmtpnomxknqcgrauj7m2yisrz3qjbom.dag-pb`](https://github.com/ipld/codec-fixtures/raw/381e762b85862b2bbdb6ef2ba140b3c505e31a44/fixtures/dagpb_Data_some/bafybeibazl2z4vqp2tmwcfag6wirmtpnomxknqcgrauj7m2yisrz3qjbom.dag-pb) - Node with data field populated, bytes: `0a050001020304` (invalid UnixFS protobuf)
+- 💢 [`bafybeiaqfni3s5s2k2r6rgpxz4hohdsskh44ka5tk6ztbjerqpvxwfkwaq.dag-pb`](https://github.com/ipld/codec-fixtures/raw/381e762b85862b2bbdb6ef2ba140b3c505e31a44/fixtures/dagpb_Data_zero/bafybeiaqfni3s5s2k2r6rgpxz4hohdsskh44ka5tk6ztbjerqpvxwfkwaq.dag-pb) - Node with empty data field, bytes: `0a00` (no UnixFS metadata)
+- 💢 [`bafybeia53f5n75ituvc3yupuf7tdnxf6fqetrmo2alc6g6iljkmk7ys5mm.dag-pb`](https://github.com/ipld/codec-fixtures/raw/381e762b85862b2bbdb6ef2ba140b3c505e31a44/fixtures/dagpb_Links_Hash_some/bafybeia53f5n75ituvc3yupuf7tdnxf6fqetrmo2alc6g6iljkmk7ys5mm.dag-pb) - Links with hash only, bytes: `120b0a09015500050001020304` (no UnixFS metadata)
+- 💢 [`bafybeifq4hcxma3kjljrpxtunnljtc6tvbkgsy3vldyfpfbx2lij76niyu.dag-pb`](https://github.com/ipld/codec-fixtures/raw/381e762b85862b2bbdb6ef2ba140b3c505e31a44/fixtures/dagpb_Links_Hash_some_Name_some/bafybeifq4hcxma3kjljrpxtunnljtc6tvbkgsy3vldyfpfbx2lij76niyu.dag-pb) - Links with hash and name, bytes: `12160a090155000500010203041209736f6d65206e616d65` (no UnixFS metadata)
+- 💢 [`bafybeie7fstnkm4yshfwnmpp7d3mlh4f4okmk7a54d6c3ffr755q7qzk44.dag-pb`](https://github.com/ipld/codec-fixtures/raw/381e762b85862b2bbdb6ef2ba140b3c505e31a44/fixtures/dagpb_Links_Hash_some_Name_zero/bafybeie7fstnkm4yshfwnmpp7d3mlh4f4okmk7a54d6c3ffr755q7qzk44.dag-pb) - Links with hash but empty name, bytes: `120d0a090155000500010203041200` (no UnixFS metadata)
+- 💢 [`bafybeiezymjvhwfuharanxmzxwuomzjjuzqjewjolr4phaiyp6l7qfwo64.dag-pb`](https://github.com/ipld/codec-fixtures/raw/381e762b85862b2bbdb6ef2ba140b3c505e31a44/fixtures/dagpb_Links_Hash_some_Tsize_some/bafybeiezymjvhwfuharanxmzxwuomzjjuzqjewjolr4phaiyp6l7qfwo64.dag-pb) - Links with hash and Tsize, bytes: `12140a0901550005000102030418ffffffffffffff0f` (no UnixFS metadata)
+- 💢 [`bafybeichjs5otecmbvwh5azdr4jc45mp2qcofh2fr54wjdxhz4znahod2i.dag-pb`](https://github.com/ipld/codec-fixtures/raw/381e762b85862b2bbdb6ef2ba140b3c505e31a44/fixtures/dagpb_Links_Hash_some_Tsize_zero/bafybeichjs5otecmbvwh5azdr4jc45mp2qcofh2fr54wjdxhz4znahod2i.dag-pb) - Links with hash but zero Tsize, bytes: `120d0a090155000500010203041800` (no UnixFS metadata)
+- 💢 [`bafybeia2qk4u55f2qj7zimmtpulejgz7urp7rzs44cvledcaj42gltkk3u.dag-pb`](https://github.com/ipld/codec-fixtures/raw/381e762b85862b2bbdb6ef2ba140b3c505e31a44/fixtures/dagpb_simple_forms_1/bafybeia2qk4u55f2qj7zimmtpulejgz7urp7rzs44cvledcaj42gltkk3u.dag-pb) - Simple form variant 1, bytes: `0a03010203` (invalid UnixFS protobuf)
+- 💢 [`bafybeiahfgovhod2uvww72vwdgatl5r6qkoeegg7at2bghiokupfphqcku.dag-pb`](https://github.com/ipld/codec-fixtures/raw/381e762b85862b2bbdb6ef2ba140b3c505e31a44/fixtures/dagpb_simple_forms_2/bafybeiahfgovhod2uvww72vwdgatl5r6qkoeegg7at2bghiokupfphqcku.dag-pb) - Simple form variant 2, bytes: `120b0a0901550005000102030412100a09015500050001020304120362617212100a090155000500010203041203666f6f` (no UnixFS metadata)
+- 💢 [`bafybeidrg2f6slbv4yzydqtgmsi2vzojajnt7iufcreynfpxndca4z5twm.dag-pb`](https://github.com/ipld/codec-fixtures/raw/381e762b85862b2bbdb6ef2ba140b3c505e31a44/fixtures/dagpb_simple_forms_3/bafybeidrg2f6slbv4yzydqtgmsi2vzojajnt7iufcreynfpxndca4z5twm.dag-pb) - Simple form variant 3, bytes: `120b0a09015500050001020304120e0a09015500050001020304120161120e0a09015500050001020304120161` (no UnixFS metadata)
+- 💢 [`bafybeieube7zxmzoc5bgttub2aqofi6xdzimv5munkjseeqccn36a6v6j4.dag-pb`](https://github.com/ipld/codec-fixtures/raw/381e762b85862b2bbdb6ef2ba140b3c505e31a44/fixtures/dagpb_simple_forms_4/bafybeieube7zxmzoc5bgttub2aqofi6xdzimv5munkjseeqccn36a6v6j4.dag-pb) - Simple form variant 4, bytes: `120e0a09015500050001020304120161120e0a09015500050001020304120161` (no UnixFS metadata)
+
+## Additional Testing Resources
+
+- Gateway Conformance Suite: [ipfs/gateway-conformance](https://github.com/ipfs/gateway-conformance)
+  - Real-world test suite with UnixFS fixtures
+  - Tests gateway behaviors with various UnixFS structures
+  - Includes edge cases and performance scenarios
+
+- Test fixture generator: [go-fixtureplate](https://github.com/ipld/go-fixtureplate)
+  - Tool for generating custom test fixtures
+  - Includes UnixFS files and directories of arbitrary shapes
+
+Report specification issues or submit corrections via [ipfs/specs](https://github.com/ipfs/specs/issues).
+
+# Appendix: Notes for Implementers
+
+This section and included subsections are not authoritative.
+
+## Popular Implementations
+
+- JavaScript
+  - [`@helia/unixfs`](https://www.npmjs.com/package/@helia/unixfs) implementation of a filesystem compatible with [Helia SDK](https://github.com/ipfs/helia#readme)
+  - Data Formats - [unixfs](https://github.com/ipfs/js-ipfs-unixfs)
+    - Importer - [unixfs-importer](https://github.com/ipfs/js-ipfs-unixfs/tree/main/packages/ipfs-unixfs-importer)
+    - Exporter - [unixfs-exporter](https://github.com/ipfs/js-ipfs-unixfs/tree/main/packages/ipfs-unixfs-exporter)
+- Go
+  - [Boxo SDK](https://github.com/ipfs/boxo#readme) includes implementation of UnixFS filesystem
+    - Protocol Buffer Definitions - [`ipfs/boxo/../unixfs.proto`](https://github.com/ipfs/boxo/blob/v0.23.0/ipld/unixfs/pb/unixfs.proto)
+    - [`ipfs/boxo/files`](https://github.com/ipfs/boxo/tree/main/files)
+    - [`ipfs/boxo/ipld/unixfs`](https://github.com/ipfs/boxo/tree/main/ipld/unixfs/)
+  - Alternative `go-ipld-prime` implementation: [`ipfs/go-unixfsnode`](https://github.com/ipfs/go-unixfsnode)
+
+<!-- TODO: Rust libraries seem to be abandoned, hiding them for now
+- Rust
+  - [`iroh-unixfs`](https://github.com/n0-computer/iroh/tree/b7a4dd2b01dbc665435659951e3e06d900966f5f/iroh-unixfs)
+  - [`unixfs-v1`](https://github.com/ipfs-rust/unixfsv1)
+-->
+
+## Simple `raw` Example
+
+In this example, we will build a single `raw` block with the string `test` as its content.
+
+First, hash the data:
+
+```console
+$ echo -n "test" | sha256sum
+9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08  -
+```
+
+Add the CID prefix:
+
+```
+f01551220
+         9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
+
+f this is the multibase prefix, we need it because we are working with a hex CID, this is omitted for binary CIDs
+ 01 the CID version, here one
+   55 the codec, here we MUST use Raw because this is a Raw file
+     12 the hashing function used, here sha256
+       20 the digest length 32 bytes
+         9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08 is the the digest we computed earlier
+```
+
+Done. Assuming we stored this block in some implementation of our choice, which makes it accessible to our client, we can try to decode it.
+
+```console
+$ ipfs cat f015512209f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
+test
+```
+
+## Offset List
+
+The offset list isn't the only way to use blocksizes and reach a correct implementation,
+it is a simple canonical one, python pseudo code to compute it looks like this:
+
+```python
+def offsetlist(node):
+  unixfs = decodeDataField(node.Data)
+  if len(node.Links) != len(unixfs.Blocksizes):
+    raise "unmatched sister-lists" # error messages are implementation details
+
+  cursor = len(unixfs.Data) if unixfs.Data else 0
+  return [cursor] + [cursor := cursor + size for size in unixfs.Blocksizes[:-1]]
+```
+
+This will tell you which offset inside this node the children at the corresponding index starts to cover. (using `[x,y)` ranging)
+
+
 # Appendix: Historical Design Decisions
 
 :::warning
@@ -588,78 +995,6 @@ In most cases, such values will exceed 2^28 (268,435,456) nanoseconds. Therefore
 the fractional part is represented as a 4-byte `fixed32`,
 [as per Google's recommendation](https://developers.google.com/protocol-buffers/docs/proto#scalar).
 
-# Appendix: Notes for Implementers
-
-This section and included subsections are not authoritative.
-
-## Popular Implementations
-
-- JavaScript
-  - [`@helia/unixfs`](https://www.npmjs.com/package/@helia/unixfs) implementation of a filesystem compatible with [Helia SDK](https://github.com/ipfs/helia#readme)
-  - Data Formats - [unixfs](https://github.com/ipfs/js-ipfs-unixfs)
-    - Importer - [unixfs-importer](https://github.com/ipfs/js-ipfs-unixfs/tree/main/packages/ipfs-unixfs-importer)
-    - Exporter - [unixfs-exporter](https://github.com/ipfs/js-ipfs-unixfs/tree/main/packages/ipfs-unixfs-exporter)
-- Go
-  - [Boxo SDK](https://github.com/ipfs/boxo#readme) includes implementation of UnixFS filesystem
-    - Protocol Buffer Definitions - [`ipfs/boxo/../unixfs.proto`](https://github.com/ipfs/boxo/blob/v0.23.0/ipld/unixfs/pb/unixfs.proto)
-    - [`ipfs/boxo/files`](https://github.com/ipfs/boxo/tree/main/files)
-    - [`ipfs/boxo/ipld/unixfs`](https://github.com/ipfs/boxo/tree/main/ipld/unixfs/)
-  - Alternative `go-ipld-prime` implementation: [`ipfs/go-unixfsnode`](https://github.com/ipfs/go-unixfsnode)
-
-<!-- TODO: Rust libraries seem to be abandoned, hiding them for now
-- Rust
-  - [`iroh-unixfs`](https://github.com/n0-computer/iroh/tree/b7a4dd2b01dbc665435659951e3e06d900966f5f/iroh-unixfs)
-  - [`unixfs-v1`](https://github.com/ipfs-rust/unixfsv1)
--->
-
-## Simple `raw` Example
-
-In this example, we will build a single `raw` block with the string `test` as its content.
-
-First, hash the data:
-
-```console
-$ echo -n "test" | sha256sum
-9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08  -
-```
-
-Add the CID prefix:
-
-```
-f01551220
-         9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
-
-f this is the multibase prefix, we need it because we are working with a hex CID, this is omitted for binary CIDs
- 01 the CID version, here one
-   55 the codec, here we MUST use Raw because this is a Raw file
-     12 the hashing function used, here sha256
-       20 the digest length 32 bytes
-         9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08 is the the digest we computed earlier
-```
-
-Done. Assuming we stored this block in some implementation of our choice, which makes it accessible to our client, we can try to decode it.
-
-```console
-$ ipfs cat f015512209f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
-test
-```
-
-## Offset List
-
-The offset list isn't the only way to use blocksizes and reach a correct implementation,
-it is a simple canonical one, python pseudo code to compute it looks like this:
-
-```python
-def offsetlist(node):
-  unixfs = decodeDataField(node.Data)
-  if len(node.Links) != len(unixfs.Blocksizes):
-    raise "unmatched sister-lists" # error messages are implementation details
-
-  cursor = len(unixfs.Data) if unixfs.Data else 0
-  return [cursor] + [cursor := cursor + size for size in unixfs.Blocksizes[:-1]]
-```
-
-This will tell you which offset inside this node the children at the corresponding index starts to cover. (using `[x,y)` ranging)
 
 [protobuf]: https://developers.google.com/protocol-buffers/
 [CID]: https://github.com/multiformats/cid/
