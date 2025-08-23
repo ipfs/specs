@@ -212,19 +212,31 @@ of the offset list when computing offsets.
 
 #### `PBNode.Links[].Name`
 
-This field makes sense only in [Directories](#dag-pb-directory) contexts and MUST be absent
-when creating a new file. For historical reasons, implementations parsing
-third-party data SHOULD accept empty values here.
+The `Name` field is primarily used in directories to identify child entries.
 
-If this field is present and non-empty, the file is invalid and the parser MUST
-error.
+**For internal file chunks:**
+- Implementations SHOULD NOT produce `Name` fields (the field should be absent in the protobuf, not an empty string)
+- For compatibility with historical data, implementations SHOULD treat empty string values ("") the same as absent when parsing
+- If a non-empty `Name` is present in an internal file chunk, the parser MUST error as this indicates an invalid file structure
 
 #### `decode(PBNode.Data).Blocksize`
 
 This field is not directly present in the block, but rather a computable property
 of a `dag-pb`, which would be used in the parent node in `decode(PBNode.Data).blocksizes`.
-It is the sum of the length of `decode(PBNode.Data).Data` field plus the sum
-of all link's `blocksizes`.
+
+**Important:** `blocksize` represents only the raw file data size, NOT including the protobuf envelope overhead.
+
+It is calculated as:
+- For `dag-pb` blocks: the length of `decode(PBNode.Data).Data` field plus the sum of all child `blocksizes`
+- For `raw` blocks (small files, raw leaves): the length of the entire raw block
+
+:::note
+
+Examples of where `blocksize` is useful:
+
+- Seeking and range requests (e.g., HTTP Range headers for video streaming). The `blocksizes` array allows calculating byte offsets (see [Offset List](#offset-list)) to determine which blocks contain the requested range without downloading unnecessary blocks.
+
+:::
 
 #### `decode(PBNode.Data).filesize`
 
@@ -258,16 +270,16 @@ The minimum valid `PBNode.Data` field for a directory is as follows:
 
 #### `dag-pb` `Directory` Link Ordering
 
-The canonical sorting order is lexicographical over the names.
+Directory links SHOULD be sorted lexicographically by the `Name` field when creating
+new directories. This ensures consistent, deterministic directory structures across
+implementations.
 
-In theory, there is no reason an encoder couldn't use an other ordering. However,
-this loses some of its meaning when mapped into most file systems today, as most file
-systems consider directories to be unordered key-value objects.
+While decoders MUST accept directories with any link ordering, encoders SHOULD use
+lexicographic sorting for better interoperability and deterministic CIDs. A decoder
+SHOULD, if it can, preserve the order of the original files.
 
-A decoder SHOULD, if it can, preserve the order of the original files in the same way
-it consumed those names. However, when some implementations decode, modify and then
-re-encode, the original link order loses it's original meaning, given that there
-is no way to indicate which sorting was used originally.
+Note: The sorting requirement helps with deduplication detection and enables more
+efficient directory traversal algorithms in some implementations.
 
 #### `dag-pb` `Directory` Path Resolution
 
@@ -419,11 +431,34 @@ through.
 
 :::
 
-### `dag-pb` `TSize` (child DAG size hint)
+### `dag-pb` `TSize` (cumulative DAG size)
 
-`Tsize` is an optional field in `PBNode.Links[]` which represents the precomputed size of the specific child DAG. It provides a performance optimization: a hint about the total size of child DAG can be read without having to fetch any child nodes.
+`Tsize` is an optional field in `PBNode.Links[]` which represents the cumulative size of the entire DAG rooted at that link, including all protobuf encoding overhead.
 
-To compute the `Tsize` of a child DAG, sum the length of the `dag-pb` outside message binary length and the `blocksizes` of all nodes in the child DAG.
+**Key distinction from blocksize:**
+- **`blocksize`**: Only the raw file data (no protobuf overhead)
+- **`Tsize`**: Total size of all serialized blocks in the DAG (includes protobuf overhead)
+
+To compute `Tsize`: sum the serialized size of the current dag-pb block and the Tsize values of all child links.
+
+:::note
+
+**Example: Directory with multi-block file**
+
+Consider the [Simple Directory fixture](#simple-directory) (`bafybeihchr7vmgjaasntayyatmp5sv6xza57iy2h4xj7g46bpjij6yhrmy`):
+
+The directory has a total `Tsize` of 1572 bytes:
+- Directory block itself: 227 bytes when serialized
+- Child entries with Tsizes: 31 + 31 + 12 + 1271 = 1345 bytes
+
+The `multiblock.txt` file within this directory demonstrates how `Tsize` accumulates:
+- Raw file content: 1026 bytes (blocksizes: [256, 256, 256, 256, 2])
+- Root dag-pb block: 245 bytes when serialized
+- Total `Tsize`: 245 + 1026 = 1271 bytes
+
+This shows how `Tsize` includes both the protobuf overhead and all child data, while `blocksize` only counts the raw file data.
+
+:::
 
 :::note
 
