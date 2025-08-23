@@ -278,36 +278,120 @@ remaining components and on the CID you popped.
 A :dfn[HAMT Directory] is a [Hashed-Array-Mapped-Trie](https://en.wikipedia.org/wiki/Hash_array_mapped_trie)
 data structure representing a [Directory](#dag-pb-directory). It is generally used to represent
 directories that cannot fit inside a single block. These are also known as "sharded
-directories:, since they allow you to split large directories into multiple blocks, known as "shards".
+directories", since they allow you to split large directories into multiple blocks, known as "shards".
 
+#### HAMT Structure and Parameters
+
+The HAMT directory is configured through the UnixFS metadata in `PBNode.Data`:
+
+- `decode(PBNode.Data).Type` MUST be `HAMTShard` (value `5`)
 - `decode(PBNode.Data).hashType` indicates the [multihash] function to use to digest
-  the path components used for sharding. It MUST be `murmur3-x64-64` (`0x22`).
-- `decode(PBNode.Data).Data.Data` is a bit field, which indicates whether or not
-  links are part of this HAMT, or its leaves. The usage of this field is unknown, given
-  that you can deduce the same information from the link names.
-- `decode(PBNode.Data).Data.fanout` MUST be a power of two. This encodes the number
-  of hash permutations that will be used on each resolution step. The log base 2
-  of the `fanout` indicate how wide the bitmask will be on the hash at for that step.
-  `fanout` MUST be between 8 and probably 65536. <!-- 65536 is a totally arbitrary choice I made, FIXME: get consensus on an upper bound. -->.
+  the path components for sharding. Currently, all HAMT implementations use `murmur3-x64-64` (`0x22`),
+  and this value MUST be consistent across all shards within the same HAMT structure
+- `decode(PBNode.Data).fanout` MUST be a power of two. This determines the number
+  of possible bucket indices (permutations) at each level of the trie. For example,
+  fanout=256 provides 256 possible buckets (0x00 to 0xFF), requiring 8 bits from the hash.
+  The hex prefix length is `log2(fanout)/4` characters (since each hex character represents 4 bits).
+  The same fanout value is used throughout all levels of a single HAMT structure.
+  Implementations choose fanout based on their specific trade-offs between tree depth and node size
+- `decode(PBNode.Data).Data` is a bitmap field indicating which buckets contain entries.
+  Each bit represents one bucket. While included in the protobuf, implementations
+  typically derive bucket occupancy from the link names directly
 
-The field `Name` of an element of `PBNode.Links` for a HAMT starts with an
-uppercase hex-encoded prefix, which is `log2(fanout)` bits wide.
+The field `Name` of an element of `PBNode.Links` for a HAMT uses a
+hex-encoded prefix corresponding to the bucket index, zero-padded to a width
+of `log2(fanout)/4` characters.
+
+Implementations choose when to convert a regular directory to HAMT based on various criteria
+such as estimated block size (commonly around 256KiB-1MiB to produce blocks that can be
+transported over Bitswap) or number of directory entries.
+
+To illustrate the HAMT structure with a concrete example:
+
+```protobuf
+// Root HAMT shard (bafybeidbclfqleg2uojchspzd4bob56dqetqjsj27gy2cq3klkkgxtpn4i)
+// This shard contains 1000 files distributed across buckets
+message PBNode {
+  // UnixFS metadata in Data field
+  Data = {
+    Type = HAMTShard        // Type = 5
+    Data = 0xffffff...      // Bitmap: bits set for populated buckets
+    hashType = 0x22         // murmur3-x64-64
+    fanout = 256            // 256 buckets (8-bit width)
+  }
+
+  // Links to sub-shards or entries
+  Links = [
+    {
+      Hash = bafybeiaebmuestgbpqhkkbrwl2qtjtvs3whkmp2trkbkimuod4yv7oygni
+      Name = "00"           // Bucket 0x00
+      Tsize = 2693          // Cumulative size of this subtree
+    },
+    {
+      Hash = bafybeia322onepwqofne3l3ptwltzns52fgapeauhmyynvoojmcvchxptu
+      Name = "01"           // Bucket 0x01
+      Tsize = 7977
+    },
+    // ... more buckets as needed up to "FF"
+  ]
+}
+
+// Sub-shard for bucket "00" (multiple files hash to 00 at first level)
+message PBNode {
+  Data = {
+    Type = HAMTShard        // Still a HAMT at second level
+    Data = 0x800000...      // Bitmap for this sub-level
+    hashType = 0x22         // murmur3-x64-64
+    fanout = 256            // Same fanout throughout
+  }
+
+  Links = [
+    {
+      Hash = bafybeigcisqd7m5nf3qmuvjdbakl5bdnh4ocrmacaqkpuh77qjvggmt2sa
+      Name = "6E470.txt"    // Bucket 0x6E + filename
+      Tsize = 1271
+    },
+    {
+      Hash = bafybeigcisqd7m5nf3qmuvjdbakl5bdnh4ocrmacaqkpuh77qjvggmt2sa
+      Name = "FF742.txt"    // Bucket 0xFF + filename
+      Tsize = 1271
+    }
+  ]
+}
+```
 
 #### `dag-pb` `HAMTDirectory` Path Resolution
 
-To resolve the path inside a HAMT:
+To resolve a path inside a HAMT:
 
-1. Take the current path component, then hash it using the [multihash] represented
-   by the value of `decode(PBNode.Data).hashType`.
-2. Pop the `log2(fanout)` lowest bits from the path component hash digest, then
-   hex encode (using 0-F) those bits using little endian. Find the link that starts
-   with this hex encoded path.
-3. If the link `Name` is exactly as long as the hex encoded representation, follow
-   the link and repeat step 2 with the child node and the remaining bit stack.
-   The child node MUST be a HAMT directory, or else the directory is invalid. Otherwise, continue.
-4. Compare the remaining part of the last name you found. If it matches the original
-   name you were trying to resolve, you have successfully resolved a path component.
-   Everything past the hex encoded prefix is the name of that element, which is useful when listing children of this directory.
+1. Hash the filename using the hash function specified in `decode(PBNode.Data).hashType`
+2. Pop `log2(fanout)` bits from the hash digest (lowest/least significant bits first),
+   then hex encode those bits using little endian to form the bucket prefix. The prefix MUST use uppercase hex characters (00-FF, not 00-ff)
+3. Find the link whose `Name` starts with this hex prefix:
+   - If `Name` equals the prefix exactly → this is a sub-shard, follow the link and repeat from step 2
+   - If `Name` equals prefix + filename → target found
+   - If no matching prefix → file not in directory
+4. When following to a sub-shard, continue consuming bits from the same hash
+
+Note: Empty intermediate shards are typically collapsed during deletion operations to maintain consistency
+and avoid having HAMT structures that differ based on insertion/deletion history.
+
+:::note
+**Example: Finding "470.txt" in a HAMT with fanout=256** (see [HAMT Sharded Directory test vector](#hamt-sharded-directory))
+
+Given a HAMT-sharded directory containing 1000 files:
+
+1. Hash the filename "470.txt" using murmur3-x64-64 (multihash `0x22`)
+2. With fanout=256, we consume 8 bits at a time from the hash:
+   - First 8 bits determine root bucket → `0x00` → link name "00"
+   - Follow link "00" to sub-shard (`bafybeiaebmuestgbpqhkkbrwl2qtjtvs3whkmp2trkbkimuod4yv7oygni`)
+3. The sub-shard is also a HAMT (has Type=HAMTShard):
+   - Next 8 bits from hash → `0x6E`
+   - Find entry with name "6E470.txt" (prefix + original filename)
+4. Link name format at leaf level: `[hex_prefix][original_filename]`
+   - "6E470.txt" means: file "470.txt" that hashed to bucket 6E at this level
+   - "FF742.txt" means: file "742.txt" that hashed to bucket FF at this level
+:::
 
 ### `dag-pb` `Symlink`
 
