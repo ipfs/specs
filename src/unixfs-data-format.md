@@ -310,12 +310,19 @@ The HAMT directory is configured through the UnixFS metadata in `PBNode.Data`:
 - `decode(PBNode.Data).hashType` indicates the [multihash] function to use to digest
   the path components for sharding. Currently, all HAMT implementations use `murmur3-x64-64` (`0x22`),
   and this value MUST be consistent across all shards within the same HAMT structure
-- `decode(PBNode.Data).fanout` MUST be a power of two. This determines the number
+- `decode(PBNode.Data).fanout` MUST be a power of two and at most 1024. This determines the number
   of possible bucket indices (permutations) at each level of the trie. For example,
   fanout=256 provides 256 possible buckets (0x00 to 0xFF), requiring 8 bits from the hash.
   The hex prefix length is `log2(fanout)/4` characters (since each hex character represents 4 bits).
   The same fanout value is used throughout all levels of a single HAMT structure.
   Implementations choose fanout based on their specific trade-offs between tree depth and node size
+  :::warning
+  Implementations MUST limit the `fanout` parameter to a maximum of 1024 to prevent
+  denial-of-service attacks. Excessively large fanout values can cause memory exhaustion
+  when allocating bucket arrays. See [CVE-2023-23625](https://nvd.nist.gov/vuln/detail/CVE-2023-23625) and
+  [GHSA-q264-w97q-q778](https://github.com/advisories/GHSA-q264-w97q-q778) for details
+  on this vulnerability.
+  :::
 - `decode(PBNode.Data).Data` is a bitmap field indicating which buckets contain entries.
   Each bit represents one bucket. While included in the protobuf, implementations
   typically derive bucket occupancy from the link names directly
