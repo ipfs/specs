@@ -76,6 +76,12 @@ be recognized because their CIDs are encoded using the `raw` (`0x55`) codec:
 - They never have any children nodes, and thus are also known as single block files.
 - Their size is the length of the block body (`Tsize` in parent is equal to `blocksize`).
 
+:::warning
+**Important**: Do not confuse `raw` codec blocks (`0x55`) with the deprecated `Raw` DataType (enum value `0`):
+- **`raw` codec** - Modern way to store data without protobuf wrapper (used for small files and leaves)
+- **`Raw` DataType** - Legacy UnixFS type that wrapped raw data in dag-pb protobuf (implementations MUST NOT produce, MAY read for compatibility)
+:::
+
 # `dag-pb` Node
 
 More complex nodes use the `dag-pb` (`0x70`) encoding. These nodes require two steps of
@@ -110,7 +116,7 @@ a protobuf message specified in the UnixFSV1 format:
 ```protobuf
 message Data {
   enum DataType {
-    Raw = 0;
+    Raw = 0; // deprecated, use raw codec blocks without dag-pb instead
     Directory = 1;
     File = 2;
     Metadata = 3; // reserved for future use
