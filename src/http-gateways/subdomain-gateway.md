@@ -6,15 +6,14 @@ description: >
   ensures compatibility with native ipfs:// and ipns:// URIs, and aligns with
   the existing Same-origin security model in web browsers, including
   relative URL pathing and permission scopes of Web APIs.
-date: 2023-01-28
+date: 2025-04-03
 maturity: reliable
 editors:
   - name: Marcin Rataj
     github: lidel
-    url: https://lidel.org/
     affiliation:
-      name: Protocol Labs
-      url: https://protocol.ai/
+      name: Shipyard
+      url: https://ipshipyard.com
   - name: Adrian Lanzafame
     github: lanzafame
     affiliation:
@@ -204,7 +203,7 @@ See also: [Migrate from Path to Subdomain Gateway](#migrating-from-path-to-subdo
 
 See: [URI router](#uri-router)
 
-# Appendix: notes for implementers
+# Appendix: Notes for implementers
 
 ## Migrating from Path to Subdomain Gateway
 
@@ -244,22 +243,38 @@ should return HTTP 400 Bad Request for CIDs longer than 63.
 
 ## Security considerations
 
-- Wildcard TLS certificates should be set for `*.ipfs.example.net` and
-  `*.ipns.example.net` if a subdomain gateway is to be exposed on the public
-  internet.
-  - If TLS termination takes place outside of gateway implementation, then
-    setting [`X-Forwarded-Proto`](#x-forwarded-proto-request-header) at a
-    reverse HTTP proxy can be used for preserving `https` protocol.
+### Wildcard TLS certificates
 
-- Subdomain gateways provide unique origin per content root, however the
-  origins still share the parent domain name used by the gateway. To fully
-  isolate websites from each other:
-  - The gateway operator should add a wildcard entry
-    to the [Public Suffix List](https://publicsuffix.org/) (PSL).
-    - Example: `dweb.link` gateway [is listed on PSL](https://publicsuffix.org/list/public_suffix_list.dat) as `*.dweb.link`
-  - Web browsers with IPFS support should detect subdomain gateway (URL
-    pattern `https://{content-root-id}.ip[f|n]s.example.net`) and dynamically
-    append it to internal PSL.
+Wildcard TLS certificates SHOULD be set for `*.ipfs.example.net`
+and `*.ipns.example.net` if a subdomain gateway is to be exposed on the public
+internet.
+
+If TLS termination takes place outside of gateway implementation, then setting
+[`X-Forwarded-Proto`](#x-forwarded-proto-request-header) at a reverse HTTP
+proxy is RECOMMENDED for preserving `https` protocol.
+
+### Public Suffix List and eTLD enforcement
+
+Subdomain gateways assign each content root a unique origin, yet these origins
+share the gateway’s parent domain. Without proper isolation, all subdomains
+under the same effective Top-Level Domain (eTLD) face risks: a single
+problematic CID could trigger widespread blocking of the entire gateway by
+software like Safe Browsing
+([incident example](https://web.archive.org/web/20230930054837/https://blog.nft.storage/posts/2022-04-29-gateways-and-gatekeepers)).
+
+To mitigate this and align with the web’s Same-origin security model, operators
+SHOULD register a wildcard entry like `*.example.net`
+with the [Public Suffix List (PSL)](https://publicsuffix.org/).
+
+This will make `ipfs.example.net` and `ipns.example.net` eTLDs, treating each
+identifier (e.g., `cid.ipfs.example.net`) as a distinct top-level Origin.
+The [public good gateway](https://docs.ipfs.tech/concepts/public-utilities/#public-ipfs-gateways),
+listed as `*.dweb.link` and `*.inbrowser.link` on the PSL, exemplifies this approach.
+
+Browsers supporting IPFS natively SHOULD detect URI patterns such as
+`https://{content-root-id}.ip[f|n]s.example.net` and dynamically update their
+internal PSL, bolstering security and compatibility without relying solely on
+operator action.
 
 ## URI router
 
@@ -272,7 +287,7 @@ addresses on a gateway.
 The `/ipfs/?uri=%s` endpoint MUST be compatible with :ref[registerProtocolHandler(scheme, url)],
 present in web browsers. The value passed in `%s` should be :ref[UTF-8 percent-encode].
 
-**Example**
+:::example
 
 Given registration:
 
@@ -288,6 +303,8 @@ which in turn should redirect to
 `https://dweb.link/ipfs/bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi`.
 
 From there, regular subdomain gateway logic applies.
+
+:::
 
 ## Redirects, single-page applications, and custom 404s
 

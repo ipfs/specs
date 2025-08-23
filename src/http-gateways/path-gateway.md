@@ -296,6 +296,8 @@ The request succeeded.
 
 If the HTTP method was `GET`, then data is transmitted in the message body.
 
+If the HTTP method was `HEAD`, then no body should be sent.
+
 ### `206` Partial Content
 
 Partial Content: range request succeeded.
@@ -310,22 +312,34 @@ The new, canonical URL is returned in the [`Location`](#location-response-header
 
 ### `400` Bad Request
 
-A generic client error returned when it is not possible to return a better one
+A generic client error returned when it is not possible to return a better
+one. For example, this can be used when the CID is malformed or its codec is
+unsupported.
 
 ### `404` Not Found
 
-Error to indicate that request was formally correct, but traversal of the
-requested content path was not possible due to a invalid or missing DAG node.
+Error to indicate that request was formally correct but either:
+
+* traversal of the requested content path was not possible due to a invalid or
+missing DAG node, or
+* the requested content is not retrievable from this gateway.
+
+Gateways MUST use 404 to signal that content is not available, particularly
+when the gateway is [non recursive](#recursive-vs-non-recursive-gateways), and only provides access to a known
+dataset, so that it can assess that the requested content is not part of it.
 
 ### `410` Gone
 
 Error to indicate that request was formally correct, but this specific Gateway
-refuses to return requested data.
+refuses to return requested data even though it would have normally provided
+it.
 
-Particularly useful for implementing [deny lists](#denylists), in order to not serve malicious content.
+`410` is particularly useful to implement [deny lists](#denylists), in order to not serve blocked content.
 The name of deny list and unique identifier of blocked entries can be provided in the response body.
 
 See: [Denylists](#denylists)
+
+See also: [`451 Unavailable for Legal Reasons`](#451-unavailable-for-legal-reasons).
 
 ### `412` Precondition Failed
 
@@ -359,23 +373,45 @@ See: [Denylists](#denylists)
 
 ### `500` Internal Server Error
 
-A generic server error returned when it is not possible to return a better one.
+A generic server error returned when it is not possible to return a better
+one. An internal server error signals the general unavailability of the
+gateway.
 
 ### `502` Bad Gateway
 
-Returned immediately when Gateway was not able to produce response for a known reason.
-For example, when gateway failed to find any providers for requested data.
+Error that indicates that a Gateway was not able to produce response for a
+known reason: for example, in the case of
+[recursive gateways](#recursive-vs-non-recursive-gateways), in the event of
+failure to find any providers for requested data. `502` indicates that the
+request can be retried and is not a permanent failure.
 
-This error response SHOULD include [`Retry-After`](#retry-after-response-header) HTTP header to indicate how long the client should wait before retrying.
+This error response SHOULD include
+[`Retry-After`](#retry-after-response-header) HTTP header to indicate how long
+the client should wait before retrying.
+
+Gateways SHOULD return `404` instead of `502` when the content is known to be
+unretrievable: for example, when the Gateway is
+[non-recursive](#recursive-vs-non-recursive-gateways) and the content is known
+to not be available.
 
 ### `504` Gateway Timeout
 
-Returned when Gateway was not able to produce response under set time limits.
-For example, when gateway failed to retrieve data from a remote provider.
+Error that indicates that the Gateway was not able to produce response under
+set time limits: for example, when gateway failed to retrieve data from a
+remote provider. `504` indicates that the request can be retried and is not a
+permanent failure.
 
-There is no generic timeout, Gateway implementations SHOULD set timeouts based on specific use cases.
+There is no generic timeout, Gateway implementations SHOULD set timeouts based
+on specific use cases.
 
-This error response SHOULD include [`Retry-After`](#retry-after-response-header) HTTP header to indicate how long the client should wait before retrying.
+This error response SHOULD include
+[`Retry-After`](#retry-after-response-header) HTTP header to indicate how long
+the client should wait before retrying.
+
+Gateways SHOULD return `404` instead of `504` when the content is known to be
+unretrievable: for example, when the Gateway is
+[non-recursive](#recursive-vs-non-recursive-gateways) and the content is known
+to not be available.
 
 ## Response Headers
 
@@ -641,9 +677,13 @@ Optional, present in certain response types:
 
 ### `Retry-After` (response header)
 
-Gateway returns this header with error responses such as [`429 Too Many Requests`](#429-too-many-requests) or [`504 Gateway Timeout`](#504-gateway-timeout).
+Gateway SHOULD return this header with error responses such as [`429 Too Many Requests`](#429-too-many-requests), [`504 Gateway Timeout`](#504-gateway-timeout) or `503` (server maintainance).
 
-The "Retry-After" header indicates how long the user agent ought to wait before making a follow-up request.
+The "Retry-After" header indicates how long the user agent ought to wait before making a follow-up request. It uses the following syntax:
+
+```
+Retry-After: <delay-seconds>
+```
 
 See Section 10.2.3 of :cite[rfc9110].
 
@@ -834,6 +874,21 @@ The usual optimizations involve:
     limiting the cost of a single page load.
   - The downside of this approach is that it will always be slower than
     skipping child block resolution.
+
+## Recursive vs non-recursive gateways
+
+A *recursive Gateway* is a gateway which generally attempts to fetch content
+from a third party it does not control by triggering lookups and retrievals. A
+recursive Gateway may not know in advance whether it can obtain and return a
+piece of content as the availability of it is out of its control. It may also
+suggest that clients retry failed requests later via `502` and `504` responses
+status codes.
+
+A *non-recursive Gateway* is gateway which accesses a known content-set and,
+under normal operation conditions, knows with certainty whether content
+requested can be obtained or not. Non-recursive gateways SHOULD prevent
+unnecessary retries from clients when the content is known to be unavailable
+by returning `404`.
 
 [dag-pb-format]: https://ipld.io/specs/codecs/dag-pb/spec/#logical-format
 [dag-json]: https://ipld.io/specs/codecs/dag-json/spec/
