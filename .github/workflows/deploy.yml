@@ -1,0 +1,79 @@
+# Deploy workflow - triggered by workflow_run after successful build
+# This workflow has access to secrets but never executes untrusted code
+# It only downloads and deploys pre-built artifacts from the build workflow
+# Security: Fork code cannot access secrets as it only runs in build workflow
+# Deploys to IPFS for all branches and GitHub Pages for main branch only
+
+name: Deploy
+
+# Explicitly declare permissions
+permissions:
+  contents: read
+  pull-requests: write
+  statuses: write
+
+on:
+  workflow_run:
+    workflows: ["Build"]
+    types: [completed]
+
+env:
+  BUILD_PATH: 'website-build'
+
+jobs:
+  deploy-ipfs:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    outputs:
+      cid: ${{ steps.deploy.outputs.cid }}
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: website-build-${{ github.event.workflow_run.id }}
+          path: ${{ env.BUILD_PATH }}
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      - name: Deploy to IPFS Mirror Providers
+        uses: ipfs/ipfs-deploy-action@b491fdc2b1ca70a9b11b1a26dd4d36210c46653f # ipfs-deploy-action/pull/37
+        id: deploy
+        with:
+          path-to-deploy: ${{ env.BUILD_PATH }}
+          cluster-url: "/dnsaddr/ipfs-websites.collab.ipfscluster.io"
+          cluster-user: ${{ secrets.CLUSTER_USER }}
+          cluster-password: ${{ secrets.CLUSTER_PASSWORD }}
+          storacha-key: ${{ secrets.STORACHA_KEY }}
+          storacha-proof: ${{ secrets.STORACHA_PROOF }}
+          #TODO pinata-jwt-token: ${{ secrets.PINATA_JWT_TOKEN }}
+          github-token: ${{ github.token }}
+
+      # TODO: right now, DNSLink is controlled by Fleek, and we use ipfs/ipfs-deploy-action for PR previews
+      #- name: Update DNSLink
+      #  if: github.event.workflow_run.head_branch == 'main'
+      #  uses: ipfs/dnslink-action@v0.1
+      #  with:
+      #    cid: ${{ steps.deploy.outputs.cid }}
+      #    dnslink_domain: 'specs.ipfs.tech'
+      #    cf_record_id: ${{ secrets.CF_RECORD_ID }}
+      #    cf_zone_id: ${{ secrets.CF_ZONE_ID }}
+      #    cf_auth_token: ${{ secrets.CF_AUTH_TOKEN }}
+      #    github_token: ${{ github.token }}
+      #    set_github_status: true
+
+  deploy-gh-pages:
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main'
+    needs: deploy-ipfs
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
