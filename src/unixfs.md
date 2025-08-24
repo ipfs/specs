@@ -204,7 +204,10 @@ range we are interested in.
 
 In the example above, the offset list would be `[0, 20]`. Thus, we know we only need to download `Qmbar` to get the range we are interested in.
 
-UnixFS parser MUST error if `blocksizes` or `Links` are not of the same length.
+A UnixFS parser MUST reject the node and halt processing if the `blocksizes` array and
+`Links` array contain different numbers of elements. Implementations SHOULD return a
+descriptive error indicating the array length mismatch rather than silently failing or
+attempting to process partial data.
 
 #### `decode(PBNode.Data).Data`
 
@@ -220,7 +223,7 @@ The `Name` field is primarily used in directories to identify child entries.
 **For internal file chunks:**
 - Implementations SHOULD NOT produce `Name` fields (the field should be absent in the protobuf, not an empty string)
 - For compatibility with historical data, implementations SHOULD treat empty string values ("") the same as absent when parsing
-- If a non-empty `Name` is present in an internal file chunk, the parser MUST error as this indicates an invalid file structure
+- If a non-empty `Name` is present in an internal file chunk, the parser MUST reject the file and halt processing as this indicates an invalid file structure
 
 #### `decode(PBNode.Data).Blocksize`
 
@@ -249,7 +252,7 @@ Otherwise, this file is invalid.
 #### `dag-pb` `File` Path Resolution
 
 A file terminates a UnixFS content path. Any attempt to resolve a path past a
-file MUST error.
+file MUST be rejected with an error indicating that UnixFS files cannot have children.
 
 ### `dag-pb` `Directory`
 
@@ -292,8 +295,8 @@ efficient directory traversal algorithms in some implementations.
 
 Pop the left-most component of the path, and try to match it to the `Name` of
 a child under `PBNode.Links`. If you find a match, you can then remember the CID.
-You MUST continue the search. If you find another match, you MUST error since
-duplicate names are not allowed. <!--TODO: check Kubo does this-->
+You MUST continue the search. If you find another match, you MUST reject the directory
+and halt path resolution since duplicate names are not allowed. <!--TODO: check Kubo does this-->
 
 Assuming no errors were raised, you can continue to the path resolution on the
 remaining components and on the CID you popped.
@@ -591,10 +594,10 @@ Relative path components MUST be resolved before trying to work on the path:
 - `.` points to the current node and MUST be removed.
 - `..` points to the parent node and MUST be removed left to right. When removing
   a `..`, the path component on the left MUST also be removed. If there is no path
-  component on the left, you MUST error to avoid out-of-bounds
-  path resolution.
-- Implementations MUST error when resolving a relative path that attempts to go
-  beyond the root CID (example: `/ipfs/cid/../foo`).
+  component on the left, implementations MUST reject the path with an error to avoid
+  out-of-bounds path resolution.
+- Implementations MUST reject paths that attempt to traverse beyond the root CID
+  (example: `/ipfs/cid/../foo`) with an error indicating invalid path traversal.
 
 ### Restricted Names
 
