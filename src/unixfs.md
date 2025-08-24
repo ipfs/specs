@@ -59,8 +59,8 @@ required. A [CID] includes two important pieces of information:
 2. A [multihash] used to specify the hashing algorithm, the hash parameters and
    the hash digest.
 
-Thus, the block must be retrieved; that is, the bytes which ,when hashed using the
-hash function specified in the multihash, gives us the same multihash value back.
+Thus, when a block is retrieved and its bytes are hashed using the
+hash function specified in the multihash, this gives the same multihash value contained in the CID.
 
 In UnixFS, a node can be encoded using two different multicodecs, listed below. More details are provided in the following sections:
 
