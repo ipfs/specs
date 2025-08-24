@@ -344,8 +344,8 @@ hex-encoded prefix corresponding to the bucket index, zero-padded to a width
 of `log2(fanout)/4` characters.
 
 Implementations choose when to convert a regular directory to HAMT based on various criteria
-such as estimated block size (commonly around 256KiB-1MiB to produce blocks that can be
-transported over Bitswap) or number of directory entries.
+such as estimated block size or number of directory entries. See [Block Size Considerations](#block-size-considerations)
+for typical thresholds.
 
 To illustrate the HAMT structure with a concrete example:
 
@@ -978,6 +978,30 @@ This section and included subsections are not authoritative.
   - [`unixfs-v1`](https://github.com/ipfs-rust/unixfsv1)
 -->
 
+## Block Size Considerations
+
+While UnixFS itself does not mandate specific block size limits, implementations typically
+enforce practical constraints for operational efficiency:
+
+- **Safe conventions for producing new blocks**: Implementations SHOULD use 256 KiB (popular
+  legacy size) or 1 MiB (modern maximum recommended) for newly created blocks
+- **Decoding requirement**: Implementations MUST be able to decode blocks up to 2 MiB
+  as it is effectively the maximum message size in Bitswap, which acts as ecosystem-wide
+  common denominator of what is the max block size at the time of writing this note (2025Q3)
+
+These limits affect several UnixFS behaviors:
+- Small files that fit in a single chunk (most common: 256 KiB, 1 MiB) are typically
+  stored as single `raw` blocks or within the `Data` field of a single `dag-pb` node
+- Directories automatically convert to HAMT sharding when approaching the block size
+  limit (commonly triggered around 256 KiB-1 MiB)
+- File chunking algorithms target block sizes that stay within these limits while
+  maximizing deduplication opportunities
+
+Note that specific block size policies are implementation-dependent and may be
+configurable. If you want to maximize the interoperability of your data, make sure
+to keep chunk sizes no bigger than 1 MiB. Consult your implementation's documentation
+for exact limits and configuration options.
+
 ## Simple `raw` Example
 
 In this example, we will build a single `raw` block with the string `test` as its content.
@@ -1058,9 +1082,10 @@ but never the file data itself.
 This was ultimately rejected for a number of reasons:
 
 1. You would always need to retrieve an additional node to access file data, which
-  limits the kind of optimizations that are possible. For example, many files are
-  under the 256 KiB block size limit, so we tend to inline them into the describing
-  UnixFS `File` node. This would not be possible with an intermediate `Metadata` node.
+  limits the kind of optimizations that are possible. For example, many files fit
+  within a single block (see [Block Size Considerations](#block-size-considerations)),
+  so we tend to inline them into the describing UnixFS `File` node. This would not be
+  possible with an intermediate `Metadata` node.
 2. The `File` node already contains some metadata (e.g. the file size), so metadata
   would be stored in multiple places. This complicates forwards compatibility with
   UnixFSv2, as mapping between metadata formats potentially requires multiple fetch
