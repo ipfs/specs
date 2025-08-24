@@ -325,12 +325,15 @@ The HAMT directory is configured through the UnixFS metadata in `PBNode.Data`:
   the path components for sharding. Currently, all HAMT implementations use `murmur3-x64-64` (`0x22`),
   and this value MUST be consistent across all shards within the same HAMT structure
 - `decode(PBNode.Data).fanout` is REQUIRED for HAMTShard nodes (though marked optional in the
-  protobuf schema). The value MUST be a power of two and at most 1024. This determines the number
-  of possible bucket indices (permutations) at each level of the trie. For example,
-  fanout=256 provides 256 possible buckets (0x00 to 0xFF), requiring 8 bits from the hash.
+  protobuf schema). The value MUST be a power of two and at most 1024. Implementations SHOULD
+  require fanout to be a multiple of 8 to ensure the bitfield aligns to byte boundaries.
+  Popular values are: 256, 512, 1024. The most common fanout is 256 (8-bit buckets),
+  providing a good balance between tree depth and node size.
+  
+  This determines the number of possible bucket indices (permutations) at each level of the trie.
+  For example, fanout=256 provides 256 possible buckets (0x00 to 0xFF), requiring 8 bits from the hash.
   The hex prefix length is `log2(fanout)/4` characters (since each hex character represents 4 bits).
-  The same fanout value is used throughout all levels of a single HAMT structure.
-  Implementations choose fanout based on their specific trade-offs between tree depth and node size
+  The same fanout value is used throughout all levels of a single HAMT structure
   :::warning
   Implementations MUST limit the `fanout` parameter to a maximum of 1024 to prevent
   denial-of-service attacks. Excessively large fanout values can cause memory exhaustion
@@ -338,17 +341,19 @@ The HAMT directory is configured through the UnixFS metadata in `PBNode.Data`:
   [GHSA-q264-w97q-q778](https://github.com/advisories/GHSA-q264-w97q-q778) for details
   on this vulnerability.
   :::
-- `decode(PBNode.Data).Data` is a bitmap field indicating which buckets contain entries.
-  Each bit represents one bucket. While included in the protobuf, implementations
-  typically derive bucket occupancy from the link names directly
+- `decode(PBNode.Data).Data` contains a bitfield indicating which buckets contain entries.
+  Each bit corresponds to one bucket (0 to fanout-1), with bit value 1 indicating the bucket
+  is occupied. The bitfield is stored in little-endian byte order. The bitfield size in bytes
+  is `fanout/8`, which is why fanout SHOULD be a multiple of 8.
+  - Implementations MUST write this bitfield when creating HAMT nodes
+  - Implementations SHOULD use this bitfield for efficient traversal (checking which buckets
+    exist without examining all links)
+  - Note: Some implementations derive bucket occupancy from link names instead of reading
+    the bitfield, but this is less efficient
 
 The field `Name` of an element of `PBNode.Links` for a HAMT uses a
 hex-encoded prefix corresponding to the bucket index, zero-padded to a width
 of `log2(fanout)/4` characters.
-
-Implementations choose when to convert a regular directory to HAMT based on various criteria
-such as estimated block size or number of directory entries. See [Block Size Considerations](#block-size-considerations)
-for typical thresholds.
 
 To illustrate the HAMT structure with a concrete example:
 
@@ -436,6 +441,16 @@ Given a HAMT-sharded directory containing 1000 files:
    - "6E470.txt" means: file "470.txt" that hashed to bucket 6E at this level
    - "FF742.txt" means: file "742.txt" that hashed to bucket FF at this level
 :::
+
+#### When to Use HAMT Sharding
+
+Implementations typically convert regular directories to HAMT when the serialized directory
+node exceeds a size threshold between 256 KiB and 1 MiB. This threshold:
+- Prevents directories from exceeding block size limits
+- Is implementation-specific and may be configurable
+- Common values range from 256 KiB (conservative) to 1 MiB (modern)
+
+See [Block Size Considerations](#block-size-considerations) for details on block size limits and conventions.
 
 ### `dag-pb` `Symlink`
 
