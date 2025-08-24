@@ -519,11 +519,11 @@ When total data size is needed for important purposes such as accounting, billin
 
 ### `dag-pb` Optional Metadata
 
-UnixFS currently supports below optional metadata fields.
+UnixFS defines the following optional metadata fields.
 
 #### `mode` Field
 
-The `mode` is for persisting the file permissions in [numeric notation](https://en.wikipedia.org/wiki/File_system_permissions#Numeric_notation)
+The `mode` (introduced in UnixFS v1.5) is for persisting the file permissions in [numeric notation](https://en.wikipedia.org/wiki/File_system_permissions#Numeric_notation)
 \[[spec](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_stat.h.html)\].
 
 - If unspecified, implementations MAY default to
@@ -535,10 +535,17 @@ The `mode` is for persisting the file permissions in [numeric notation](https://
   - For future-proofing, the (de)serialization layer must preserve the entire uint32 value during clone/copy operations, modifying only bit values that have a well defined meaning: `clonedValue = ( modifiedBits & 07777 ) | ( originalValue & 0xFFFFF000 )`
   - Implementations of this spec must proactively mask off bits without a defined meaning in the implemented version of the spec: `interpretedValue = originalValue & 07777`
 
+**Implementation guidance:**
+- When importing new data, implementations SHOULD NOT include the mode field unless the user explicitly requests preserving permissions
+  - Including mode changes the root CID, causing unnecessary deduplication failures when permission differences are irrelevant
+- Implementations MUST be able to parse UnixFS nodes both with and without this field
+- When present during operations like copying, implementations SHOULD preserve this field
+
 #### `mtime` Field
 
-A two-element structure ( `Seconds`, `FractionalNanoseconds` ) representing the
+The `mtime` (introduced in UnixFS v1.5) is a two-element structure ( `Seconds`, `FractionalNanoseconds` ) representing the
 modification time in seconds relative to the unix epoch `1970-01-01T00:00:00Z`.
+
 The two fields are:
 
 1. `Seconds` ( always present, signed 64bit integer ): represents the amount of seconds after **or before** the epoch.
@@ -570,6 +577,12 @@ non-IPFS target MUST observe the following:
   - When the resulting `UnixTime` is larger than the targets range ( e.g. 32bit
     vs 64bit mismatch), implementations must assume the highest possible value
     in the targets range. In most cases, this would be `2038-01-19T03:14:07Z`.
+
+**Implementation guidance:**
+- When importing new data, implementations SHOULD NOT include the mtime field unless the user explicitly requests preserving timestamps
+  - Including mtime changes the root CID, causing unnecessary deduplication failures when timestamp differences are irrelevant
+- Implementations MUST be able to parse UnixFS nodes both with and without this field
+- When present during operations like copying, implementations SHOULD preserve this field
 
 ## UnixFS Paths
 
