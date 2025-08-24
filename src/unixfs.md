@@ -128,17 +128,17 @@ message Data {
   }
 
   required DataType Type = 1;
-  optional bytes Data = 2;
+  optional bytes Data = 2;        // file content (File), symlink target (Symlink), bitmap (HAMTShard), unused (Directory)
   optional uint64 filesize = 3;
-  repeated uint64 blocksizes = 4;
-  optional uint64 hashType = 5;
-  optional uint64 fanout = 6;
-  optional uint32 mode = 7; // opt-in, AKA UnixFS 1.5
-  optional UnixTime mtime = 8; // opt-in, AKA UnixFS 1.5
+  repeated uint64 blocksizes = 4; // required for multi-block files (Type=File) with Links
+  optional uint64 hashType = 5;   // required for Type=HAMTShard (currently always murmur3-x64-64)
+  optional uint64 fanout = 6;     // required for Type=HAMTShard (power of 2, max 1024)
+  optional uint32 mode = 7;       // opt-in, AKA UnixFS 1.5
+  optional UnixTime mtime = 8;    // opt-in, AKA UnixFS 1.5
 }
 
 message Metadata {
-  optional string MimeType = 1;
+  optional string MimeType = 1; // reserved for future use
 }
 
 message UnixTime {
@@ -321,7 +321,8 @@ The HAMT directory is configured through the UnixFS metadata in `PBNode.Data`:
 - `decode(PBNode.Data).hashType` indicates the [multihash] function to use to digest
   the path components for sharding. Currently, all HAMT implementations use `murmur3-x64-64` (`0x22`),
   and this value MUST be consistent across all shards within the same HAMT structure
-- `decode(PBNode.Data).fanout` MUST be a power of two and at most 1024. This determines the number
+- `decode(PBNode.Data).fanout` is REQUIRED for HAMTShard nodes (though marked optional in the
+  protobuf schema). The value MUST be a power of two and at most 1024. This determines the number
   of possible bucket indices (permutations) at each level of the trie. For example,
   fanout=256 provides 256 possible buckets (0x00 to 0xFF), requiring 8 bits from the hash.
   The hex prefix length is `log2(fanout)/4` characters (since each hex character represents 4 bits).
@@ -456,6 +457,11 @@ through.
 ### `dag-pb` `TSize` (cumulative DAG size)
 
 `Tsize` is an optional field in `PBNode.Links[]` which represents the cumulative size of the entire DAG rooted at that link, including all protobuf encoding overhead.
+
+While optional in the protobuf schema, implementations SHOULD include `Tsize` for:
+- All directory entries (enables fast directory size display)
+- Multi-block files (enables parallel downloading and progress tracking)
+- HAMT shard links (enables efficient traversal decisions)
 
 **Key distinction from blocksize:**
 - **`blocksize`**: Only the raw file data (no protobuf overhead)
