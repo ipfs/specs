@@ -94,13 +94,13 @@ message PBLink {
   // This contains raw CID bytes (either CIDv0 or CIDv1) with no multibase prefix.
   // CIDv1 is a binary format composed of unsigned varints, while CIDv0 is a raw multihash.
   // In both cases, the bytes are stored directly without any additional prefix.
-  optional bytes Hash = 1;
+  bytes Hash = 1;
 
   // UTF-8 string name
-  optional string Name = 2;
+  string Name = 2;
 
   // cumulative size of target object
-  optional uint64 Tsize = 3;
+  uint64 Tsize = 3;
 }
 
 message PBNode {
@@ -108,7 +108,7 @@ message PBNode {
   repeated PBLink Links = 2;
 
   // opaque user data
-  optional bytes Data = 1;
+  bytes Data = 1;
 }
 ```
 
@@ -127,23 +127,23 @@ message Data {
     HAMTShard = 5;
   }
 
-  required DataType Type = 1;
-  optional bytes Data = 2;        // file content (File), symlink target (Symlink), bitmap (HAMTShard), unused (Directory)
-  optional uint64 filesize = 3;   // mandatory for Type=File and Type=Raw, defaults to 0 if omitted
+  DataType Type = 1;          // MUST be present - validate at application layer
+  bytes Data = 2;              // file content (File), symlink target (Symlink), bitmap (HAMTShard), unused (Directory)
+  uint64 filesize = 3;         // mandatory for Type=File and Type=Raw, defaults to 0 if omitted
   repeated uint64 blocksizes = 4; // required for multi-block files (Type=File) with Links
-  optional uint64 hashType = 5;   // required for Type=HAMTShard (currently always murmur3-x64-64)
-  optional uint64 fanout = 6;     // required for Type=HAMTShard (power of 2, max 1024)
-  optional uint32 mode = 7;       // opt-in, AKA UnixFS 1.5
-  optional UnixTime mtime = 8;    // opt-in, AKA UnixFS 1.5
+  uint64 hashType = 5;         // required for Type=HAMTShard (currently always murmur3-x64-64)
+  uint64 fanout = 6;           // required for Type=HAMTShard (power of 2, max 1024)
+  uint32 mode = 7;             // opt-in, AKA UnixFS 1.5
+  UnixTime mtime = 8;          // opt-in, AKA UnixFS 1.5
 }
 
 message Metadata {
-  optional string MimeType = 1; // reserved for future use
+  string MimeType = 1; // reserved for future use
 }
 
 message UnixTime {
-  required int64 Seconds = 1;
-  optional fixed32 FractionalNanoseconds = 2;
+  int64 Seconds = 1;              // MUST be present when UnixTime is used
+  fixed32 FractionalNanoseconds = 2;
 }
 ```
 
