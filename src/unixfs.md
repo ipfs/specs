@@ -129,7 +129,7 @@ message Data {
 
   required DataType Type = 1;
   optional bytes Data = 2;        // file content (File), symlink target (Symlink), bitmap (HAMTShard), unused (Directory)
-  optional uint64 filesize = 3;
+  optional uint64 filesize = 3;   // mandatory for Type=File and Type=Raw, defaults to 0 if omitted
   repeated uint64 blocksizes = 4; // required for multi-block files (Type=File) with Links
   optional uint64 hashType = 5;   // required for Type=HAMTShard (currently always murmur3-x64-64)
   optional uint64 fanout = 6;     // required for Type=HAMTShard (power of 2, max 1024)
@@ -246,8 +246,11 @@ Examples of where `blocksize` is useful:
 
 #### `decode(PBNode.Data).filesize`
 
-If present, this field MUST be equal to the `Blocksize` computation above.
-Otherwise, this file is invalid.
+For `Type=File` (0) and `Type=Raw` (2), this field is mandatory. While marked as "optional" 
+in the protobuf schema (for compatibility with other types like Directory), implementations:
+- MUST include this field when creating File or Raw nodes
+- When reading, if this field is absent, MUST interpret it as 0 (zero-length file)
+- If present, this field MUST be equal to the `Blocksize` computation above, otherwise the file is invalid
 
 #### `dag-pb` `File` Path Resolution
 
