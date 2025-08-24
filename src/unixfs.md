@@ -70,7 +70,7 @@ In UnixFS, a node can be encoded using two different multicodecs, listed below. 
 # `raw` Node
 
 The simplest nodes use `raw` encoding and are implicitly a [File](#dag-pb-file). They can
-be recognized because their CIDs are encoded using the `raw` (`0x55`) codec:
+be recognized because their [CIDs](https://github.com/multiformats/cid) are encoded using the `raw` (`0x55`) codec:
 
 - The block is the file data. There is no protobuf envelope or metadata.
 - They never have any children nodes, and thus are also known as single block files.
@@ -90,7 +90,10 @@ summarized as follows:
 
 ```protobuf
 message PBLink {
-  // binary CID (with no multibase prefix) of the target object
+  // Binary representation of CID (https://github.com/multiformats/cid) of the target object.
+  // This contains raw CID bytes (either CIDv0 or CIDv1) with no multibase prefix.
+  // CIDv1 is a binary format composed of unsigned varints, while CIDv0 is a raw multihash.
+  // In both cases, the bytes are stored directly without any additional prefix.
   optional bytes Hash = 1;
 
   // UTF-8 string name
