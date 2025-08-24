@@ -261,18 +261,23 @@ A :dfn[Directory], also known as folder, is a named collection of child [Nodes](
 - Every link in `PBNode.Links` is an entry (child) of the directory, and
   `PBNode.Links[].Name` gives you the name of that child.
 - Duplicate names are not allowed. Therefore, two elements of `PBNode.Link` CANNOT
-  have the same `Name`. If two identical names are present in a directory, the
-  decoder MUST fail.
+  have the same `Name`. Names are considered identical if they are byte-for-byte
+  equal (not just semantically equivalent). If two identical names are present in
+  a directory, the decoder MUST fail.
 - Implementations SHOULD detect when directory becomes too big to fit in a single
   `Directory` block and use [`HAMTDirectory`] type instead.
 
-The minimum valid `PBNode.Data` field for a directory is as follows:
+The `PBNode.Data` field MUST contain valid UnixFS protobuf data for all UnixFS nodes.
+For directories (DataType==1), the minimum valid `PBNode.Data` field is as follows:
 
 ```json
 {
   "Type": "Directory"
 }
 ```
+
+For historical compatibility, implementations MAY encounter dag-pb nodes with empty or
+missing Data fields from older IPFS versions, but MUST NOT produce such nodes.
 
 #### `dag-pb` `Directory` Link Ordering
 
