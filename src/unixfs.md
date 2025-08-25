@@ -256,7 +256,7 @@ Examples of where `blocksize` is useful:
 
 #### `decode(PBNode.Data).filesize`
 
-For `Type=File` (0) and `Type=Raw` (2), this field is mandatory. While marked as "optional" 
+For `Type=File` (0) and `Type=Raw` (2), this field is mandatory. While marked as "optional"
 in the protobuf schema (for compatibility with other types like Directory), implementations:
 - MUST include this field when creating File or Raw nodes
 - When reading, if this field is absent, MUST interpret it as 0 (zero-length file)
@@ -316,12 +316,12 @@ efficient directory traversal algorithms in some implementations.
 Pop the left-most component of the path, and match it to the `Name` of
 a child under `PBNode.Links`.
 
-Duplicate names are not allowed in UnixFS directories. However, when reading 
-third-party data that contains duplicates, implementations MUST always return 
-the first matching entry and ignore subsequent ones (following the 
-[Robustness Principle](https://specs.ipfs.tech/architecture/principles/#robustness)). 
-Similarly, when writers mutate a UnixFS directory that has duplicate 
-names, they MUST drop the redundant entries and only keep the first occurrence 
+Duplicate names are not allowed in UnixFS directories. However, when reading
+third-party data that contains duplicates, implementations MUST always return
+the first matching entry and ignore subsequent ones (following the
+[Robustness Principle](https://specs.ipfs.tech/architecture/principles/#robustness)).
+Similarly, when writers mutate a UnixFS directory that has duplicate
+names, they MUST drop the redundant entries and only keep the first occurrence
 of each name.
 
 Assuming no errors were raised, you can continue to the path resolution on the
@@ -1036,7 +1036,6 @@ This section and included subsections are not authoritative.
     - [`ipfs/boxo/files`](https://github.com/ipfs/boxo/tree/main/files)
     - [`ipfs/boxo/ipld/unixfs`](https://github.com/ipfs/boxo/tree/main/ipld/unixfs/)
   - Alternative `go-ipld-prime` implementation: [`ipfs/go-unixfsnode`](https://github.com/ipfs/go-unixfsnode)
-
 
 ## Block Size Considerations
 
