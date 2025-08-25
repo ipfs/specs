@@ -677,11 +677,11 @@ Relative path components MUST be resolved before trying to work on the path:
 
 ### Restricted Names
 
-The following names SHOULD NOT be used:
+The following names SHOULD NOT be used in UnixFS directories:
 
 - The `.` string, as it represents the self node in POSIX pathing.
 - The `..` string, as it represents the parent node in POSIX pathing.
-- The empty string. <!--TODO: check that this is true-->
+- The empty string, as POSIX explicitly prohibits zero-length filenames
 - Any string containing a `NULL` (`0x00`) byte, as this is often used to signify string
   terminations in some systems, such as C-compatible systems. Many unix
   file systems do not accept this character in path components.
