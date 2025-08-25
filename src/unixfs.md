@@ -162,6 +162,12 @@ A `dag-pb` UnixFS node supports different types, which are defined in
 A :dfn[File] is a container over an arbitrary sized amount of bytes. Files are either
 single block or multi-block. A multi-block file is a concatenation of multiple child files.
 
+:::note
+Single-block files SHOULD prefer the `raw` codec (0x55) over `dag-pb` for the canonical CID,
+as it's more efficient and avoids the protobuf overhead. The `raw` encoding is described
+in the [`raw` Node](#raw-node) section.
+:::
+
 #### The _sister-lists_ `PBNode.Links` and `decode(PBNode.Data).blocksizes`
 
 The _sister-lists_ are the key point of why `dag-pb` is important for files. They
