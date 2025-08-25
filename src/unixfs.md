@@ -455,7 +455,7 @@ See [Block Size Considerations](#block-size-considerations) for details on block
 ### `dag-pb` `Symlink`
 
 A :dfn[Symlink] represents a POSIX [symbolic link](https://pubs.opengroup.org/onlinepubs/9699919799/functions/symlink.html).
-A symlink MUST NOT have children. <!--TODO: check that this is true-->
+A symlink MUST NOT have children in `PBNode.Links`.
 
 The `PBNode.Data.Data` field is a POSIX path that MAY be inserted in front of the
 currently remaining path component stack.
