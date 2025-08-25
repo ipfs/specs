@@ -313,10 +313,16 @@ efficient directory traversal algorithms in some implementations.
 
 #### `dag-pb` `Directory` Path Resolution
 
-Pop the left-most component of the path, and try to match it to the `Name` of
-a child under `PBNode.Links`. If you find a match, you can then remember the CID.
-You MUST continue the search. If you find another match, you MUST reject the directory
-and halt path resolution since duplicate names are not allowed. <!--TODO: check Kubo does this-->
+Pop the left-most component of the path, and match it to the `Name` of
+a child under `PBNode.Links`.
+
+Duplicate names are not allowed in UnixFS directories. However, when reading 
+third-party data that contains duplicates, implementations MUST always return 
+the first matching entry and ignore subsequent ones (following the 
+[Robustness Principle](https://specs.ipfs.tech/architecture/principles/#robustness)). 
+Similarly, when writers mutate a UnixFS directory that has duplicate 
+names, they MUST drop the redundant entries and only keep the first occurrence 
+of each name.
 
 Assuming no errors were raised, you can continue to the path resolution on the
 remaining components and on the CID you popped.
