@@ -1037,11 +1037,6 @@ This section and included subsections are not authoritative.
     - [`ipfs/boxo/ipld/unixfs`](https://github.com/ipfs/boxo/tree/main/ipld/unixfs/)
   - Alternative `go-ipld-prime` implementation: [`ipfs/go-unixfsnode`](https://github.com/ipfs/go-unixfsnode)
 
-<!-- TODO: Rust libraries seem to be abandoned, hiding them for now
-- Rust
-  - [`iroh-unixfs`](https://github.com/n0-computer/iroh/tree/b7a4dd2b01dbc665435659951e3e06d900966f5f/iroh-unixfs)
-  - [`unixfs-v1`](https://github.com/ipfs-rust/unixfsv1)
--->
 
 ## Block Size Considerations
 
