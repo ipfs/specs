@@ -607,6 +607,14 @@ non-IPFS target MUST observe the following:
 
 ## UnixFS Paths
 
+:::note
+Path resolution describes how IPFS systems traverse UnixFS DAGs. While path resolution
+behavior is mostly IPFS semantics layered over UnixFS data structures, certain UnixFS
+types (notably HAMTDirectory) define specific resolution algorithms as part of their
+data structure specification. Each UnixFS type includes a "Path Resolution" subsection
+documenting its specific requirements.
+:::
+
 Paths begin with a `<CID>/` or `/ipfs/<CID>/`, where `<CID>` is a [multibase]
 encoded [CID]. The CID encoding MUST NOT use a multibase alphabet that contains
 `/` (`0x2f`) unicode codepoints. However, CIDs may use a multibase encoding with
