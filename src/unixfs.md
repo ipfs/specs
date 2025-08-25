@@ -2,7 +2,7 @@
 title: UnixFS
 description: >
   UnixFS is a Protocol Buffers-based format for describing files, directories,
-  and symlinks as dag-pb and raw DAGs in IPFS.
+  and symlinks as dag-pb DAGs and raw blocks in IPFS.
 date: 2025-08-23
 maturity: draft
 editors:
@@ -113,7 +113,7 @@ message PBNode {
 ```
 
 After decoding the node, we obtain a `PBNode`. This `PBNode` contains a field
-`Data` that contains the bytes that require the second decoding. These are also
+`Data` that contains the bytes that require the second decoding. This will also be
 a protobuf message specified in the UnixFSV1 format:
 
 ```protobuf
@@ -150,7 +150,7 @@ message UnixTime {
 Summarizing, a `dag-pb` UnixFS node is a [`dag-pb`][ipld-dag-pb] protobuf,
 whose `Data` field is a UnixFSV1 Protobuf message. For clarity, the specification
 document may represent these nested Protobufs as one object. In this representation,
-it is implied that the `PBNode.Data` field is encoded in a protobuf.
+it is implied that the `PBNode.Data` field is protobuf-encoded.
 
 ## `dag-pb` Types
 
@@ -267,7 +267,7 @@ A :dfn[Directory], also known as folder, is a named collection of child [Nodes](
   have the same `Name`. Names are considered identical if they are byte-for-byte
   equal (not just semantically equivalent). If two identical names are present in
   a directory, the decoder MUST fail.
-- Implementations SHOULD detect when directory becomes too big to fit in a single
+- Implementations SHOULD detect when a directory becomes too big to fit in a single
   `Directory` block and use [`HAMTDirectory`] type instead.
 
 The `PBNode.Data` field MUST contain valid UnixFS protobuf data for all UnixFS nodes.
