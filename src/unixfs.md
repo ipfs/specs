@@ -198,6 +198,10 @@ size in bytes of the partial file content present in children DAGs. Each index i
 `PBNode.Links` MUST have a corresponding chunk size stored at the same index
 in `decode(PBNode.Data).blocksizes`.
 
+The child blocks containing the partial file data can be either:
+- `raw` blocks (0x55): Direct file data without protobuf wrapper
+- `dag-pb` blocks (0x70): File data wrapped in protobuf, potentially with further children
+
 :::warning
 Implementers need to be extra careful to ensure the values in `Data.blocksizes`
 are calculated by following the definition from [`Blocksize`](#decodepbnodedatablocksize).
@@ -302,7 +306,9 @@ not on read" approach maintains DAG stability - existing unsorted directories re
 when accessed or traversed, preventing unintentional mutations of intermediate nodes that could
 alter their CIDs.
 
-Note: Sorting on write (when the Links list is modified) helps with deduplication detection and enables more
+Note: Lexicographic sorting was chosen as the standard because it provides a universal,
+locale-independent ordering that works consistently across all implementations and languages.
+Sorting on write (when the Links list is modified) helps with deduplication detection and enables more
 efficient directory traversal algorithms in some implementations.
 
 #### `dag-pb` `Directory` Path Resolution
