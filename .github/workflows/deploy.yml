@@ -36,7 +36,7 @@ jobs:
           github-token: ${{ github.token }}
 
       - name: Deploy to IPFS Mirror Providers
-        uses: ipshipyard/ipfs-deploy-action@2cee726c91c340ab8e29c638de0d5367066d242b # fix/workflow-run-support with all fixes
+        uses: ipshipyard/ipfs-deploy-action@v1
         id: deploy
         with:
           path-to-deploy: ${{ env.BUILD_PATH }}
