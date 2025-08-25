@@ -331,15 +331,23 @@ The HAMT directory is configured through the UnixFS metadata in `PBNode.Data`:
   the path components for sharding. Currently, all HAMT implementations use `murmur3-x64-64` (`0x22`),
   and this value MUST be consistent across all shards within the same HAMT structure
 - `decode(PBNode.Data).fanout` is REQUIRED for HAMTShard nodes (though marked optional in the
-  protobuf schema). The value MUST be a power of two and at most 1024. Implementations SHOULD
-  require fanout to be a multiple of 8 to ensure the bitfield aligns to byte boundaries.
-  Popular values are: 256, 512, 1024. The most common fanout is 256 (8-bit buckets),
-  providing a good balance between tree depth and node size.
+  protobuf schema). The value MUST be a power of two, a multiple of 8 (for byte-aligned
+  bitfields), and at most 1024.
   
   This determines the number of possible bucket indices (permutations) at each level of the trie.
   For example, fanout=256 provides 256 possible buckets (0x00 to 0xFF), requiring 8 bits from the hash.
   The hex prefix length is `log2(fanout)/4` characters (since each hex character represents 4 bits).
   The same fanout value is used throughout all levels of a single HAMT structure
+  
+  :::note
+  Implementations that onboard user data to create new HAMTDirectory structures are free to choose a `fanout` value or allow users to configure it based on their use case:
+  - **256**: Balanced tree depth and node size, suitable for most use cases
+  - **1024**: Creates wider, shallower DAGs with fewer levels
+    - Advantages: Minimizes tree depth for faster lookups, reduces number of intermediate nodes to traverse
+    - Trade-offs: Larger blocks mean higher latency on cold cache reads and more data
+      rewritten when modifying directories (each change affects a larger block)
+  :::
+  
   :::warning
   Implementations MUST limit the `fanout` parameter to a maximum of 1024 to prevent
   denial-of-service attacks. Excessively large fanout values can cause memory exhaustion
@@ -350,7 +358,7 @@ The HAMT directory is configured through the UnixFS metadata in `PBNode.Data`:
 - `decode(PBNode.Data).Data` contains a bitfield indicating which buckets contain entries.
   Each bit corresponds to one bucket (0 to fanout-1), with bit value 1 indicating the bucket
   is occupied. The bitfield is stored in little-endian byte order. The bitfield size in bytes
-  is `fanout/8`, which is why fanout SHOULD be a multiple of 8.
+  is `fanout/8`, which is why fanout MUST be a multiple of 8.
   - Implementations MUST write this bitfield when creating HAMT nodes
   - Implementations SHOULD use this bitfield for efficient traversal (checking which buckets
     exist without examining all links)
