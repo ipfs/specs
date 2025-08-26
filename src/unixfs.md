@@ -934,6 +934,25 @@ Test vectors for UnixFS directory structures, progressing from simple flat direc
 
 Test vectors for special UnixFS features and edge cases.
 
+### Well-Known UnixFS CIDs
+
+Common empty structures that implementations frequently encounter:
+
+* **Empty dag-pb directory**
+  - **CIDv0**: `QmUNLLsPACCz1vLxQVkXqqLX5R1X345qqfHbsf67hvA3Nn`
+  - **CIDv1**: `bafybeiczsscdsbs7ffqz55asqdf3smv6klcw3gofszvwlyarci47bgf354`
+  - **Inlined**: `bafyaabakaieac` (identity multihash)
+
+* **Empty dag-pb file**
+  - **CIDv0**: `QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH`
+  - **CIDv1**: `bafybeif7ztnhq65lumvvtr4ekcwd2ifwgm3awq4zfr3srh462rwyinlb4y`
+
+* **Empty raw block**
+  - **CIDv1**: `bafkreihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku`
+  - **Inlined**: `bafkqaaa` (identity multihash)
+
+These CIDs appear frequently in UnixFS implementations and are often hardcoded for performance optimization.
+
 ### Symbolic Links
 
 - Fixture: [`symlink.car`](https://github.com/ipfs/gateway-conformance/raw/refs/tags/v0.8.1/fixtures/path_gateway_unixfs/symlink.car)
