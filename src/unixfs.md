@@ -11,24 +11,20 @@ editors:
     affiliation:
       name: Interplanetary Shipyard
       url: https://ipshipyard.com/
-contributors:
+former_editors:
   - name: Hugo Valtier
-    github: jorropo
+    github: Jorropo
     affiliation:
       name: Interplanetary Shipyard
       url: https://ipshipyard.com/
+contributors:
 thanks:
-  - name: Jeromy Johnson
-    github: whyrusleeping
-  - name: Steven Allen
-    github: Stebalien
-  - name: Hector Sanjuan
-    github: hsanjuan
-    affiliation:
-      name: Interplanetary Shipyard
-      url: https://ipshipyard.com/
+  - name: David Dias
+    github: daviddias
   - name: Łukasz Magiera
     github: magik6k
+  - name: Jeromy Johnson
+    github: whyrusleeping
   - name: Alex Potsides
     github: achingbrain
     affiliation:
@@ -36,11 +32,38 @@ thanks:
       url: https://ipshipyard.com/
   - name: Peter Rabbitson
     github: ribasushi
+  - name: Steven Allen
+    github: Stebalien
+  - name: Hector Sanjuan
+    github: hsanjuan
+    affiliation:
+      name: Interplanetary Shipyard
+      url: https://ipshipyard.com/
   - name: Henrique Dias
     github: hacdias
     affiliation:
       name: Interplanetary Shipyard
       url: https://ipshipyard.com/
+  - name: Marten Seemann
+    github: marten-seemann
+  - name: Adin Schmahmann
+    github: aschmahmann
+    affiliation:
+      name: Interplanetary Shipyard
+      url: https://ipshipyard.com/
+  - name: Will Scott
+    github: willscott
+  - name: John Turpish
+    github: John-LittleBearLabs
+  - name: Alan Shaw
+    github: alanshaw
+  - name: Andrew Gillis
+    github: gammazero
+    affiliation:
+      name: Interplanetary Shipyard
+      url: https://ipshipyard.com/
+  - name: bumblefudge
+    github: bumblefudge
 
 tags: ['data-formats']
 order: 1
