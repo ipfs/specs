@@ -1,8 +1,8 @@
 ---
 title: UnixFS
 description: >
-  UnixFS is a Protocol Buffers-based format for describing files, directories,
-  and symlinks as dag-pb DAGs and raw blocks in IPFS.
+  UnixFS is a Protocol Buffers-based format for describing files and directories
+  as dag-pb DAGs and raw blocks in IPFS.
 date: 2025-08-23
 maturity: draft
 editors:
