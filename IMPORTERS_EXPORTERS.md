@@ -1,5 +1,8 @@
 # ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Data Importers & Exporters
 
+> [!NOTE]
+> This is a work-in-progress specification from the early days of IPFS. For current UnixFS and data import specifications, please refer to https://specs.ipfs.tech/unixfs/
+
 **Authors(s)**:
 - David Dias
 - Juan Benet
