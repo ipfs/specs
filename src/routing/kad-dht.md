@@ -71,7 +71,7 @@ all nodes within that swarm must use it. Public DHT swarms MUST use a unique
 libp2p protocol identifier, whereas private swarms SHOULD use a distinct
 identifier. Although private swarms may reuse an identifier if their networks
 remain isolated, they will merge upon interaction. Therefore, unique
-identifiers are recommended.
+identifiers SHOULD be used.
 
 #### Amino DHT
 
@@ -260,7 +260,7 @@ their routing table originate from a diverse set of Autonomous System Numbers
 (ASNs). This measure helps mitigate Sybil attacks and enhances the network’s
 resilience.
 
-A recommended approach is to impose the following limits:
+Implementations SHOULD impose the following limits:
 
 * **Globally**, a maximum of `3` nodes sharing the same IP grouping should be
 allowed in the routing table.
@@ -282,13 +282,13 @@ representation within the table.
 
 There are several strategies a DHT Server can use to verify that nodes in its
 Routing Table remain reachable. Implementations may choose their own methods,
-provided they avoid serving unresponsive nodes. One recommended strategy is to
+provided they avoid serving unresponsive nodes. The recommended strategy is to
 periodically refresh the Routing Table.
 
-DHT Servers SHOULD perform a Routing Table Refresh every `10` minutes. During
-this process, the server sends a ping request to all nodes it hasn’t heard from
-recently (e.g in the last 5 minutes). Any peer that fails to respond MUST be
-removed from the Routing Table.
+When using periodic refresh, DHT Servers SHOULD perform a Routing Table Refresh
+every `10` minutes. During this process, the server sends a ping request to all
+nodes it hasn't heard from recently (e.g in the last 5 minutes). Any peer that
+fails to respond MUST be removed from the Routing Table.
 
 After removing unresponsive peers, any buckets that are not full MUST be
 replenished with fresh, online peers. This can be accomplished by either adding
@@ -372,9 +372,9 @@ discarded.
 #### Termination
 
 The resilience parameter (`β`) defines the number of closest reachable peers
-that must be successfully queried before a lookup is considered complete. It is
-recommended to set `β` to `3`, ensuring that multiple nodes confirm the lookup
-result for increased reliability.
+that must be successfully queried before a lookup is considered complete.
+Implementations SHOULD set `β` to `3`, ensuring that multiple nodes confirm the
+lookup result for increased reliability.
 
 The lookup process continues until the `β` closest reachable peers to `kid`
 have been queried. However, the process MAY terminate earlier if the
@@ -387,8 +387,7 @@ A client MAY have multiple concurrent in-flight queries to distinct nodes for
 the same lookup. This behavior is specific to the client and does not affect
 how DHT servers operate.
 
-It is recommended that the maximum number of in-flight requests (denoted by
-`α`) be set to `10`.
+The maximum number of in-flight requests (denoted by `α`) SHOULD be set to `10`.
 
 ## Peer Routing
 
@@ -411,7 +410,7 @@ DHT clients that want to remain routable must ensure their multiaddresses are
 stored in the peerstore of the DHT Servers closest to them in XOR distance.
 Since peerstore entries expire over time, DHT Clients SHOULD periodically
 reconnect to their closest DHT servers to prevent their information from being
-removed. It is recommended to perform this reconnection every 10 minutes.
+removed. Implementations SHOULD perform this reconnection every 10 minutes.
 
 When receiving a `FIND_NODE` request for a given Peer ID, DHT Servers MUST
 always respond with the information of that Peer ID, if it is included in their
