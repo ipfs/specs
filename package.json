@@ -10,6 +10,6 @@
   "license": "",
   "private": true,
   "devDependencies": {
-    "spec-generator": "^1.5.0"
+    "spec-generator": "^1.6.0"
   }
 }

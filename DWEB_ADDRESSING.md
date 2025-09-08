@@ -1,5 +1,8 @@
 # ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Addressing on the Decentralized Web
 
+> [!NOTE]
+> This is an incomplete work-in-progress document from the early days of IPFS. For current addressing specifications, please refer to https://specs.ipfs.tech/
+
 **Authors(s)**:
 - [Lars Gierth](mailto:lgierth@ipfs.io)
 
