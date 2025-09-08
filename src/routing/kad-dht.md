@@ -160,13 +160,13 @@ DHT Servers MUST support the [libp2p ping
 protocol](https://github.com/libp2p/specs/blob/master/ping/ping.md) to allow
 probing by other DHT nodes.
 
-DHT Servers MUST support both
-[`QUIC`](https://github.com/libp2p/specs/blob/master/quic/README.md) and
-`TCP`+[`Yamux`](https://github.com/libp2p/specs/blob/master/yamux/README.md)+[`Noise`](https://github.com/libp2p/specs/blob/master/noise/README.md).
+DHT Servers MUST support `TCP` with [`Yamux`](https://github.com/libp2p/specs/blob/master/yamux/README.md) multiplexing
+and SHOULD support [`QUIC`](https://github.com/libp2p/specs/blob/master/quic/README.md) over UDP as a modern alternative to TCP.
+For secure communication, DHT Servers MUST support both
+[`TLS`](https://github.com/libp2p/specs/blob/master/tls/tls.md) and
+[`Noise`](https://github.com/libp2p/specs/blob/master/noise/README.md).
 It is essential that all DHT Servers are able to open a connection to each
-other. Additionally, DHT Servers SHOULD support
-[`TLS`](https://github.com/libp2p/specs/blob/master/tls/tls.md) as an
-alternative to Noise, [`WebRTC
+other. Additionally, DHT Servers SHOULD support [`WebRTC
 direct`](https://github.com/libp2p/specs/blob/master/webrtc/webrtc-direct.md),
 [Secure
 `WebSockets`](https://github.com/libp2p/specs/blob/master/websockets/README.md)
@@ -175,14 +175,16 @@ and
 DHT Servers adoption of browser-based transports is encouraged to allow for
 browser-based DHT Clients to interact with the DHT.
 
-DHT Clients SHOULD support
-[`QUIC`](https://github.com/libp2p/specs/blob/master/quic/README.md) and
-`TCP`+[`Yamux`](https://github.com/libp2p/specs/blob/master/yamux/README.md)+[`Noise`](https://github.com/libp2p/specs/blob/master/noise/README.md)
-whenever possible. They MAY also support additional libp2p transports. However,
+DHT Clients SHOULD support `TCP` with [`Yamux`](https://github.com/libp2p/specs/blob/master/yamux/README.md) multiplexing
+and [`QUIC`](https://github.com/libp2p/specs/blob/master/quic/README.md) over UDP whenever possible. For secure communication, clients SHOULD support both
+[`TLS`](https://github.com/libp2p/specs/blob/master/tls/tls.md) and
+[`Noise`](https://github.com/libp2p/specs/blob/master/noise/README.md).
+They MAY also support additional libp2p transports. However,
 to guarantee discovery of existing records in the DHT, a client MUST implement
-at least one of these: `QUIC` or `TCP`+`Yamux`+`Noise`.
+at least one transport (`QUIC` or `TCP`+`Yamux`) with at least one security
+protocol (`TLS` or `Noise`).
 
-Clients that cannot support either `QUIC` or `TCP`+`Yamux`+`Noise` (e.g.,
+Clients that cannot support the required transports and security protocols (e.g.,
 browser-based nodes) MAY still act as DHT Clients, but their ability to find
 records in the DHT will be limited.
 
