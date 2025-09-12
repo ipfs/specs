@@ -246,7 +246,7 @@ The content body must be a [`application/vnd.ipfs.ipns-record`][application/vnd.
 
 ## DHT Routing API
 
-### `GET /routing/v1/dht/closest/peers/{peer-id}?[closerThan]&[count]`
+### `GET /routing/v1/dht/closest/peers/{peer-id}`
 
 #### Path Parameters
 
@@ -254,8 +254,8 @@ The content body must be a [`application/vnd.ipfs.ipns-record`][application/vnd.
 
 #### Query Parameters
 
-- `closerThan` is an optional [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md) represented as a CIDv1 encoded with `libp2p-key` codec.
-  - Returned peer records must be closer to `peer-id` than `closerThan`.
+- `closer-than` is an optional [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md) represented as a CIDv1 encoded with `libp2p-key` codec.
+  - Returned peer records must be closer to `peer-id` than `closer-than`.
   - If omitted the routing implementation should use its own [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md).
 - `count` is an optional number that specifies how many peer records the requester desires.
   - Minimum 1, maximum 100, default 20.
