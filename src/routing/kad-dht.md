@@ -331,23 +331,22 @@ and make error handling more complex.
 
 ### Server behavior
 
-Upon receiving a lookup request for a Kademlia Identifier, a DHT Server MUST
-return the Peer ID and multiaddresses of the `k` closest nodes to the requested
-Kademlia Identifier that are stored in its Routing Table. DHT Servers SHOULD
-NOT return any information about unresponsive nodes.
+Upon receiving a lookup request for a Kademlia Identifier `kid`, a DHT Server
+MUST return the Peer ID and multiaddresses of the `k` closest DHT Servers to
+`kid` that are stored in its Routing Table. It SHOULD NOT include itself, nor
+the requester in the response. If itself or the requester's Peer ID are among
+the `k` closest DHT Servers, it SHOULD return the next closest nodes instead,
+to return a total of `k` DHT Servers. DHT Servers SHOULD NOT return any
+information about unresponsive nodes.
 
 In public DHT swarms, DHT Servers MUST filter out private and loopback
-multiaddresses, and MUST NOT include peers whose only addresses are private or
-loopback.
+multiaddresses, and MUST NOT include DHT Servers whose only addresses are
+private or loopback.
 
-DHT Servers SHOULD NOT return their own Peer ID in responses to `FIND_NODE`
-queries. However, they MUST include information about the requester, if and
-only if the requester is a DHT Server in its routing table and it is among the
-`k` closest nodes to the target key.
-
-A DHT Server SHOULD always return information about its known `k` closest
-peers, provided its routing table contains at least `k` peers, even if those
-peers are not closer to the target key than itself.
+A DHT Server SHOULD always return information about the `k` closest DHT Servers
+to `kid` (excluding self and the requester), provided its routing table
+contains enough DHT Servers, even if these DHT Servers are not closer to `kid`
+than self or the requester.
 
 ### Client behavior
 
@@ -408,7 +407,7 @@ established a connection to the target Peer ID.
 
 #### Discovering non-DHT Servers
 
-DHT clients that want to remain routable must ensure their multiaddresses are
+DHT clients that want to remain routable MUST ensure their multiaddresses are
 stored in the peerstore of the DHT Servers closest to them in XOR distance.
 Since peerstore entries expire over time, DHT Clients SHOULD periodically
 reconnect to their closest DHT servers to prevent their information from being
@@ -417,7 +416,9 @@ removed. Implementations SHOULD perform this reconnection every 10 minutes.
 When receiving a `FIND_NODE` request for a given Peer ID, DHT Servers MUST
 always respond with the information of that Peer ID, if it is included in their
 peerstore, even if the target node isn't a DHT Server or only advertises
-private addresses.
+private addresses. Moreover, if the target Peer ID is self, or the requester's
+Peer ID, the corresponding peer information should be included in addition to
+the `k` closest DHT Servers.
 
 ### `GetClosestPeers`
 
