@@ -33,6 +33,8 @@ editors:
     affiliation:
         name: Protocol Labs
         url: https://protocol.ai/
+xref:
+  - kad-dht
 tags: ['ipns']
 order: 0
 ---
@@ -287,7 +289,7 @@ Once the record is created, it is ready to be spread through the network. This w
 
 The means of distribution are left unspecified. Implementations MAY choose to
 publish signed record using multiple routing systems, such as
-[libp2p Kademlia DHT](https://github.com/libp2p/specs/tree/master/kad-dht) or :cite[ipns-pubsub-router] (see [Routing record](#routing-record)).
+:cite[kad-dht] or :cite[ipns-pubsub-router] (see [Routing record](#routing-record)).
 
 On the other side, each peer must be able to get a record published by another node. It only needs to have the unique identifier used to publish the record to the network. Taking into account the routing system being used, we may obtain a set of occurrences of the record from the network. In this case, records can be compared using the sequence number, in order to obtain the most recent one.
 
@@ -471,7 +473,7 @@ Note: Base32 according to the :cite[rfc4648].
 #### Routing Record
 
 The routing record is spread across the network according to the available routing systems.
-The two routing systems currently available in IPFS are the [libp2p Kademlia DHT](https://github.com/libp2p/specs/tree/master/kad-dht) and :cite[ipns-pubsub-router].
+The two routing systems currently available in IPFS are the :cite[kad-dht] and :cite[ipns-pubsub-router].
 
 **Key format:** `/ipns/BINARY_ID`
 
