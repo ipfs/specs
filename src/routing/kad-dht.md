@@ -443,8 +443,7 @@ more Peer IDs providing the corresponding content. Instead of storing the
 content itself, the DHT stores provider records pointing to the peers hosting
 the content.
 
-<!-- TODO: link to Multihash and CID specs -->
-A Provider Record is identified by the multihash contained by the CID. It
+A Provider Record is identified by the [multihash] contained by the [CID]. It
 functions as an append-only list, where multiple providers can add themselves
 as content hosts. Since strict consistency across the network is not required,
 different DHT servers MAY store slightly different sets of providers, but the
@@ -781,6 +780,9 @@ is skipped during the initial routing table setup.
 [libp2p-kad](https://github.com/libp2p/rust-libp2p/tree/master/protocols/kad)
 
 # Bibliography <!-- TODO: handle citations better - xref is not enough, does not support DOI papers -->
+
+[CID]: https://github.com/multiformats/cid/
+[multihash]: https://github.com/multiformats/multihash
 
 [0]: Maymounkov, P., & Mazières, D. (2002). Kademlia: A Peer-to-Peer
 Information System Based on the XOR Metric. In P. Druschel, F. Kaashoek, & A.
