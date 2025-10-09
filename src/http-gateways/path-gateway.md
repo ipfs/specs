@@ -41,6 +41,8 @@ xref:
   - dnslink-gateway
   - ipip-0402
   - ipip-0412
+  - ipip-0288
+  - ipns-record
 tags: ['httpGateways', 'lowLevelHttpGateways']
 order: 0
 ---

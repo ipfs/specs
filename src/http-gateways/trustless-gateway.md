@@ -23,6 +23,7 @@ xref:
   - url
   - path-gateway
   - ipip-0412
+  - ipns-record
 tags: ['httpGateways', 'lowLevelHttpGateways', 'exchange']
 order: 1
 ---

@@ -35,6 +35,7 @@ editors:
       name: Shipyard
       url: https://ipshipyard.com
 xref:
+  - ipip-0337
   - ipns-record
 order: 0
 tags: ['routing']
