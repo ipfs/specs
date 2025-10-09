@@ -37,6 +37,8 @@ editors:
 xref:
   - url
   - trustless-gateway
+  - subdomain-gateway
+  - dnslink-gateway
   - ipip-0402
   - ipip-0412
 tags: ['httpGateways', 'lowLevelHttpGateways']

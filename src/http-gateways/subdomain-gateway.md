@@ -42,6 +42,8 @@ editors:
 xref:
   - url
   - html
+  - path-gateway
+  - web-redirects-file
 tags: ['httpGateways', 'webHttpGateways']
 order: 3
 ---
