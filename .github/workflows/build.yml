@@ -52,3 +52,4 @@ jobs:
           name: website-build-${{ github.run_id }}
           path: ${{ env.BUILD_PATH }}
           retention-days: 1
+          include-hidden-files: true
