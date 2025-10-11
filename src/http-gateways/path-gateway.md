@@ -332,6 +332,11 @@ Gateways MUST use 404 to signal that content is not available, particularly
 when the gateway is [non recursive](#recursive-vs-non-recursive-gateways), and only provides access to a known
 dataset, so that it can assess that the requested content is not part of it.
 
+NOTE: Gateways MUST return 404 for missing root blocks. However, for streaming
+responses (such as CAR), once HTTP 200 OK status is sent, gateways cannot
+change it. If a child block is missing during streaming, the gateway SHOULD
+terminate the stream. Clients MUST verify response completeness.
+
 ### `410` Gone
 
 Error to indicate that request was formally correct, but this specific Gateway
@@ -667,6 +672,11 @@ X-Ipfs-Roots: bafybeiaysi4s6lnjev27ln5icwm6tueaw2vdykrtjkwiphwekaywqhcjze,bafybe
 NOTE: while the first CID will change every time any article is changed,
 the last root (responsible for specific article or a subdirectory) may not
 change at all, allowing for smarter caching beyond what standard Etag offers.
+
+NOTE: Gateways that stream responses (e.g., CAR) without pre-resolving the
+entire path MAY only include the root CID for simple `/ipfs/{cid}` requests, or
+MAY omit this header for path requests where intermediate CIDs are not known
+when headers are sent.
 
 ### `X-Content-Type-Options` (response header)
 
