@@ -646,6 +646,10 @@ Indicates the original, requested content path before any path resolution and tr
 
 Example: `X-Ipfs-Path: /ipns/k2..ul6/subdir/file.txt`
 
+This header SHOULD be returned with deserialized responses.
+Implementations MAY omit it with trustless response types
+(`application/vnd.ipld.raw` and `application/vnd.ipld.car`).
+
 ### `X-Ipfs-Roots` (response header)
 
 Used for HTTP caching.
@@ -674,6 +678,10 @@ X-Ipfs-Roots: bafybeiaysi4s6lnjev27ln5icwm6tueaw2vdykrtjkwiphwekaywqhcjze,bafybe
 NOTE: while the first CID will change every time any article is changed,
 the last root (responsible for specific article or a subdirectory) may not
 change at all, allowing for smarter caching beyond what standard Etag offers.
+
+This header SHOULD be returned with deserialized responses.
+Implementations MAY omit it with trustless response types
+(`application/vnd.ipld.raw` and `application/vnd.ipld.car`).
 
 NOTE: Gateways that stream responses (e.g., CAR) without pre-resolving the
 entire path MAY only include the root CID for simple `/ipfs/{cid}` requests, or
