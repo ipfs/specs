@@ -4,7 +4,7 @@ description: >
   The minimal subset of HTTP Gateway response types facilitates data retrieval
   via CID and ensures integrity verification, all while eliminating the need to
   trust the gateway itself.
-date: 2025-03-06
+date: 2025-10-13
 maturity: reliable
 editors:
   - name: Marcin Rataj
@@ -12,13 +12,17 @@ editors:
     affiliation:
       name: Shipyard
       url: https://ipshipyard.com
-  - name: Henrique Dias
-    github: hacdias
   - name: Héctor Sanjuán
     github: hsanjuan
     affiliation:
       name: Shipyard
       url: https://ipshipyard.com
+former_editors:
+  - name: Henrique Dias
+    github: hacdias
+thanks:
+  - name: Rod Vagg
+    github: rvagg
 xref:
   - url
   - path-gateway
@@ -107,6 +111,13 @@ interoperability and ensures consistent HTTP cache behavior across various
 gateway implementations.
 
 :::
+
+### `Cache-Control: only-if-cached` (request header)
+
+Trustless gateways, particularly non-recursive ones serving from a local block
+store, are well-suited for :cite[path-gateway]'s `Cache-Control: only-if-cached`
+request header. When received, gateway SHOULD return HTTP 412 if the root block
+is not immediately available.
 
 ## Request Query Parameters
 
@@ -305,20 +316,6 @@ When no custom `filename` is provided:
 Same as in :cite[path-gateway], SHOULD be returned when Trustless Gateway
 supports more than a single response format and the `format` query parameter is
 missing or does not match well-known format from `Accept` header.
-
-### `Cache-Control: only-if-cached` (request header)
-
-Trustless gateways, particularly non-recursive ones serving from a local block
-store, are well-suited for :cite[path-gateway]'s `Cache-Control: only-if-cached`
-request header. When received, gateway SHOULD return HTTP 412 if the root block
-is not immediately available.
-
-### `X-Ipfs-Path` and `X-Ipfs-Roots` (response headers)
-
-See :cite[path-gateway] for definitions. Trustless gateways SHOULD return
-`X-Ipfs-Path`. For `X-Ipfs-Roots`, streaming gateways MAY only include the root
-CID or omit for path requests where intermediate CIDs are unknown when headers
-are sent.
 
 ### `Etag` (response header)
 

@@ -4,15 +4,23 @@ description: >
   The comprehensive low-level HTTP Gateway enables the integration of IPFS
   resources into the HTTP stack through /ipfs and /ipns namespaces, supporting
   both deserialized and verifiable response types.
-date: 2024-04-17
+date: 2025-10-13
 maturity: reliable
 editors:
   - name: Marcin Rataj
     github: lidel
     url: https://lidel.org/
     affiliation:
-      name: Protocol Labs
-      url: https://protocol.ai/
+      name: Shipyard
+      url: https://ipshipyard.com
+former_editors:
+  - name: Henrique Dias
+    github: hacdias
+    url: https://hacdias.com/
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
+thanks:
   - name: Adrian Lanzafame
     github: lanzafame
     affiliation:
@@ -25,12 +33,6 @@ editors:
       url: https://protocol.ai/
   - name: Oli Evans
     github: olizilla
-    affiliation:
-      name: Protocol Labs
-      url: https://protocol.ai/
-  - name: Henrique Dias
-    github: hacdias
-    url: https://hacdias.com/
     affiliation:
       name: Protocol Labs
       url: https://protocol.ai/
