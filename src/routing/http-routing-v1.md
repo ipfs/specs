@@ -246,19 +246,16 @@ The content body must be a [`application/vnd.ipfs.ipns-record`][application/vnd.
 
 ## DHT Routing API
 
-### `GET /routing/v1/dht/closest/peers/{peer-id}`
+### `GET /routing/v1/dht/closest/peers/{key}`
+
+This optional endpoint allows light clients to lower the cost of DHT walks in browser contexts.
 
 #### Path Parameters
 
-- `peer-id` is a [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md) represented as a CIDv1 encoded with `libp2p-key` codec.
-
-#### Query Parameters
-
-- `closer-than` is an optional [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md) represented as a CIDv1 encoded with `libp2p-key` codec.
-  - Returned peer records must be closer to `peer-id` than `closer-than`.
-  - If omitted the routing implementation should use its own [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md).
-- `count` is an optional number that specifies how many peer records the requester desires.
-  - Minimum 1, maximum 100, default 20.
+- `key` is a [CID] or [Peer ID][peer-id-representation] to find the closest peers to.
+  - [CID] should be a CIDv1 in any encoding.
+  - [Peer ID][peer-id-representation] can be represented as a Multihash in Base58btc, or a CIDv1 with `libp2p-key` (`0x72`) codec in Base36 or Base32.
+  - Implementations SHOULD support both CID and Peer ID formats for maximum interoperability.
 
 #### Response Status Codes
 
@@ -294,7 +291,7 @@ The content body must be a [`application/vnd.ipfs.ipns-record`][application/vnd.
 }
 ```
 
-The number of peer records in the responses SHOULD be limited to the `count` query parameter, which defaults to 20 if unspecified.
+The number of peer records in the response SHOULD be limited to the DHT bucket size (20 for Amino DHT).
 
 The client SHOULD be able to make a request with `Accept: application/x-ndjson` and get a [stream](#streaming) with more results.
 
