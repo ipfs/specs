@@ -36,7 +36,9 @@ editors:
       url: https://ipshipyard.com
 xref:
   - ipip-0337
+  - ipip-0518
   - ipns-record
+  - rfc3986
 order: 0
 tags: ['routing']
 ---
@@ -52,7 +54,11 @@ As such, human-readable encodings of types are preferred. This specification may
 ## Common Data Types
 
 - CIDs are always string-encoded using a [multibase]-encoded [CIDv1].
-- Multiaddrs are string-encoded according to the [human-readable multiaddr specification][multiaddr].
+- Addresses in the `Addrs` field can be:
+  - Multiaddrs: string-encoded according to the [human-readable multiaddr specification][multiaddr], always starting with `/`
+  - HTTP(S) URLs: absolute URLs with `http://` or `https://` schemes, parsed as URIs according to :cite[rfc3986]
+  - Parsing logic: if a string starts with `/`, parse as multiaddr; otherwise, parse as URI
+  - Unsupported addresses: implementations MUST skip addresses they cannot parse or do not support, and MUST continue processing remaining addresses (see [IPIP-0518](https://specs.ipfs.tech/ipips/ipip-0518/))
 - Peer IDs are string-encoded according [PeerID string representation specification][peer-id-representation]: either a Multihash in Base58btc, or a CIDv1 with libp2p-key (`0x72`) codec in Base36 or Base32.
 - Multibase bytes are string-encoded according to [the Multibase spec][multibase], and SHOULD use base64.
 - Timestamps are Unix millisecond epoch timestamps.
@@ -77,16 +83,18 @@ This API uses a standard version prefix in the path, such as `/v1/...`. If a bac
 
 Optional `?filter-addrs` to apply Network Address Filtering from [IPIP-484](https://specs.ipfs.tech/ipips/ipip-0484/).
 
-- `?filter-addrs=<comma-separated-list>` optional parameter that indicates which network transports to return by filtering the multiaddrs in the `Addrs` field of the [Peer schema](#peer-schema).
+- `?filter-addrs=<comma-separated-list>` optional parameter that indicates which network transports to return by filtering the addresses in the `Addrs` field of the [Peer schema](#peer-schema).
 - The value of the `filter-addrs` parameter is a comma-separated (`,` or `%2C`) list of network transport protocol _name strings_ as defined in the [multiaddr protocol registry](https://github.com/multiformats/multiaddr/blob/master/protocols.csv), e.g. `?filter-addrs=tls,webrtc-direct,webtransport`.
-- `unknown` can be be passed to include providers whose multiaddrs are unknown, e.g. `?filter-addrs=unknown`. This allows for not removing providers whose multiaddrs are unknown at the time of filtering (e.g. keeping DHT results that require additional peer lookup).
-- Multiaddrs are filtered by checking if the protocol name appears in any of the multiaddrs (logical OR).
-- Negative filtering is done by prefixing the protocol name with `!`, e.g. to skip IPv6 and QUIC addrs: `?filter-addrs=!ip6,!quic-v1`. Note that negative filtering is done by checking if the protocol name does not appear in any of the multiaddrs (logical AND).
+- `unknown` can be be passed to include providers whose addresses are unknown, e.g. `?filter-addrs=unknown`. This allows for not removing providers whose addresses are unknown at the time of filtering (e.g. keeping DHT results that require additional peer lookup).
+- Addresses are filtered by checking if the protocol name appears in any of the multiaddrs, or if the URI scheme matches for HTTP(S) URLs (logical OR in both cases).
+  - Example: `http` can be be passed to include providers whose addresses are HTTP-compatible. This will include `http://` `https://` URIs, and `/http` `/https` and `/tls/http` Multiaddrs.
+  - For the purpose of filtering, implementations SHOULD include `/tls/http` Multiaddrs when `https` is passed as a filter to ensure composed multiaddrs are included in results.
+- Negative filtering is done by prefixing the protocol name with `!`, e.g. to skip IPv6 and QUIC addrs: `?filter-addrs=!ip6,!quic-v1`. Note that negative filtering is done by checking if the protocol name does not appear in any of the addresses (logical AND).
 - If no parameter is passed, the default behavior is to return the original list of addresses unchanged.
 - If only negative filters are provided, addresses not passing any of the negative filters are included.
 - If positive filters are provided, only addresses passing at least one positive filter (and no negative filters) are included.
 - If both positive and negative filters are provided, the address must pass all negative filters and at least one positive filter to be included.
-- If there are no multiaddrs that match the passed transports, the provider is omitted from the response.
+- If there are no addresses that match the passed transports, the provider is omitted from the response.
 - Filtering is case-insensitive.
 
 ##### `filter-protocols` (providers request query parameter)
@@ -315,14 +323,17 @@ The `peer` schema represents an arbitrary peer.
 {
   "Schema": "peer",
   "ID": "bafz...",
-  "Addrs": ["/ip4/..."],
+  "Addrs": ["/ip4/...", "https://trustless-gateway.example.com"],
   "Protocols": ["transport-bitswap", ...]
   ...
 }
 ```
 
 - `ID`: the [Peer ID][peer-id] as Multihash in Base58btc or CIDv1 with libp2p-key codec.
-- `Addrs`: an optional list of known [multiaddrs][multiaddr] for this peer.
+- `Addrs`: an optional list of known addresses for this peer, which can include both:
+  - [Multiaddrs][multiaddr]: strings starting with `/`, e.g., `/ip4/192.168.1.1/tcp/4001`
+  - HTTP(S) URLs: absolute URLs with `http://` or `https://` schemes, e.g., `https://trustless-gateway.example.com`
+  - Implementations MUST skip addresses they cannot parse or do not support and continue with remaining addresses
   - If missing or empty, it means the router server is missing that information, and the client should use `ID` to lookup updated peer information.
 - `Protocols`: an optional list of protocols known to be supported by this peer.
   - If missing or empty, it means the router server is missing that information, and the client should use `ID` and `Addrs` to lookup connect to the peer and use the [libp2p identify protocol](https://github.com/libp2p/specs/tree/master/identify) to learn about supported ones.
