@@ -541,3 +541,21 @@ identity CIDs MAY not be handled.
 MUST support [`HEAD` requests](#head-ipfs-cid-path-params).
 
 The response is the same as [`GET`](#get-ipfs-bafkqaaa) but without body and all headers are optional.
+
+## Usage Within Peer-to-Peer(p2p) Networks
+
+While Trustless Gateways can be used as a verifiable gateway into a wider IPFS network, they can also be used as retrieval endpoints within a p2p IPFS network such as IPFS Mainnet.
+When in p2p environments there are additional constraints for implementers to be aware of
+
+### Block Limits
+
+Clients SHOULD NOT download unbounded amounts of data before being able to validate that data. The RECOMMENDED maximum block size for clients to accept is 2MiB.
+
+### HTTPS and HTTP/2
+
+Gateways serving data to non-LAN peers SHOULD support HTTPS and HTTP/2 or greater.
+Similarly, it is RECOMMENDED that clients restrict communications with non-LAN peers to HTTPS and HTTP/2 or greater.
+
+### Recursion
+
+Trustless Gateways meant to be used within p2p contexts SHOULD NOT themselves recursively search for content to return.
