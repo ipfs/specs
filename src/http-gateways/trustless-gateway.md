@@ -542,20 +542,90 @@ MUST support [`HEAD` requests](#head-ipfs-cid-path-params).
 
 The response is the same as [`GET`](#get-ipfs-bafkqaaa) but without body and all headers are optional.
 
-## Usage Within Peer-to-Peer(p2p) Networks
+## Usage Within Peer-to-Peer (P2P) Networks {#p2p-usage}
 
-While Trustless Gateways can be used as a verifiable gateway into a wider IPFS network, they can also be used as retrieval endpoints within a p2p IPFS network such as IPFS Mainnet.
-When in p2p environments there are additional constraints for implementers to be aware of
+Trustless Gateways serve two primary deployment models:
 
-### Block Limits
+1. **Verifiable bridges**: Gateways that provide trustless access from HTTP clients into IPFS networks, where the gateway operator is distinct from content providers
+2. **P2P retrieval endpoints**: Gateways embedded within P2P networks where they serve as HTTP interfaces to peer-operated block stores
 
-Clients SHOULD NOT download unbounded amounts of data before being able to validate that data. The RECOMMENDED maximum block size for clients to accept is 2MiB.
+When deploying gateways as P2P retrieval endpoints, implementers should be aware of additional constraints below:
 
-### HTTPS and HTTP/2
+### Block Limits {#p2p-block-limits}
 
-Gateways serving data to non-LAN peers SHOULD support HTTPS and HTTP/2 or greater.
-Similarly, it is RECOMMENDED that clients restrict communications with non-LAN peers to HTTPS and HTTP/2 or greater.
+Clients SHOULD NOT download unbounded amounts of data before being able to validate that data.
 
-### Recursion
+Clients SHOULD limit the maximum block size to 2MiB. This value aligns with the maximum block size used in UnixFS chunking and provides a reasonable balance between transfer efficiency and resource constraints.
 
-Trustless Gateways meant to be used within p2p contexts SHOULD NOT themselves recursively search for content to return.
+:::note
+
+Blocks larger than 2MiB can cause memory pressure on resource-constrained clients and increase the window for incomplete transfers. Since blocks must be validated as a unit, smaller blocks allow for more granular verification and easier retries on failure.
+
+:::
+
+### HTTPS and HTTP/2 {#p2p-transport}
+
+Gateways serving data to non-LAN peers SHOULD support HTTPS and HTTP/2 (:cite[rfc9113]) or greater.
+
+Clients SHOULD restrict communications with non-LAN peers to HTTPS and HTTP/2 (:cite[rfc9113]) or greater.
+
+:::note
+
+**HTTP/2**
+
+HTTP/2 provides request multiplexing, which is critical for performance in P2P environments. HTTP/1.1 fundamentally lacks multiplexing: only one request-response pair can be active on a connection at a time. This creates head-of-line blocking, where a slow or large response blocks all subsequent responses on that connection, even if they are ready to send. HTTP/1.1's optional pipelining feature does not solve this because responses must still be returned in order.
+
+To work around this limitation, clients must open multiple parallel TCP connections to achieve concurrent requests. However, each additional connection incurs significant overhead: TCP handshake latency, memory buffers, bandwidth competition, and increased implementation complexity. Browsers limit concurrent connections per origin (typically 6-8) to manage these costs, but this limitation affects all HTTP/1.1 clients, not just browsers, as the overhead of maintaining many connections becomes prohibitive.
+
+When fetching a DAG that requires many block requests, HTTP/1.1's lack of multiplexing creates a critical bottleneck. Clients face a difficult trade-off: either serialize requests (severely limiting throughput) or maintain many parallel connections (incurring substantial overhead). Users may experience acceptable performance with small test cases, but real-world IPFS content with deep DAG structures will encounter significant slowdowns. HTTP/2's stream multiplexing (:cite[rfc9113]) eliminates this bottleneck by allowing many concurrent requests over a single connection without head-of-line blocking at the application layer.
+
+**TLS**
+
+HTTPS provides transport security, preventing block data from being observed or tampered with in transit when communicating with peers over the public internet. While IPFS multihashes inherently allow clients to detect tampering (the digest verification provides cryptographic integrity), TLS prevents observation of transferred data and is also a prerequisite for HTTP/2 in web browsers, which do not support unencrypted HTTP/2 connections.
+
+**LAN Environments**
+
+For the purposes of this section, "LAN" refers to local area networks where peers communicate over trusted, high-bandwidth connections (e.g., within the same private network). "Non-LAN" refers to peers communicating over the public internet.
+
+In LAN environments, getting a TLS certificate setup with which to use HTTPS may be difficult, h2c may not be easily accessible across platforms/languages, and performance criteria are more controllable, which makes supporting HTTP/1.1 more manageable.
+
+:::
+
+### Recursion {#p2p-recursion}
+
+Trustless Gateways operating in P2P contexts SHOULD NOT recursively search for content.
+
+In P2P networks, gateways typically serve as block stores for specific peers or content, rather than attempting to locate content across the entire network. Recursive content discovery is handled by the P2P layer (e.g., Amino DHT, IPFS routing), not by individual HTTP gateways.
+
+Gateways that do not have content locally SHOULD return `404 Not Found` rather than attempting to fetch from other gateways or peers. This allows clients to efficiently query multiple gateways in parallel and discover which ones have the content cached.
+
+:::note
+
+This behavior aligns with the non-recursive gateway model where gateways serve only cached or pre-fetched content. Clients are responsible for content routing and choosing which gateways to query. See also the [`Cache-Control: only-if-cached`](#cache-control-only-if-cached-request-header) header for client-side control of this behavior.
+
+:::
+
+### Security Considerations {#p2p-security}
+
+#### Gateway Operators
+
+When serving content to peers over the public internet, gateway operators SHOULD implement the following security measures:
+
+- **Transport Security**: Use HTTPS with valid TLS certificates to prevent block interception and tampering in transit
+- **Rate Limiting**: Implement request rate limiting and concurrent connection limits to prevent resource exhaustion. When limits are exceeded, return HTTP `429 Too Many Requests` with a `Retry-After` header indicating when the client may retry
+- **Timeout Limits**: Enforce connection and request timeout limits to prevent resource exhaustion from slow or stalled connections
+- **Input Validation**: Validate CID format and encoding before processing requests to prevent malformed input attacks
+- **Path Validation**: For CAR requests with paths, validate path components to prevent path traversal attacks
+- **Block Size Limits**: Enforce maximum block size limits (see [Block Limits](#p2p-block-limits)) to prevent memory exhaustion
+
+#### Clients
+
+Clients making requests to gateway peers SHOULD implement the following security measures:
+
+- **Block Validation**: Validate all received blocks by verifying that the digest in the CID's Multihash matches the digest of the block payload before processing or storing
+- **Block Size Limits**: Limit the maximum accepted block size (see [Block Limits](#p2p-block-limits)) to prevent memory exhaustion from malicious gateways
+- **Connection Management**:
+  - Implement connection pooling with appropriate limits to avoid overwhelming local resources
+  - Respect the gateway's HTTP/2 `SETTINGS_MAX_CONCURRENT_STREAMS` value (Section 6.5.2 of :cite[rfc9113]) to avoid overwhelming the gateway
+  - Use HTTP/2 connection coalescing when multiple gateways share the same origin to reduce connection overhead
+- **Timeout Limits**: Set appropriate connection and request timeout limits to prevent hanging on unresponsive gateways. A safe default is to timeout after 30 seconds of not receiving any new bytes
