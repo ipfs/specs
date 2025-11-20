@@ -35,6 +35,8 @@ editors:
         url: https://protocol.ai/
 xref:
   - kad-dht
+  - ipip-0337
+  - ipns-pubsub-router
 tags: ['ipns']
 order: 0
 ---
