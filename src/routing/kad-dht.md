@@ -5,12 +5,28 @@ description: >
   overlay network used for peer and content routing in the InterPlanetary File
   System (IPFS). It extends the libp2p Kademlia DHT specification, adapting and
   adding features to support IPFS-specific requirements.
-date: 2025-03-24
+date: 2025-11-20
 maturity: reliable
 editors:
   - name: Guillaume Michel
     url: https://guillaume.michel.id
     github: guillaumemichel
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
+thanks:
+  - name: Adin Schmahmann
+    github: aschmahmann
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
+  - name: Alex Potsides
+    github: achingbrain
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
+  - name: Marcin Rataj
+    github: lidel
     affiliation:
       name: Shipyard
       url: https://ipshipyard.com
