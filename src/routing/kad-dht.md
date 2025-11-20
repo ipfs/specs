@@ -75,7 +75,7 @@ identifiers SHOULD be used.
 
 #### Amino DHT
 
-[_Amino DHT_]((https://blog.ipfs.tech/2023-09-amino-refactoring/#why-amino)) is
+[_Amino DHT_](https://blog.ipfs.tech/2023-09-amino-refactoring/#why-amino) is
 a public instance of the _IPFS Kademlia DHT_ spec mounted under
 `/ipfs/kad/1.0.0` libp2p protocol, it is also referred to as the _Public IPFS
 DHT_.
@@ -90,7 +90,7 @@ and can be joined by using the [public good Amino DHT Bootstrappers](https://doc
 #### IPFS LAN DHTs
 
 _IPFS LAN DHTs_ are DHT swarms operating exclusively within a local network.
-Thy are accessible only to nodes within the same network and are identified by
+They are accessible only to nodes within the same network and are identified by
 the libp2p protocol `/ipfs/lan/kad/1.0.0`.
 
 In a LAN DHT:
@@ -289,7 +289,7 @@ periodically refresh the Routing Table.
 
 When using periodic refresh, DHT Servers SHOULD perform a Routing Table Refresh
 every `10` minutes. During this process, the server sends a ping request to all
-nodes it hasn't heard from recently (e.g in the last 5 minutes). Any peer that
+nodes it hasn't heard from recently (e.g., in the last 5 minutes). Any peer that
 fails to respond MUST be removed from the Routing Table.
 
 After removing unresponsive peers, any buckets that are not full MUST be
@@ -359,16 +359,6 @@ list.
 Upon receiving a response, the client adds freshly received peers to the list
 of closest peers. It sends a request to the closest peer to `kid` that hasn't
 been queried yet. The client ignores timeouts and invalid responses.
-
-When a client (or a DHT server acting as a client) initiates a lookup for a
-Kademlia Identifier `kid`, it begins by selecting the known nodes closest to
-`kid` in terms of XOR distance, and adds them to a candidate list. It then
-sends lookup requests to the closest nodes from that list.
-
-As responses are received, any newly discovered peers are added to the
-candidate list. The client proceeds by sending a request to the nearest peer to
-`kid` that has not yet been queried. Invalid responses and timeouts are simply
-discarded.
 
 #### Termination
 
@@ -593,10 +583,10 @@ and [IPNS Record Size Limit](https://specs.ipfs.tech/ipns/ipns-record/#record-si
 
 A quorum is the minimum number of distinct responses a client must collect from
 DHT Servers to determine a valid result. Since different DHT Servers may store
-different versions of an IPNS record, a client fetches the record from multiple
+different versions of an [IPNS record](https://specs.ipfs.tech/ipns/ipns-record/), a client fetches the record from multiple
 DHT Servers to increase the likelihood of retrieving the most recent version.
 
-For IPNS lookups, the default quorum value is `16`, meaning the client attempts
+For IPNS lookups, implementations SHOULD use a quorum value of `16`, meaning the client attempts
 to collect responses from at least `16` DHT Servers out of `20` before
 determining the best available record.
 

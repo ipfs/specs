@@ -477,6 +477,10 @@ Note: Base32 according to the :cite[rfc4648].
 The routing record is spread across the network according to the available routing systems.
 The two routing systems currently available in IPFS are the :cite[kad-dht] and :cite[ipns-pubsub-router].
 
+When using :cite[kad-dht] for routing, implementations SHOULD follow the retrieval strategies
+documented in the IPFS Kademlia DHT specification, including the recommended quorum value
+for IPNS record lookups.
+
 **Key format:** `/ipns/BINARY_ID`
 
 - `/ipns/` is the ASCII prefix (bytes in hex: `2f69706e732f`)
