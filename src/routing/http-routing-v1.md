@@ -4,9 +4,28 @@ description: >
   Delegated routing is a mechanism for IPFS implementations to use for offloading
   content routing, peer routing and naming to another process/server. This specification describes
   an HTTP API for delegated routing of content, peers, and IPNS.
-date: 2025-08-19
+date: 2025-11-20
 maturity: reliable
 editors:
+  - name: Marcin Rataj
+    github: lidel
+    url: https://lidel.org/
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
+former_editors:
+  - name: Henrique Dias
+    url: https://hacdias.com/
+    github: hacdias
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
+  - name: Daniel Norman
+    github: 2color
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
+thanks:
   - name: Gus Eggert
     github: guseggert
     affiliation:
@@ -17,20 +36,15 @@ editors:
     affiliation:
       name: Protocol Labs
       url: https://protocol.ai/
-  - name: Henrique Dias
-    url: https://hacdias.com/
-    github: hacdias
+  - name: Alex Potsides
+    github: achingbrain
     affiliation:
       name: Shipyard
       url: https://ipshipyard.com
-  - name: Marcin Rataj
-    github: lidel
-    url: https://lidel.org/
-    affiliation:
-      name: Shipyard
-      url: https://ipshipyard.com
-  - name: Daniel Norman
-    github: 2color
+  - name: Will Scott
+    github: willscott
+  - name: Hector Sanjuan
+    github: hsanjuan
     affiliation:
       name: Shipyard
       url: https://ipshipyard.com
@@ -254,8 +268,9 @@ This optional endpoint allows light clients to lower the cost of DHT walks in br
 #### Path Parameters
 
 - `key` is a [CID] or [Peer ID][peer-id-representation] to find the closest peers to.
-  - [CID] should be a CIDv1 in any encoding.
+  - [CID] SHOULD be a CIDv1 in any encoding.
   - [Peer ID][peer-id-representation] can be represented as a Multihash in Base58btc, or a CIDv1 with `libp2p-key` (`0x72`) codec in Base36 or Base32.
+  - Arbitrary multihash lookups can be performed by wrapping the multihash in a CIDv1 with `raw` (`0x55`) codec.
   - Implementations SHOULD support both CID and Peer ID formats for maximum interoperability.
 
 #### Response Status Codes
@@ -294,7 +309,9 @@ This optional endpoint allows light clients to lower the cost of DHT walks in br
 
 The number of peer records in the response SHOULD be limited to the DHT bucket size (20 for Amino DHT).
 
-The client SHOULD be able to make a request with `Accept: application/x-ndjson` and get a [stream](#streaming) with more results.
+Peers SHOULD be returned sorted by closeness to the key. For Kademlia-based DHT implementations (such as Amino DHT), this means sorting by XOR distance with the closest peers first.
+
+The client SHOULD be able to make a request with `Accept: application/x-ndjson` and get a [stream](#streaming) with results. Note that due to the XOR sorting requirement, the streamed response may be blocked until the DHT lookup completes and peers can be sorted before transmission.
 
 Each object in the `Peers` list is a record conforming to the [Peer Schema](#peer-schema).
 
