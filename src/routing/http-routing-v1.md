@@ -261,6 +261,8 @@ The content body must be a [`application/vnd.ipfs.ipns-record`][application/vnd.
 
 ## DHT Routing API
 
+The DHT Routing API is OPTIONAL. Implementations that do not support DHT operations MAY return `404` (Not Found) or `501` (Not Implemented) as specified in [Error Codes](#error-codes).
+
 ### `GET /routing/v1/dht/closest/peers/{key}`
 
 This optional endpoint allows light clients to lower the cost of DHT walks in browser contexts.
@@ -278,6 +280,7 @@ This optional endpoint allows light clients to lower the cost of DHT walks in br
 - `200` (OK): the response body contains peer records.
 - `404` (Not Found): must be returned if no matching records are found.
 - `422` (Unprocessable Entity): request does not conform to schema or semantic constraints.
+- `501` (Not Implemented): may be returned if DHT operations are not supported.
 
 #### Response Headers
 
