@@ -12,6 +12,7 @@ install:
 
 website: clean install
 	npx spec-generator -c .config.json
+	touch out/.nojekyll
 
 watch: clean install
 	npx spec-generator -c .config.json -w

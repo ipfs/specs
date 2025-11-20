@@ -33,6 +33,9 @@ editors:
     affiliation:
         name: Protocol Labs
         url: https://protocol.ai/
+xref:
+  - ipip-0337
+  - ipns-pubsub-router
 tags: ['ipns']
 order: 0
 ---

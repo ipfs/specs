@@ -40,8 +40,10 @@ editors:
       name: Protocol Labs
       url: https://protocol.ai/
 xref:
-  - url
   - html
+  - path-gateway
+  - url
+  - web-redirects-file
 tags: ['httpGateways', 'webHttpGateways']
 order: 3
 ---

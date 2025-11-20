@@ -4,15 +4,23 @@ description: >
   The comprehensive low-level HTTP Gateway enables the integration of IPFS
   resources into the HTTP stack through /ipfs and /ipns namespaces, supporting
   both deserialized and verifiable response types.
-date: 2024-04-17
+date: 2025-10-13
 maturity: reliable
 editors:
   - name: Marcin Rataj
     github: lidel
     url: https://lidel.org/
     affiliation:
-      name: Protocol Labs
-      url: https://protocol.ai/
+      name: Shipyard
+      url: https://ipshipyard.com
+former_editors:
+  - name: Henrique Dias
+    github: hacdias
+    url: https://hacdias.com/
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
+thanks:
   - name: Adrian Lanzafame
     github: lanzafame
     affiliation:
@@ -28,17 +36,15 @@ editors:
     affiliation:
       name: Protocol Labs
       url: https://protocol.ai/
-  - name: Henrique Dias
-    github: hacdias
-    url: https://hacdias.com/
-    affiliation:
-      name: Protocol Labs
-      url: https://protocol.ai/
 xref:
   - url
   - trustless-gateway
+  - subdomain-gateway
+  - dnslink-gateway
   - ipip-0402
   - ipip-0412
+  - ipip-0288
+  - ipns-record
 tags: ['httpGateways', 'lowLevelHttpGateways']
 order: 0
 ---
@@ -327,6 +333,11 @@ missing DAG node, or
 Gateways MUST use 404 to signal that content is not available, particularly
 when the gateway is [non recursive](#recursive-vs-non-recursive-gateways), and only provides access to a known
 dataset, so that it can assess that the requested content is not part of it.
+
+NOTE: Gateways MUST return 404 for missing root blocks. However, for streaming
+responses (such as CAR), once HTTP 200 OK status is sent, gateways cannot
+change it. If a child block is missing during streaming, the gateway SHOULD
+terminate the stream. Clients MUST verify response completeness.
 
 ### `410` Gone
 
@@ -635,6 +646,10 @@ Indicates the original, requested content path before any path resolution and tr
 
 Example: `X-Ipfs-Path: /ipns/k2..ul6/subdir/file.txt`
 
+This header SHOULD be returned with deserialized responses.
+Implementations MAY omit it with trustless response types
+(`application/vnd.ipld.raw` and `application/vnd.ipld.car`).
+
 ### `X-Ipfs-Roots` (response header)
 
 Used for HTTP caching.
@@ -663,6 +678,15 @@ X-Ipfs-Roots: bafybeiaysi4s6lnjev27ln5icwm6tueaw2vdykrtjkwiphwekaywqhcjze,bafybe
 NOTE: while the first CID will change every time any article is changed,
 the last root (responsible for specific article or a subdirectory) may not
 change at all, allowing for smarter caching beyond what standard Etag offers.
+
+This header SHOULD be returned with deserialized responses.
+Implementations MAY omit it with trustless response types
+(`application/vnd.ipld.raw` and `application/vnd.ipld.car`).
+
+NOTE: Gateways that stream responses (e.g., CAR) without pre-resolving the
+entire path MAY only include the root CID for simple `/ipfs/{cid}` requests, or
+MAY omit this header for path requests where intermediate CIDs are not known
+when headers are sent.
 
 ### `X-Content-Type-Options` (response header)
 
