@@ -25,11 +25,15 @@ thanks:
     affiliation:
       name: Shipyard
       url: https://ipshipyard.com
+  - name: Jeromy Johnson
+    github: whyrusleeping
   - name: Marcin Rataj
     github: lidel
     affiliation:
       name: Shipyard
       url: https://ipshipyard.com
+  - name: Petar Maymounkov
+    github: petar
 tags: ['routing']
 order: 1
 ---
