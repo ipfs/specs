@@ -51,7 +51,7 @@ thanks:
 xref:
   - ipip-0337
   - ipns-record
-order: 0
+order: 3
 tags: ['routing']
 ---
 
