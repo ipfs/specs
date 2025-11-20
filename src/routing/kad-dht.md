@@ -228,10 +228,11 @@ keyspace.
 Example:
 
 ```sh
-PeerID b58 representation: 12D3KooWKudojFn6pff7Kah2Mkem3jtFfcntpG9X3QBNiggsYxK2
-PeerID CID representation: k51qzi5uqu5djx47o56x8r9lvy85co0sdf1yfbzxlukdq4irr8ssn3o7dpfasp
-PeerID hex representation: 0024080112209e3b433cbd31c2b8a6ebbdca998bd0f4c2141c9c9af5422e976051b1e63af14d
-Kademlia identifier (hex): e43d28f0996557c0d5571d75c62a57a59d7ac1d30a51ecedcdb9d5e4afa56100
+PeerID b58 representation:  12D3KooWLU2znyJMtDiHArqAGbZn8CgUGp92kxDBtefftEEaHSZS
+PeerID CID b32:             bafzaajaiaejcbhr3im6l2mocxctoxpoktgf5b5gccqojzgxviixjoycrwhtdv4kn
+PeerID CID b36:             k51qzi5uqu5dk4kbd5bpmklj30q0q8n3091bncahugkx18e84p1od2rk25olsd
+PeerID binary (hex):        0024080112209e3b433cbd31c2b8a6ebbdca998bd0f4c2141c9c9af5422e976051b1e63af14d
+Kademlia identifier (hex):  e43d28f0996557c0d5571d75c62a57a59d7ac1d30a51ecedcdb9d5e4afa56100
 ```
 
 ## Routing Table
