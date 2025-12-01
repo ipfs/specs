@@ -128,16 +128,14 @@ Same as [`format`](https://specs.ipfs.tech/http-gateways/path-gateway/#format-re
 - `format=car` → `application/vnd.ipld.car`
 - `format=ipns-record` → `application/vnd.ipfs.ipns-record`
 
+When both `Accept` HTTP header and `format` query parameter are present,
+`format` SHOULD take precedence.
+
 :::note
 
 A Client SHOULD include the `format` query parameter in the request URL, in
 addition to the `Accept` header. This provides the best interoperability and
 ensures consistent HTTP cache behavior across various gateway implementations.
-
-When both the `Accept` header and `format` parameter are present, a specific
-`Accept` value (e.g., `application/vnd.ipld.raw`) SHOULD take precedence over
-`format`. Wildcards (e.g., `*/*`, `application/*`) are not specific and do not
-take precedence (as specified in :cite[path-gateway]).
 
 :::
 
