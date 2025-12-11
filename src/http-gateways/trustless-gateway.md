@@ -155,7 +155,8 @@ The following additional values are supported:
 A Gateway MUST augment the returned `Etag` based on the passed `entity-bytes`.
 
 A Gateway SHOULD return an HTTP 400 Bad Request error when the requested range
-is outside of valid offset positions in full, and the gateway knows that upfront.
+is entirely outside of the entity's byte range and the Gateway is able to determine this
+upfront.
 
 In more nuanced error scenarios, a Gateway MUST return a valid CAR response
 that includes enough blocks for the client to understand why the requested
