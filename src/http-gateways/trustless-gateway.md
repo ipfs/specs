@@ -4,19 +4,30 @@ description: >
   The minimal subset of HTTP Gateway response types facilitates data retrieval
   via CID and ensures integrity verification, all while eliminating the need to
   trust the gateway itself.
-date: 2023-06-20
+date: 2025-10-13
 maturity: reliable
 editors:
   - name: Marcin Rataj
     github: lidel
-    url: https://lidel.org/
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
+  - name: Héctor Sanjuán
+    github: hsanjuan
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
+former_editors:
   - name: Henrique Dias
     github: hacdias
-    url: https://hacdias.com/
+thanks:
+  - name: Rod Vagg
+    github: rvagg
 xref:
   - url
   - path-gateway
   - ipip-0412
+  - ipns-record
 tags: ['httpGateways', 'lowLevelHttpGateways', 'exchange']
 order: 1
 ---
@@ -32,7 +43,7 @@ The minimal implementation means:
 - for raw blocks:
   - data is requested by CID, only supported path is `/ipfs/{cid}`
   - no path traversal or recursive resolution
-- for CAR files:
+- for CARs:
   - the pathing behavior is identical to :cite[path-gateway]
 
 # HTTP API
@@ -47,9 +58,13 @@ Optional `path` is permitted for requests that specify CAR format (`?format=car`
 
 For block requests (`?format=raw` or `Accept: application/vnd.ipld.raw`), only `GET /ipfs/{cid}[?{params}]` is supported.
 
+Client and Server implementations SHOULD include support for the [`GET` probe path](#dedicated-probe-paths).
+
 ## `HEAD /ipfs/{cid}[/{path}][?{params}]`
 
 Same as GET, but does not return any payload.
+
+Client and Server implementations SHOULD include support for the [`HEAD` probe path](#dedicated-probe-paths).
 
 ## `GET /ipns/{key}[?{params}]`
 
@@ -88,15 +103,50 @@ Below response types SHOULD be supported:
 A Gateway SHOULD return HTTP 400 Bad Request when running in strict trustless
 mode (no deserialized responses) and `Accept` header is missing.
 
+:::note
+
+A Client SHOULD include the [`format` query parameter](#format-request-query-parameter)
+in the request URL, in addition to the `Accept` header. This provides the best
+interoperability and ensures consistent HTTP cache behavior across various
+gateway implementations.
+
+:::
+
+### `Cache-Control: only-if-cached` (request header)
+
+Trustless gateways, particularly non-recursive ones serving from a local block
+store, are well-suited for :cite[path-gateway]'s `Cache-Control: only-if-cached`
+request header. When received, gateway SHOULD return HTTP 412 if the root block
+is not immediately available.
+
 ## Request Query Parameters
 
-### :dfn[dag-scope] (request query parameter)
+### :dfn[`format`] (request query parameter)
+
+Same as [`format`](https://specs.ipfs.tech/http-gateways/path-gateway/#format-request-query-parameter) in :cite[path-gateway], but with limited number of supported response types:
+- `format=raw` → `application/vnd.ipld.raw`
+- `format=car` → `application/vnd.ipld.car`
+- `format=ipns-record` → `application/vnd.ipfs.ipns-record`
+
+:::note
+
+A Client SHOULD include the `format` query parameter in the request URL, in
+addition to the `Accept` header. This provides the best interoperability and
+ensures consistent HTTP cache behavior across various gateway implementations.
+
+When both the `Accept` header and `format` parameter are present, a specific
+`Accept` value (e.g., `application/vnd.ipld.raw`) SHOULD take precedence over
+`format`. Wildcards (e.g., `*/*`, `application/*`) are not specific and do not
+take precedence (as specified in :cite[path-gateway]).
+
+:::
+
+### :dfn[`dag-scope`] (request query parameter)
 
 Optional, `dag-scope=(block|entity|all)` with default value `all`, only available for CAR requests.
 
 Describes the shape of the DAG fetched the terminus of the specified path whose blocks
-are included in the returned CAR file after the blocks required to traverse
-path segments.
+are included in the returned CAR stream after the blocks required to traverse path segments.
 
 - `block` - Only the root block at the end of the path is returned after blocks
   required to verify the specified path segments.
@@ -111,7 +161,7 @@ path segments.
 
 When present, returned `Etag` must include unique prefix based on the passed scope type.
 
-### :dfn[entity-bytes] (request query parameter)
+### :dfn[`entity-bytes`] (request query parameter)
 
 The optional `entity-bytes=from:to` parameter is available only for CAR
 requests.
@@ -184,9 +234,63 @@ returned:
     returned to the client, the HTTP status code has already been sent to the
     client.
 
+### :dfn[`car-version`] (request query parameter)
+
+Optional, only used on CAR requests.
+
+Serves same purpose as [CAR `version` content type parameter](#car-version-content-type-parameter).
+
+In case both are present in the request, the value from the [`Accept`](#accept-request-header) HTTP Header has priority and a matching [`Content-Location`](#content-location-response-header) SHOULD be returned with the response.
+
+### :dfn[`car-order`] (request query parameter)
+
+Optional, only used on CAR requests.
+
+Serves same purpose as [CAR `order` content type parameter](#car-order-content-type-parameter).
+
+In case both are present in the request, the value from the [`Accept`](#accept-request-header) HTTP Header has priority and a matching [`Content-Location`](#content-location-response-header) SHOULD be returned with the response.
+
+### :dfn[`car-dups`] (request query parameter)
+
+Optional, only used on CAR requests.
+
+Serves same purpose as [CAR `dups` content type parameter](#car-dups-content-type-parameter).
+
+In case both are present in the request, the value from the [`Accept`](#accept-request-header) HTTP Header has priority and a matching [`Content-Location`](#content-location-response-header) SHOULD be returned with the response.
+
 # HTTP Response
 
-Below MUST be implemented **in addition** to "HTTP Response" of :cite[path-gateway].
+Below MUST be implemented **in addition** to "HTTP Response" of
+:cite[path-gateway], with special attention to the "Response Status Codes" and
+the "Recursive vs non-recursive gateways" sections.
+
+## Response Status Codes
+
+Trustless Gateways MUST follow the response status codes defined in :cite[path-gateway], including:
+
+### `404 Not Found`
+
+A Trustless Gateway MUST return `404 Not Found` when the **root block** (the CID in the request path) is not available in the gateway's storage.
+
+This applies to:
+- HEAD requests for any CID
+- GET requests for raw blocks (`application/vnd.ipld.raw`)
+- GET requests for CAR streams (`application/vnd.ipld.car`) when the root block is missing
+
+For non-recursive Trustless Gateways (such as those serving from a local block store), this definitively signals that the requested content is not part of the gateway's dataset.
+
+### Streaming and Missing Child Blocks
+
+For CAR responses, once a gateway begins streaming (after successfully loading the root block), it has committed to HTTP `200 OK`. If a child block is encountered as missing during DAG traversal:
+
+- The gateway SHOULD terminate the stream (potentially with an incomplete CAR)
+- Clients MUST verify CAR completeness and handle incomplete streams as retrieval failures
+
+This follows the streaming principle stated in the [`entity-bytes`](#entity-bytes-request-query-parameter) section above.
+
+### `500 Internal Server Error`
+
+A Trustless Gateway SHOULD return `500 Internal Server Error` only for genuine server errors, not for content unavailability. Examples include storage backend failures, resource exhaustion, or unexpected internal errors.
 
 ## Response Headers
 
@@ -204,6 +308,33 @@ If a CAR stream was requested:
 
 MUST be returned and set to `attachment` to ensure requested bytes are not rendered by a web browser.
 
+When no custom `filename` is provided:
+- CAR responses should use `filename="<cid>.car"`
+- Raw block responses should use `filename="<cid>.bin"`
+
+### `Content-Location` (response header)
+
+Same as in :cite[path-gateway], SHOULD be returned when Trustless Gateway
+supports more than a single response format and the `format` query parameter is
+missing or does not match well-known format from `Accept` header.
+
+### `Etag` (response header)
+
+MUST be returned and follow the recommendations in :cite[path-gateway].
+
+:::note
+
+**Implementation Variance**: Etag generation for CAR responses is
+implementation-specific. Different gateways may generate different Etags for
+identical requests due to variations in what parameters are included (e.g.,
+`order`, `dups`) and how they are encoded in the Etag calculation.
+
+As a result, `If-None-Match` conditional requests may not work across different
+gateway implementations. Clients SHOULD NOT assume Etags are portable between
+gateways.
+
+:::
+
 # Block Responses (application/vnd.ipld.raw)
 
 An opaque bytes matching the requested block CID
@@ -218,7 +349,7 @@ A CAR stream for the requested
 content type (with optional `order` and `dups` params), path and optional
 `dag-scope` and `entity-bytes` URL parameters.
 
-## CAR version
+## CAR `version` (content type parameter)
 
 Value returned in
 [`CarV1Header.version`](https://ipld.io/specs/transport/car/carv1/#header)
@@ -385,3 +516,29 @@ returned as [application/vnd.ipfs.ipns-record](https://www.iana.org/assignments/
 A Client MUST confirm the record signature match `libp2p-key` from the requested IPNS Name.
 
 A Client MUST [perform additional record verification according to the IPNS specification](https://specs.ipfs.tech/ipns/ipns-record/#record-verification).
+
+# Appendix: Notes for implementers
+
+## Dedicated Probe Paths
+
+Trustless gateways SHOULD provide probing endpoints as described below.
+
+### `GET /ipfs/bafkqaaa`
+
+`bafkqaaa` is the identity empty CID. This endpoint can be used to probe that
+that the endpoint corresponds to a trustless gateway.
+
+For block requests (signaled by `?format=raw` and `Accept: application/vnd.ipld.raw`), when supported, it MUST return `200 OK`
+and an empty body.
+
+For CAR requests (signaled by `?format=car` and `Accept: application/vnd.ipld.car`), when supported, it MUST return `200 OK` and a valid CAR with CAR Header `roots` set to `bafkqaaa`. Identity block MAY be skipped in the CAR Data section.
+
+This specific identity CID is special for probing. Other random
+identity CIDs MAY not be handled.
+
+### `HEAD /ipfs/bafkqaaa`
+
+`bafkqaaa` is the identity empty CID. If this endpoint is enabled, the gateway
+MUST support [`HEAD` requests](#head-ipfs-cid-path-params).
+
+The response is the same as [`GET`](#get-ipfs-bafkqaaa) but without body and all headers are optional.

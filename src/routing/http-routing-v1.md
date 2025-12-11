@@ -4,9 +4,28 @@ description: >
   Delegated routing is a mechanism for IPFS implementations to use for offloading
   content routing, peer routing and naming to another process/server. This specification describes
   an HTTP API for delegated routing of content, peers, and IPNS.
-date: 2023-08-31
+date: 2025-11-20
 maturity: reliable
 editors:
+  - name: Marcin Rataj
+    github: lidel
+    url: https://lidel.org/
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
+former_editors:
+  - name: Henrique Dias
+    url: https://hacdias.com/
+    github: hacdias
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
+  - name: Daniel Norman
+    github: 2color
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
+thanks:
   - name: Gus Eggert
     github: guseggert
     affiliation:
@@ -17,21 +36,22 @@ editors:
     affiliation:
       name: Protocol Labs
       url: https://protocol.ai/
-  - name: Henrique Dias
-    url: https://hacdias.com/
-    github: hacdias
+  - name: Alex Potsides
+    github: achingbrain
     affiliation:
-      name: Protocol Labs
-      url: https://protocol.ai/
-  - name: Marcin Rataj
-    github: lidel
-    url: https://lidel.org/
+      name: Shipyard
+      url: https://ipshipyard.com
+  - name: Will Scott
+    github: willscott
+  - name: Hector Sanjuan
+    github: hsanjuan
     affiliation:
-      name: Protocol Labs
-      url: https://protocol.ai/
+      name: Shipyard
+      url: https://ipshipyard.com
 xref:
+  - ipip-0337
   - ipns-record
-order: 0
+order: 3
 tags: ['routing']
 ---
 
@@ -47,7 +67,7 @@ As such, human-readable encodings of types are preferred. This specification may
 
 - CIDs are always string-encoded using a [multibase]-encoded [CIDv1].
 - Multiaddrs are string-encoded according to the [human-readable multiaddr specification][multiaddr].
-- Peer IDs are string-encoded according [PeerID string representation specification][peer-id-representation]: either a Multihash in Base58btc, or a CIDv1 with libp2p-key (`0x72`) codec.
+- Peer IDs are string-encoded according [PeerID string representation specification][peer-id-representation]: either a Multihash in Base58btc, or a CIDv1 with libp2p-key (`0x72`) codec in Base36 or Base32.
 - Multibase bytes are string-encoded according to [the Multibase spec][multibase], and SHOULD use base64.
 - Timestamps are Unix millisecond epoch timestamps.
 
@@ -63,13 +83,56 @@ This API uses a standard version prefix in the path, such as `/v1/...`. If a bac
 
 #### Path Parameters
 
-- `cid` is the [CID](https://github.com/multiformats/cid) to fetch provider records for.
+- `cid` is the [CID](https://github.com/multiformats/cid) to fetch provider records for (preferably normalized to a CIDv1 in Base32, to maximize HTTP cache hits).
+
+#### Request Query Parameters
+
+##### `filter-addrs` (providers request query parameter)
+
+Optional `?filter-addrs` to apply Network Address Filtering from [IPIP-484](https://specs.ipfs.tech/ipips/ipip-0484/).
+
+- `?filter-addrs=<comma-separated-list>` optional parameter that indicates which network transports to return by filtering the multiaddrs in the `Addrs` field of the [Peer schema](#peer-schema).
+- The value of the `filter-addrs` parameter is a comma-separated (`,` or `%2C`) list of network transport protocol _name strings_ as defined in the [multiaddr protocol registry](https://github.com/multiformats/multiaddr/blob/master/protocols.csv), e.g. `?filter-addrs=tls,webrtc-direct,webtransport`.
+- `unknown` can be be passed to include providers whose multiaddrs are unknown, e.g. `?filter-addrs=unknown`. This allows for not removing providers whose multiaddrs are unknown at the time of filtering (e.g. keeping DHT results that require additional peer lookup).
+- Multiaddrs are filtered by checking if the protocol name appears in any of the multiaddrs (logical OR).
+- Negative filtering is done by prefixing the protocol name with `!`, e.g. to skip IPv6 and QUIC addrs: `?filter-addrs=!ip6,!quic-v1`. Note that negative filtering is done by checking if the protocol name does not appear in any of the multiaddrs (logical AND).
+- If no parameter is passed, the default behavior is to return the original list of addresses unchanged.
+- If only negative filters are provided, addresses not passing any of the negative filters are included.
+- If positive filters are provided, only addresses passing at least one positive filter (and no negative filters) are included.
+- If both positive and negative filters are provided, the address must pass all negative filters and at least one positive filter to be included.
+- If there are no multiaddrs that match the passed transports, the provider is omitted from the response.
+- Filtering is case-insensitive.
+
+##### `filter-protocols` (providers request query parameter)
+
+Optional `?filter-protocols` to apply IPFS Protocol Filtering from [IPIP-484](https://specs.ipfs.tech/ipips/ipip-0484/).
+
+- The `filter-protocols` parameter is a comma-separated (`,` or `%2C`) list of transfer protocol names, e.g. `?filter-protocols=unknown,transport-bitswap,transport-ipfs-gateway-http`.
+- Transfer protocols names should be treated as opaque strings and have a max length of 63 characters. A non-exhaustive list of transfer protocols are defined per convention in the [multicodec registry](https://github.com/multiformats/multicodec/blob/3b7b52deb31481790bc4bae984d8675bda4e0c82/table.csv#L149-L151).
+- Implementations MUST preserve all transfer protocol names when returning a positive result that matches one or more of them.
+- A special `unknown` name can be be passed to include providers whose transfer protocol list is empty (unknown), e.g. `?filter-protocols=unknown`. This allows for including providers returned from the DHT that do not contain explicit transfer protocol information.
+- Providers are filtered by checking if the transfer protocol name appears in the `Protocols` array (logical OR).
+- If the provider doesn't match any of the passed transfer protocols, the provider is omitted from the response.
+- If a provider passes the filter, it is returned unchanged, i.e. the full set of protocols is returned including protocols that not included in the filter. (note that this is different from `filter-addrs` where only the multiaddrs that pass the filter are returned)
+- Filtering is case-insensitive.
+- If no parameter is passed, the default behavior is to not filter by transfer protocol.
 
 #### Response Status Codes
 
 - `200` (OK): the response body contains 0 or more records.
 - `404` (Not Found): must be returned if no matching records are found.
 - `422` (Unprocessable Entity): request does not conform to schema or semantic constraints.
+
+#### Response Headers
+
+- `Content-Type`: the content type of this response, which MUST be `application/json` or `application/x-ndjson` (see [streaming](#streaming)).
+- `Last-Modified`: an HTTP-date timestamp ([RFC9110, Section 5.6.7](https://www.rfc-editor.org/rfc/rfc9110#section-5.6.7)) of the resolution, allowing HTTP proxies and CDNs to support inexpensive update checks via `If-Modified-Since`
+- `Cache-Control: public, max-age={ttl}, public, stale-while-revalidate={max-ttl}, stale-if-error={max-ttl}`: meaningful cache TTL returned with the response.
+  - The `max-age` SHOULD be shorter for responses whose resolution ended in no results (e.g. 15 seconds),
+    and longer for responses that have results (e.g. 5 minutes).
+  - Implementations SHOULD include `max-ttl`, set to the maximum cache window of the underlying routing system.
+    For example, if Amino DHT results are returned, `stale-while-revalidate` SHOULD be set to `172800` (48h, which at the time of writing this specification, is the provider record expiration window).
+- `Vary: Accept`: allows intermediate caches to play nicely with the different possible content types.
 
 #### Response Body
 
@@ -100,13 +163,34 @@ Each object in the `Providers` list is a record conforming to a schema, usually 
 #### Path Parameters
 
 - `peer-id` is the [Peer ID](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md) to fetch peer records for,
-represented as a CIDv1 encoded with `libp2p-key` codec.
+represented as either a Multihash in Base58btc, or a CIDv1 with libp2p-key (`0x72`) codec (in Base36 or Base32).
+
+#### Request Query Parameters
+
+##### `filter-addrs` (peers request query parameter)
+
+Optional, same rules as [`filter-addrs` providers request query parameter](#filter-addrs-providers-request-query-parameter).
+
+##### `filter-protocols` (peers request query parameter)
+
+Optional, same rules as [`filter-protocols` providers request query parameter](#filter-protocols-providers-request-query-parameter).
 
 #### Response Status Codes
 
 - `200` (OK): the response body contains the peer record.
 - `404` (Not Found): must be returned if no matching records are found.
 - `422` (Unprocessable Entity): request does not conform to schema or semantic constraints.
+
+#### Response Headers
+
+- `Content-Type`: the content type of this response, which MUST be `application/json` or `application/x-ndjson` (see [streaming](#streaming)).
+- `Last-Modified`: an HTTP-date timestamp ([RFC9110, Section 5.6.7](https://www.rfc-editor.org/rfc/rfc9110#section-5.6.7)) of the resolution, allowing HTTP proxies and CDNs to support inexpensive update checks via `If-Modified-Since`
+- `Cache-Control: public, max-age={ttl}, public, stale-while-revalidate={max-ttl}, stale-if-error={max-ttl}`: meaningful cache TTL returned with the response.
+  - When present, `ttl` SHOULD be shorter for responses whose resolution ended in no results (e.g. 15 seconds),
+    and longer for responses that have results (e.g. 5 minutes).
+  - Implementations SHOULD include `max-ttl`, set to the maximum cache window of the underlying routing system.
+    For example, if Amino DHT results are returned, `stale-while-revalidate` SHOULD be set to `172800` (48h, which at the time of writing this specification, is the provider record expiration window).
+- `Vary: Accept`: allows intermediate caches to play nicely with the different possible content types.
 
 #### Response Body
 
@@ -148,7 +232,12 @@ Each object in the `Peers` list is a record conforming to the [Peer Schema](#pee
 #### Response Headers
 
 - `Etag`: a globally unique opaque string used for HTTP caching. MUST be derived from the protobuf record returned in the body.
-- `Cache-Control: max-age={TTL}`: cache TTL returned with :ref[IPNS Record] that has `IpnsEntry.data[TTL] > 0`. When present, SHOULD match the TTL value from the record. When record was not found (HTTP 404) or has no TTL (value is `0`), implementation SHOULD default to `max-age=60`.
+- `Cache-Control: public, max-age={ttl}, public, stale-while-revalidate={sig-ttl}, stale-if-error={sig-ttl}`: meaningful cache TTL returned with :ref[IPNS Record]
+  - The `max-age` value in seconds SHOULD match duration from `IpnsEntry.data[TTL]`, if present and bigger than `0`. Otherwise, implementation SHOULD default to `max-age=60`.
+  - Implementations SHOULD include `sig-ttl`, set to the remaining number of seconds the returned IPNS Record is valid.
+- `Expires:`: an HTTP-date timestamp ([RFC9110, Section 5.6.7](https://www.rfc-editor.org/rfc/rfc9110#section-5.6.7)) when the validity of IPNS Record expires (if `ValidityType=0`, when signature expires)
+- `Last-Modified`: an HTTP-date timestamp of when cacheable resolution occurred: allows HTTP proxies and CDNs to support inexpensive update checks via `If-Modified-Since`
+- `Vary: Accept`: allows intermediate caches to play nicely with the different possible content types.
 
 #### Response Body
 
@@ -169,6 +258,65 @@ The content body must be a [`application/vnd.ipfs.ipns-record`][application/vnd.
 - `200` (OK): the provided :ref[IPNS Record] was published.
 - `400` (Bad Request): the provided :ref[IPNS Record] or :ref[IPNS Name] are not valid.
 - `406` (Not Acceptable): submitted content type is not supported. Error message returned in body should inform the user to retry with `Content-Type: application/vnd.ipfs.ipns-record`.
+
+## DHT Routing API
+
+The DHT Routing API is OPTIONAL. Implementations that do not support DHT operations MAY return `404` (Not Found) or `501` (Not Implemented) as specified in [Error Codes](#error-codes).
+
+### `GET /routing/v1/dht/closest/peers/{key}`
+
+This optional endpoint allows light clients to lower the cost of DHT walks in browser contexts.
+
+#### Path Parameters
+
+- `key` is a [CID] or [Peer ID][peer-id-representation] to find the closest peers to.
+  - [CID] SHOULD be a CIDv1 in any encoding.
+  - [Peer ID][peer-id-representation] can be represented as a Multihash in Base58btc, or a CIDv1 with `libp2p-key` (`0x72`) codec in Base36 or Base32.
+  - Arbitrary multihash lookups can be performed by wrapping the multihash in a CIDv1 with `raw` (`0x55`) codec.
+  - Implementations SHOULD support both CID and Peer ID formats for maximum interoperability.
+
+#### Response Status Codes
+
+- `200` (OK): the response body contains peer records.
+- `404` (Not Found): must be returned if no matching records are found.
+- `422` (Unprocessable Entity): request does not conform to schema or semantic constraints.
+- `501` (Not Implemented): may be returned if DHT operations are not supported.
+
+#### Response Headers
+
+- `Content-Type`: the content type of this response, which MUST be `application/json` or `application/x-ndjson` (see [streaming](#streaming)).
+- `Last-Modified`: an HTTP-date timestamp ([RFC9110, Section 5.6.7](https://www.rfc-editor.org/rfc/rfc9110#section-5.6.7)) of the resolution, allowing HTTP proxies and CDNs to support inexpensive update checks via `If-Modified-Since`
+- `Cache-Control: public, max-age={ttl}, public, stale-while-revalidate={max-ttl}, stale-if-error={max-ttl}`: meaningful cache TTL returned with the response.
+  - When present, `ttl` SHOULD be shorter for responses whose resolution ended in no results (e.g. 15 seconds),
+    and longer for responses that have results (e.g. 5 minutes).
+  - Implementations SHOULD include `max-ttl`, set to the maximum cache window of the underlying routing system.
+    For example, if Amino DHT results are returned, `stale-while-revalidate` SHOULD be set to `172800` (48h, which at the time of writing this specification, is the provider record expiration window).
+- `Vary: Accept`: allows intermediate caches to play nicely with the different possible content types.
+
+#### Response Body
+
+```json
+{
+  "Peers": [
+    {
+      "Schema": "<schema>",
+      "Protocols": ["<protocol-a>", "<protocol-b>", ...],
+      "ID": "bafz...",
+      "Addrs": ["/ip4/..."],
+      ...
+    },
+    ...
+  ]
+}
+```
+
+The number of peer records in the response SHOULD be limited to the DHT bucket size (20 for Amino DHT).
+
+Peers SHOULD be returned sorted by closeness to the key. For Kademlia-based DHT implementations (such as Amino DHT), this means sorting by XOR distance with the closest peers first.
+
+The client SHOULD be able to make a request with `Accept: application/x-ndjson` and get a [stream](#streaming) with results. Note that due to the XOR sorting requirement, the streamed response may be blocked until the DHT lookup completes and peers can be sorted before transmission.
+
+Each object in the `Peers` list is a record conforming to the [Peer Schema](#peer-schema).
 
 ## Pagination
 
