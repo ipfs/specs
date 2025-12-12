@@ -256,7 +256,7 @@ These are the equivalents:
 - `format=ipns-record` → `Accept: application/vnd.ipfs.ipns-record`
 
 When both `Accept` HTTP header  and `format` query parameter are present,
-`Accept` SHOULD take precedence.
+`format` SHOULD take precedence.
 
 :::note
 
