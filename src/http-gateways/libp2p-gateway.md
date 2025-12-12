@@ -16,6 +16,7 @@ editors:
       name: Shipyard
       url: https://ipshipyard.com
 xref:
+  - http-routing-v1
   - path-gateway
   - trustless-gateway
 tags: ['httpGateways', 'lowLevelHttpGateways', 'exchange', 'transport']

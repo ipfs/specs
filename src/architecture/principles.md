@@ -18,6 +18,9 @@ editors:
         url: https://protocol.ai/
 tags: ['architecture']
 order: 0
+xref:
+  - trustless-gateway
+  - http-routing-v1
 ---
 
 The IPFS stack is a suite of specifications and tools that share two key characteristics:

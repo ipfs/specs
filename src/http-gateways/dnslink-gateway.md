@@ -17,6 +17,9 @@ editors:
     affiliation:
       name: Cloudflare
       url: https://cloudflare.com/
+xref:
+  - path-gateway
+  - web-redirects-file
 tags: ['httpGateways', 'webHttpGateways']
 order: 4
 ---
