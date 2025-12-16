@@ -69,7 +69,11 @@ Client application SHOULD check if file is present at specific filesystem paths,
 When `gateway` file is present, the file contents MUST be interpreted as an
 ASCII text file with one URL per line (separated by `\n` or `\r\n`).
 
-The first line MUST be a valid `http://` or `https://` URL.
+The first line MUST be a valid `http://` or `https://` URL without a path
+(e.g., `http://127.0.0.1:8080`). The gateway at this URL MUST support
+:cite[trustless-gateway], SHOULD support :cite[path-gateway] when deserialized
+responses are required, and SHOULD support :cite[subdomain-gateway] when Origin
+isolation is required.
 
 Implementations MAY support additional lines for gateway pools or failover.
 Implementations that do not support multiple URLs SHOULD read only the first
