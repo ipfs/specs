@@ -99,7 +99,7 @@ user how to run a local node.
 
 ### Compatibility and Testing
 
-Implementers should test against implementations mentioned in :cite[ipip-0280]
+Implementers SHOULD test against implementations mentioned in :cite[ipip-0280]
 as the baseline for making decisions around maximizing interoperability.
 
 ## Copyright
