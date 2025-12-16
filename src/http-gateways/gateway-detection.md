@@ -4,7 +4,7 @@ description: >
   Specification of the rules and standards for detecting and identifying
   user-preferred IPFS gateways within applications, enabling seamless
   integration and user control.
-date: 2023-10-03
+date: 2025-12-16
 maturity: reliable
 editors:
   - name: Mark Gaiser
@@ -13,8 +13,8 @@ editors:
     github: lidel
     url: https://lidel.org/
     affiliation:
-        name: Protocol Labs
-        url: https://protocol.ai/
+        name: Shipyard
+        url: https://ipshipyard.com
 tags: ['httpGateways', 'integratingHttpGateways']
 order: 99
 ---
@@ -41,7 +41,7 @@ Applications SHOULD evaluate these hints in order and stop on the first match:
 
 ### `IPFS_GATEWAY` Environment Variable
 
-When `IPFS_GATEWAY` environment variable is set, the value MUST be interpreted
+When `IPFS_GATEWAY` environment variable is set, the value SHOULD be interpreted
 as URL of IPFS Gateway application to use.
 
 This variable SHOULD override gateway selection done by all other means, including
