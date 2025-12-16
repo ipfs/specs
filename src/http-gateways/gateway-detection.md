@@ -67,12 +67,14 @@ Client application SHOULD check if file is present at specific filesystem paths,
      1. `$HOME/.config/ipfs/gateway` (user)
      2. `/etc/ipfs/gateway` (global)
 
-When `gateway` file is present, the file contents MUST be interpreted as line
-separated (`\n` or `\r\n`) ASCII text file.
+When `gateway` file is present, the file contents MUST be interpreted as an
+ASCII text file with one URL per line (separated by `\n` or `\r\n`).
 
-The first line of `gateway` file MUST be a valid `http://` or `https://` URL.
+The first line MUST be a valid `http://` or `https://` URL.
 
-Implementations that only need one URL SHOULD use the first one and ignore the rest of the file.
+Implementations MAY support additional lines for gateway pools or failover.
+Implementations that do not support multiple URLs SHOULD read only the first
+line and ignore the rest of the file.
 
 ### Security
 
