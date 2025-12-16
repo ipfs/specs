@@ -53,19 +53,18 @@ Client application SHOULD check if file is present at specific filesystem paths,
 
 1. If `IPFS_PATH` is set, try `$IPFS_PATH/gateway`
 2. If `HOME` is set, try `$HOME/.ipfs/gateway`
-3. If `$XDG_CONFIG_HOME` is set, try `$XDG_CONFIG_HOME/ipfs/gateway`
-4. If `/etc` exists, try `/etc/ipfs/gateway`
-5. Try OS-specific paths
-   - Windows
+3. Try OS-specific paths:
+   - Linux/Unix:
+     1. `$XDG_CONFIG_HOME/ipfs/gateway` (only if `XDG_CONFIG_HOME` is set)
+     2. `$HOME/.config/ipfs/gateway` (default XDG location)
+     3. `/etc/ipfs/gateway` (system-wide)
+   - Windows:
      1. `%LOCALAPPDATA%/ipfs/gateway` (local user)
      2. `%APPDATA%/ipfs/gateway` (roaming user)
-     3. `%PROGRAMDATA%/ipfs/gateway` (global)
-   - macOS
+     3. `%PROGRAMDATA%/ipfs/gateway` (system-wide)
+   - macOS:
      1. `$HOME/Library/Application Support/ipfs/gateway` (user)
-     2. `/Library/Application Support/ipfs/gateway` (global)
-   - Linux
-     1. `$HOME/.config/ipfs/gateway` (user)
-     2. `/etc/ipfs/gateway` (global)
+     2. `/Library/Application Support/ipfs/gateway` (system-wide)
 
 When `gateway` file is present, the file contents MUST be interpreted as an
 ASCII text file with one URL per line (separated by `\n` or `\r\n`).
