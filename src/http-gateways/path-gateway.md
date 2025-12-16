@@ -1,29 +1,50 @@
 ---
 title: Path Gateway Specification
 description: >
-  The most versatile form of IPFS Gateway is a Path Gateway. It exposes namespaces, such
-  as /ipfs/ and /ipns/ under an HTTP server root and provides basic primitives for integrating
-  IPFS resources within the existing HTTP stack.
-date: 2023-03-30
+  The comprehensive low-level HTTP Gateway enables the integration of IPFS
+  resources into the HTTP stack through /ipfs and /ipns namespaces, supporting
+  both deserialized and verifiable response types.
+date: 2025-10-13
 maturity: reliable
 editors:
   - name: Marcin Rataj
     github: lidel
     url: https://lidel.org/
-  - name: Adrian Lanzafame
-    github: lanzafame
-  - name: Vasco Santos
-    github: vasco-santos
-  - name: Oli Evans
-    github: olizilla
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
+former_editors:
   - name: Henrique Dias
     github: hacdias
     url: https://hacdias.com/
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
+thanks:
+  - name: Adrian Lanzafame
+    github: lanzafame
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
+  - name: Vasco Santos
+    github: vasco-santos
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
+  - name: Oli Evans
+    github: olizilla
+    affiliation:
+      name: Protocol Labs
+      url: https://protocol.ai/
 xref:
   - url
   - trustless-gateway
+  - subdomain-gateway
+  - dnslink-gateway
   - ipip-0402
   - ipip-0412
+  - ipip-0288
+  - ipns-record
 tags: ['httpGateways', 'lowLevelHttpGateways']
 order: 0
 ---
@@ -130,18 +151,28 @@ block is in the local cache.
 
 ### `Accept` (request header)
 
-Can be used for requesting specific response format
+Can be used for requesting specific response format, and/or passing optional
+content type parameters.
 
 For example:
 
 - [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw) – disables [IPLD codec deserialization](https://ipld.io/docs/codecs/), requests a verifiable raw [block](https://docs.ipfs.io/concepts/glossary/#block) to be returned
-- [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car) – disables [IPLD codec deserialization](https://ipld.io/docs/codecs/), requests a verifiable [CAR](https://docs.ipfs.io/concepts/glossary/#car) stream to be returned
-- [application/x-tar](https://en.wikipedia.org/wiki/Tar_(computing)) – returns UnixFS tree (files and directories) as a [TAR](https://en.wikipedia.org/wiki/Tar_(computing)) stream. Returned tree starts at a root item which name is the same as the requested CID. Produces 400 Bad Request for content that is not UnixFS.
+- [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car) – disables [IPLD codec deserialization](https://ipld.io/docs/codecs/), requests a verifiable [CAR](https://docs.ipfs.io/concepts/glossary/#car) stream to be returned with implicit or explicit [`dag-scope`](https://specs.ipfs.tech/http-gateways/trustless-gateway/#dag-scope-request-query-parameter) for blocks at the terminus of the specified path and the blocks required to traverse path segments from root CID to the terminus.
+- [application/x-tar](https://en.wikipedia.org/wiki/Tar_(computing)) – returns UnixFS tree (files and directories) as a [TAR](https://en.wikipedia.org/wiki/Tar_(computing)) stream. Returned tree starts at a DAG which name is the same as the terminus segment. Produces 400 Bad Request for content that is not UnixFS.
 - [application/vnd.ipld.dag-json](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-json) – requests [IPLD Data Model](https://ipld.io/docs/data-model/) representation serialized into [DAG-JSON format](https://ipld.io/docs/codecs/known/dag-json/). If the requested CID already has `dag-json` (0x0129) codec, data is validated as DAG-JSON before being returned as-is. Invalid DAG-JSON produces HTTP Error 500.
-- [application/vnd.ipld.dag-cbor](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-cbor) – requests [IPLD Data Model](https://ipld.io/docs/data-model/) representation serialized into [DAG-CBOR format](https://ipld.io/docs/codecs/known/dag-cbor/). If the requested CID already has `dag-cbor` (0x71) codec,  data is validated as DAG-CBOR before being returned as-is. Invalid DAG-CBON produces HTTP Error 500.
+- [application/vnd.ipld.dag-cbor](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-cbor) – requests [IPLD Data Model](https://ipld.io/docs/data-model/) representation serialized into [DAG-CBOR format](https://ipld.io/docs/codecs/known/dag-cbor/). If the requested CID already has `dag-cbor` (0x71) codec,  data is validated as DAG-CBOR before being returned as-is. Invalid DAG-CBOR produces HTTP Error 500.
 - [application/json](https://www.iana.org/assignments/media-types/application/json) – same as `application/vnd.ipld.dag-json`, unless the CID's codec already is `json` (0x0200). Then, the raw JSON block can be returned as-is without any conversion.
 - [application/cbor](https://www.iana.org/assignments/media-types/application/cbor) – same as `application/vnd.ipld.dag-cbor`, unless the CID's codec already is `cbor` (0x51). Then, the raw CBOR block can be returned as-is without any conversion.
 - [application/vnd.ipfs.ipns-record](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record) – requests a verifiable :cite[ipns-record] to be returned. Produces 400 Bad Request if the content is not under the IPNS namespace, or contains a path.
+
+:::note
+
+A Client SHOULD include the [`format` query parameter](#format-request-query-parameter)
+in the request URL, in addition to the `Accept` header. This provides the best
+interoperability and ensures consistent HTTP cache behavior across various
+gateway implementations.
+
+:::
 
 ### `Range` (request header)
 
@@ -224,13 +255,42 @@ These are the equivalents:
 - `format=cbor` → `Accept: application/cbor`
 - `format=ipns-record` → `Accept: application/vnd.ipfs.ipns-record`
 
+When both `Accept` HTTP header  and `format` query parameter are present,
+`Accept` SHOULD take precedence.
+
+:::note
+
+A Client SHOULD include the `format` query parameter in the request URL, in
+addition to the `Accept` header. This provides the best interoperability and
+ensures consistent HTTP cache behavior across various gateway implementations.
+
+:::
+
+A Gateway SHOULD include the
+[`Content-Location`](#content-location-response-header) header in the response when:
+- the request contains an `Accept` header specifying a well-known response
+  format, but the URL does not include the `format` query parameter
+- the `format` parameter is present, but does not match the format from `Accept`
+
 ### `dag-scope` (request query parameter)
 
-Only used on CAR requests, same as :ref[dag-scope] from :cite[trustless-gateway].
+Optional, can be used to limit the scope of verifiable DAG requests such as CAR, same as :ref[dag-scope] from :cite[trustless-gateway].
 
 ### `entity-bytes` (request query parameter)
 
-Only used on CAR requests, same as :ref[entity-bytes] from :cite[trustless-gateway].
+Optional, can be used to limit the scope of verifiable DAG requests such as CAR, same as :ref[entity-bytes] from :cite[trustless-gateway].
+
+### `car-version` (request query parameter)
+
+Optional, specific to CAR requests, same as :ref[car-version] from :cite[trustless-gateway].
+
+### `car-order` (request query parameter)
+
+Optional, specific to CAR requests, same as :ref[car-order] from :cite[trustless-gateway].
+
+### `car-dups` (request query parameter)
+
+Optional, specific to CAR requests, same as :ref[car-dups] from :cite[trustless-gateway].
 
 # HTTP Response
 
@@ -241,6 +301,8 @@ Only used on CAR requests, same as :ref[entity-bytes] from :cite[trustless-gatew
 The request succeeded.
 
 If the HTTP method was `GET`, then data is transmitted in the message body.
+
+If the HTTP method was `HEAD`, then no body should be sent.
 
 ### `206` Partial Content
 
@@ -256,22 +318,39 @@ The new, canonical URL is returned in the [`Location`](#location-response-header
 
 ### `400` Bad Request
 
-A generic client error returned when it is not possible to return a better one
+A generic client error returned when it is not possible to return a better
+one. For example, this can be used when the CID is malformed or its codec is
+unsupported.
 
 ### `404` Not Found
 
-Error to indicate that request was formally correct, but traversal of the
-requested content path was not possible due to a invalid or missing DAG node.
+Error to indicate that request was formally correct but either:
+
+* traversal of the requested content path was not possible due to a invalid or
+missing DAG node, or
+* the requested content is not retrievable from this gateway.
+
+Gateways MUST use 404 to signal that content is not available, particularly
+when the gateway is [non recursive](#recursive-vs-non-recursive-gateways), and only provides access to a known
+dataset, so that it can assess that the requested content is not part of it.
+
+NOTE: Gateways MUST return 404 for missing root blocks. However, for streaming
+responses (such as CAR), once HTTP 200 OK status is sent, gateways cannot
+change it. If a child block is missing during streaming, the gateway SHOULD
+terminate the stream. Clients MUST verify response completeness.
 
 ### `410` Gone
 
 Error to indicate that request was formally correct, but this specific Gateway
-refuses to return requested data.
+refuses to return requested data even though it would have normally provided
+it.
 
-Particularly useful for implementing [deny lists](#denylists), in order to not serve malicious content.
+`410` is particularly useful to implement [deny lists](#denylists), in order to not serve blocked content.
 The name of deny list and unique identifier of blocked entries can be provided in the response body.
 
 See: [Denylists](#denylists)
+
+See also: [`451 Unavailable for Legal Reasons`](#451-unavailable-for-legal-reasons).
 
 ### `412` Precondition Failed
 
@@ -305,23 +384,45 @@ See: [Denylists](#denylists)
 
 ### `500` Internal Server Error
 
-A generic server error returned when it is not possible to return a better one.
+A generic server error returned when it is not possible to return a better
+one. An internal server error signals the general unavailability of the
+gateway.
 
 ### `502` Bad Gateway
 
-Returned immediately when Gateway was not able to produce response for a known reason.
-For example, when gateway failed to find any providers for requested data.
+Error that indicates that a Gateway was not able to produce response for a
+known reason: for example, in the case of
+[recursive gateways](#recursive-vs-non-recursive-gateways), in the event of
+failure to find any providers for requested data. `502` indicates that the
+request can be retried and is not a permanent failure.
 
-This error response SHOULD include [`Retry-After`](#retry-after-response-header) HTTP header to indicate how long the client should wait before retrying.
+This error response SHOULD include
+[`Retry-After`](#retry-after-response-header) HTTP header to indicate how long
+the client should wait before retrying.
+
+Gateways SHOULD return `404` instead of `502` when the content is known to be
+unretrievable: for example, when the Gateway is
+[non-recursive](#recursive-vs-non-recursive-gateways) and the content is known
+to not be available.
 
 ### `504` Gateway Timeout
 
-Returned when Gateway was not able to produce response under set time limits.
-For example, when gateway failed to retrieve data from a remote provider.
+Error that indicates that the Gateway was not able to produce response under
+set time limits: for example, when gateway failed to retrieve data from a
+remote provider. `504` indicates that the request can be retried and is not a
+permanent failure.
 
-There is no generic timeout, Gateway implementations SHOULD set timeouts based on specific use cases.
+There is no generic timeout, Gateway implementations SHOULD set timeouts based
+on specific use cases.
 
-This error response SHOULD include [`Retry-After`](#retry-after-response-header) HTTP header to indicate how long the client should wait before retrying.
+This error response SHOULD include
+[`Retry-After`](#retry-after-response-header) HTTP header to indicate how long
+the client should wait before retrying.
+
+Gateways SHOULD return `404` instead of `504` when the content is known to be
+unretrievable: for example, when the Gateway is
+[non-recursive](#recursive-vs-non-recursive-gateways) and the content is known
+to not be available.
 
 ## Response Headers
 
@@ -468,12 +569,35 @@ To illustrate, `?filename=testтест.pdf` should produce:
   not attempt to render raw bytes. CID and `.bin` file extension should be used
   if  a custom `filename` was not provided with the request.
 
+### `Content-Location` (response header)
+
+Returned when a non-default content format has been negotiated with the
+[`Accept` header](#accept-request-header) but `format` was missing from the URL.
+
+The value of this field SHOULD include
+the URL of the resource with the `format` query parameter included, so that
+generic HTTP caches can store deserialized, CAR, and block responses separately.
+
+:::note
+
+For example, a request to `/ipfs/{cid}` with `Accept: application/vnd.ipld.raw`
+SHOULD return a `Content-Location: /ipfs/{cid}?format=raw` header in order for
+block response to be cached separately from deserialized one.
+
+:::
+
 ### `Content-Length` (response header)
 
 Represents the length of returned HTTP payload.
 
+:::warning
+
+<!-- TODO https://github.com/ipfs/specs/issues/461 -->
+
 NOTE: the value may differ from the real size of requested data if compression or chunked `Transfer-Encoding` are used.
-<!-- TODO (https://github.com/ipfs/in-web-browsers/issues/194) IPFS clients looking for UnixFS file size should use value from `X-Ipfs-DataSize` instead. -->
+See [ipfs/specs#461](https://github.com/ipfs/specs/issues/461).
+
+:::
 
 ### `Content-Range` (response header)
 
@@ -495,16 +619,24 @@ deterministic.
 Returned only when response status code is [`301` Moved Permanently](#301-moved-permanently).
 The value informs the HTTP client about new URL for requested resource.
 
-This header is more widely used in [SUBDOMAIN_GATEWAY.md](./SUBDOMAIN_GATEWAY.md#location-response-header).
-
 #### Use in directory URL normalization
 
 Gateway MUST return a redirect when a valid UnixFS directory was requested
 without the trailing `/`, for example:
 
-- response for `https://ipfs.io/ipns/en.wikipedia-on-ipfs.org/wiki`
- (no trailing slash) will be HTTP 301 redirect with
+- response for UnixFS directory at `https://example.com/ipns/en.wikipedia-on-ipfs.org/wiki`
+ (no trailing slash) MUST be HTTP 301 redirect with
   `Location: /ipns/en.wikipedia-on-ipfs.org/wiki/`
+
+This normalization is required for directory-based relative links
+and security scopes such as Service Worker registrations to work correctly.
+It also ensures the same behavior on path gateways (`https://example.com/ipfs/cid/` with trailing `/`)
+and origin-isolated HTTP contexts `https://cid.ipfs.dweb.link`
+or non-HTTP URLs like `ipfs://cid`, where empty path component is implicit `/`.
+
+#### Use in interop with Subdomain Gateway
+
+See [`Location` section](https://specs.ipfs.tech/http-gateways/subdomain-gateway/#location-response-header) of :cite[subdomain-gateway].
 
 ### `X-Ipfs-Path` (response header)
 
@@ -513,6 +645,10 @@ Used for HTTP caching and indicating the IPFS address of the data.
 Indicates the original, requested content path before any path resolution and traversal is performed.
 
 Example: `X-Ipfs-Path: /ipns/k2..ul6/subdir/file.txt`
+
+This header SHOULD be returned with deserialized responses.
+Implementations MAY omit it with trustless response types
+(`application/vnd.ipld.raw` and `application/vnd.ipld.car`).
 
 ### `X-Ipfs-Roots` (response header)
 
@@ -543,14 +679,14 @@ NOTE: while the first CID will change every time any article is changed,
 the last root (responsible for specific article or a subdirectory) may not
 change at all, allowing for smarter caching beyond what standard Etag offers.
 
-<!-- TODO: https://github.com/ipfs/in-web-browsers/issues/194
-- `X-Ipfs-DagSize`
-    - Indicates the total size of the DAG (raw data + IPLD metadata) representing the requested resource.
-        - For UnixFS this is equivalent  to  `CumulativeSize` from   `ipfs files stat`
-- `X-Ipfs-DataSize`
-    - Indicates the original byte size of the raw data (not impacted by HTTP transfer encoding or compression), without IPFS/IPLD metadata.
-        - For UnixFS this is equivalent to `Size` from `ipfs files stat` or `ipfs dag stat`
--->
+This header SHOULD be returned with deserialized responses.
+Implementations MAY omit it with trustless response types
+(`application/vnd.ipld.raw` and `application/vnd.ipld.car`).
+
+NOTE: Gateways that stream responses (e.g., CAR) without pre-resolving the
+entire path MAY only include the root CID for simple `/ipfs/{cid}` requests, or
+MAY omit this header for path requests where intermediate CIDs are not known
+when headers are sent.
 
 ### `X-Content-Type-Options` (response header)
 
@@ -565,9 +701,13 @@ Optional, present in certain response types:
 
 ### `Retry-After` (response header)
 
-Gateway returns this header with error responses such as [`429 Too Many Requests`](#429-too-many-requests) or [`504 Gateway Timeout`](#504-gateway-timeout).
+Gateway SHOULD return this header with error responses such as [`429 Too Many Requests`](#429-too-many-requests), [`504 Gateway Timeout`](#504-gateway-timeout) or `503` (server maintainance).
 
-The "Retry-After" header indicates how long the user agent ought to wait before making a follow-up request.
+The "Retry-After" header indicates how long the user agent ought to wait before making a follow-up request. It uses the following syntax:
+
+```
+Retry-After: <delay-seconds>
+```
 
 See Section 10.2.3 of :cite[rfc9110].
 
@@ -720,7 +860,7 @@ Gateway MUST respond with HTTP error when requested CID is on any of active deny
 Gateway implementation MAY apply some denylists by default as long the gateway
 operator is able to inspect and modify the list of denylists that are applied.
 
-**Examples of public deny lists**
+Examples of public deny lists:
 
 - [The Bad Bits Denylist](https://badbits.dwebops.pub/) – a list of hashed CIDs
   that have been flagged for various reasons (copyright violation, malware,
@@ -758,6 +898,21 @@ The usual optimizations involve:
     limiting the cost of a single page load.
   - The downside of this approach is that it will always be slower than
     skipping child block resolution.
+
+## Recursive vs non-recursive gateways
+
+A *recursive Gateway* is a gateway which generally attempts to fetch content
+from a third party it does not control by triggering lookups and retrievals. A
+recursive Gateway may not know in advance whether it can obtain and return a
+piece of content as the availability of it is out of its control. It may also
+suggest that clients retry failed requests later via `502` and `504` responses
+status codes.
+
+A *non-recursive Gateway* is gateway which accesses a known content-set and,
+under normal operation conditions, knows with certainty whether content
+requested can be obtained or not. Non-recursive gateways SHOULD prevent
+unnecessary retries from clients when the content is known to be unavailable
+by returning `404`.
 
 [dag-pb-format]: https://ipld.io/specs/codecs/dag-pb/spec/#logical-format
 [dag-json]: https://ipld.io/specs/codecs/dag-json/spec/

@@ -1,7 +1,9 @@
 # ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) IPFS Architecture Overview
 
+> [!NOTE]
+> This document contains historical notes about IPFS architecture from ~2015. For current specifications, please refer to https://specs.ipfs.tech/
 
-**Authors(s)**:
+**Author(s)**:
 - [Juan Benet](https://github.com/jbenet)
 - [David Dias](https://github.com/daviddias)
 

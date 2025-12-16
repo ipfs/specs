@@ -1,30 +1,37 @@
 ---
 title: Web _redirects File Specification
 description: >
-  The Redirects File specification is an extension of the Subdomain Gateway and DNSLink Gateway specifications that
-  enables URL redirects or rewrites by adding redirect rules to a0 file stored underneath the root CID of a web
-  site.
-date: 2023-01-28
+  Defines how URL redirects and rewrites can be implemented by adding rules to
+  a plain text file stored underneath the root CID of a website.
+date: 2025-03-19
 maturity: reliable
 editors:
   - name: Justin Johnson
     github: justincjohnson
+    affiliation:
+      name: Fission
+      url: https://fission.codes/
   - name: Marcin Rataj
     github: lidel
-    url: https://lidel.org/
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
+xref:
+  - subdomain-gateway
+  - dnslink-gateway
 tags: ['httpGateways', 'webHttpGateways']
 order: 5
 ---
 
 The Web Redirects File specification is an extension of the Subdomain Gateway and DNSLink Gateway specifications.
 
-Developers can enable URL redirects or rewrites by adding redirect rules to a file named `_redirects` stored underneath the root CID of their web site.
+Developers can enable URL redirects or rewrites by adding redirect rules to a file named `_redirects` stored underneath the root CID of their website.
 
 This can be used, for example, to enable URL rewriting for hosting a single-page application, to redirect invalid URLs to a pretty 404 page, or to avoid  [link rot](https://en.wikipedia.org/wiki/Link_rot) when moving to IPFS-based website hosting.
 
 # File Name and Location
 
-The Redirects File MUST be named `_redirects` and stored underneath the root CID of the web site.
+The Redirects File MUST be named `_redirects` and stored underneath the root CID of the website.
 
 # File Format
 
@@ -70,7 +77,11 @@ For example:
 
 This rule will redirect a URL like `/posts/06/15/2022/hello-world` to `/articles/2022/06/15/hello-world`.
 
-### Splat
+Implementation MUST error when the same placeholder name is used more than once in `from`.
+
+Implementation MUST allow the same placeholder name to be used more than once in `to`.
+
+### Catch-All Splat
 
 If a `from` path ends with an asterisk (i.e. `*`), the remainder of the `from` path is slurped up into the special `:splat` placeholder, which can then be injected into the `to` path.
 
@@ -86,7 +97,7 @@ Splat logic MUST only apply to a single trailing asterisk, as this is a greedy m
 
 ### Comments
 
-Any line beginning with `#` will be treated as a comment and ignored at evaluation time.
+Any line beginning with `#` MUST be treated as a comment and ignored at evaluation time.
 
 For example:
 
@@ -103,7 +114,14 @@ is functionally equivalent to
 
 ### Line Termination
 
-Lines MUST be terminated by either `\n` or `\r\n`.
+Lines MUST be separated from each other by either `\n` or `\r\n`.
+
+Termination of the last line in the file is optional.
+
+### Whitespace Characters
+
+Blank lines, leading and trailing whitespace characters like `\x20` (space) or
+`\t` (tab) MUST be ignored, aside from the line termination mentioned above.
 
 ### Max File Size
 
@@ -111,21 +129,36 @@ The file size MUST NOT exceed 64 KiB.
 
 # Evaluation
 
-## Subdomain or DNSLink Gateways
+## Same-Origin Requirement
 
-Rules MUST only be evaluated when hosted on a Subdomain or DNSLink Gateway, so that we have [Same-Origin](https://en.wikipedia.org/wiki/Same-origin_policy) isolation.
+Rules MUST only be evaluated in contexts where
+[Same-Origin](https://en.wikipedia.org/wiki/Same-origin_policy) isolation per
+root CID is possible.
+
+This requirement is fulfilled on a Subdomain or DNSLink HTTP Gateway,
+and also applies to a web browser with native `ipfs://` and `ipns://` scheme handler.
 
 ## Order
 
 Rules MUST be evaluated in order, redirecting or rewriting using the first matching rule.
 
+The non-existent paths that are being requested should be intercepted and redirected to the destination path and the specified HTTP status code returned. The rules are evaluated in the order they appear in the file.
+
+Any request for an existing file should be returned as is, and not intercepted by the last catch all rule.
+
 ## No Forced Redirects
 
 All redirect logic MUST only be evaluated if the requested path is not present in the DAG.  This means that any performance impact associated with checking for the existence of a `_redirects` file or evaluating redirect rules will only be incurred for non-existent paths.
 
-# Error Handling
+## Error Handling
 
 If the `_redirects` file exists but there is an error reading or parsing it, the errors MUST be returned to the user with a 500 HTTP status code.
+
+## Query Parameters
+
+Implementations SHOULD retain any dynamic query parameters supplied by the user and pass them along in the `Location` header of the HTTP redirect response.
+
+When merging these user-provided parameters with any static ones defined in the [`To`](#to) field, the user’s dynamic values take precedence, overriding static ones in case of a conflict.
 
 # Security
 
@@ -184,6 +217,17 @@ $ ipfs cat /ipfs/QmYBhLYDwVFvxos9h8CGU2ibaY66QNgv8hpfewxaQrPiZj/_redirects
 /* /index.html 200
 ```
 
-The non-existent paths that are being requested should be intercepted and redirected to the destination path and the specified HTTP status code returned. The rules are evaluated in the order they appear in the file.
+A dedicated test vector with URL query parameter behavior can be found in `bafybeiee3ltldvmfgsxiqazbatrkbvkl34eanbourajwnavhupb64nnbxa`.
+Implementations SHOULD use it for internal testing when [query parameter support](#query-parameters) is desired.
 
-Any request for an existing file should be returned as is, and not intercepted by the last catch all rule.
+```
+$ ipfs cat bafybeiee3ltldvmfgsxiqazbatrkbvkl34eanbourajwnavhupb64nnbxa/_redirects
+# redirect to URL with some static query parameters
+/source1/* /target-file?static-query1=static-val1&static-query2=static-val2 301
+
+# redirect to URL where path segments are converted to query parameters
+/source2/:code/:name /target-file?code=:code&name=:name 301
+
+# catch-all redirect (test should make request with query parameters, and confirm response preserved them in returned Location header)
+/source3/* https://example.net/target3/:splat 301
+```
