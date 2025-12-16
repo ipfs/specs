@@ -28,7 +28,7 @@ client applications.
 
 ## Specification
 
-There are two ways of hinting user-prefered gateway URL:
+There are two ways of hinting user-preferred gateway URL:
 
 - Setting the `IPFS_GATEWAY` environment variable
 - Creating a `gateway` file at a well-known path
@@ -68,7 +68,7 @@ Client application SHOULD check if file is present at specific filesystem paths,
      2. `/etc/ipfs/gateway` (global)
 
 When `gateway` file is present, the file contents MUST be interpreted as line
-separated (`\n` or `\r\n`) `text/plain` file.
+separated (`\n` or `\r\n`) ASCII text file.
 
 The first line of `gateway` file MUST be a valid `http://` or `https://` URL.
 
