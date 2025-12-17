@@ -3,7 +3,7 @@ title: UnixFS
 description: >
   UnixFS is a Protocol Buffers-based format for describing files and directories
   as dag-pb DAGs and raw blocks in IPFS.
-date: 2025-08-23
+date: 2025-09-09
 maturity: draft
 editors:
   - name: Marcin Rataj
@@ -976,6 +976,28 @@ Common empty structures that implementations frequently encounter:
 
 These CIDs appear frequently in UnixFS implementations and are often hardcoded for performance optimization.
 
+### Identity CID Size Limit
+
+:::warning
+Identity CIDs (using multihash code `0x00`) are experimental and subject to strict size limitations.
+:::
+
+Identity CIDs embed data directly in the CID rather than referencing external blocks. While useful for very small data that benefits from inline storage, in UnixFS contexts they are limited to prevent misuse:
+
+- **Maximum digest size**: 128 bytes
+- **Purpose**: Small inline data only, not general-purpose data containers
+
+Implementations:
+- **MUST** never produce identity CIDs with digest sizes exceeding 128 bytes
+- **MUST** reject identity CIDs with digest sizes exceeding 128 bytes when reading
+- **SHOULD** automatically convert identity CIDs to regular blocks if data modifications would push the digest size over the 128-byte limit
+
+This limit ensures identity CIDs remain an optimization for tiny data rather than a way to embed arbitrary amounts of data directly in CIDs.
+
+**Examples:**
+- Valid (128 bytes): `bafkqbaabijbeeqscijbeeqscijbeeqscijbeeqscijbeeqscijbeeqscijbeeqscijbeeqscijbeeqscijbeeqscijbeeqscijbeeqscijbeeqscijbeeqscijbeeqscijbeeqscijbeeqscijbeeqscijbeeqscijbeeqscijbeeqscijbeeqscijbeeqscijbeeqscijbeeqscijbee` - Implementations MUST accept and convert to 128 'B' characters
+- Invalid (129 bytes): `bafkqbaibifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqi` - Implementations MUST reject
+
 ### Symbolic Links
 
 - Fixture: [`symlink.car`](https://github.com/ipfs/gateway-conformance/raw/refs/tags/v0.8.1/fixtures/path_gateway_unixfs/symlink.car)
@@ -1047,6 +1069,7 @@ These validate that implementations properly reject malformed or non-UnixFS dag-
 - 💢 [`bafybeiahfgovhod2uvww72vwdgatl5r6qkoeegg7at2bghiokupfphqcku.dag-pb`](https://github.com/ipld/codec-fixtures/raw/381e762b85862b2bbdb6ef2ba140b3c505e31a44/fixtures/dagpb_simple_forms_2/bafybeiahfgovhod2uvww72vwdgatl5r6qkoeegg7at2bghiokupfphqcku.dag-pb) - Simple form variant 2, bytes: `120b0a0901550005000102030412100a09015500050001020304120362617212100a090155000500010203041203666f6f` (no UnixFS metadata)
 - 💢 [`bafybeidrg2f6slbv4yzydqtgmsi2vzojajnt7iufcreynfpxndca4z5twm.dag-pb`](https://github.com/ipld/codec-fixtures/raw/381e762b85862b2bbdb6ef2ba140b3c505e31a44/fixtures/dagpb_simple_forms_3/bafybeidrg2f6slbv4yzydqtgmsi2vzojajnt7iufcreynfpxndca4z5twm.dag-pb) - Simple form variant 3, bytes: `120b0a09015500050001020304120e0a09015500050001020304120161120e0a09015500050001020304120161` (no UnixFS metadata)
 - 💢 [`bafybeieube7zxmzoc5bgttub2aqofi6xdzimv5munkjseeqccn36a6v6j4.dag-pb`](https://github.com/ipld/codec-fixtures/raw/381e762b85862b2bbdb6ef2ba140b3c505e31a44/fixtures/dagpb_simple_forms_4/bafybeieube7zxmzoc5bgttub2aqofi6xdzimv5munkjseeqccn36a6v6j4.dag-pb) - Simple form variant 4, bytes: `120e0a09015500050001020304120161120e0a09015500050001020304120161` (no UnixFS metadata)
+- 💢 `bafkqbaibifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqi` - Identity CID with 129-byte digest (exceeds [128-byte limit](#identity-cid-size-limit) for identity CIDs). Content: 129 'A' characters. Implementations MUST reject this CID as the digest exceeds the maximum allowed size for identity multihashes.
 
 ## Additional Testing Resources
 

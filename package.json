@@ -9,7 +9,7 @@
   "author": "",
   "license": "",
   "private": true,
-  "devDependencies": {
-    "spec-generator": "^1.6.0"
+  "dependencies": {
+    "spec-generator": "^1.6.1"
   }
 }

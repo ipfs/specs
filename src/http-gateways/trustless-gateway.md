@@ -4,7 +4,7 @@ description: >
   The minimal subset of HTTP Gateway response types facilitates data retrieval
   via CID and ensures integrity verification, all while eliminating the need to
   trust the gateway itself.
-date: 2025-03-06
+date: 2025-10-13
 maturity: reliable
 editors:
   - name: Marcin Rataj
@@ -12,17 +12,22 @@ editors:
     affiliation:
       name: Shipyard
       url: https://ipshipyard.com
-  - name: Henrique Dias
-    github: hacdias
   - name: Héctor Sanjuán
     github: hsanjuan
     affiliation:
       name: Shipyard
       url: https://ipshipyard.com
+former_editors:
+  - name: Henrique Dias
+    github: hacdias
+thanks:
+  - name: Rod Vagg
+    github: rvagg
 xref:
   - url
   - path-gateway
   - ipip-0412
+  - ipns-record
 tags: ['httpGateways', 'lowLevelHttpGateways', 'exchange']
 order: 1
 ---
@@ -38,7 +43,7 @@ The minimal implementation means:
 - for raw blocks:
   - data is requested by CID, only supported path is `/ipfs/{cid}`
   - no path traversal or recursive resolution
-- for CAR files:
+- for CARs:
   - the pathing behavior is identical to :cite[path-gateway]
 
 # HTTP API
@@ -107,6 +112,13 @@ gateway implementations.
 
 :::
 
+### `Cache-Control: only-if-cached` (request header)
+
+Trustless gateways, particularly non-recursive ones serving from a local block
+store, are well-suited for :cite[path-gateway]'s `Cache-Control: only-if-cached`
+request header. When received, gateway SHOULD return HTTP 412 if the root block
+is not immediately available.
+
 ## Request Query Parameters
 
 ### :dfn[`format`] (request query parameter)
@@ -122,6 +134,11 @@ A Client SHOULD include the `format` query parameter in the request URL, in
 addition to the `Accept` header. This provides the best interoperability and
 ensures consistent HTTP cache behavior across various gateway implementations.
 
+When both the `Accept` header and `format` parameter are present, a specific
+`Accept` value (e.g., `application/vnd.ipld.raw`) SHOULD take precedence over
+`format`. Wildcards (e.g., `*/*`, `application/*`) are not specific and do not
+take precedence (as specified in :cite[path-gateway]).
+
 :::
 
 ### :dfn[`dag-scope`] (request query parameter)
@@ -129,8 +146,7 @@ ensures consistent HTTP cache behavior across various gateway implementations.
 Optional, `dag-scope=(block|entity|all)` with default value `all`, only available for CAR requests.
 
 Describes the shape of the DAG fetched the terminus of the specified path whose blocks
-are included in the returned CAR file after the blocks required to traverse
-path segments.
+are included in the returned CAR stream after the blocks required to traverse path segments.
 
 - `block` - Only the root block at the end of the path is returned after blocks
   required to verify the specified path segments.
@@ -189,7 +205,8 @@ The following additional values are supported:
 A Gateway MUST augment the returned `Etag` based on the passed `entity-bytes`.
 
 A Gateway SHOULD return an HTTP 400 Bad Request error when the requested range
-cannot be parsed as valid offset positions.
+is entirely outside of the entity's byte range and the Gateway is able to determine this
+upfront.
 
 In more nuanced error scenarios, a Gateway MUST return a valid CAR response
 that includes enough blocks for the client to understand why the requested
@@ -197,8 +214,8 @@ that includes enough blocks for the client to understand why the requested
 returned:
 
 - If the requested `entity-bytes` resolves to a range that partially falls
-  outside the entity's byte range, the response MUST include the subset of
-  blocks within the entity's bytes.
+  outside the entity's byte range (before or after),
+  the response MUST include the subset of blocks within the entity's bytes.
   - This allows clients to request valid ranges of the entity without needing
     to know its total size beforehand, and it does not require the Gateway to
     buffer the entire entity before returning the response.
@@ -247,6 +264,34 @@ Below MUST be implemented **in addition** to "HTTP Response" of
 :cite[path-gateway], with special attention to the "Response Status Codes" and
 the "Recursive vs non-recursive gateways" sections.
 
+## Response Status Codes
+
+Trustless Gateways MUST follow the response status codes defined in :cite[path-gateway], including:
+
+### `404 Not Found`
+
+A Trustless Gateway MUST return `404 Not Found` when the **root block** (the CID in the request path) is not available in the gateway's storage.
+
+This applies to:
+- HEAD requests for any CID
+- GET requests for raw blocks (`application/vnd.ipld.raw`)
+- GET requests for CAR streams (`application/vnd.ipld.car`) when the root block is missing
+
+For non-recursive Trustless Gateways (such as those serving from a local block store), this definitively signals that the requested content is not part of the gateway's dataset.
+
+### Streaming and Missing Child Blocks
+
+For CAR responses, once a gateway begins streaming (after successfully loading the root block), it has committed to HTTP `200 OK`. If a child block is encountered as missing during DAG traversal:
+
+- The gateway SHOULD terminate the stream (potentially with an incomplete CAR)
+- Clients MUST verify CAR completeness and handle incomplete streams as retrieval failures
+
+This follows the streaming principle stated in the [`entity-bytes`](#entity-bytes-request-query-parameter) section above.
+
+### `500 Internal Server Error`
+
+A Trustless Gateway SHOULD return `500 Internal Server Error` only for genuine server errors, not for content unavailability. Examples include storage backend failures, resource exhaustion, or unexpected internal errors.
+
 ## Response Headers
 
 ### `Content-Type` (response header)
@@ -263,11 +308,32 @@ If a CAR stream was requested:
 
 MUST be returned and set to `attachment` to ensure requested bytes are not rendered by a web browser.
 
+When no custom `filename` is provided:
+- CAR responses should use `filename="<cid>.car"`
+- Raw block responses should use `filename="<cid>.bin"`
+
 ### `Content-Location` (response header)
 
 Same as in :cite[path-gateway], SHOULD be returned when Trustless Gateway
 supports more than a single response format and the `format` query parameter is
 missing or does not match well-known format from `Accept` header.
+
+### `Etag` (response header)
+
+MUST be returned and follow the recommendations in :cite[path-gateway].
+
+:::note
+
+**Implementation Variance**: Etag generation for CAR responses is
+implementation-specific. Different gateways may generate different Etags for
+identical requests due to variations in what parameters are included (e.g.,
+`order`, `dups`) and how they are encoded in the Etag calculation.
+
+As a result, `If-None-Match` conditional requests may not work across different
+gateway implementations. Clients SHOULD NOT assume Etags are portable between
+gateways.
+
+:::
 
 # Block Responses (application/vnd.ipld.raw)
 
@@ -465,7 +531,7 @@ that the endpoint corresponds to a trustless gateway.
 For block requests (signaled by `?format=raw` and `Accept: application/vnd.ipld.raw`), when supported, it MUST return `200 OK`
 and an empty body.
 
-For CAR requests (signaled by `?format=car` and `Accept: application/vnd.ipld.car`), when supported, it MUST return `200 OK` and a valid CAR file with CAR Header `roots` set to `bafkqaaa`. Identity block MAY be skipped in the CAR Data section.
+For CAR requests (signaled by `?format=car` and `Accept: application/vnd.ipld.car`), when supported, it MUST return `200 OK` and a valid CAR with CAR Header `roots` set to `bafkqaaa`. Identity block MAY be skipped in the CAR Data section.
 
 This specific identity CID is special for probing. Other random
 identity CIDs MAY not be handled.

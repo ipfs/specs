@@ -16,6 +16,9 @@ editors:
     affiliation:
       name: Shipyard
       url: https://ipshipyard.com
+xref:
+  - subdomain-gateway
+  - dnslink-gateway
 tags: ['httpGateways', 'webHttpGateways']
 order: 5
 ---
