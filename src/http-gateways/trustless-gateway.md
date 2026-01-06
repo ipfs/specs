@@ -128,16 +128,14 @@ Same as [`format`](https://specs.ipfs.tech/http-gateways/path-gateway/#format-re
 - `format=car` → `application/vnd.ipld.car`
 - `format=ipns-record` → `application/vnd.ipfs.ipns-record`
 
+When both `Accept` HTTP header and `format` query parameter are present,
+`format` SHOULD take precedence.
+
 :::note
 
 A Client SHOULD include the `format` query parameter in the request URL, in
 addition to the `Accept` header. This provides the best interoperability and
 ensures consistent HTTP cache behavior across various gateway implementations.
-
-When both the `Accept` header and `format` parameter are present, a specific
-`Accept` value (e.g., `application/vnd.ipld.raw`) SHOULD take precedence over
-`format`. Wildcards (e.g., `*/*`, `application/*`) are not specific and do not
-take precedence (as specified in :cite[path-gateway]).
 
 :::
 
@@ -240,7 +238,7 @@ Optional, only used on CAR requests.
 
 Serves same purpose as [CAR `version` content type parameter](#car-version-content-type-parameter).
 
-In case both are present in the request, the value from the [`Accept`](#accept-request-header) HTTP Header has priority and a matching [`Content-Location`](#content-location-response-header) SHOULD be returned with the response.
+In case both are present in the request, the URL query parameter SHOULD take precedence and a matching [`Content-Location`](#content-location-response-header) SHOULD be returned with the response.
 
 ### :dfn[`car-order`] (request query parameter)
 
@@ -248,7 +246,7 @@ Optional, only used on CAR requests.
 
 Serves same purpose as [CAR `order` content type parameter](#car-order-content-type-parameter).
 
-In case both are present in the request, the value from the [`Accept`](#accept-request-header) HTTP Header has priority and a matching [`Content-Location`](#content-location-response-header) SHOULD be returned with the response.
+In case both are present in the request, the URL query parameter SHOULD take precedence and a matching [`Content-Location`](#content-location-response-header) SHOULD be returned with the response.
 
 ### :dfn[`car-dups`] (request query parameter)
 
@@ -256,7 +254,7 @@ Optional, only used on CAR requests.
 
 Serves same purpose as [CAR `dups` content type parameter](#car-dups-content-type-parameter).
 
-In case both are present in the request, the value from the [`Accept`](#accept-request-header) HTTP Header has priority and a matching [`Content-Location`](#content-location-response-header) SHOULD be returned with the response.
+In case both are present in the request, the URL query parameter SHOULD take precedence and a matching [`Content-Location`](#content-location-response-header) SHOULD be returned with the response.
 
 # HTTP Response
 
