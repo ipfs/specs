@@ -556,11 +556,15 @@ When deploying gateways as P2P retrieval endpoints, implementers should be aware
 
 Clients SHOULD NOT download unbounded amounts of data before being able to validate that data.
 
-Clients SHOULD limit the maximum block size to 2MiB. This value aligns with the maximum block size used in UnixFS chunking and provides a reasonable balance between transfer efficiency and resource constraints.
+Clients SHOULD limit the maximum block size to 2MiB.
 
 :::note
 
-Blocks larger than 2MiB can cause memory pressure on resource-constrained clients and increase the window for incomplete transfers. Since blocks must be validated as a unit, smaller blocks allow for more granular verification and easier retries on failure.
+This value aligns with the maximum block size used in Bitswap, and throughout much of the ecosystem. Blocks larger than 2MiB are not ecosystem-safe: tooling built to handle larger blocks will encounter compatibility issues with storage providers, pinning services, and other infrastructure that enforce this limit.
+
+Beyond compatibility, larger blocks increase memory pressure on resource-constrained clients and widen the window for incomplete transfers. Since blocks must be validated as a unit, smaller blocks allow for more granular verification and easier retries on failure.
+
+See [Supporting Large Blocks](https://discuss.ipfs.tech/t/supporting-large-ipld-blocks/15093/) for ongoing discussion.
 
 :::
 
@@ -578,7 +582,7 @@ HTTP/2 provides request multiplexing, which is critical for performance in P2P e
 
 To work around this limitation, clients must open multiple parallel TCP connections to achieve concurrent requests. However, each additional connection incurs significant overhead: TCP handshake latency, memory buffers, bandwidth competition, and increased implementation complexity. Browsers limit concurrent connections per origin (typically 6-8) to manage these costs, but this limitation affects all HTTP/1.1 clients, not just browsers, as the overhead of maintaining many connections becomes prohibitive.
 
-When fetching a DAG that requires many block requests, HTTP/1.1's lack of multiplexing creates a critical bottleneck. Clients face a difficult trade-off: either serialize requests (severely limiting throughput) or maintain many parallel connections (incurring substantial overhead). Users may experience acceptable performance with small test cases, but real-world IPFS content with deep DAG structures will encounter significant slowdowns. HTTP/2's stream multiplexing (:cite[rfc9113]) eliminates this bottleneck by allowing many concurrent requests over a single connection without head-of-line blocking at the application layer.
+When fetching content that requires many concurrent requests (block fetches, CAR queries, optimistic HEAD/GET probes), HTTP/1.1's lack of multiplexing creates a critical bottleneck. Clients face a difficult trade-off: either serialize requests (severely limiting throughput) or maintain many parallel connections (incurring substantial overhead). Users may experience acceptable performance with small test cases, but real-world IPFS content with deep DAG structures will encounter significant slowdowns. HTTP/2's stream multiplexing (:cite[rfc9113]) eliminates this bottleneck by allowing many concurrent requests over a single connection without head-of-line blocking at the application layer.
 
 **TLS**
 
@@ -596,7 +600,7 @@ In LAN environments, getting a TLS certificate setup with which to use HTTPS may
 
 Trustless Gateways operating in P2P contexts SHOULD NOT recursively search for content.
 
-In P2P networks, gateways typically serve as block stores for specific peers or content, rather than attempting to locate content across the entire network. Recursive content discovery is handled by the P2P layer (e.g., Amino DHT, IPFS routing), not by individual HTTP gateways.
+In P2P networks, gateways typically serve as block stores for specific peers or content, rather than attempting to locate content across the entire network. Content discovery is handled separately by the P2P layer (e.g., Amino DHT, delegated routing), not by individual HTTP gateways.
 
 Gateways that do not have content locally SHOULD return `404 Not Found` rather than attempting to fetch from other gateways or peers. This allows clients to efficiently query multiple gateways in parallel and discover which ones have the content cached.
 
