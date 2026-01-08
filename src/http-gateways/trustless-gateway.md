@@ -205,7 +205,8 @@ The following additional values are supported:
 A Gateway MUST augment the returned `Etag` based on the passed `entity-bytes`.
 
 A Gateway SHOULD return an HTTP 400 Bad Request error when the requested range
-cannot be parsed as valid offset positions.
+is entirely outside of the entity's byte range and the Gateway is able to determine this
+upfront.
 
 In more nuanced error scenarios, a Gateway MUST return a valid CAR response
 that includes enough blocks for the client to understand why the requested
@@ -213,8 +214,8 @@ that includes enough blocks for the client to understand why the requested
 returned:
 
 - If the requested `entity-bytes` resolves to a range that partially falls
-  outside the entity's byte range, the response MUST include the subset of
-  blocks within the entity's bytes.
+  outside the entity's byte range (before or after),
+  the response MUST include the subset of blocks within the entity's bytes.
   - This allows clients to request valid ranges of the entity without needing
     to know its total size beforehand, and it does not require the Gateway to
     buffer the entire entity before returning the response.
