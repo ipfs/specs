@@ -548,7 +548,7 @@ The response is the same as [`GET`](#get-ipfs-bafkqaaa) but without body and all
 Trustless Gateways serve two primary deployment models:
 
 1. **Verifiable bridges**: Gateways that provide trustless access from HTTP clients into IPFS networks, where the gateway operator is distinct from content providers
-2. **P2P retrieval endpoints**: Gateways embedded within P2P networks where they serve as HTTP interfaces to peer-operated block stores
+2. **P2P retrieval endpoints** (or **HTTP providers**): Peers within P2P networks that expose block stores via this HTTP API, acting as network participants rather than bridges
 
 When deploying gateways as P2P retrieval endpoints, implementers should be aware of additional constraints below:
 
