@@ -4,7 +4,7 @@ description: >
   The minimal subset of HTTP Gateway response types facilitates data retrieval
   via CID and ensures integrity verification, all while eliminating the need to
   trust the gateway itself.
-date: 2025-10-13
+date: 2026-01-09
 maturity: reliable
 editors:
   - name: Marcin Rataj
@@ -14,6 +14,11 @@ editors:
       url: https://ipshipyard.com
   - name: Héctor Sanjuán
     github: hsanjuan
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
+  - name: Adin Schmahmann
+    github: aschmahmann
     affiliation:
       name: Shipyard
       url: https://ipshipyard.com
@@ -542,3 +547,95 @@ identity CIDs MAY not be handled.
 MUST support [`HEAD` requests](#head-ipfs-cid-path-params).
 
 The response is the same as [`GET`](#get-ipfs-bafkqaaa) but without body and all headers are optional.
+
+## Usage Within Peer-to-Peer (P2P) Networks {#p2p-usage}
+
+Trustless Gateways serve two primary deployment models:
+
+1. **Verifiable bridges**: Gateways that provide trustless access from HTTP clients into IPFS networks, where the gateway operator is distinct from content providers
+2. **P2P retrieval endpoints** (or **HTTP providers**): Peers within P2P networks that expose block stores via this HTTP API, acting as network participants rather than bridges
+
+When deploying gateways as P2P retrieval endpoints, implementers should be aware of additional constraints below:
+
+### Block Limits {#p2p-block-limits}
+
+Clients SHOULD NOT download unbounded amounts of data before being able to validate that data.
+
+Clients SHOULD limit the maximum block size to 2MiB.
+
+:::note
+
+This value aligns with the maximum block size used in Bitswap, and throughout much of the ecosystem. Blocks larger than 2MiB are not ecosystem-safe: tooling built to handle larger blocks will encounter compatibility issues with storage providers, pinning services, and other infrastructure that enforce this limit.
+
+Beyond compatibility, larger blocks increase memory pressure on resource-constrained clients and widen the window for incomplete transfers. Since blocks must be validated as a unit, smaller blocks allow for more granular verification and easier retries on failure.
+
+See [Supporting Large Blocks](https://discuss.ipfs.tech/t/supporting-large-ipld-blocks/15093/) for ongoing discussion.
+
+:::
+
+### HTTPS and HTTP/2 {#p2p-transport}
+
+Gateways serving data to non-LAN peers SHOULD support HTTPS and HTTP/2 (:cite[rfc9113]) or greater.
+
+Clients SHOULD restrict communications with non-LAN peers to HTTPS and HTTP/2 (:cite[rfc9113]) or greater.
+
+:::note
+
+**HTTP/2**
+
+HTTP/2 provides request multiplexing, which is critical for performance in P2P environments. HTTP/1.1 fundamentally lacks multiplexing: only one request-response pair can be active on a connection at a time. This creates head-of-line blocking, where a slow or large response blocks all subsequent responses on that connection, even if they are ready to send. HTTP/1.1's optional pipelining feature does not solve this because responses must still be returned in order.
+
+To work around this limitation, clients must open multiple parallel TCP connections to achieve concurrent requests. However, each additional connection incurs significant overhead: TCP handshake latency, memory buffers, bandwidth competition, and increased implementation complexity. Browsers limit concurrent connections per origin (typically 6-8) to manage these costs, but this limitation affects all HTTP/1.1 clients, not just browsers, as the overhead of maintaining many connections becomes prohibitive.
+
+When fetching content that requires many concurrent requests (block fetches, CAR queries, optimistic HEAD/GET probes), HTTP/1.1's lack of multiplexing creates a critical bottleneck. Clients face a difficult trade-off: either serialize requests (severely limiting throughput) or maintain many parallel connections (incurring substantial overhead). Users may experience acceptable performance with small test cases, but real-world IPFS content with deep DAG structures will encounter significant slowdowns. HTTP/2's stream multiplexing (:cite[rfc9113]) eliminates this bottleneck by allowing many concurrent requests over a single connection without head-of-line blocking at the application layer.
+
+**TLS**
+
+HTTPS provides transport security, preventing block data from being observed or tampered with in transit when communicating with peers over the public internet. While IPFS multihashes inherently allow clients to detect tampering (the digest verification provides cryptographic integrity), TLS prevents observation of transferred data and is also a prerequisite for HTTP/2 in web browsers, which do not support unencrypted HTTP/2 connections.
+
+**LAN Environments**
+
+For the purposes of this section, "LAN" refers to local area networks where peers communicate over trusted, high-bandwidth connections (e.g., within the same private network). "Non-LAN" refers to peers communicating over the public internet.
+
+In LAN environments, getting a TLS certificate setup with which to use HTTPS may be difficult, h2c (HTTP/2 over cleartext TCP, without TLS) may not be easily accessible across platforms/languages, and performance criteria are more controllable, which makes supporting HTTP/1.1 more manageable.
+
+:::
+
+### Recursion {#p2p-recursion}
+
+Trustless Gateways operating in P2P contexts SHOULD NOT recursively search for content.
+
+Gateways that do not have content locally SHOULD return `404 Not Found` rather than attempting to fetch from other gateways or peers.
+
+:::note
+
+In P2P networks, gateways serve as block stores for specific peers or content, rather than attempting to locate content across the entire network. Content discovery is handled by the P2P layer (e.g., Amino DHT, delegated routing), not by individual HTTP gateways. Clients are responsible for content routing and choosing which gateways to query.
+
+Returning `404 Not Found` for missing content allows clients to efficiently query multiple gateways in parallel and discover which ones have the content cached. See also the [`Cache-Control: only-if-cached`](#cache-control-only-if-cached-request-header) header for client-side control of this behavior.
+
+:::
+
+### Security Considerations {#p2p-security}
+
+#### HTTP Servers
+
+When serving content to peers over the public internet, HTTP servers:
+
+- **Transport Security**: MUST support HTTPS with valid TLS certificates to prevent block interception and tampering in transit
+- **Rate Limiting**: SHOULD implement request rate limiting and concurrent connection limits to prevent resource exhaustion. When limits are exceeded, SHOULD return HTTP `429 Too Many Requests` with a `Retry-After` header indicating when the client may retry
+- **Timeout Limits**: SHOULD enforce connection and request timeout limits to prevent resource exhaustion from slow or stalled connections
+- **Input Validation**: SHOULD validate CID format and encoding before processing requests to prevent malformed input attacks
+- **Path Validation**: For CAR requests with paths, SHOULD validate path components to prevent path traversal attacks
+- **Block Size Limits**: SHOULD enforce maximum block size limits (see [Block Limits](#p2p-block-limits)) to prevent memory exhaustion
+
+#### HTTP Clients
+
+When making requests to HTTP providers over the public internet, HTTP clients:
+
+- **Block Validation**: MUST validate all received blocks by verifying that the digest in the CID's Multihash matches the digest of the block payload before processing or storing
+- **Block Size Limits**: SHOULD limit the maximum accepted block size (see [Block Limits](#p2p-block-limits)) to prevent memory exhaustion from malicious servers
+- **Connection Management**:
+  - SHOULD implement connection pooling with appropriate limits to avoid overwhelming local resources
+  - SHOULD respect the server's HTTP/2 `SETTINGS_MAX_CONCURRENT_STREAMS` value (Section 6.5.2 of :cite[rfc9113]) to avoid overwhelming the server
+  - SHOULD use HTTP/2 connection coalescing when multiple servers share the same origin to reduce connection overhead
+- **Timeout Limits**: SHOULD set appropriate connection and request timeout limits to prevent hanging on unresponsive servers. A safe default is to timeout after 30 seconds of not receiving any new bytes
