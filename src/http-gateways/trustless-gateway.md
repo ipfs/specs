@@ -4,7 +4,7 @@ description: >
   The minimal subset of HTTP Gateway response types facilitates data retrieval
   via CID and ensures integrity verification, all while eliminating the need to
   trust the gateway itself.
-date: 2025-10-13
+date: 2026-01-09
 maturity: reliable
 editors:
   - name: Marcin Rataj
@@ -14,6 +14,11 @@ editors:
       url: https://ipshipyard.com
   - name: Héctor Sanjuán
     github: hsanjuan
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
+  - name: Adin Schmahmann
+    github: aschmahmann
     affiliation:
       name: Shipyard
       url: https://ipshipyard.com
