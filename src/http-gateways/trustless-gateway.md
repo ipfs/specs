@@ -592,7 +592,7 @@ HTTPS provides transport security, preventing block data from being observed or 
 
 For the purposes of this section, "LAN" refers to local area networks where peers communicate over trusted, high-bandwidth connections (e.g., within the same private network). "Non-LAN" refers to peers communicating over the public internet.
 
-In LAN environments, getting a TLS certificate setup with which to use HTTPS may be difficult, h2c may not be easily accessible across platforms/languages, and performance criteria are more controllable, which makes supporting HTTP/1.1 more manageable.
+In LAN environments, getting a TLS certificate setup with which to use HTTPS may be difficult, h2c (HTTP/2 over cleartext TCP, without TLS) may not be easily accessible across platforms/languages, and performance criteria are more controllable, which makes supporting HTTP/1.1 more manageable.
 
 :::
 
@@ -612,25 +612,25 @@ Returning `404 Not Found` for missing content allows clients to efficiently quer
 
 ### Security Considerations {#p2p-security}
 
-#### Gateway Operators
+#### HTTP Servers
 
-When serving content to peers over the public internet, gateway operators SHOULD implement the following security measures:
+When serving content to peers over the public internet, HTTP servers:
 
-- **Transport Security**: Use HTTPS with valid TLS certificates to prevent block interception and tampering in transit
-- **Rate Limiting**: Implement request rate limiting and concurrent connection limits to prevent resource exhaustion. When limits are exceeded, return HTTP `429 Too Many Requests` with a `Retry-After` header indicating when the client may retry
-- **Timeout Limits**: Enforce connection and request timeout limits to prevent resource exhaustion from slow or stalled connections
-- **Input Validation**: Validate CID format and encoding before processing requests to prevent malformed input attacks
-- **Path Validation**: For CAR requests with paths, validate path components to prevent path traversal attacks
-- **Block Size Limits**: Enforce maximum block size limits (see [Block Limits](#p2p-block-limits)) to prevent memory exhaustion
+- **Transport Security**: MUST support HTTPS with valid TLS certificates to prevent block interception and tampering in transit
+- **Rate Limiting**: SHOULD implement request rate limiting and concurrent connection limits to prevent resource exhaustion. When limits are exceeded, SHOULD return HTTP `429 Too Many Requests` with a `Retry-After` header indicating when the client may retry
+- **Timeout Limits**: SHOULD enforce connection and request timeout limits to prevent resource exhaustion from slow or stalled connections
+- **Input Validation**: SHOULD validate CID format and encoding before processing requests to prevent malformed input attacks
+- **Path Validation**: For CAR requests with paths, SHOULD validate path components to prevent path traversal attacks
+- **Block Size Limits**: SHOULD enforce maximum block size limits (see [Block Limits](#p2p-block-limits)) to prevent memory exhaustion
 
-#### Clients
+#### HTTP Clients
 
-Clients making requests to gateway peers SHOULD implement the following security measures:
+When making requests to HTTP providers over the public internet, HTTP clients:
 
-- **Block Validation**: Validate all received blocks by verifying that the digest in the CID's Multihash matches the digest of the block payload before processing or storing
-- **Block Size Limits**: Limit the maximum accepted block size (see [Block Limits](#p2p-block-limits)) to prevent memory exhaustion from malicious gateways
+- **Block Validation**: MUST validate all received blocks by verifying that the digest in the CID's Multihash matches the digest of the block payload before processing or storing
+- **Block Size Limits**: SHOULD limit the maximum accepted block size (see [Block Limits](#p2p-block-limits)) to prevent memory exhaustion from malicious servers
 - **Connection Management**:
-  - Implement connection pooling with appropriate limits to avoid overwhelming local resources
-  - Respect the gateway's HTTP/2 `SETTINGS_MAX_CONCURRENT_STREAMS` value (Section 6.5.2 of :cite[rfc9113]) to avoid overwhelming the gateway
-  - Use HTTP/2 connection coalescing when multiple gateways share the same origin to reduce connection overhead
-- **Timeout Limits**: Set appropriate connection and request timeout limits to prevent hanging on unresponsive gateways. A safe default is to timeout after 30 seconds of not receiving any new bytes
+  - SHOULD implement connection pooling with appropriate limits to avoid overwhelming local resources
+  - SHOULD respect the server's HTTP/2 `SETTINGS_MAX_CONCURRENT_STREAMS` value (Section 6.5.2 of :cite[rfc9113]) to avoid overwhelming the server
+  - SHOULD use HTTP/2 connection coalescing when multiple servers share the same origin to reduce connection overhead
+- **Timeout Limits**: SHOULD set appropriate connection and request timeout limits to prevent hanging on unresponsive servers. A safe default is to timeout after 30 seconds of not receiving any new bytes
