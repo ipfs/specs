@@ -600,13 +600,13 @@ In LAN environments, getting a TLS certificate setup with which to use HTTPS may
 
 Trustless Gateways operating in P2P contexts SHOULD NOT recursively search for content.
 
-In P2P networks, gateways typically serve as block stores for specific peers or content, rather than attempting to locate content across the entire network. Content discovery is handled separately by the P2P layer (e.g., Amino DHT, delegated routing), not by individual HTTP gateways.
-
-Gateways that do not have content locally SHOULD return `404 Not Found` rather than attempting to fetch from other gateways or peers. This allows clients to efficiently query multiple gateways in parallel and discover which ones have the content cached.
+Gateways that do not have content locally SHOULD return `404 Not Found` rather than attempting to fetch from other gateways or peers.
 
 :::note
 
-This behavior aligns with the non-recursive gateway model where gateways serve only cached or pre-fetched content. Clients are responsible for content routing and choosing which gateways to query. See also the [`Cache-Control: only-if-cached`](#cache-control-only-if-cached-request-header) header for client-side control of this behavior.
+In P2P networks, gateways serve as block stores for specific peers or content, rather than attempting to locate content across the entire network. Content discovery is handled by the P2P layer (e.g., Amino DHT, delegated routing), not by individual HTTP gateways. Clients are responsible for content routing and choosing which gateways to query.
+
+Returning `404 Not Found` for missing content allows clients to efficiently query multiple gateways in parallel and discover which ones have the content cached. See also the [`Cache-Control: only-if-cached`](#cache-control-only-if-cached-request-header) header for client-side control of this behavior.
 
 :::
 
