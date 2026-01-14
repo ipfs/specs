@@ -501,7 +501,9 @@ node exceeds a size threshold between 256 KiB and 1 MiB. This threshold:
 
 See [Block Size Considerations](#block-size-considerations) for details on block size limits and conventions.
 
-For standardized threshold estimation methods that enable deterministic CID generation, see [IPIP-499: UnixFS CID Profiles](../ipips/ipip-0499.md).
+:::note
+For standardized threshold estimation methods that enable deterministic CID generation, see [IPIP-499: UnixFS CID Profiles](https://specs.ipfs.tech/ipips/ipip-0499/).
+:::
 
 ### `dag-pb` `Symlink`
 
