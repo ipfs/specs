@@ -80,6 +80,8 @@ Same as in :cite[path-gateway], but with limited number of supported response ty
 
 ## Request Headers
 
+For HTTP Caching, follow `Cache-Control`, `If-Modified-Since`, and `If-None-Match` from :cite[path-gateway].
+
 ### `Accept` (request header)
 
 A Client SHOULD send this HTTP header to leverage content type negotiation
@@ -293,6 +295,8 @@ This follows the streaming principle stated in the [`entity-bytes`](#entity-byte
 A Trustless Gateway SHOULD return `500 Internal Server Error` only for genuine server errors, not for content unavailability. Examples include storage backend failures, resource exhaustion, or unexpected internal errors.
 
 ## Response Headers
+
+For HTTP Caching, follow `Cache-Control`, `Last-Modified`, and `Etag` from :cite[path-gateway].
 
 ### `Content-Type` (response header)
 
