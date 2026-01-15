@@ -473,14 +473,19 @@ Returned directive depends on requested content path and format:
 
 - `Cache-Control: public, max-age=29030400, immutable` MUST be returned for
   every immutable resource under `/ipfs/` namespace.
+  - Generated `/ipfs/` responses such as UnixFS directory listings are not
+    byte-for-byte immutable and SHOULD have a meaningful expiration that allows
+    for generated responses to be updated over time. Suggested value is at least one week:
+    `public, max-age=604800, stale-while-revalidate=2678400`.
 
-- `Cache-Control: public, max-age=<ttl>` SHOULD be returned for mutable
+- `Cache-Control: public, max-age=<ttl>, stale-while-revalidate=2678400` SHOULD be returned for mutable
   resources under `/ipns/{id-with-ttl}/` namespace; `max-age=<ttl>` SHOULD
   indicate remaining TTL of the mutable pointer such as :cite[ipns-record] or DNSLink
   TXT record.
   - Implementations MAY place an upper bound on any TTL received, as
     noted in Section 8 of :cite[rfc2181].
-  - If TTL value is unknown, implementations SHOULD not send a `Cache-Control`
+  - If TTL value is unknown, implementations MAY send a best-effort `Cache-Control`
+    informing caches and CDNs how long a stale response is acceptable.
   - No matter if TTL value is known or not, implementations SHOULD always
     send a [`Last-Modified`](#last-modified-response-header) header with the timestamp of the record resolution.
 
