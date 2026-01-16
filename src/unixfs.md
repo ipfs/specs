@@ -501,6 +501,10 @@ node exceeds a size threshold between 256 KiB and 1 MiB. This threshold:
 
 See [Block Size Considerations](#block-size-considerations) for details on block size limits and conventions.
 
+:::note
+For standardized threshold estimation methods that enable deterministic CID generation, see [IPIP-499: UnixFS CID Profiles](https://specs.ipfs.tech/ipips/ipip-0499/).
+:::
+
 ### `dag-pb` `Symlink`
 
 A :dfn[Symlink] represents a POSIX [symbolic link](https://pubs.opengroup.org/onlinepubs/9699919799/functions/symlink.html).
