@@ -346,6 +346,23 @@ responses (such as CAR), once HTTP 200 OK status is sent, gateways cannot
 change it. If a child block is missing during streaming, the gateway SHOULD
 terminate the stream. Clients MUST verify response completeness.
 
+### `406` Not Acceptable
+
+Returned when the requested response format does not match the CID's codec
+and the gateway does not perform cross-codec conversion.
+
+For example, requesting `?format=dag-json` on a `dag-cbor` block, or
+`?format=dag-cbor` on a `dag-pb` block, SHOULD return a 406 response.
+
+Similarly, requesting `?format=tar` for content that is not UnixFS SHOULD
+return 406.
+
+Implementations MAY include an actionable hint in the response body (e.g.,
+suggesting the client fetch the raw block with `?format=raw` and convert
+client-side).
+
+See :cite[ipip-0524] for details.
+
 ### `410` Gone
 
 Error to indicate that request was formally correct, but this specific Gateway
@@ -760,10 +777,10 @@ By default, implicit deserialized response type is based on `Accept` header and 
   - Bytes representing a CBOR file, see [application/cbor](https://www.iana.org/assignments/media-types/application/cbor)
   - Works exactly the same as `raw`, but returned `Content-Type` is `application/cbor`
 - DAG-JSON (0x0129)
-  - If the `Accept` header includes `text/html`, implementation should return a generated HTML with options to download DAG-JSON as-is, or converted to DAG-CBOR.
+  - If the `Accept` header includes `text/html`, implementation should return a generated HTML with an option to download DAG-JSON as-is.
   - Otherwise, response works exactly the same as `raw` block, but returned `Content-Type` is [application/vnd.ipld.dag-json](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-json)
 - DAG-CBOR (0x71)
-  - If the `Accept` header includes `text/html`: implementation should return a generated HTML with options to download DAG-CBOR as-is, or converted to DAG-JSON.
+  - If the `Accept` header includes `text/html`: implementation should return a generated HTML with an option to download DAG-CBOR as-is.
   - Otherwise, response works exactly the same as `raw` block, but returned `Content-Type` is [application/vnd.ipld.dag-cbor](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-cbor)
 
 The following response types require an explicit opt-in, can only be requested with [`format`](#format-request-query-parameter) query parameter or [`Accept`](#accept-request-header) header:
