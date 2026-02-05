@@ -4,7 +4,7 @@ description: >
   The comprehensive low-level HTTP Gateway enables the integration of IPFS
   resources into the HTTP stack through /ipfs and /ipns namespaces, supporting
   both deserialized and verifiable response types.
-date: 2025-10-13
+date: 2026-02-05
 maturity: reliable
 editors:
   - name: Marcin Rataj
@@ -36,6 +36,12 @@ thanks:
     affiliation:
       name: Protocol Labs
       url: https://protocol.ai/
+  - name: Alex Potsides
+    github: achingbrain
+    url: https://achingbrain.net
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
 xref:
   - url
   - trustless-gateway
@@ -161,7 +167,7 @@ For example:
 - [application/x-tar](https://en.wikipedia.org/wiki/Tar_(computing)) – returns a UnixFS tree (files and directories) as a [TAR](https://en.wikipedia.org/wiki/Tar_(computing)) stream. Returned tree starts at a DAG which name is the same as the terminus segment. Produces 406 Not Acceptable for content that is not UnixFS.
 - [application/vnd.ipld.dag-json](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-json) – Returns the block when CID codec is `dag-json`. Implementations MAY validate block data before returning. SHOULD produce 406 Not Acceptable when the CID codec does not match.
 - [application/vnd.ipld.dag-cbor](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-cbor) – Returns the block when CID codec is `dag-cbor`. Implementations MAY validate block data before returning. SHOULD produce 406 Not Acceptable when the CID codec does not match.
-- [application/json](https://www.iana.org/assignments/media-types/application/json) – Returns the block when CID codec is `json`. Implementations MAY validate block data before returning. SHOULD produce 406 Not Acceptable when the CID codec does not match.
+- [application/json](https://www.iana.org/assignments/media-types/application/json) – For blocks with CID codec `json`, returns block data as `application/json`. Implementations MAY validate block data before returning. For deserialized UnixFS files that represent text files with valid JSON, implementations SHOULD allow serving the file content as `application/json` regardless of the CID codec being `dag-pb` or `raw`. SHOULD produce 406 Not Acceptable in all other cases.
 - [application/cbor](https://www.iana.org/assignments/media-types/application/cbor) – Returns the block when CID codec is `cbor`. Implementations MAY validate block data before returning. SHOULD produce 406 Not Acceptable when the CID codec does not match.
 - [application/vnd.ipfs.ipns-record](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record) – requests a verifiable :cite[ipns-record] to be returned. Produces 400 Bad Request if the content is not under the IPNS namespace, or contains a path.
 - [text/html](https://html.spec.whatwg.org/) – returns a human-readable representation of the requested data which may include a link to download the raw data.
