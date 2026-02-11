@@ -37,7 +37,7 @@ thanks:
       name: Protocol Labs
       url: https://protocol.ai/
 xref:
-  - url
+  - rfc3986
   - trustless-gateway
   - subdomain-gateway
   - dnslink-gateway
@@ -518,7 +518,7 @@ When deserialized responses are enabled,
 and no explicit response format is provided with the request, and the
 requested data itself has no built-in content type metadata, implementations
 SHOULD perform content type sniffing based on file name
-(from :ref[url] path, or optional [`filename`](#filename-request-query-parameter) parameter)
+(from URI path, or optional [`filename`](#filename-request-query-parameter) parameter)
 and magic bytes to improve the utility of produced responses.
 
 For example:
