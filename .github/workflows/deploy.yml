@@ -8,6 +8,7 @@ name: Deploy
 
 # Explicitly declare permissions
 permissions:
+  actions: read
   contents: read
   pull-requests: write
   statuses: write
@@ -26,6 +27,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       cid: ${{ steps.deploy.outputs.cid }}
+    environment:
+      name: 'ipfs-publish'
     steps:
       - name: Download build artifact
         uses: actions/download-artifact@v4
@@ -48,18 +51,23 @@ jobs:
           #TODO pinata-jwt-token: ${{ secrets.PINATA_JWT_TOKEN }}
           github-token: ${{ github.token }}
 
-      # TODO: right now, DNSLink is controlled by Fleek, and we use ipfs/ipfs-deploy-action for PR previews
-      #- name: Update DNSLink
-      #  if: github.event.workflow_run.head_branch == 'main'
-      #  uses: ipfs/dnslink-action@v0.1
-      #  with:
-      #    cid: ${{ steps.deploy.outputs.cid }}
-      #    dnslink_domain: 'specs.ipfs.tech'
-      #    cf_record_id: ${{ secrets.CF_RECORD_ID }}
-      #    cf_zone_id: ${{ secrets.CF_ZONE_ID }}
-      #    cf_auth_token: ${{ secrets.CF_AUTH_TOKEN }}
-      #    github_token: ${{ github.token }}
-      #    set_github_status: true
+  dnslink-update:
+    runs-on: ubuntu-latest
+    needs: deploy-ipfs
+    if: github.event.workflow_run.head_branch == 'main'
+    environment:
+      name: 'cf-dnslink'
+      url: "https://specs-ipfs-tech.ipns.inbrowser.link/"
+    steps:
+      - name: Update DNSLink
+        uses: ipshipyard/dnslink-action@v1
+        with:
+          cid: ${{ needs.deploy-ipfs.outputs.cid }}
+          dnslink_domain: 'specs-ipfs-tech.dnslinks.ipshipyard.tech'
+          cf_zone_id: ${{ secrets.CF_DNS_ZONE_ID }}
+          cf_auth_token: ${{ secrets.CF_DNS_AUTH_TOKEN }}
+          github_token: ${{ github.token }}
+          set_github_status: true
 
   deploy-gh-pages:
     if: |

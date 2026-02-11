@@ -69,7 +69,9 @@ Implementations MUST ensure DNSLink resolution is safe and correct:
   recursion limit (e.g. 32) and HTTP 400 Bad Request error MUST be returned
   when the limit is reached.
 
-**Example: resolving an advanced DNSLink chain**
+:::note
+
+Example: resolving an advanced DNSLink chain
 
 To illustrate, given DNSLink records:
 
@@ -84,6 +86,8 @@ content path:
 2. Resolving DNSlink at `a.example.net` replaces `/ipns/a.example.net` with `/ipns/b.example.net/path-b`
 3. Resolving DNSlink at `b.example.net` replaces `/ipns/b.example.net` with `/ipfs/bafy…qy3k/path-c`
 4. The immutable content path is `/ipfs/bafy…qy3k/path-c/path-b/path-a`
+
+:::
 
 # HTTP Response
 
