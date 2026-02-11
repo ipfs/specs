@@ -4,7 +4,7 @@ description: >
   Delegated routing is a mechanism for IPFS implementations to use for offloading
   content routing, peer routing and naming to another process/server. This specification describes
   an HTTP API for delegated routing of content, peers, and IPNS.
-date: 2024-10-29
+date: 2026-02-11
 maturity: reliable
 editors:
   - name: Gus Eggert
@@ -54,11 +54,7 @@ As such, human-readable encodings of types are preferred. This specification may
 ## Common Data Types
 
 - CIDs are always string-encoded using a [multibase]-encoded [CIDv1].
-- Addresses in the `Addrs` field can be:
-  - Multiaddrs: string-encoded according to the [human-readable multiaddr specification][multiaddr], always starting with `/`
-  - HTTP(S) URLs: absolute URLs with `http://` or `https://` schemes, parsed as URIs according to :cite[rfc3986]
-  - Parsing logic: if a string starts with `/`, parse as multiaddr; otherwise, parse as URI
-  - Unsupported addresses: implementations MUST skip addresses they cannot parse or do not support, and MUST continue processing remaining addresses (see [IPIP-0518](https://specs.ipfs.tech/ipips/ipip-0518/))
+- Multiaddrs are string-encoded according to the [human-readable multiaddr specification][multiaddr].
 - Peer IDs are string-encoded according [PeerID string representation specification][peer-id-representation]: either a Multihash in Base58btc, or a CIDv1 with libp2p-key (`0x72`) codec in Base36 or Base32.
 - Multibase bytes are string-encoded according to [the Multibase spec][multibase], and SHOULD use base64.
 - Timestamps are Unix millisecond epoch timestamps.
@@ -83,18 +79,17 @@ This API uses a standard version prefix in the path, such as `/v1/...`. If a bac
 
 Optional `?filter-addrs` to apply Network Address Filtering from [IPIP-484](https://specs.ipfs.tech/ipips/ipip-0484/).
 
-- `?filter-addrs=<comma-separated-list>` optional parameter that indicates which network transports to return by filtering the addresses in the `Addrs` field of the [Peer schema](#peer-schema).
-- The value of the `filter-addrs` parameter is a comma-separated (`,` or `%2C`) list of network transport protocol _name strings_ as defined in the [multiaddr protocol registry](https://github.com/multiformats/multiaddr/blob/master/protocols.csv), e.g. `?filter-addrs=tls,webrtc-direct,webtransport`.
-- `unknown` can be be passed to include providers whose addresses are unknown, e.g. `?filter-addrs=unknown`. This allows for not removing providers whose addresses are unknown at the time of filtering (e.g. keeping DHT results that require additional peer lookup).
-- Addresses are filtered by checking if the protocol name appears in any of the multiaddrs, or if the URI scheme matches for HTTP(S) URLs (logical OR in both cases).
-  - Example: `http` can be be passed to include providers whose addresses are HTTP-compatible. This will include `http://` `https://` URIs, and `/http` `/https` and `/tls/http` Multiaddrs.
-  - For the purpose of filtering, implementations SHOULD include `/tls/http` Multiaddrs when `https` is passed as a filter to ensure composed multiaddrs are included in results.
-- Negative filtering is done by prefixing the protocol name with `!`, e.g. to skip IPv6 and QUIC addrs: `?filter-addrs=!ip6,!quic-v1`. Note that negative filtering is done by checking if the protocol name does not appear in any of the addresses (logical AND).
+- `?filter-addrs=<comma-separated-list>` optional parameter that indicates which network addresses to return by filtering the `Addrs` field of [Peer schema](#peer-schema) and [Generic schema](#generic-schema) provider records.
+- The value is a comma-separated (`,` or `%2C`) list of filter names.
+- For multiaddr addresses (all addresses in the `peer` schema, and strings starting with `/` in the `generic` schema): filter names are matched against multiaddr protocol _name strings_ as defined in the [multiaddr protocol registry](https://github.com/multiformats/multiaddr/blob/master/protocols.csv), e.g. `?filter-addrs=tls,webrtc-direct,webtransport`. A multiaddr matches a filter if the protocol name appears anywhere in the multiaddr (logical OR).
+- For URI addresses in the [Generic schema](#generic-schema) (strings not starting with `/`): filter names are matched against the URI scheme per :cite[rfc3986]. For example, `?filter-addrs=https` matches `https://example.com`.
+- `unknown` can be passed to include records whose addresses are unknown, e.g. `?filter-addrs=unknown`. This allows for not removing records whose addresses are unknown at the time of filtering (e.g. keeping DHT results that require additional peer lookup).
+- Negative filtering is done by prefixing the name with `!`, e.g. to skip IPv6 and QUIC addrs: `?filter-addrs=!ip6,!quic-v1`. Negative filtering checks that the name does not appear in any of the addresses (logical AND).
 - If no parameter is passed, the default behavior is to return the original list of addresses unchanged.
-- If only negative filters are provided, addresses not passing any of the negative filters are included.
-- If positive filters are provided, only addresses passing at least one positive filter (and no negative filters) are included.
+- If only negative filters are provided, addresses not matching any of the negative filters are included.
+- If positive filters are provided, only addresses matching at least one positive filter (and no negative filters) are included.
 - If both positive and negative filters are provided, the address must pass all negative filters and at least one positive filter to be included.
-- If there are no addresses that match the passed transports, the provider is omitted from the response.
+- If no addresses remain after filtering, the record is omitted from the response.
 - Filtering is case-insensitive.
 
 ##### `filter-protocols` (providers request query parameter)
@@ -104,10 +99,10 @@ Optional `?filter-protocols` to apply IPFS Protocol Filtering from [IPIP-484](ht
 - The `filter-protocols` parameter is a comma-separated (`,` or `%2C`) list of transfer protocol names, e.g. `?filter-protocols=unknown,transport-bitswap,transport-ipfs-gateway-http`.
 - Transfer protocols names should be treated as opaque strings and have a max length of 63 characters. A non-exhaustive list of transfer protocols are defined per convention in the [multicodec registry](https://github.com/multiformats/multicodec/blob/3b7b52deb31481790bc4bae984d8675bda4e0c82/table.csv#L149-L151).
 - Implementations MUST preserve all transfer protocol names when returning a positive result that matches one or more of them.
-- A special `unknown` name can be be passed to include providers whose transfer protocol list is empty (unknown), e.g. `?filter-protocols=unknown`. This allows for including providers returned from the DHT that do not contain explicit transfer protocol information.
-- Providers are filtered by checking if the transfer protocol name appears in the `Protocols` array (logical OR).
-- If the provider doesn't match any of the passed transfer protocols, the provider is omitted from the response.
-- If a provider passes the filter, it is returned unchanged, i.e. the full set of protocols is returned including protocols that not included in the filter. (note that this is different from `filter-addrs` where only the multiaddrs that pass the filter are returned)
+- A special `unknown` name can be passed to include records whose transfer protocol list is empty (unknown), e.g. `?filter-protocols=unknown`. This allows for including providers returned from the DHT that do not contain explicit transfer protocol information.
+- Records are filtered by checking if the transfer protocol name appears in the `Protocols` array (logical OR). This applies to both [Peer schema](#peer-schema) and [Generic schema](#generic-schema) records.
+- If the record doesn't match any of the passed transfer protocols, it is omitted from the response.
+- If a record passes the filter, it is returned unchanged, i.e. the full set of protocols is returned including protocols not included in the filter. (note that this is different from `filter-addrs` where only the addresses that pass the filter are returned)
 - Filtering is case-insensitive.
 - If no parameter is passed, the default behavior is to not filter by transfer protocol.
 
@@ -323,17 +318,14 @@ The `peer` schema represents an arbitrary peer.
 {
   "Schema": "peer",
   "ID": "bafz...",
-  "Addrs": ["/ip4/...", "https://trustless-gateway.example.com"],
+  "Addrs": ["/ip4/..."],
   "Protocols": ["transport-bitswap", ...]
   ...
 }
 ```
 
 - `ID`: the [Peer ID][peer-id] as Multihash in Base58btc or CIDv1 with libp2p-key codec.
-- `Addrs`: an optional list of known addresses for this peer, which can include both:
-  - [Multiaddrs][multiaddr]: strings starting with `/`, e.g., `/ip4/192.168.1.1/tcp/4001`
-  - HTTP(S) URLs: absolute URLs with `http://` or `https://` schemes, e.g., `https://trustless-gateway.example.com`
-  - Implementations MUST skip addresses they cannot parse or do not support and continue with remaining addresses
+- `Addrs`: an optional list of known [multiaddrs][multiaddr] for this peer.
   - If missing or empty, it means the router server is missing that information, and the client should use `ID` to lookup updated peer information.
 - `Protocols`: an optional list of protocols known to be supported by this peer.
   - If missing or empty, it means the router server is missing that information, and the client should use `ID` and `Addrs` to lookup connect to the peer and use the [libp2p identify protocol](https://github.com/libp2p/specs/tree/master/identify) to learn about supported ones.
@@ -358,6 +350,50 @@ the case, the field MUST be ignored.
   "Protocols": ["transport-bitswap", "protocol-a", "protocol-b", ...],
   "protocol-a": "[base64-blob]",
   "protocol-b": { "foo": "bar" }
+}
+```
+
+:::
+
+### Generic Schema
+
+The `generic` schema represents a provider that is not necessarily a libp2p peer. Unlike the `peer` schema, identifiers are not limited to PeerIDs and addresses are not limited to multiaddrs. See [IPIP-0518](https://specs.ipfs.tech/ipips/ipip-0518/) for motivation and design rationale.
+
+```json
+{
+  "Schema": "generic",
+  "ID": "did:key:z6Mkm1...",
+  "Addrs": ["https://trustless-gateway.example.com"],
+  "Protocols": ["transport-ipfs-gateway-http"]
+  ...
+}
+```
+
+- `ID`: a string identifier for the provider. SHOULD be self-authenticating (e.g. `did:key`) and less than 100 bytes.
+- `Addrs`: an optional list of addresses as strings. Addresses are duck-typed based on their format:
+  - If a string starts with `/`, it is parsed as a [multiaddr][multiaddr]
+  - Otherwise, it is parsed as a URI per :cite[rfc3986]
+  - Clients MUST skip addresses they cannot parse or do not support and continue with remaining entries. This includes URIs with unrecognized schemes, unsupported multiaddrs, or all multiaddrs if the client only supports URIs.
+- `Protocols`: an optional list of transfer protocol names associated with this record. Protocol names are opaque strings with a max length of 63 characters, established by rough consensus across compatible implementations per the [robustness principle](https://specs.ipfs.tech/architecture/principles/#robustness).
+
+Servers and caching proxies MUST act as pass-through and return `Addrs` and `Protocols` as-is, unless explicitly filtered by the client via `?filter-addrs` or `?filter-protocols` query parameters.
+
+The total serialized size of a single `generic` record MUST be less than 10 KiB.
+
+:::note
+
+To allow for protocol-specific fields and future-proofing, the parser MUST
+allow for unknown fields, and the clients MUST ignore unknown ones.
+
+Below is an example of a `generic` record with protocol-specific extra fields:
+
+```json
+{
+  "Schema": "generic",
+  "ID": "did:key:z6Mkm1...",
+  "Addrs": ["https://provider.example.com"],
+  "Protocols": ["example-future-protocol"],
+  "example-future-protocol": {"version": 2, "features": ["foo"]}
 }
 ```
 
