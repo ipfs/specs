@@ -43,8 +43,8 @@ jobs:
           cluster-url: "/dnsaddr/ipfs-websites.collab.ipfscluster.io"
           cluster-user: ${{ secrets.CLUSTER_USER }}
           cluster-password: ${{ secrets.CLUSTER_PASSWORD }}
-          storacha-key: ${{ secrets.STORACHA_KEY }}
-          storacha-proof: ${{ secrets.STORACHA_PROOF }}
+          #TODO storacha-key: ${{ secrets.STORACHA_KEY }}
+          #TODO storacha-proof: ${{ secrets.STORACHA_PROOF }}
           #TODO pinata-jwt-token: ${{ secrets.PINATA_JWT_TOKEN }}
           github-token: ${{ github.token }}
 
