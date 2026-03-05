@@ -4,7 +4,7 @@ description: >
   The comprehensive low-level HTTP Gateway enables the integration of IPFS
   resources into the HTTP stack through /ipfs and /ipns namespaces, supporting
   both deserialized and verifiable response types.
-date: 2025-10-13
+date: 2026-03-05
 maturity: reliable
 editors:
   - name: Marcin Rataj
@@ -256,7 +256,7 @@ These are the equivalents:
 - `format=ipns-record` → `Accept: application/vnd.ipfs.ipns-record`
 
 When both `Accept` HTTP header  and `format` query parameter are present,
-`Accept` SHOULD take precedence.
+`format` SHOULD take precedence.
 
 :::note
 
