@@ -4,7 +4,7 @@ description: >
   The minimal subset of HTTP Gateway response types facilitates data retrieval
   via CID and ensures integrity verification, all while eliminating the need to
   trust the gateway itself.
-date: 2026-01-09
+date: 2026-03-05
 maturity: reliable
 editors:
   - name: Marcin Rataj
@@ -133,16 +133,14 @@ Same as [`format`](https://specs.ipfs.tech/http-gateways/path-gateway/#format-re
 - `format=car` → `application/vnd.ipld.car`
 - `format=ipns-record` → `application/vnd.ipfs.ipns-record`
 
+When both `Accept` HTTP header and `format` query parameter are present,
+`format` SHOULD take precedence.
+
 :::note
 
 A Client SHOULD include the `format` query parameter in the request URL, in
 addition to the `Accept` header. This provides the best interoperability and
 ensures consistent HTTP cache behavior across various gateway implementations.
-
-When both the `Accept` header and `format` parameter are present, a specific
-`Accept` value (e.g., `application/vnd.ipld.raw`) SHOULD take precedence over
-`format`. Wildcards (e.g., `*/*`, `application/*`) are not specific and do not
-take precedence (as specified in :cite[path-gateway]).
 
 :::
 
@@ -245,7 +243,7 @@ Optional, only used on CAR requests.
 
 Serves same purpose as [CAR `version` content type parameter](#car-version-content-type-parameter).
 
-In case both are present in the request, the value from the [`Accept`](#accept-request-header) HTTP Header has priority and a matching [`Content-Location`](#content-location-response-header) SHOULD be returned with the response.
+In case both are present in the request, the URL query parameter SHOULD take precedence and a matching [`Content-Location`](#content-location-response-header) SHOULD be returned with the response.
 
 ### :dfn[`car-order`] (request query parameter)
 
@@ -253,7 +251,7 @@ Optional, only used on CAR requests.
 
 Serves same purpose as [CAR `order` content type parameter](#car-order-content-type-parameter).
 
-In case both are present in the request, the value from the [`Accept`](#accept-request-header) HTTP Header has priority and a matching [`Content-Location`](#content-location-response-header) SHOULD be returned with the response.
+In case both are present in the request, the URL query parameter SHOULD take precedence and a matching [`Content-Location`](#content-location-response-header) SHOULD be returned with the response.
 
 ### :dfn[`car-dups`] (request query parameter)
 
@@ -261,7 +259,7 @@ Optional, only used on CAR requests.
 
 Serves same purpose as [CAR `dups` content type parameter](#car-dups-content-type-parameter).
 
-In case both are present in the request, the value from the [`Accept`](#accept-request-header) HTTP Header has priority and a matching [`Content-Location`](#content-location-response-header) SHOULD be returned with the response.
+In case both are present in the request, the URL query parameter SHOULD take precedence and a matching [`Content-Location`](#content-location-response-header) SHOULD be returned with the response.
 
 # HTTP Response
 
@@ -621,11 +619,11 @@ Returning `404 Not Found` for missing content allows clients to efficiently quer
 
 When serving content to peers over the public internet, HTTP servers:
 
-- **Transport Security**: MUST support HTTPS with valid TLS certificates to prevent block interception and tampering in transit
+- **Transport Security**: SHOULD support HTTPS with valid TLS certificates to prevent observation of block data in transit (integrity is already provided by CID verification)
 - **Rate Limiting**: SHOULD implement request rate limiting and concurrent connection limits to prevent resource exhaustion. When limits are exceeded, SHOULD return HTTP `429 Too Many Requests` with a `Retry-After` header indicating when the client may retry
 - **Timeout Limits**: SHOULD enforce connection and request timeout limits to prevent resource exhaustion from slow or stalled connections
 - **Input Validation**: SHOULD validate CID format and encoding before processing requests to prevent malformed input attacks
-- **Path Validation**: For CAR requests with paths, SHOULD validate path components to prevent path traversal attacks
+- **Path Validation**: For CAR requests with paths, SHOULD validate path components to prevent unexpected DAG traversal behavior or resource exhaustion from deeply nested paths
 - **Block Size Limits**: SHOULD enforce maximum block size limits (see [Block Limits](#p2p-block-limits)) to prevent memory exhaustion
 
 #### HTTP Clients
@@ -637,5 +635,5 @@ When making requests to HTTP providers over the public internet, HTTP clients:
 - **Connection Management**:
   - SHOULD implement connection pooling with appropriate limits to avoid overwhelming local resources
   - SHOULD respect the server's HTTP/2 `SETTINGS_MAX_CONCURRENT_STREAMS` value (Section 6.5.2 of :cite[rfc9113]) to avoid overwhelming the server
-  - SHOULD use HTTP/2 connection coalescing when multiple servers share the same origin to reduce connection overhead
+  - SHOULD use HTTP/2 connection coalescing when multiple origins resolve to the same server (shared IP and TLS certificate) to reduce connection overhead
 - **Timeout Limits**: SHOULD set appropriate connection and request timeout limits to prevent hanging on unresponsive servers. A safe default is to timeout after 30 seconds of not receiving any new bytes
