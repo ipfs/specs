@@ -3,7 +3,7 @@ title: UnixFS
 description: >
   UnixFS is a Protocol Buffers-based format for describing files and directories
   as dag-pb DAGs and raw blocks in IPFS.
-date: 2025-09-09
+date: 2026-03-05
 maturity: draft
 editors:
   - name: Marcin Rataj
@@ -500,6 +500,10 @@ node exceeds a size threshold between 256 KiB and 1 MiB. This threshold:
 - Common values range from 256 KiB (conservative) to 1 MiB (modern)
 
 See [Block Size Considerations](#block-size-considerations) for details on block size limits and conventions.
+
+:::note
+For standardized threshold estimation methods that enable deterministic CID generation, see [IPIP-499: UnixFS CID Profiles](https://specs.ipfs.tech/ipips/ipip-0499/).
+:::
 
 ### `dag-pb` `Symlink`
 
