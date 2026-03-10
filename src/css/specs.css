@@ -30,6 +30,62 @@ body {
   background: url('/img/watermark-ratified.svg');
 }
 
+.ipip-historic .watermark {
+  display: block;
+  background: url('/img/watermark-historic.svg');
+  background-color: #faf8f5;
+}
+
+.ipip-historic {
+  --highlight-colour: #b08050;
+  --highlight-colour-faded: #c9a07a;
+  --standard-gradient: linear-gradient(to right, #5c4a3a, #b08050);
+}
+
+.ipip-historic header {
+  border-bottom-color: #b08050;
+}
+
+.ipip-historic a {
+  color: #8b6914;
+}
+
+.ipip-historic a:hover {
+  color: #b08050;
+}
+
+.ipip-historic h1,
+.ipip-historic h2,
+.ipip-historic h3,
+.ipip-historic h4,
+.ipip-historic h5,
+.ipip-historic h6 {
+  color: #5c4a3a;
+}
+
+.ipip-historic :is(h2, h3, h4, h5, h6) bdi.secno {
+  color: #9a8a7a;
+}
+
+.ipip-historic pre {
+  background: #faf6f0;
+  border-color: #b08050;
+}
+
+.ipip-historic div.note,
+.ipip-historic div.warning,
+.ipip-historic div.example {
+  background: #faf6f0;
+}
+
+.ipip-historic div.note {
+  border-color: #b08050;
+}
+
+.ipip-historic div.warning {
+  border-color: #c07030;
+}
+
 #ipseity-back-to-root {
   margin-bottom: 2rem;
   background: var(--standard-gradient);
