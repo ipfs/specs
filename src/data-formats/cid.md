@@ -145,7 +145,7 @@ To decode a CID, follow the following algorithm:
 * Otherwise, decode it according to the multibase spec and:
   * If the first decoded byte is 0x12, return an error. CIDv0 CIDs may not be multibase encoded and there will be no CIDv18 (0x12 = 18) to prevent ambiguity with decoded CIDv0s.
   * Otherwise, you now have a binary CID. Continue to step 2.
-2. Given a (binary) CID (`cid`):
+1. Given a (binary) CID (`cid`):
 * If it's 34 bytes long with the leading bytes `[0x12, 0x20, ...]`, it's a CIDv0.
   * The CID's multihash is `cid`.
   * The CID's multicodec is DagProtobuf
