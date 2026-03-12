@@ -133,7 +133,7 @@ cidv0 ::= <multihash-content-address>
 See the section: [How does it work?](#how-does-it-work)
 
 ```text
-<cidv1> ::= <multibase-prefix><multicodec-cidv1><multicodec-content-type><multihash-content-address>
+<cidv1> ::= <multicodec-cidv1><multicodec-content-type><multihash-content-address>
 ```
 
 ## Decoding Algorithm
