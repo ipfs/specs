@@ -135,10 +135,10 @@ CIDs design takes into account many difficult tradeoffs encountered while buildi
 ### CIDv0
 
 CIDv0 is a backwards-compatible version, where:
-- the `multibase` of the string representation is always `base58btc` and implicit (not written)
-- the `multicodec` is always `dag-pb` and implicit (not written)
-- the `cid-version` is always `cidv0` and implicit (not written)
-- the `multihash` is written as is but is always a full (length 32) sha256 hash.
+- the `multibase` of the string representation is always `base58btc` and implicit (prefix `z` not present)
+- the `multicodec` is always `dag-pb` (`0x70`) and implicit (not written)
+- the `cid-version` is always `cidv0` (`0`) and implicit (not written)
+- the `multihash` is written as is but is always a full (length 32) `sha2-256` (`0x12`) hash.
 
 ```text
 cidv0 ::= <multihash-content-address>
@@ -154,7 +154,7 @@ See the section: [How does it work?](#how-does-it-work)
 
 ## Decoding Algorithm
 
-To decode a CID, follow the following algorithm:
+To decode a CID, follow this algorithm:
 
 1. If it's a string (ASCII/UTF-8):
    * If it is 46 characters long and starts with `Qm`, it's a CIDv0. Decode it as base58btc and continue to step 2.
