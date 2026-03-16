@@ -26,11 +26,11 @@ tags: ['data-formats']
 order: 1
 ---
 
-**CID** is a format for referencing content in distributed information systems, like [IPFS](https://ipfs.io).
+**CID** is a format for referencing content in distributed information systems, like [IPFS](https://ipfs.tech).
 It leverages [content addressing](https://en.wikipedia.org/wiki/Content-addressable_storage),
 [cryptographic hashing](https://simple.wikipedia.org/wiki/Cryptographic_hash_function), and
 [self-describing formats](https://github.com/multiformats/multiformats).
-It is the core identifier used by [IPFS](https://ipfs.io) and [IPLD](https://ipld.io).
+It is the core identifier used by [IPFS](https://ipfs.tech) and [IPLD](https://ipld.io).
 It uses a [multicodec](https://github.com/multiformats/multicodec) to indicate its version, making it fully self describing.
 
 ## What is it?
@@ -39,10 +39,10 @@ A CID is a self-describing content-addressed identifier.
 It uses cryptographic hashes to achieve content addressing. It uses several
 [multiformats](https://github.com/multiformats/multiformats) to achieve flexible self-description, namely:
 
-1. [multihash](https://github.com/multiformats/multihash) to hash content addressed, and
+1. [multihash](https://github.com/multiformats/multihash) for content-addressed hashing, and
 2. [multicodec](https://github.com/multiformats/multicodec) to type that addressed content,
 to form a binary self-contained identifier, and optionally also
-3. [multibase](https://github.com/multiformats/multibase) to encode that binary CID as a  string.
+3. [multibase](https://github.com/multiformats/multibase) to encode that binary CID as a string.
 
 Concretely, it's a *typed* content address: a tuple of `(content-type, content-address)`.
 
@@ -72,12 +72,12 @@ In such applications, CIDs are often expressed as a Unicode *string* rather than
 In these contexts, then, the full string form is:
 
 ```text
-<cidv1> ::= <multibase-codec><multibase-encoding(<CIDv1-multicodec><multicodec><multihash>)>
+<cidv1-str> ::= <multibase-codec><multibase-encoding(<CIDv1-multicodec><multicodec><multihash>)>
 ```
 
 Where
 
-- `<multibase-codec>` is a [multibase](https://github.com/multiformats/multibase) prefix  (1 Unicode code point in length) that renders the base-encoded unicode string following it self-describing for simpler conversion back to binary.
+- `<multibase-codec>` is a [multibase](https://github.com/multiformats/multibase) prefix (1 Unicode code point in length) that renders the base-encoded unicode string following it self-describing for simpler conversion back to binary.
 
 A CID is fundamentally a binary value.
 The multibase prefix identifies the string encoding but is not part of the CID itself -- the same CID may be encoded in different bases for different contexts.
