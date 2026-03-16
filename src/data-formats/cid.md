@@ -79,6 +79,10 @@ Where
 
 - `<multibase-codec>` is a [multibase](https://github.com/multiformats/multibase) prefix  (1 Unicode code point in length) that renders the base-encoded unicode string following it self-describing for simpler conversion back to binary.
 
+A CID is fundamentally a binary value.
+The multibase prefix identifies the string encoding but is not part of the CID itself -- the same CID may be encoded in different bases for different contexts.
+IPFS implementations SHOULD support at minimum `base58btc`, `base32`, `base16`, and `base36` (the latter for ed25519 keys in [IPNS Records](https://specs.ipfs.tech/ipns/ipns-record/)).
+
 ## Variant - Human-Readable Form
 
 It is often advantageous to translate a CID, which is already modular and self-describing, into a *human-readable* expansion of its self-describing parts, for purposes such as debugging, unit testing, and documentation.
@@ -164,6 +168,9 @@ These sections provide additional context. This is not part of specification,
 and is provided here only for extra context.
 :::
 
+<!-- TODO: review each implementation for spec conformance before listing here.
+     A spec should not reference implementations that may not follow it.
+
 ## Implementations
 
 - [go-cid](https://github.com/ipfs/go-cid)
@@ -174,7 +181,8 @@ and is provided here only for extra context.
 - [elixir-cid](https://github.com/nocursor/ex-cid)
 - [dart_cid](https://github.com/dwyl/dart_cid)
 - [zig_cid](https://github.com/zen-eth/multiformats-zig)
-- [Add yours today!](https://github.com/multiformats/cid/edit/master/README.md)
+
+-->
 
 ## FAQ
 
@@ -184,21 +192,19 @@ Please check their repositories: [multicodec](https://github.com/multiformats/mu
 
 > **Q. Why does CID exist?**
 
-We were using base58btc encoded multihashes in IPFS, and then we needed to switch formats to IPLD.
-We struggled with lots of problems of addressing data with different formats until we created CIDs.
-You can read the history of this format here: https://github.com/ipfs/specs/issues/130
+IPFS originally used base58btc-encoded multihashes, but the need to support multiple data formats via IPLD revealed limitations of bare multihashes as identifiers.
+CIDs were created to provide a self-describing, versioned, typed content address.
+The history of this format is documented at: https://github.com/ipfs/specs/issues/130
 
 > **Q. Is the use of multicodec similar to file extensions?**
 
-Yes, kind of! like a file extension, the multicodec identifier establishes the format of the data.
-Unlike file extensions, these are in the middle of the identifier and not meant to be changed by users.
-There is also a short table of supported formats.
+Yes. Like a file extension, the multicodec in a CID tells consumers how to interpret the bytes.
+And just like file extensions, most users will never change it, but it is technically possible to swap the codec to change how the same bytes behind a CID are parsed.
 
 > **Q. What formats (multicodec codes) does CID support?**
 
-We are figuring this out at this time.
-It will likely be a subset of [multicodecs](https://github.com/multiformats/multicodec/blob/master/table.csv) for secure distributed systems.
-So far, we want to address IPFS's UnixFS and raw blocks ([`dag-pb`](https://ipld.io/specs/codecs/dag-pb/spec/), [`raw`](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw)), IPNS's [`libp2p-key`](https://github.com/libp2p/specs/blob/master/RFC/0001-text-peerid-cid.md), and IPLD's [`dag-json`](https://ipld.io/specs/codecs/dag-json/spec/)/[`dag-cbor`](https://ipld.io/specs/codecs/dag-cbor/spec/) formats.
+CID can reference content of any type registered in the [multicodec table](https://github.com/multiformats/multicodec/blob/master/table.csv).
+In practice, IPFS primarily uses [`dag-pb`](https://web.archive.org/web/20260305020653/https://ipld.io/specs/codecs/dag-pb/spec/) (`0x70`), [`raw`](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw) (`0x55`), [`dag-cbor`](https://web.archive.org/web/20260305020653/https://ipld.io/specs/codecs/dag-cbor/spec/) (`0x71`), [`dag-json`](https://web.archive.org/web/20260305020653/https://ipld.io/specs/codecs/dag-json/spec/) (`0x0129`), and [`libp2p-key`](https://github.com/libp2p/specs/blob/4e2c796bc77a2639136b277224468b7c48b9fff1/RFC/0001-text-peerid-cid.md) (`0x72`).
 
 > **Q. What is the process for updating CID specification (e.g., adding a new version)?**
 
@@ -210,4 +216,4 @@ Due to this, changes to CID specification MUST be submitted as an improvement pr
 
 ## Historical Design Decisions
 
-You can read an [in-depth discussion on why this format was needed in IPFS](https://github.com/ipfs/specs/issues/130).
+You can read an [in-depth discussion on why this format was needed in IPFS](https://github.com/ipfs/specs/issues/130) and the [original CIDv1 proposal](https://github.com/multiformats/cid/blob/f638ca68390758f0d4c7f90ac843091d3973cd02/original-rfc.md).
