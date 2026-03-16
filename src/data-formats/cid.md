@@ -21,6 +21,19 @@ editors:
 former_editors:
   - name: Juan Benet
     github: jbenet
+thanks:
+  - name: Steven Allen
+    github: Stebalien
+  - name: Rod Vagg
+    github: rvagg
+  - name: bumblefudge
+    github: bumblefudge
+  - name: Volker Mische
+    github: vmx
+  - name: Joel Thorstensson
+    github: oed
+  - name: Oli Evans
+    github: olizilla
 
 tags: ['data-formats']
 order: 1
