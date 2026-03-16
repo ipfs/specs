@@ -141,22 +141,21 @@ See the section: [How does it work?](#how-does-it-work)
 To decode a CID, follow the following algorithm:
 
 1. If it's a string (ASCII/UTF-8):
-* If it is 46 characters long and starts with `Qm...`, it's a CIDv0. Decode it as base58btc and continue to step 2.
-* Otherwise, decode it according to the multibase spec and:
-  * If the first decoded byte is 0x12, return an error. CIDv0 CIDs may not be multibase encoded and there will be no CIDv18 (0x12 = 18) to prevent ambiguity with decoded CIDv0s.
-  * Otherwise, you now have a binary CID. Continue to step 2.
-1. Given a (binary) CID (`cid`):
-* If it's 34 bytes long with the leading bytes `[0x12, 0x20, ...]`, it's a CIDv0.
-  * The CID's multihash is `cid`.
-  * The CID's multicodec is DagProtobuf
-  * The CID's version is 0.
-* Otherwise, let `N` be the first varint in `cid`. This is the CID's version.
-  * If `N == 0x01` (CIDv1):
-    * The CID's multicodec is the second varint in `cid`
-    * The CID's multihash is the rest of the `cid` (after the second varint).
-    * The CID's version is 1.
-  * If `N == 0x02` (CIDv2), or `N == 0x03` (CIDv3), the CID version is reserved.
-  * If `N` is equal to some other multicodec, the CID is malformed.
+   * If it is 46 characters long and starts with `Qm`, it's a CIDv0. Decode it as base58btc and continue to step 2.
+   * Otherwise, decode it according to the multibase spec and:
+     * If the first decoded byte is `0x12`, return an error. CIDv0 CIDs may not be multibase encoded and there will be no CIDv18 (`0x12` = 18) to prevent ambiguity with decoded CIDv0s.
+     * Otherwise, you now have a binary CID. Continue to step 2.
+2. Given a (binary) CID (`cid`):
+   * If the first two bytes are `[0x12, 0x20]` (the `sha2-256` multihash function code followed by digest length 32), it's a CIDv0.
+     * The CID's multihash is `cid` (34 bytes: 2-byte prefix + 32-byte digest).
+     * The CID's multicodec is `dag-pb` (`0x70`), implicit.
+     * The CID's version is 0.
+   * Otherwise, read the first varint in `cid`. This is the CID's version.
+     * If `0x01` (CIDv1):
+       * The CID's multicodec is the second varint in `cid`.
+       * The CID's multihash is the rest of `cid` (after the second varint).
+       * The CID's version is 1.
+     * Otherwise, the CID is malformed.
 
 # Appendices
 
