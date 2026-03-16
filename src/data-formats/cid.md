@@ -1,0 +1,231 @@
+---
+title: CID (Content IDentifier)
+description: >
+    Self-describing content-addressed identifiers for distributed systems
+date: 2026-03-12
+maturity: permanent
+editors:
+  - name: Marcin Rataj
+    github: lidel
+    affiliation:
+      name: Interplanetary Shipyard
+      url: https://ipshipyard.com/
+  - name: Robin Berjon
+    email: robin@berjon.com
+    url: https://berjon.com/
+    github: darobin
+    twitter: robinberjon
+    affiliation:
+        name: IPFS Foundation
+        url: https://ipfsfoundation.org/
+former_editors:
+  - name: Juan Benet
+    github: jbenet
+thanks:
+  - name: Steven Allen
+    github: Stebalien
+  - name: Rod Vagg
+    github: rvagg
+  - name: bumblefudge
+    github: bumblefudge
+  - name: Volker Mische
+    github: vmx
+  - name: Joel Thorstensson
+    github: oed
+  - name: Oli Evans
+    github: olizilla
+
+tags: ['data-formats']
+order: 1
+---
+
+**CID** is a format for referencing content in distributed information systems, like [IPFS](https://ipfs.tech).
+It leverages [content addressing](https://en.wikipedia.org/wiki/Content-addressable_storage),
+[cryptographic hashing](https://simple.wikipedia.org/wiki/Cryptographic_hash_function), and
+[self-describing formats](https://github.com/multiformats/multiformats).
+It is the core identifier used by [IPFS](https://ipfs.tech) and [IPLD](https://ipld.io).
+It uses a [multicodec](https://github.com/multiformats/multicodec) to indicate its version, making it fully self describing.
+
+## What is it?
+
+A CID is a self-describing content-addressed identifier.
+It uses cryptographic hashes to achieve content addressing. It uses several
+[multiformats](https://github.com/multiformats/multiformats) to achieve flexible self-description, namely:
+
+1. [multihash](https://github.com/multiformats/multihash) for content-addressed hashing, and
+2. [multicodec](https://github.com/multiformats/multicodec) to type that addressed content,
+to form a binary self-contained identifier, and optionally also
+3. [multibase](https://github.com/multiformats/multibase) to encode that binary CID as a string.
+
+Concretely, it's a *typed* content address: a tuple of `(content-type, content-address)`.
+
+## How does it work?
+
+Current version: CIDv1.
+
+CIDv1 is a **binary** format composed of [unsigned varints](https://github.com/multiformats/unsigned-varint)
+prefixing a hash digest to form a self-describing "content address":
+
+```text
+<cidv1> ::= <CIDv1-multicodec><content-type-multicodec><content-multihash>
+# or, expanded:
+<cidv1> ::= <`0x01`, the code for `CIDv1`><another code from `ipld` entries in multicodec table that signals content type of data being addressed><multihash of addressed data>
+```
+
+Where
+
+- `<multicodec-cidv1>` is a [multicodec](https://github.com/multiformats/multicodec) representing the version of CID, here for upgradability purposes.
+- `<multicodec-content-type>` is a [multicodec](https://github.com/multiformats/multicodec) code representing the content type or format of the data being addressed.
+- `<multihash-content-address>` is a [multihash](https://github.com/multiformats/multihash) value, which uses a registry of hash function abbreviations to prefix a cryptographic hash of the content being addressed, thus making it self-describing.
+
+## Variant - Stringified Form
+
+Since CIDs have many applications outside of binary-only contexts, a given CID may need to be base-encoded for different consumers or transports.
+In such applications, CIDs are expressed as a Unicode *string* with a [multibase](https://github.com/multiformats/multibase) prefix.
+The multibase prefix identifies the string encoding but is not part of the CID itself -- the same binary CID may be represented in different bases depending on context and needs such as string length and case-sensitivity.
+The full string form is:
+
+```text
+<cidv1-str> ::= <multibase-prefix><multibase-encoding(<CIDv1-multicodec><multicodec><multihash>)>
+```
+
+Where
+
+- `<multibase-prefix>` is a [multibase prefix](https://github.com/multiformats/multibase/blob/master/multibase.csv) (1 Unicode code point) that makes the string self-describing for conversion back to binary.
+
+IPFS implementations SHOULD support at minimum `base58btc` (`z`), `base32` (`b`), `base16` (`f`), and `base36` (`k`, for ed25519 keys in [IPNS Records](https://specs.ipfs.tech/ipns/ipns-record/)).
+
+## Variant - Human-Readable Form
+
+It is often advantageous to translate a CID, which is already modular and self-describing, into a *human-readable* expansion of its self-describing parts, for purposes such as debugging, unit testing, and documentation.
+We can easily transform a Stringified CID to a "Human-Readable CID" by translating and segmenting its constituent parts as follows:
+
+```text
+<hr-cid> ::= <hr-mbc> "-" <hr-cid-mc> "-" <hr-mc> "-" <hr-mh>
+```
+Where each sub-component is replaced with its own human-readable form from the relevant registry:
+
+- `<hr-mbc>` is the name of the multibase code (eg `z`--> `base58btc`)
+- `<hr-cid-mc>` is the name of the multicodec for the version of CID used (eg `0x01` --> `cidv1`)
+- `<hr-mc>` is the name of the multicodec code (eg `0x51` --> `cbor`)
+- `<hr-mh>` is the name of the multihash code (eg `sha2-256-256`) followed by a final dash and the hash itself `-abcdef0123456789...`)
+
+For example:
+
+```text
+# example CID
+zb2rhe5P4gXftAwvA4eXQ5HJwsER2owDyS9sKaQRRVQPn93bA
+# corresponding human readable CID
+base58btc - cidv1 - raw - sha2-256-256-6e6ff7950a36187a801613426e858dce686cd7d7e3c0fc42ee0330072d245c95
+```
+See: https://cid.ipfs.io/#zb2rhe5P4gXftAwvA4eXQ5HJwsER2owDyS9sKaQRRVQPn93bA
+
+## Design Considerations
+
+CIDs design takes into account many difficult tradeoffs encountered while building [IPFS](https://ipfs.tech). These are mostly coming from the multiformats project.
+
+- Compactness: CIDs are binary in nature to ensure these are as compact as possible, as they're meant to be part of longer path identifiers or URIs.
+- Transport friendliness (or "copy-pastability"): CIDs are encoded with multibase to allow choosing the best base for transporting. For example, CIDs can be encoded into base58btc to yield shorter and easily-copy-pastable hashes.
+- Versatility: CIDs are meant to be able to represent values of any format with any cryptographic hash.
+- Avoid Lock-in: CIDs prevent lock-in to old, potentially-outdated decisions.
+- Upgradability: CIDs encode a version to ensure the CID format itself can evolve.
+
+## Versions
+
+### CIDv0
+
+CIDv0 is a backwards-compatible version, where:
+- the `multibase` of the string representation is always `base58btc` and implicit (prefix `z` not present)
+- the `multicodec` is always `dag-pb` (`0x70`) and implicit (not written)
+- the `cid-version` is always `cidv0` (`0`) and implicit (not written)
+- the `multihash` is written as is but is always a full (length 32) `sha2-256` (`0x12`) hash.
+
+```text
+cidv0 ::= <multihash-content-address>
+```
+
+### CIDv1
+
+See the section: [How does it work?](#how-does-it-work)
+
+```text
+<cidv1> ::= <multicodec-cidv1><multicodec-content-type><multihash-content-address>
+```
+
+## Decoding Algorithm
+
+To decode a CID, follow this algorithm:
+
+1. If it's a string (ASCII/UTF-8):
+   * If it is 46 characters long and starts with `Qm`, it's a CIDv0. Decode it as base58btc and continue to step 2.
+   * Otherwise, decode it according to the multibase spec and:
+     * If the first decoded byte is `0x12`, return an error. CIDv0 CIDs may not be multibase encoded and there will be no CIDv18 (`0x12` = 18) to prevent ambiguity with decoded CIDv0s.
+     * Otherwise, you now have a binary CID. Continue to step 2.
+2. Given a (binary) CID (`cid`):
+   * If the first two bytes are `[0x12, 0x20]` (the `sha2-256` multihash function code followed by digest length 32), it's a CIDv0.
+     * The CID's multihash is `cid` (34 bytes: 2-byte prefix + 32-byte digest).
+     * The CID's multicodec is `dag-pb` (`0x70`), implicit.
+     * The CID's version is 0.
+   * Otherwise, read the first varint in `cid`. This is the CID's version.
+     * If `0x01` (CIDv1):
+       * The CID's multicodec is the second varint in `cid`.
+       * The CID's multihash is the rest of `cid` (after the second varint).
+       * The CID's version is 1.
+     * Otherwise, the CID is malformed.
+
+# Appendices
+
+:::warning
+These sections provide additional context. This is not part of specification,
+and is provided here only for extra context.
+:::
+
+<!-- TODO: review each implementation for spec conformance before listing here.
+     A spec should not reference implementations that may not follow it.
+
+## Implementations
+
+- [go-cid](https://github.com/ipfs/go-cid)
+- [java-cid](https://github.com/ipld/java-cid)
+- [js-multiformats](https://github.com/multiformats/js-multiformats)
+- [rust-cid](https://github.com/multiformats/rust-cid)
+- [py-multiformats-cid](https://github.com/pinnaculum/py-multiformats-cid)
+- [elixir-cid](https://github.com/nocursor/ex-cid)
+- [dart_cid](https://github.com/dwyl/dart_cid)
+- [zig_cid](https://github.com/zen-eth/multiformats-zig)
+
+-->
+
+## FAQ
+
+> **Q. I have questions on multicodec, multibase, or multihash.**
+
+Please check their repositories: [multicodec](https://github.com/multiformats/multicodec), [multibase](https://github.com/multiformats/multibase), [multihash](https://github.com/multiformats/multihash).
+
+> **Q. Why does CID exist?**
+
+IPFS originally used base58btc-encoded multihashes, but the need to support multiple data formats via IPLD revealed limitations of bare multihashes as identifiers.
+CIDs were created to provide a self-describing, versioned, typed content address.
+The history of this format is documented at: https://github.com/ipfs/specs/issues/130
+
+> **Q. Is the use of multicodec similar to file extensions?**
+
+Yes. Like a file extension, the multicodec in a CID tells consumers how to interpret the bytes.
+And just like file extensions, most users will never change it, but it is technically possible to swap the codec to change how the same bytes behind a CID are parsed.
+
+> **Q. What formats (multicodec codes) does CID support?**
+
+CID can reference content of any type registered in the [multicodec table](https://github.com/multiformats/multicodec/blob/master/table.csv).
+In practice, IPFS primarily uses [`dag-pb`](https://web.archive.org/web/20260305020653/https://ipld.io/specs/codecs/dag-pb/spec/) (`0x70`), [`raw`](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw) (`0x55`), [`dag-cbor`](https://web.archive.org/web/20260305020653/https://ipld.io/specs/codecs/dag-cbor/spec/) (`0x71`), [`dag-json`](https://web.archive.org/web/20260305020653/https://ipld.io/specs/codecs/dag-json/spec/) (`0x0129`), and [`libp2p-key`](https://github.com/libp2p/specs/blob/4e2c796bc77a2639136b277224468b7c48b9fff1/RFC/0001-text-peerid-cid.md) (`0x72`).
+
+> **Q. What is the process for updating CID specification (e.g., adding a new version)?**
+
+CIDs are a well established standard.
+IPFS uses CIDs for content-addressing and IPNS.
+Making changes to such key protocol requires a careful review which should include feedback from implementers and stakeholders across ecosystem.
+
+Due to this, changes to CID specification MUST be submitted as an improvement proposal to [ipfs/specs](https://github.com/ipfs/specs/tree/main/IPIP) repository (PR with [IPIP document](https://github.com/ipfs/specs/blob/main/IPIP/0000-template.md)), and follow the IPIP process described there.
+
+## Historical Design Decisions
+
+You can read an [in-depth discussion on why this format was needed in IPFS](https://github.com/ipfs/specs/issues/130) and the [original CIDv1 proposal](https://github.com/multiformats/cid/blob/f638ca68390758f0d4c7f90ac843091d3973cd02/original-rfc.md).
