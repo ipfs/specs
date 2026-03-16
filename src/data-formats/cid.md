@@ -80,21 +80,20 @@ Where
 
 ## Variant - Stringified Form
 
-Since CIDs have many applications outside of binary-only contexts, a given CID may need to be base-encoded multiple ways for different consumers or for different transports.
-In such applications, CIDs are often expressed as a Unicode *string* rather than a bytestring, which adds a single code-point prefix.
-In these contexts, then, the full string form is:
+Since CIDs have many applications outside of binary-only contexts, a given CID may need to be base-encoded for different consumers or transports.
+In such applications, CIDs are expressed as a Unicode *string* with a [multibase](https://github.com/multiformats/multibase) prefix.
+The multibase prefix identifies the string encoding but is not part of the CID itself -- the same binary CID may be represented in different bases depending on context and needs such as string length and case-sensitivity.
+The full string form is:
 
 ```text
-<cidv1-str> ::= <multibase-codec><multibase-encoding(<CIDv1-multicodec><multicodec><multihash>)>
+<cidv1-str> ::= <multibase-prefix><multibase-encoding(<CIDv1-multicodec><multicodec><multihash>)>
 ```
 
 Where
 
-- `<multibase-codec>` is a [multibase](https://github.com/multiformats/multibase) prefix (1 Unicode code point in length) that renders the base-encoded unicode string following it self-describing for simpler conversion back to binary.
+- `<multibase-prefix>` is a [multibase prefix](https://github.com/multiformats/multibase/blob/master/multibase.csv) (1 Unicode code point) that makes the string self-describing for conversion back to binary.
 
-A CID is fundamentally a binary value.
-The multibase prefix identifies the string encoding but is not part of the CID itself -- the same CID may be encoded in different bases for different contexts.
-IPFS implementations SHOULD support at minimum `base58btc`, `base32`, `base16`, and `base36` (the latter for ed25519 keys in [IPNS Records](https://specs.ipfs.tech/ipns/ipns-record/)).
+IPFS implementations SHOULD support at minimum `base58btc` (`z`), `base32` (`b`), `base16` (`f`), and `base36` (`k`, for ed25519 keys in [IPNS Records](https://specs.ipfs.tech/ipns/ipns-record/)).
 
 ## Variant - Human-Readable Form
 
