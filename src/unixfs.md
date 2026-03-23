@@ -135,6 +135,27 @@ message PBNode {
 }
 ```
 
+:::note
+
+The `PBNode` definition above lists `Links` (field 2) before `Data` (field 1).
+This field order is stricter than the intuitive protobuf convention of
+serializing fields by field number.
+
+Decoders MUST accept both field orderings, as existing IPFS data contains
+blocks encoded in either order.
+
+Encoders that want to be compliant with the `unixfs-v0-2015` and
+`unixfs-v1-2025` profiles from
+[IPIP-499](https://specs.ipfs.tech/ipips/ipip-0499/) SHOULD produce `Links`
+before `Data`, matching the [`dag-pb`][ipld-dag-pb] wire encoding order used
+by those profiles. A future IPIP introducing new profiles MAY adopt a
+different field order.
+
+See the "Protobuf Strictness" section of the [`dag-pb` spec][ipld-dag-pb]
+for the full set of encoding constraints.
+
+:::
+
 After decoding the node, we obtain a `PBNode`. This `PBNode` contains a field
 `Data` that contains the bytes that require the second decoding. This will also be
 a protobuf message specified in the UnixFSV1 format:
@@ -179,6 +200,23 @@ it is implied that the `PBNode.Data` field is protobuf-encoded.
 
 A `dag-pb` UnixFS node supports different types, which are defined in
 `decode(PBNode.Data).Type`. Every type is handled differently.
+
+:::warning
+
+**Streaming parser consideration:** In the [`dag-pb`][ipld-dag-pb] encoding
+order required by [IPIP-499](https://specs.ipfs.tech/ipips/ipip-0499/)
+profiles, all `PBNode.Links` entries are serialized before `PBNode.Data`.
+Since `DataType` (which determines how to interpret the node and its links) is
+encoded inside `PBNode.Data`, a streaming or incremental protobuf parser cannot
+determine the node type until after all links have been read.
+
+This affects implementations that attempt to interpret links during parsing:
+In particular, a streaming parser cannot determine whether link `Name` fields
+carry [HAMT hex-prefixed bucket indices](#hamt-structure-and-parameters) or
+plain [directory entry names](#dag-pb-directory) without first buffering all
+links.
+
+:::
 
 ### `dag-pb` `File`
 
@@ -851,6 +889,7 @@ Test vectors for UnixFS directory structures, progressing from simple flat direc
     ```
   - Purpose: Directory listing, link sorting, deduplication (ascii.txt and ascii-copy.txt share same CID)
   - Validation: Links sorted lexicographically by Name, each has valid Tsize
+  - Wire order: `Links`(x4) then `Data` ([`dag-pb`][ipld-dag-pb] field order per [IPIP-499](https://specs.ipfs.tech/ipips/ipip-0499/) profiles)
 
 ### Nested Directories
 
@@ -956,6 +995,7 @@ Test vectors for UnixFS directory structures, progressing from simple flat direc
     - Fanout field = 256
     - Link Names in HAMT have 2-character hex prefix (hash buckets)
     - Can retrieve any file by name through hash bucket calculation
+  - Wire order: `Links`(x252) then `Data` ([`dag-pb`][ipld-dag-pb] field order per [IPIP-499](https://specs.ipfs.tech/ipips/ipip-0499/) profiles)
 
 ## Special Cases and Advanced Features
 
@@ -1186,6 +1226,36 @@ Below section explains some of historical decisions. This is not part of specifi
 and is provided here only for extra context.
 :::
 
+## `PBNode` Field Order: Legacy Constraint and Compatibility Guidance
+
+The [`dag-pb`][ipld-dag-pb] encoding order required by
+[IPIP-499](https://specs.ipfs.tech/ipips/ipip-0499/) profiles (`unixfs-v0-2015`
+and `unixfs-v1-2025`) serializes `PBNode.Links` (field 2) before `PBNode.Data`
+(field 1). This is stricter than the intuitive protobuf convention of encoding
+fields by field number.
+
+This ordering is a historical artifact: early protobuf serializers (notably
+the original JavaScript implementation) wrote fields in source declaration
+order rather than field number order. The original `.proto` definition listed
+`Links` before `Data` (while assigning them field numbers 2 and 1
+respectively). Once blocks with this byte ordering were written to the IPFS
+network, the encoding became permanent: changing it would produce different
+CIDs for the same logical content. The [`dag-pb` specification][ipld-dag-pb]
+codified this field order for existing profiles.
+
+Following the [Robustness Principle](https://specs.ipfs.tech/architecture/principles/#robustness),
+implementations writing backward and forward compatible software should be
+conservative in what they produce (use the field order expected by the target
+profile) and liberal in what they accept (decode blocks regardless of field
+order). A future IPIP introducing new profiles may adopt a different field
+order convention.
+
+A practical consequence of the current `Links`-before-`Data` order is that
+streaming protobuf parsers encounter all link entries before `PBNode.Data`.
+For UnixFS, this means the node type (`DataType`) and associated metadata
+(e.g., HAMT `fanout` and `hashType`) are not available until after all links
+have been parsed. See the [`dag-pb` Types](#dag-pb-types) section for details.
+
 ## Design Considerations: Extra Metadata
 
 Metadata support in UnixFSv1.5 has been expanded to increase the number of possible
@@ -1305,4 +1375,4 @@ the fractional part is represented as a 4-byte `fixed32`,
 [multicodec]: https://github.com/multiformats/multicodec
 [multihash]: https://github.com/multiformats/multihash
 [Bitswap]: https://specs.ipfs.tech/bitswap-protocol/
-[ipld-dag-pb]: https://ipld.io/specs/codecs/dag-pb/spec/
+[ipld-dag-pb]: https://web.archive.org/web/20260305020653/https://ipld.io/specs/codecs/dag-pb/spec/
