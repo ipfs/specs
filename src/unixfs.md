@@ -142,7 +142,9 @@ This field order is stricter than the intuitive protobuf convention of
 serializing fields by field number.
 
 Decoders MUST accept both field orderings, as existing IPFS data contains
-blocks encoded in either order.
+blocks encoded in either order. However, each field MUST appear as a
+contiguous group: interleaving (e.g., `Links`, `Data`, `Links`) is not
+valid and decoders SHOULD reject it.
 
 Encoders that want to be compliant with the `unixfs-v0-2015` and
 `unixfs-v1-2025` profiles from
@@ -1247,8 +1249,9 @@ Following the [Robustness Principle](https://specs.ipfs.tech/architecture/princi
 implementations writing backward and forward compatible software should be
 conservative in what they produce (use the field order expected by the target
 profile) and liberal in what they accept (decode blocks regardless of field
-order). A future IPIP introducing new profiles may adopt a different field
-order convention.
+order). Interleaving (e.g., `Links`, `Data`, `Links`) is not a valid
+third ordering; it produces duplicate `Links` lists. A future IPIP
+introducing new profiles may adopt a different field order convention.
 
 A practical consequence of the current `Links`-before-`Data` order is that
 streaming protobuf parsers encounter all link entries before `PBNode.Data`.
