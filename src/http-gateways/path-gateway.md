@@ -504,7 +504,9 @@ Returned directive depends on requested content path and format:
     content-addressed and never expires, so a stale response can only show
     outdated markup, never invalid data, and a fixed stale window is safe. A
     floor of one week works well:
-    `public, max-age=604800, stale-while-revalidate=2678400`.
+    `public, max-age=604800, stale-while-revalidate=2678400`. This fixed window
+    applies only under the immutable `/ipfs/` namespace. The same listing
+    reached through `/ipns/` is mutable and follows the rules below.
 
 - `Cache-Control: public, max-age=<ttl>` SHOULD be returned for mutable
   resources under the `/ipns/{id-with-ttl}/` namespace, where `<ttl>` is the
@@ -524,6 +526,12 @@ Returned directive depends on requested content path and format:
     record response (`format=ipns-record`), whose body is the signed record
     itself. A DNSLink pointer carries no signature EOL and MAY use a bounded
     best-effort stale window.
+  - A generated response reached through `/ipns/`, such as a directory listing,
+    is mutable even though its body is regenerated markup. Apply the `/ipns/`
+    `max-age` and stale-window rules above, not the fixed window for generated
+    `/ipfs/` responses: the pointer it renders can move and, for an
+    :cite[ipns-record], expire, so the response MUST NOT be cached past the
+    record's EOL.
   - If the TTL is unknown, implementations MAY send a best-effort
     `Cache-Control` telling caches and CDNs how long a stale response is
     acceptable.
