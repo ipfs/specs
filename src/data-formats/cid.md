@@ -2,7 +2,7 @@
 title: CID (Content IDentifier)
 description: >
     Self-describing content-addressed identifiers for distributed systems
-date: 2026-03-12
+date: 2026-06-15
 maturity: permanent
 editors:
   - name: Marcin Rataj
@@ -154,24 +154,47 @@ See the section: [How does it work?](#how-does-it-work)
 
 ## Decoding Algorithm
 
-To decode a CID, follow this algorithm:
+The binary fields of a CID are [unsigned varints](https://github.com/multiformats/unsigned-varint).
+Two rules hold for every CID:
 
-1. If it's a string (ASCII/UTF-8):
-   * If it is 46 characters long and starts with `Qm`, it's a CIDv0. Decode it as base58btc and continue to step 2.
-   * Otherwise, decode it according to the multibase spec and:
-     * If the first decoded byte is `0x12`, return an error. CIDv0 CIDs may not be multibase encoded and there will be no CIDv18 (`0x12` = 18) to prevent ambiguity with decoded CIDv0s.
-     * Otherwise, you now have a binary CID. Continue to step 2.
-2. Given a (binary) CID (`cid`):
-   * If the first two bytes are `[0x12, 0x20]` (the `sha2-256` multihash function code followed by digest length 32), it's a CIDv0.
-     * The CID's multihash is `cid` (34 bytes: 2-byte prefix + 32-byte digest).
-     * The CID's multicodec is `dag-pb` (`0x70`), implicit.
-     * The CID's version is 0.
-   * Otherwise, read the first varint in `cid`. This is the CID's version.
-     * If `0x01` (CIDv1):
-       * The CID's multicodec is the second varint in `cid`.
-       * The CID's multihash is the rest of `cid` (after the second varint).
-       * The CID's version is 1.
-     * Otherwise, the CID is malformed.
+- each varint MUST be minimally encoded, and a decoder MUST reject any overlong (non-minimal) varint;
+- a decoder MUST reject any bytes left over after the multihash.
+
+A binary CID has one of two shapes, told apart by its leading bytes:
+
+| Leading bytes | Shape |
+| --- | --- |
+| `0x01` | a **CIDv1**, where this first varint is the version field |
+| `0x12 0x20` | a bare 34-byte `sha2-256` multihash: a **CIDv0** |
+| anything else | not a CID; a decoder MUST reject it |
+
+A CIDv0 is identified by the two-byte prefix `0x12 0x20`, not by the leading byte `0x12` alone: `0x12` is the `sha2-256` multihash code and `0x20` is its digest length, 32. A CIDv0 has no version field.
+
+### Decoding a binary CID
+
+To decode a binary CID `bytes`:
+
+1. If `bytes` is exactly 34 bytes long and begins with `0x12 0x20`, it is a **CIDv0**, a bare `sha2-256` multihash (`cidv0 ::= <multihash-content-address>`):
+   1. The 34 bytes are `0x12` (the `sha2-256` code), `0x20` (the digest length, 32), and a 32-byte digest.
+   2. The content type is implicitly `dag-pb` (`0x70`) and is not encoded.
+2. Otherwise, read the leading varint of `bytes`.
+3. If the leading varint is `0x01`, it is a **CIDv1** (`<cidv1> ::= <multicodec-cidv1><multicodec-content-type><multihash-content-address>`):
+   1. The `<multicodec-cidv1>` version field is the `0x01` just read.
+   2. Read the next varint as the `<multicodec-content-type>`, which types the content.
+   3. Read the [`<multihash-content-address>`](https://github.com/multiformats/multihash) that follows, structured as `<hash-code><digest-length><digest>`.
+   4. The `<digest-length>` MUST consume the remaining bytes exactly; a decoder MUST reject a truncated digest or any trailing bytes.
+4. Otherwise, a decoder MUST reject `bytes`. No other leading value is a CID. In particular, reject a leading `0x12` that is not the `0x12 0x20` prefix of a 34-byte input, and reject `0x00`, `0x02` (reserved for the never-deployed CIDv2), and `0x03` (reserved for the never-deployed CIDv3).
+
+### Decoding a CID string
+
+To decode a CID string (ASCII or UTF-8):
+
+1. If the string is 46 characters long and begins with `Qm`:
+   1. Decode it as `base58btc` to get `bytes`.
+   2. Decode `bytes` as a binary CID (above) and return the result; it validates as a CIDv0.
+2. Otherwise, decode the string by its [multibase](https://github.com/multiformats/multibase) prefix to get `bytes`.
+3. If the first byte of `bytes` is `0x12`, a decoder MUST reject the input: a CIDv0 is never multibase-encoded, and `0x12` equals 18, a value reserved so that no CIDv18 can be confused with a base-decoded CIDv0.
+4. Decode `bytes` as a binary CID (above) and return the result.
 
 # Appendices
 
