@@ -3,7 +3,7 @@ title: IPNS Record and Protocol
 description: >
   Specifies the IPNS protocol in a language-agnostic manner, allowing everyone to
   create a compatible IPNS Record Publisher or Resolver.
-date: 2023-10-03
+date: 2025-02-28
 maturity: reliable
 editors:
   - name: Vasco Santos
@@ -33,6 +33,10 @@ editors:
     affiliation:
         name: Protocol Labs
         url: https://protocol.ai/
+xref:
+  - kad-dht
+  - ipip-0337
+  - ipns-pubsub-router
 tags: ['ipns']
 order: 0
 ---
@@ -160,7 +164,7 @@ A logical :dfn[IPNS Record] is a data structure containing the following fields:
 
 - A hint for how long (in nanoseconds) the record should be cached before going back to, for instance the DHT, in order to check if it has been updated. The function and trade-offs of this value are analogous to the TTL of DNS record.
 - Implementations MUST include this value inside the DAG-CBOR document at `IpnsEntry.data[TTL]`.
-- Suggested default: 1 hour (3 600 000 000 000 nanoseconds).
+- Suggested default: 5 minutes (300 000 000 000 nanoseconds).
 
 #### :dfn[Public Key]{also="ipns-record-public-key"} (bytes)
 
@@ -287,7 +291,7 @@ Once the record is created, it is ready to be spread through the network. This w
 
 The means of distribution are left unspecified. Implementations MAY choose to
 publish signed record using multiple routing systems, such as
-[libp2p Kademlia DHT](https://github.com/libp2p/specs/tree/master/kad-dht) or :cite[ipns-pubsub-router] (see [Routing record](#routing-record)).
+:cite[kad-dht] or :cite[ipns-pubsub-router] (see [Routing record](#routing-record)).
 
 On the other side, each peer must be able to get a record published by another node. It only needs to have the unique identifier used to publish the record to the network. Taking into account the routing system being used, we may obtain a set of occurrences of the record from the network. In this case, records can be compared using the sequence number, in order to obtain the most recent one.
 
@@ -471,7 +475,11 @@ Note: Base32 according to the :cite[rfc4648].
 #### Routing Record
 
 The routing record is spread across the network according to the available routing systems.
-The two routing systems currently available in IPFS are the [libp2p Kademlia DHT](https://github.com/libp2p/specs/tree/master/kad-dht) and :cite[ipns-pubsub-router].
+The two routing systems currently available in IPFS are the :cite[kad-dht] and :cite[ipns-pubsub-router].
+
+When using :cite[kad-dht] for routing, implementations SHOULD follow the retrieval strategies
+documented in the IPFS Kademlia DHT specification, including the recommended quorum value
+for IPNS record lookups.
 
 **Key format:** `/ipns/BINARY_ID`
 

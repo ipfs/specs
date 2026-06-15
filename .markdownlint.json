@@ -8,5 +8,7 @@
   "blanks-around-lists": false,
   "single-trailing-newline": false,
   "link-fragments": false,
-  "line-length": false
+  "line-length": false,
+  "blanks-around-fences": false,
+  "no-inline-html": false
 }

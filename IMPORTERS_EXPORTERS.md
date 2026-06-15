@@ -1,5 +1,8 @@
 # ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) Data Importers & Exporters
 
+> [!NOTE]
+> This is a work-in-progress specification from the early days of IPFS. For current UnixFS and data import specifications, please refer to https://specs.ipfs.tech/unixfs/
+
 **Authors(s)**:
 - David Dias
 - Juan Benet
@@ -43,7 +46,7 @@ Essentially, data importing is divided into two parts:
 - Splitters - The chunking algorithms applied to each file, these can be:
   - fixed size chunking (also known as dumb chunking)
   - rabin fingerprinting
-  - dedicated format chunking, these require knowledge of the format and typically only work with certain time of files (e.g. video, audio, images, etc)
+  - dedicated format chunking, these require knowledge of the format and typically only work with certain type of files (e.g. video, audio, images, etc)
   - special data structures chunking, formats like, tar, pdf, doc, container and/org vm images fall into this category
 
 ### Goals

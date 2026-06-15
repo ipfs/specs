@@ -1,5 +1,8 @@
 # ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) The Keychain
 
+> [!NOTE]
+> This is a work-in-progress specification from the early days of IPFS that was never completed. It remains here for historical reference.
+
 **Authors(s)**:
 - [Juan Benet](github.com/jbenet)
 
