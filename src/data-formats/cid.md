@@ -95,31 +95,6 @@ Where
 
 IPFS implementations SHOULD support at minimum `base58btc` (`z`), `base32` (`b`), `base16` (`f`), and `base36` (`k`, for ed25519 keys in [IPNS Records](https://specs.ipfs.tech/ipns/ipns-record/)).
 
-## Variant - Human-Readable Form
-
-It is often advantageous to translate a CID, which is already modular and self-describing, into a *human-readable* expansion of its self-describing parts, for purposes such as debugging, unit testing, and documentation.
-We can easily transform a Stringified CID to a "Human-Readable CID" by translating and segmenting its constituent parts as follows:
-
-```text
-<hr-cid> ::= <hr-mbc> "-" <hr-cid-mc> "-" <hr-mc> "-" <hr-mh>
-```
-Where each sub-component is replaced with its own human-readable form from the relevant registry:
-
-- `<hr-mbc>` is the name of the multibase code (eg `z`--> `base58btc`)
-- `<hr-cid-mc>` is the name of the multicodec for the version of CID used (eg `0x01` --> `cidv1`)
-- `<hr-mc>` is the name of the multicodec code (eg `0x51` --> `cbor`)
-- `<hr-mh>` is the name of the multihash code (eg `sha2-256-256`) followed by a final dash and the hash itself `-abcdef0123456789...`)
-
-For example:
-
-```text
-# example CID
-zb2rhe5P4gXftAwvA4eXQ5HJwsER2owDyS9sKaQRRVQPn93bA
-# corresponding human readable CID
-base58btc - cidv1 - raw - sha2-256-256-6e6ff7950a36187a801613426e858dce686cd7d7e3c0fc42ee0330072d245c95
-```
-See: https://cid.ipfs.io/#zb2rhe5P4gXftAwvA4eXQ5HJwsER2owDyS9sKaQRRVQPn93bA
-
 ## Design Considerations
 
 CIDs design takes into account many difficult tradeoffs encountered while building [IPFS](https://ipfs.tech). These are mostly coming from the multiformats project.
@@ -252,3 +227,34 @@ Due to this, changes to CID specification MUST be submitted as an improvement pr
 ## Historical Design Decisions
 
 You can read an [in-depth discussion on why this format was needed in IPFS](https://github.com/ipfs/specs/issues/130) and the [original CIDv1 proposal](https://github.com/multiformats/cid/blob/f638ca68390758f0d4c7f90ac843091d3973cd02/original-rfc.md).
+
+## Human-Readable Form
+
+This is design guidance for tools that present a human-readable CID inspector to a user, such as a debugger, a block explorer, or the diagnostic UI at https://cid.ipfs.tech.
+It is not a wire format: nothing produces or parses it, and it carries no information beyond what the CID already encodes.
+
+When such a UI needs to show what a CID contains, it can expand the already self-describing CID into a labelled listing of its parts:
+
+```text
+<hr-cid> ::= <hr-mbc> "-" <hr-cid-mc> "-" <hr-mc> "-" <hr-mh>
+```
+
+Where each sub-component is the name of its code in the relevant multiformats registry:
+
+- `<hr-mbc>` is the multibase code name (eg `b` -> `base32`)
+- `<hr-cid-mc>` is the CID version multicodec name (eg `0x01` -> `cidv1`)
+- `<hr-mc>` is the content-type multicodec name (eg `0x55` -> `raw`)
+- `<hr-mh>` is the multihash code name and digest length (eg `sha2-256-256`), then a final dash and the hex digest
+
+For example, the CIDv1 for the raw bytes `hello`:
+
+```text
+# example CID
+bafkreibm6jg3ux5qumhcn2b3flc3tyu6dmlb4xa7u5bf44yegnrjhc4yeq
+# corresponding human readable CID
+base32 - cidv1 - raw - sha2-256-256-2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824
+```
+
+These names come from the multiformats registries and are provisional labels for human eyes only; only the numeric codes are stable.
+A UI should show the codes next to the names, and no consumer should rely on a name staying the same.
+See: https://cid.ipfs.tech/#bafkreibm6jg3ux5qumhcn2b3flc3tyu6dmlb4xa7u5bf44yegnrjhc4yeq
