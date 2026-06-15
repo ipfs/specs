@@ -196,9 +196,9 @@ and is provided here only for extra context.
 
 ## FAQ
 
-> **Q. I have questions on multicodec, multibase, or multihash.**
+> **Q. I have questions on multicodec, multibase, multihash, or unsigned-varint.**
 
-Please check their repositories: [multicodec](https://github.com/multiformats/multicodec), [multibase](https://github.com/multiformats/multibase), [multihash](https://github.com/multiformats/multihash).
+Please check their repositories: [multicodec](https://github.com/multiformats/multicodec), [multibase](https://github.com/multiformats/multibase), [multihash](https://github.com/multiformats/multihash), [unsigned-varint](https://github.com/multiformats/unsigned-varint).
 
 > **Q. Why does CID exist?**
 
