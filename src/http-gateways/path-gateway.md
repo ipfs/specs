@@ -4,7 +4,7 @@ description: >
   The comprehensive low-level HTTP Gateway enables the integration of IPFS
   resources into the HTTP stack through /ipfs and /ipns namespaces, supporting
   both deserialized and verifiable response types.
-date: 2026-03-05
+date: 2026-06-15
 maturity: reliable
 editors:
   - name: Marcin Rataj
@@ -496,22 +496,40 @@ in caches.
 Returned directive depends on requested content path and format:
 
 - `Cache-Control: public, max-age=29030400, immutable` MUST be returned for
-  every immutable resource under `/ipfs/` namespace.
-  - Generated `/ipfs/` responses such as UnixFS directory listings are not
-    byte-for-byte immutable and SHOULD have a meaningful expiration that allows
-    for generated responses to be updated over time. Suggested value is at least one week:
+  every immutable resource under the `/ipfs/` namespace.
+  - Generated `/ipfs/` responses, such as UnixFS directory listings, are not
+    byte-for-byte stable: their markup can change between implementations and
+    versions, so they MUST NOT be marked `immutable`. Give them an expiration
+    that lets caches pick up regenerated markup. The underlying data is
+    content-addressed and never expires, so a stale response can only show
+    outdated markup, never invalid data, and a fixed stale window is safe. A
+    floor of one week works well:
     `public, max-age=604800, stale-while-revalidate=2678400`.
 
-- `Cache-Control: public, max-age=<ttl>, stale-while-revalidate=2678400` SHOULD be returned for mutable
-  resources under `/ipns/{id-with-ttl}/` namespace; `max-age=<ttl>` SHOULD
-  indicate remaining TTL of the mutable pointer such as :cite[ipns-record] or DNSLink
-  TXT record.
-  - Implementations MAY place an upper bound on any TTL received, as
-    noted in Section 8 of :cite[rfc2181].
-  - If TTL value is unknown, implementations MAY send a best-effort `Cache-Control`
-    informing caches and CDNs how long a stale response is acceptable.
-  - No matter if TTL value is known or not, implementations SHOULD always
-    send a [`Last-Modified`](#last-modified-response-header) header with the timestamp of the record resolution.
+- `Cache-Control: public, max-age=<ttl>` SHOULD be returned for mutable
+  resources under the `/ipns/{id-with-ttl}/` namespace, where `<ttl>` is the
+  remaining TTL of the mutable pointer: the :cite[ipns-record] `TTL` field or
+  the DNSLink TXT record TTL.
+  - Implementations MAY place an upper bound on any TTL received, as noted in
+    Section 8 of :cite[rfc2181].
+  - A `stale-while-revalidate` or `stale-if-error` window MAY be added to
+    improve CDN and offline behavior, but it MUST respect the pointer's
+    expiration. An :cite[ipns-record] with `ValidityType=0` is cryptographically
+    valid only until its `Validity` (EOL) timestamp, and a validating client
+    rejects it once that timestamp passes. Cap `max-age` to the remaining
+    validity, and size the stale window so that `max-age` plus the stale window
+    still ends before the EOL; a fixed stale window is unsafe because it can
+    push reuse past the EOL. Return `Cache-Control: no-store` for a response
+    backed by an already-expired record. This bound is mandatory for the raw
+    record response (`format=ipns-record`), whose body is the signed record
+    itself. A DNSLink pointer carries no signature EOL and MAY use a bounded
+    best-effort stale window.
+  - If the TTL is unknown, implementations MAY send a best-effort
+    `Cache-Control` telling caches and CDNs how long a stale response is
+    acceptable.
+  - Whether or not the TTL is known, implementations SHOULD always send a
+    [`Last-Modified`](#last-modified-response-header) header with the timestamp
+    of the record resolution.
 
 ### `Last-Modified` (response header)
 

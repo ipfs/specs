@@ -4,7 +4,7 @@ description: >
   Delegated routing is a mechanism for IPFS implementations to use for offloading
   content routing, peer routing and naming to another process/server. This specification describes
   an HTTP API for delegated routing of content, peers, and IPNS.
-date: 2025-12-17
+date: 2026-06-15
 maturity: reliable
 editors:
   - name: Marcin Rataj
@@ -232,9 +232,11 @@ Each object in the `Peers` list is a record conforming to the [Peer Schema](#pee
 #### Response Headers
 
 - `Etag`: a globally unique opaque string used for HTTP caching. MUST be derived from the protobuf record returned in the body.
-- `Cache-Control: public, max-age={ttl}, public, stale-while-revalidate={sig-ttl}, stale-if-error={sig-ttl}`: meaningful cache TTL returned with :ref[IPNS Record]
-  - The `max-age` value in seconds SHOULD match duration from `IpnsEntry.data[TTL]`, if present and bigger than `0`. Otherwise, implementation SHOULD default to `max-age=60`.
-  - Implementations SHOULD include `sig-ttl`, set to the remaining number of seconds the returned IPNS Record is valid.
+- `Cache-Control: public, max-age={ttl}, stale-while-revalidate={stale}, stale-if-error={stale}`: cache lifetime for the returned :ref[IPNS Record].
+  - An IPNS Record with `ValidityType=0` is valid only until its EOL, the `Validity` timestamp. A cache that reuses the record past the EOL serves a record that fails validation, so the entire cache lifetime MUST stay within the remaining validity.
+  - `{ttl}` (the `max-age`) SHOULD match `IpnsEntry.data[TTL]` in seconds, or default to `60` when `TTL` is absent or `0`. Either way, cap it to the remaining validity.
+  - `{stale}` SHOULD be the remaining validity minus `max-age`, so `max-age` plus the stale window ends at the EOL and never crosses it.
+  - Return `Cache-Control: no-store` instead when the record is already expired, or when its `ValidityType` is unrecognized and the EOL is therefore unknown.
 - `Expires:`: an HTTP-date timestamp ([RFC9110, Section 5.6.7](https://www.rfc-editor.org/rfc/rfc9110#section-5.6.7)) when the validity of IPNS Record expires (if `ValidityType=0`, when signature expires)
 - `Last-Modified`: an HTTP-date timestamp of when cacheable resolution occurred: allows HTTP proxies and CDNs to support inexpensive update checks via `If-Modified-Since`
 - `Vary: Accept`: allows intermediate caches to play nicely with the different possible content types.
