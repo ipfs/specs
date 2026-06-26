@@ -2,7 +2,7 @@
 title: CID (Content IDentifier)
 description: >
     Self-describing content-addressed identifiers for distributed systems
-date: 2026-06-15
+date: 2026-06-26
 maturity: permanent
 editors:
   - name: Marcin Rataj
@@ -167,12 +167,10 @@ To decode a binary CID `bytes`:
 
 To decode a CID string (ASCII or UTF-8):
 
-1. If the string is 46 characters long and begins with `Qm`:
-   1. Decode it as `base58btc` to get `bytes`.
-   2. Decode `bytes` as a binary CID (above) and return the result; it validates as a CIDv0.
-2. Otherwise, decode the string by its [multibase](https://github.com/multiformats/multibase) prefix to get `bytes`.
-3. If the first byte of `bytes` is `0x12`, a decoder MUST reject the input: a CIDv0 is never multibase-encoded, and `0x12` equals 18, a value reserved so that no CIDv18 can be confused with a base-decoded CIDv0.
-4. Decode `bytes` as a binary CID (above) and return the result.
+1. Convert the string to binary `bytes`:
+   - If it is 46 characters long and begins with `Qm`, it is a CIDv0; decode it as `base58btc`.
+   - Otherwise, decode it by its [multibase](https://github.com/multiformats/multibase) prefix.
+2. Decode `bytes` as a binary CID (above) and return the result.
 
 # Appendices
 
