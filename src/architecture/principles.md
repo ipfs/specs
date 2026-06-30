@@ -12,10 +12,9 @@ editors:
     url: https://berjon.com/
     github: darobin
     twitter: robinberjon
-    mastodon: "@robin@mastodon.social"
     affiliation:
-        name: Protocol Labs
-        url: https://protocol.ai/
+        name: IPFS Foundation
+        url: https://ipfsfoundation.org/
 tags: ['architecture']
 order: 0
 xref:
