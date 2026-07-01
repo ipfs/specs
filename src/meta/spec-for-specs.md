@@ -10,8 +10,8 @@ editors:
     email: robin@berjon.com
     url: https://berjon.com/
     github: darobin
-    twitter: robinberjon
     mastodon: "@robin@mastodon.social"
+    bluesky: robin.berjon.com
     affiliation:
         name: Protocol Labs
         url: https://protocol.ai/
@@ -61,8 +61,8 @@ editors:
       email: robin@berjon.com
       url: https://berjon.com/
       github: darobin
-      twitter: robinberjon
       mastodon: "@robin@mastodon.social"
+      bluesky: robin.berjon.com
       affiliation:
           name: Protocol Labs
           url: https://protocol.ai/
@@ -80,9 +80,9 @@ it SHOULD include a `description` field with the description of the specificatio
 
 The :ref[frontmatter] MUST also contain an `editors` field, which is an array of objects describing people
 who are responsible for editing this given :ref[spec]. The `editors` field MUST contain at least one
-person. The fields that describe a person are `name`, `email`, `url`, `github`, `twitter`, `mastodon`,
-and `affiliation` which is in turn an object with fields `name` and `url`. Each person as well as the
-affiliation MUST have a `name`; every other field is OPTIONAL.
+person. The fields that describe a person are `name`, `email`, `url`, `github`, `mastodon`, `twitter`,
+ `bluesky`, and `affiliation` which is in turn an object with fields `name` and `url`.
+Each person as well as the affiliation MUST have a `name`; every other field is OPTIONAL.
 
 The `xref` field exemplified above is described in the [references](#refs) section.
 
