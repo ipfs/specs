@@ -14,7 +14,7 @@ editors:
     email: robin@berjon.com
     url: https://berjon.com/
     github: darobin
-    twitter: robinberjon
+    bluesky: robin.berjon.com
     affiliation:
         name: IPFS Foundation
         url: https://ipfsfoundation.org/
