@@ -102,6 +102,7 @@ Optional `?filter-addrs` to apply Network Address Filtering from [IPIP-484](http
 - If both positive and negative filters are provided, the address must pass all negative filters and at least one positive filter to be included.
 - If there are no multiaddrs that match the passed transports, the provider is omitted from the response.
 - Filtering is case-insensitive.
+- Where a peer reports a [DNSADDR] address, it should be fully resolved before filtering is applied to the final address set.
 
 ##### `filter-protocols` (providers request query parameter)
 
@@ -468,6 +469,7 @@ libp2p protocol.
 
 [multibase]: https://github.com/multiformats/multibase
 [CIDv1]: https://github.com/multiformats/cid#cidv1
+[DNSADDR]: https://github.com/multiformats/multiaddr/blob/master/protocols/DNSADDR.md
 [multiaddr]: https://github.com/multiformats/multiaddr#specification
 [peer-id]: https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md
 [peer-id-representation]: https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#string-representation
