@@ -4,7 +4,7 @@ description: >
   Delegated routing is a mechanism for IPFS implementations to use for offloading
   content routing, peer routing and naming to another process/server. This specification describes
   an HTTP API for delegated routing of content, peers, and IPNS.
-date: 2025-12-17
+date: 2026-07-29
 maturity: reliable
 editors:
   - name: Marcin Rataj
@@ -102,7 +102,7 @@ Optional `?filter-addrs` to apply Network Address Filtering from [IPIP-484](http
 - If both positive and negative filters are provided, the address must pass all negative filters and at least one positive filter to be included.
 - If there are no multiaddrs that match the passed transports, the provider is omitted from the response.
 - Filtering is case-insensitive.
-- Where a peer reports a [DNSADDR] address, it should be fully resolved before filtering is applied to the final address set.
+- Where a peer reports a [DNSADDR] address, it SHOULD be fully resolved before filtering is applied to the final address set. The original `/dnsaddr` address SHOULD be kept in that set, so that a client asking for it (e.g. `?filter-addrs=dnsaddr`) still gets it back.
 
 ##### `filter-protocols` (providers request query parameter)
 
