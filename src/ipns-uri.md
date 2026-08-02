@@ -220,11 +220,11 @@ This section is non-normative.
 ### Why base36 for Ed25519
 
 A single DNS label is capped at 63 characters, and an authority that should double as a
-subdomain-gateway label inherits that cap. An Ed25519
-`libp2p-key` CIDv1 is about 40 bytes; its `base32` string runs to roughly 64 characters, just
-over the limit, while its `base36` string (`k51...`) fits. base32 remains fine for shorter
-identifiers, but base36 is what keeps an Ed25519 IPNS name usable as an authority and as a
-Subdomain Gateway label.
+subdomain-gateway label inherits that cap. Because an Ed25519 key is inlined rather than hashed
+(see [Keys too big to inline](#keys-too-big-to-inline)), its `libp2p-key` CIDv1 is 40 bytes, the
+largest an IPNS name gets in practice. That is 65 characters in `base32`, two over the limit, and
+63 in `base36` (`k51...`), which just fits. base32 remains fine for the shorter, hashed names, but
+base36 is what keeps an Ed25519 IPNS name usable as an authority and as a Subdomain Gateway label.
 
 ### Room for new key types
 
@@ -237,8 +237,8 @@ key container codecs that drop the libp2p wrapper altogether. Both directions ar
 The codec rule in [Cryptographic key form](#cryptographic-key-form) is written to survive that: it
 names no fixed set and leaves each implementation to say which codecs it accepts. What does not
 change is the shape of the authority, a case-insensitive CIDv1 that fits a DNS label. Post-quantum
-public keys are considerably larger than Ed25519 ones, so a key that does not fit runs into the
-same wall as an RSA name (see [RSA names may not fit](#rsa-names-may-not-fit)).
+public keys are far too large to inline, so their names will be digests rather than keys, with the
+consequences described in [Keys too big to inline](#keys-too-big-to-inline).
 
 ### Keep the whole resolution chain
 
@@ -250,14 +250,27 @@ answers a different question later: the DNS name is the human-readable origin, t
 :ref[IPNS Name] fetches the latest content from the same publisher even if the domain lapses,
 and the CID retrieves the exact saved version for as long as anyone keeps it available.
 
-### RSA names may not fit
+### Keys too big to inline
 
-An RSA key produces a `libp2p-key` CIDv1 large enough to exceed 63 characters, so an RSA IPNS
-name cannot become a subdomain label on gateway deployments that rely on public DNS and wildcard
-TLS certificates (see the
-[`ipfs://` note on long roots](https://specs.ipfs.tech/ipfs-uri/#roots-longer-than-63-characters)).
-A local resolver or a `*.localhost` gateway can still serve it. Prefer Ed25519 for public
-interoperability.
+An :ref[IPNS Name] is a multihash of the serialized public key, so how big that key is decides
+what the name actually carries.
+
+- A small key is hashed with `identity`, which stores the key verbatim inside the multihash. The
+  name *is* the key, and a resolver can recover it by decoding the authority. Ed25519 is the case
+  that matters: its serialized form is 36 bytes, inside the 42-byte inlining threshold.
+- A larger key, RSA or ECDSA today, is hashed with `sha2-256` instead. The name commits to the key
+  without carrying it, so the authority is a 32-byte digest no matter how big the key was.
+
+The second case produces the *shorter* name, not the longer one: about 57 characters in base36
+against 63 for an inlined Ed25519 key. The 63-character DNS label limit is a constraint on inlined
+keys, and it does not bite here.
+
+What does bite is that the key cannot be recovered from the name, so a resolver has to obtain it
+some other way before it can check a signature. Records for such keys carry a serialized copy of
+the public key alongside the signature, and a resolver MUST confirm that the copy hashes back to
+the authority before trusting it (:cite[ipns-record]). Because the authority is exactly the hash of
+those key bytes, the key is itself content-addressed: it can be stored and fetched as immutable
+data under the same multihash rather than travelling in every record.
 
 ## IANA considerations
 
