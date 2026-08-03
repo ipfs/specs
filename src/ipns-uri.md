@@ -4,7 +4,7 @@ description: >
   The ipns:// URI scheme for addressing mutable pointers, cryptographic IPNS
   names and DNSLink names, defined for interoperability with web browsers.
 date: 2026-08-03
-maturity: draft
+maturity: reliable
 editors:
   - name: Marcin Rataj
     github: lidel

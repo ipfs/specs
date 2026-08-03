@@ -4,7 +4,7 @@ description: >
   The ipfs:// URI scheme for addressing immutable, content-addressed data by
   CID, defined for interoperability with web browsers.
 date: 2026-08-03
-maturity: draft
+maturity: reliable
 editors:
   - name: Marcin Rataj
     github: lidel
