@@ -3,7 +3,7 @@ title: IPNS URI (ipns://)
 description: >
   The ipns:// URI scheme for addressing mutable pointers, cryptographic IPNS
   names and DNSLink names, defined for interoperability with web browsers.
-date: 2026-08-02
+date: 2026-08-03
 maturity: draft
 editors:
   - name: Marcin Rataj
@@ -140,9 +140,9 @@ The same WHATWG-URL-governs tie-breaker applies.
 
 - When the content root is a DNS name, it MUST be resolved via DNSLink
   (:cite[dnslink-gateway]), and for the public internet it MUST be an ICANN-compatible DNS name:
-  lowercase LDH labels (letters, digits, hyphens, with no leading or trailing hyphen) joined by at
-  least one `.`. The dot both reflects public DNS structure and keeps the DNS name distinct from a
-  single-label cryptographic key.
+  lowercase LDH labels (ASCII letters, digits, hyphens, with no leading or trailing hyphen) joined
+  by at least one dot (`.`). The dot both reflects public DNS structure and keeps the DNS name
+  distinct from a single-label cryptographic key.
 - An internationalized name MUST be converted to its ASCII form (`xn--...` punycode labels) via
   [domain to ASCII](https://url.spec.whatwg.org/#concept-domain-to-ascii) before it is placed in
   the authority; the authority itself carries only LDH labels.

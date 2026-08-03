@@ -3,7 +3,7 @@ title: IPFS URI (ipfs://)
 description: >
   The ipfs:// URI scheme for addressing immutable, content-addressed data by
   CID, defined for interoperability with web browsers.
-date: 2026-08-02
+date: 2026-08-03
 maturity: draft
 editors:
   - name: Marcin Rataj
@@ -197,6 +197,10 @@ behavior, and nothing needs to: the codec in the content root does.
   following it moves the traversal into a different document.
 - `raw` is opaque bytes with no links to follow, so a non-empty path has nowhere to go.
 
+Other codecs follow the same rule: a resolver walks `{path}` only as far as the codec defines
+links, so a codec with no links, or one the resolver does not recognize, leaves a non-empty path
+unresolvable.
+
 This applies at every step, not only the first. Each link the traversal follows carries its own CID
 with its own codec, so the rules can change partway down a path: a `dag-cbor` root can link to a
 `dag-pb` node, after which the remaining segments are UnixFS names. Path Gateway
@@ -223,8 +227,9 @@ rests on that gateway rather than on the URI.
 A native `ipfs://` implementation SHOULD resolve content paths with the same semantics as a
 Path Gateway, so that the same URI resolves consistently whether it is opened by a native handler
 or handed to a gateway. In a browser-like context, a native implementation SHOULD also mirror the
-origin isolation that a Subdomain Gateway provides, giving each content root its own origin (see
-[Origin](#origin)).
+origin isolation that a Subdomain Gateway provides, giving each content root its own origin,
+derived from the scheme and that root alone. [Origin](#origin) describes the two serializations
+known to work.
 
 ## Notes for implementers
 
@@ -234,8 +239,8 @@ new requirements.
 ### Reading `ipfs://` as a WHATWG URL
 
 The `//` is what makes the content root an authority. Neither `ipfs` nor `ipns` is a
-[special scheme](https://url.spec.whatwg.org/#special-scheme), and the two forms parse very
-differently:
+[special scheme](https://url.spec.whatwg.org/#special-scheme), and the two forms (with and
+without the `//`) parse very differently:
 
 - `ipfs://{cid}/{path}` has `//`, so the parser reads `{cid}` as the authority and `{path}` as a
   segmented, relative-resolvable path. The result is a URL that can be a base for relative
