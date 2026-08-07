@@ -10,11 +10,18 @@ editors:
     github: markg85
   - name: Marcin Rataj
     github: lidel
-    url: https://lidel.org/
     affiliation:
       name: Shipyard
       url: https://ipshipyard.com
 thanks:
+  - name: Tim Perry
+    github: pimterry
+  - name: Dietrich Ayala
+    github: autonome
+  - name: Dave Justice
+    github: meandavejustice
+  - name: dirkf
+    github: dirkf
   - name: Daniel Norman
     github: 2color
 tags: ['httpGateways', 'integratingHttpGateways']
