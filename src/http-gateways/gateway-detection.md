@@ -2,9 +2,9 @@
 title: Detecting User-Preferred IPFS Gateway
 description: >
   Specification of the rules and standards for detecting and identifying
-  user-preferred IPFS gateways within applications, enabling seamless
+  user-preferred IPFS Gateways within applications, enabling seamless
   integration and user control.
-date: 2025-12-16
+date: 2026-08-07
 maturity: reliable
 editors:
   - name: Mark Gaiser
@@ -15,20 +15,22 @@ editors:
     affiliation:
         name: Shipyard
         url: https://ipshipyard.com
+thanks:
+  - name: Daniel Norman
+    github: 2color
 tags: ['httpGateways', 'integratingHttpGateways']
 order: 99
 ---
 
-
 ## Introduction
 
-This document defines conventions for how applications can identify available
-IPFS gateway, and how IPFS gateway implementations can signal own endpoint to
+This document defines conventions for how applications can identify an available
+IPFS Gateway, and how IPFS Gateway implementations can signal their own endpoint to
 client applications.
 
 ## Specification
 
-There are two ways of hinting user-preferred gateway URL:
+There are two ways of hinting the user-preferred gateway URL:
 
 - Setting the `IPFS_GATEWAY` environment variable
 - Creating a `gateway` file at a well-known path
@@ -36,13 +38,12 @@ There are two ways of hinting user-preferred gateway URL:
 Applications SHOULD evaluate these hints in order and stop on the first match:
 
 1. Check if a valid `IPFS_GATEWAY` environment variable is set
-2. Check if a valid `gateway` file is present at one of well-known filesystem paths
-
+2. Check if a valid `gateway` file is present at one of the well-known filesystem paths
 
 ### `IPFS_GATEWAY` Environment Variable
 
-When `IPFS_GATEWAY` environment variable is set, the value SHOULD be interpreted
-as URL of IPFS Gateway application to use.
+When the `IPFS_GATEWAY` environment variable is set, the value SHOULD be interpreted
+as the URL of the IPFS Gateway to use.
 
 This variable SHOULD override gateway selection done by all other means, including
 internal application configuration.
@@ -81,7 +82,7 @@ line and ignore the rest of the file.
 
 ### Security
 
-Applications that integrate IPFS support via HTTP gateway:
+Applications that integrate IPFS support via HTTP gateways:
 
 MUST NOT hard-code non-localhost URL as a default fallback. Instead, SHOULD ask
 user to define preferred IPFS gateway using one of methods defined in this
