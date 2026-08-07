@@ -4,7 +4,7 @@ description: >
   Delegated routing is a mechanism for IPFS implementations to use for offloading
   content routing, peer routing and naming to another process/server. This specification describes
   an HTTP API for delegated routing of content, peers, and IPNS.
-date: 2025-11-20
+date: 2026-07-29
 maturity: reliable
 editors:
   - name: Marcin Rataj
@@ -102,6 +102,7 @@ Optional `?filter-addrs` to apply Network Address Filtering from [IPIP-484](http
 - If both positive and negative filters are provided, the address must pass all negative filters and at least one positive filter to be included.
 - If there are no multiaddrs that match the passed transports, the provider is omitted from the response.
 - Filtering is case-insensitive.
+- Where a peer reports a [DNSADDR] address, it SHOULD be fully resolved before filtering is applied to the final address set. The original `/dnsaddr` address SHOULD be kept in that set, so that a client asking for it (e.g. `?filter-addrs=dnsaddr`) still gets it back.
 
 ##### `filter-protocols` (providers request query parameter)
 
@@ -120,7 +121,7 @@ Optional `?filter-protocols` to apply IPFS Protocol Filtering from [IPIP-484](ht
 #### Response Status Codes
 
 - `200` (OK): the response body contains 0 or more records.
-- `404` (Not Found): must be returned if no matching records are found.
+- `404` (Not Found): SHOULD NOT be returned by a server, but if a client receives it, it MUST be interpreted as 200 with 0 results for backward compatibility, resiliency, and maximal interoperability.
 - `422` (Unprocessable Entity): request does not conform to schema or semantic constraints.
 
 #### Response Headers
@@ -177,8 +178,8 @@ Optional, same rules as [`filter-protocols` providers request query parameter](#
 
 #### Response Status Codes
 
-- `200` (OK): the response body contains the peer record.
-- `404` (Not Found): must be returned if no matching records are found.
+- `200` (OK): the response body contains 0 or more peer records.
+- `404` (Not Found): SHOULD NOT be returned by a server, but if a client receives it, it MUST be interpreted as 200 with 0 results for backward compatibility, resiliency, and maximal interoperability.
 - `422` (Unprocessable Entity): request does not conform to schema or semantic constraints.
 
 #### Response Headers
@@ -225,8 +226,8 @@ Each object in the `Peers` list is a record conforming to the [Peer Schema](#pee
 
 #### Response Status Codes
 
-- `200` (OK): the response body contains the :ref[IPNS Record] for the given :ref[IPNS Name].
-- `404` (Not Found): must be returned if no matching records are found.
+- `200` (OK): the response body contains the :ref[IPNS Record] for the given :ref[IPNS Name] with `Content-Type: application/vnd.ipfs.ipns-record`. Any other content type MUST be interpreted as "no record found".
+- `404` (Not Found): SHOULD NOT be returned by a server, but if a client receives it, it MUST be interpreted as "no record found" for backward compatibility, resiliency, and maximal interoperability.
 - `406` (Not Acceptable): requested content type is missing or not supported. Error message returned in body should inform the user to retry with `Accept: application/vnd.ipfs.ipns-record`.
 
 #### Response Headers
@@ -468,6 +469,7 @@ libp2p protocol.
 
 [multibase]: https://github.com/multiformats/multibase
 [CIDv1]: https://github.com/multiformats/cid#cidv1
+[DNSADDR]: https://github.com/multiformats/multiaddr/blob/master/protocols/DNSADDR.md
 [multiaddr]: https://github.com/multiformats/multiaddr#specification
 [peer-id]: https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md
 [peer-id-representation]: https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#string-representation

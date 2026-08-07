@@ -4,7 +4,7 @@ description: >
   The comprehensive low-level HTTP Gateway enables the integration of IPFS
   resources into the HTTP stack through /ipfs and /ipns namespaces, supporting
   both deserialized and verifiable response types.
-date: 2025-10-13
+date: 2026-03-05
 maturity: reliable
 editors:
   - name: Marcin Rataj
@@ -36,6 +36,12 @@ thanks:
     affiliation:
       name: Protocol Labs
       url: https://protocol.ai/
+  - name: Alex Potsides
+    github: achingbrain
+    url: https://achingbrain.net
+    affiliation:
+      name: Shipyard
+      url: https://ipshipyard.com
 xref:
   - url
   - trustless-gateway
@@ -158,12 +164,13 @@ For example:
 
 - [application/vnd.ipld.raw](https://www.iana.org/assignments/media-types/application/vnd.ipld.raw) – disables [IPLD codec deserialization](https://ipld.io/docs/codecs/), requests a verifiable raw [block](https://docs.ipfs.io/concepts/glossary/#block) to be returned
 - [application/vnd.ipld.car](https://www.iana.org/assignments/media-types/application/vnd.ipld.car) – disables [IPLD codec deserialization](https://ipld.io/docs/codecs/), requests a verifiable [CAR](https://docs.ipfs.io/concepts/glossary/#car) stream to be returned with implicit or explicit [`dag-scope`](https://specs.ipfs.tech/http-gateways/trustless-gateway/#dag-scope-request-query-parameter) for blocks at the terminus of the specified path and the blocks required to traverse path segments from root CID to the terminus.
-- [application/x-tar](https://en.wikipedia.org/wiki/Tar_(computing)) – returns UnixFS tree (files and directories) as a [TAR](https://en.wikipedia.org/wiki/Tar_(computing)) stream. Returned tree starts at a DAG which name is the same as the terminus segment. Produces 400 Bad Request for content that is not UnixFS.
-- [application/vnd.ipld.dag-json](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-json) – requests [IPLD Data Model](https://ipld.io/docs/data-model/) representation serialized into [DAG-JSON format](https://ipld.io/docs/codecs/known/dag-json/). If the requested CID already has `dag-json` (0x0129) codec, data is validated as DAG-JSON before being returned as-is. Invalid DAG-JSON produces HTTP Error 500.
-- [application/vnd.ipld.dag-cbor](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-cbor) – requests [IPLD Data Model](https://ipld.io/docs/data-model/) representation serialized into [DAG-CBOR format](https://ipld.io/docs/codecs/known/dag-cbor/). If the requested CID already has `dag-cbor` (0x71) codec,  data is validated as DAG-CBOR before being returned as-is. Invalid DAG-CBOR produces HTTP Error 500.
-- [application/json](https://www.iana.org/assignments/media-types/application/json) – same as `application/vnd.ipld.dag-json`, unless the CID's codec already is `json` (0x0200). Then, the raw JSON block can be returned as-is without any conversion.
-- [application/cbor](https://www.iana.org/assignments/media-types/application/cbor) – same as `application/vnd.ipld.dag-cbor`, unless the CID's codec already is `cbor` (0x51). Then, the raw CBOR block can be returned as-is without any conversion.
+- [application/x-tar](https://en.wikipedia.org/wiki/Tar_(computing)) – returns a UnixFS tree (files and directories) as a [TAR](https://en.wikipedia.org/wiki/Tar_(computing)) stream. Returned tree starts at a DAG which name is the same as the terminus segment. Produces 406 Not Acceptable for content that is not UnixFS.
+- [application/vnd.ipld.dag-json](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-json) – Returns the block when CID codec is `dag-json`. Implementations MAY validate block data before returning. SHOULD produce 406 Not Acceptable when the CID codec does not match.
+- [application/vnd.ipld.dag-cbor](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-cbor) – Returns the block when CID codec is `dag-cbor`. Implementations MAY validate block data before returning. SHOULD produce 406 Not Acceptable when the CID codec does not match.
+- [application/json](https://www.iana.org/assignments/media-types/application/json) – For blocks with CID codec `json`, returns block data as `application/json`. Implementations MAY validate block data before returning. For deserialized UnixFS files that represent text files with valid JSON, implementations SHOULD allow serving the file content as `application/json` regardless of the CID codec being `dag-pb` or `raw`. SHOULD produce 406 Not Acceptable in all other cases.
+- [application/cbor](https://www.iana.org/assignments/media-types/application/cbor) – Returns the block when CID codec is `cbor`. Implementations MAY validate block data before returning. SHOULD produce 406 Not Acceptable when the CID codec does not match.
 - [application/vnd.ipfs.ipns-record](https://www.iana.org/assignments/media-types/application/vnd.ipfs.ipns-record) – requests a verifiable :cite[ipns-record] to be returned. Produces 400 Bad Request if the content is not under the IPNS namespace, or contains a path.
+- [text/html](https://html.spec.whatwg.org/) – returns a human-readable representation of the requested data which may include a link to download the raw data.
 
 :::note
 
@@ -256,7 +263,7 @@ These are the equivalents:
 - `format=ipns-record` → `Accept: application/vnd.ipfs.ipns-record`
 
 When both `Accept` HTTP header  and `format` query parameter are present,
-`Accept` SHOULD take precedence.
+`format` SHOULD take precedence.
 
 :::note
 
@@ -338,6 +345,23 @@ NOTE: Gateways MUST return 404 for missing root blocks. However, for streaming
 responses (such as CAR), once HTTP 200 OK status is sent, gateways cannot
 change it. If a child block is missing during streaming, the gateway SHOULD
 terminate the stream. Clients MUST verify response completeness.
+
+### `406` Not Acceptable
+
+Returned when the requested response format does not match the CID's codec
+and the gateway does not perform cross-codec conversion.
+
+For example, requesting `?format=dag-json` on a `dag-cbor` block, or
+`?format=dag-cbor` on a `dag-pb` block, SHOULD return a 406 response.
+
+Similarly, requesting `?format=tar` for content that is not UnixFS SHOULD
+return 406.
+
+Implementations MAY include an actionable hint in the response body (e.g.,
+suggesting the client fetch the raw block with `?format=raw` and convert
+client-side).
+
+See :cite[ipip-0524] for details.
 
 ### `410` Gone
 
@@ -753,10 +777,10 @@ By default, implicit deserialized response type is based on `Accept` header and 
   - Bytes representing a CBOR file, see [application/cbor](https://www.iana.org/assignments/media-types/application/cbor)
   - Works exactly the same as `raw`, but returned `Content-Type` is `application/cbor`
 - DAG-JSON (0x0129)
-  - If the `Accept` header includes `text/html`, implementation should return a generated HTML with options to download DAG-JSON as-is, or converted to DAG-CBOR.
+  - If the `Accept` header includes `text/html`, implementation should return a generated HTML with an option to download DAG-JSON as-is.
   - Otherwise, response works exactly the same as `raw` block, but returned `Content-Type` is [application/vnd.ipld.dag-json](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-json)
 - DAG-CBOR (0x71)
-  - If the `Accept` header includes `text/html`: implementation should return a generated HTML with options to download DAG-CBOR as-is, or converted to DAG-JSON.
+  - If the `Accept` header includes `text/html`: implementation should return a generated HTML with an option to download DAG-CBOR as-is.
   - Otherwise, response works exactly the same as `raw` block, but returned `Content-Type` is [application/vnd.ipld.dag-cbor](https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-cbor)
 
 The following response types require an explicit opt-in, can only be requested with [`format`](#format-request-query-parameter) query parameter or [`Accept`](#accept-request-header) header:
