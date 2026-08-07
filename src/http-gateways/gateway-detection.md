@@ -1,9 +1,8 @@
 ---
 title: Detecting User-Preferred IPFS Gateway
 description: >
-  Specification of the rules and standards for detecting and identifying
-  user-preferred IPFS Gateways within applications, enabling seamless
-  integration and user control.
+  How applications detect the user-preferred IPFS Gateway via the
+  IPFS_GATEWAY environment variable or a well-known gateway file.
 date: 2026-08-07
 maturity: reliable
 editors:
@@ -13,8 +12,8 @@ editors:
     github: lidel
     url: https://lidel.org/
     affiliation:
-        name: Shipyard
-        url: https://ipshipyard.com
+      name: Shipyard
+      url: https://ipshipyard.com
 thanks:
   - name: Daniel Norman
     github: 2color
@@ -40,20 +39,28 @@ Applications SHOULD evaluate these hints in order and stop on the first match:
 1. Check if a valid `IPFS_GATEWAY` environment variable is set
 2. Check if a valid `gateway` file is present at one of the well-known filesystem paths
 
+If a hint is present but its value is not a valid URL, applications SHOULD
+report an error instead of silently falling back to the next hint.
+
+If no valid hint is found, gateway selection is unconfigured. Applications
+SHOULD NOT fall back to a hard-coded non-localhost gateway (see Security below).
+
 ### `IPFS_GATEWAY` Environment Variable
 
 When the `IPFS_GATEWAY` environment variable is set, the value SHOULD be interpreted
-as the URL of the IPFS Gateway to use.
+as the URL of the IPFS Gateway to use. The value holds a single URL, following
+the same rules as the first line of the `gateway` file.
 
-This variable SHOULD override gateway selection done by all other means, including
-internal application configuration.
+Applications SHOULD give this variable precedence over gateway URLs from
+internal application configuration. Explicit per-invocation user input, such as
+a command-line argument, MAY take precedence over this variable.
 
 ### The `gateway` Configuration File
 
 Client application SHOULD check if file is present at specific filesystem paths, in order:
 
 1. If `IPFS_PATH` is set, try `$IPFS_PATH/gateway`
-2. If `HOME` is set, try `$HOME/.ipfs/gateway`
+2. Otherwise, if `HOME` is set, try `$HOME/.ipfs/gateway` (the default `IPFS_PATH` location)
 3. Try OS-specific paths:
    - Linux/Unix:
      1. `$XDG_CONFIG_HOME/ipfs/gateway` (only if `XDG_CONFIG_HOME` is set)
@@ -70,33 +77,34 @@ Client application SHOULD check if file is present at specific filesystem paths,
 When `gateway` file is present, the file contents MUST be interpreted as an
 ASCII text file with one URL per line (separated by `\n` or `\r\n`).
 
-The first line MUST be a valid `http://` or `https://` URL without a path
+The first line MUST be a valid `http://` or `https://` URL consisting only of
+a scheme, host, and optional port, with no path, query, or fragment
 (e.g., `http://127.0.0.1:8080`). The gateway at this URL MUST support
 :cite[trustless-gateway], SHOULD support :cite[path-gateway] when deserialized
 responses are required, and SHOULD support :cite[subdomain-gateway] when Origin
 isolation is required.
 
 Implementations MAY support additional lines for gateway pools or failover.
-Implementations that do not support multiple URLs SHOULD read only the first
-line and ignore the rest of the file.
+Additional lines, when present, MUST follow the same URL rules, and empty
+lines MUST be ignored. Implementations that do not support multiple URLs
+SHOULD read only the first line and ignore the rest of the file.
 
 ### Security
 
 Applications that integrate IPFS support via HTTP gateways:
 
-MUST NOT hard-code non-localhost URL as a default fallback. Instead, SHOULD ask
-user to define preferred IPFS gateway using one of methods defined in this
-document.
-
-SHOULD either warn user when non-localhost gateway is used for deserialized
-responses (warning about the risk of MITM), or (preferred) limit HTTP use
-outside of localhost to verifiable response types defined in
-:cite[trustless-gateway].
+- SHOULD NOT hard-code a non-localhost URL as a default fallback. Instead, they
+  SHOULD ask the user to define a preferred IPFS gateway using one of the
+  methods defined in this document.
+- SHOULD either warn the user when a non-localhost gateway is used for
+  deserialized responses (risk of MITM), or (preferred) limit HTTP use
+  outside of localhost to verifiable response types defined in
+  :cite[trustless-gateway].
 
 ### Privacy and User Control
 
-Applications SHOULD never default to public gateways. Instead, suggest to the
-user how to run a local node.
+Applications SHOULD NOT default to public gateways (see Security above).
+Instead, applications SHOULD suggest to the user how to run a local node.
 
 ### Compatibility and Testing
 
