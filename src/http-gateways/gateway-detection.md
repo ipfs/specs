@@ -1,5 +1,5 @@
 ---
-title: Detecting User-Preferred IPFS Gateway
+title: User-Preferred Gateway Detection
 description: >
   How applications detect the user-preferred IPFS Gateway via the
   IPFS_GATEWAY environment variable or a well-known gateway file.
