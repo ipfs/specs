@@ -100,6 +100,13 @@ Applications that integrate IPFS support via HTTP gateways:
   deserialized responses (risk of MITM), or (preferred) limit HTTP use
   outside of localhost to verifiable response types defined in
   :cite[trustless-gateway].
+- When running in a web browser, SHOULD use a gateway URL that qualifies as a
+  [secure context](https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/Secure_Contexts):
+  either `https://`, or localhost (e.g., `http://127.0.0.1:8080`), which
+  browsers treat as potentially trustworthy.
+- When Origin isolation is required, SHOULD use a :cite[subdomain-gateway]
+  (e.g., `http://{cid}.ipfs.localhost:8080`), so each content root is loaded
+  from its own origin.
 
 ### Privacy and User Control
 
