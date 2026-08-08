@@ -38,20 +38,14 @@ body {
 
 .ipip-historic {
   --highlight-colour: #b08050;
-  --highlight-colour-faded: #c9a07a;
+  --link-colour: #8b6914;
+  --note-colour: #b08050;
+  --warning-colour: #c07030;
   --standard-gradient: linear-gradient(to right, #5c4a3a, #b08050);
 }
 
 .ipip-historic header {
   border-bottom-color: #b08050;
-}
-
-.ipip-historic a {
-  color: #8b6914;
-}
-
-.ipip-historic a:hover {
-  color: #b08050;
 }
 
 .ipip-historic h1,
@@ -70,20 +64,13 @@ body {
 .ipip-historic pre {
   background: #faf6f0;
   border-color: #b08050;
+  box-shadow: -1px 0 0 0 #b08050, 0 0 0 1px #e5d8c8;
 }
 
 .ipip-historic div.note,
 .ipip-historic div.warning,
 .ipip-historic div.example {
   background: #faf6f0;
-}
-
-.ipip-historic div.note {
-  border-color: #b08050;
-}
-
-.ipip-historic div.warning {
-  border-color: #c07030;
 }
 
 #ipseity-back-to-root {
