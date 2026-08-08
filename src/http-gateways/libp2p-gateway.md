@@ -19,7 +19,7 @@ xref:
   - http-routing-v1
   - path-gateway
   - trustless-gateway
-tags: ['httpGateways', 'lowLevelHttpGateways', 'exchange', 'transport']
+tags: ['httpGateways', 'integratingHttpGateways', 'exchange', 'transport']
 order: 3
 ---
 

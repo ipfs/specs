@@ -1,9 +1,9 @@
-# ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) IPFS Architecture Overview
+# ![status: deprecated](https://img.shields.io/badge/status-deprecated-red.svg?style=flat-square) IPFS Architecture Overview
 
 > [!NOTE]
 > This document contains historical notes about IPFS architecture from ~2015. For current specifications, please refer to https://specs.ipfs.tech/
 
-**Authors(s)**:
+**Author(s)**:
 - [Juan Benet](https://github.com/jbenet)
 - [David Dias](https://github.com/daviddias)
 
@@ -12,7 +12,7 @@
 
 * * *
 
-**Abstract**
+## Abstract
 
 This spec document defines the IPFS protocol stack, the subsystems, the interfaces, and how it all fits together. It delegates non-interface details to other specs as much as possible. This is meant as a top-level view of the protocol and how the system fits together.
 
@@ -20,12 +20,12 @@ Note, this document is not meant to be an introduction of the concepts in IPFS a
 
 # Table of Contents
 
-- 1. IPFS and the Merkle DAG
-- 2. Nodes and Network Model
-- 3. The Stack
-- 4. Applications and data structures -- on top of IPFS
-- 5. Lifetime of fetching an object
-- 6. IPFS User Interfaces
+1. IPFS and the Merkle DAG
+1. Nodes and Network Model
+1. The Stack
+1. Applications and data structures -- on top of IPFS
+1. Lifetime of fetching an object
+1. IPFS User Interfaces
 
 # 1. IPFS and the Merkle DAG
 
@@ -47,7 +47,6 @@ In turn, these yield properties for the system as a whole:
 - (todo: list more)
 
 IPFS is a stack of network protocols that organize agent networks to create, publish, distribute, serve, and download merkledags. It is the authenticated, decentralized, permanent web.
-
 
 # 2. Nodes and Network Model
 
@@ -72,7 +71,6 @@ sha2-512
 sha3
 ```
 
-
 # 3. The Stack
 
 IPFS has a stack of modular protocols. Each layer may have multiple implementations, all in different modules. This spec will only address the interfaces between the layers, and briefly mention possible implementations. Details are left to the other specs.
@@ -85,7 +83,7 @@ IPFS has five layers:
 - **routing** - locating peers and objects
 - **network** - establishing connections between peers
 
-![](img/ipfs-stack.png)
+![IPFS protocol stack](img/ipfs-stack.png)
 
 These are briefly described bottom-up.
 
@@ -165,7 +163,7 @@ The merkledag is enough to resolve paths:
 
 See more in the [path resolution spec](https://github.com/ipld/specs/blob/master/data-model-layer/paths.md).
 
-![](img/ipfs-resolve/ipfs-resolve.gif)
+![IPFS path resolution](img/ipfs-resolve/ipfs-resolve.gif)
 
 ## 3.5 Naming -- PKI namespace and mutable pointers
 
@@ -196,7 +194,7 @@ The unix filesystem abstractions -- files and directories -- are the main way pe
 
 See more in the [unixfs spec](https://github.com/ipfs/specs/blob/master/UNIXFS.md).
 
-## 5. Lifetime of fetching an object.
+## 5. Lifetime of fetching an object
 
 Suppose we ask an IPFS node to retrieve
 
@@ -225,7 +223,7 @@ IPFS is not just a protocol. It is also a toolset. IPFS implementations include 
 
 * * *
 
-# WIP Stack Dump:
+# WIP Stack Dump
 
 - How the layers fit together
 - How they call on each other

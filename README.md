@@ -1,5 +1,7 @@
 # IPFS Specifications
 
+**Don't read the specs here! Go to [specs.ipfs.tech](https://specs.ipfs.tech/), it's a much better experience!**
+
 > This repository contains the specs for the IPFS Protocol and associated subsystems.
 
 - [Documentation and Community](#documentation-and-community)
