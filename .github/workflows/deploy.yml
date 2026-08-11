@@ -39,16 +39,16 @@ jobs:
           github-token: ${{ github.token }}
 
       - name: Deploy to IPFS Mirror Providers
-        uses: ipshipyard/ipfs-deploy-action@v1
+        uses: ipshipyard/ipfs-deploy-action@v2
         id: deploy
         with:
           path-to-deploy: ${{ env.BUILD_PATH }}
+          # Kubo's recursive add skips dotfiles by default, which would drop
+          # .well-known/security.txt and .nojekyll from the deployed site
+          ipfs-add-options: '--hidden'
           cluster-url: "/dnsaddr/ipfs-websites.collab.ipfscluster.io"
           cluster-user: ${{ secrets.CLUSTER_USER }}
           cluster-password: ${{ secrets.CLUSTER_PASSWORD }}
-          #TODO storacha-key: ${{ secrets.STORACHA_KEY }}
-          #TODO storacha-proof: ${{ secrets.STORACHA_PROOF }}
-          #TODO pinata-jwt-token: ${{ secrets.PINATA_JWT_TOKEN }}
           github-token: ${{ github.token }}
 
   dnslink-update:

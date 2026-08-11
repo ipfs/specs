@@ -13,6 +13,7 @@ install:
 website: clean install
 	npx spec-generator -c .config.json
 	touch out/.nojekyll
+	node scripts/gen-security-txt.mjs out/.well-known/security.txt
 
 watch: clean install
 	npx spec-generator -c .config.json -w
