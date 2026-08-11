@@ -4,7 +4,7 @@ description: >
   The comprehensive low-level HTTP Gateway enables the integration of IPFS
   resources into the HTTP stack through /ipfs and /ipns namespaces, supporting
   both deserialized and verifiable response types.
-date: 2026-06-15
+date: 2026-08-11
 maturity: reliable
 editors:
   - name: Marcin Rataj
@@ -496,48 +496,68 @@ in caches.
 Returned directive depends on requested content path and format:
 
 - `Cache-Control: public, max-age=29030400, immutable` MUST be returned for
-  every immutable resource under the `/ipfs/` namespace.
-  - Generated `/ipfs/` responses, such as UnixFS directory listings, are not
-    byte-for-byte stable: their markup can change between implementations and
-    versions, so they MUST NOT be marked `immutable`. Give them an expiration
-    that lets caches pick up regenerated markup. The underlying data is
-    content-addressed and never expires, so a stale response can only show
-    outdated markup, never invalid data, and a fixed stale window is safe. A
-    floor of one week works well:
-    `public, max-age=604800, stale-while-revalidate=2678400`. This fixed window
-    applies only under the immutable `/ipfs/` namespace. The same listing
-    reached through `/ipns/` is mutable and follows the rules below.
+  every immutable resource under the `/ipfs/` namespace, except generated
+  responses described below.
+  - A generated response is one whose body is markup produced by the gateway
+    rather than the data addressed by the CID: a UnixFS directory listing
+    rendered as HTML, or an HTML preview of a `dag-cbor`/`dag-json` document.
+    Deterministic format conversions (such as `dag-cbor` returned as
+    `dag-json`) are not generated responses and keep the `immutable`
+    directive.
+  - Generated `/ipfs/` responses are not byte-for-byte stable: their markup
+    can change between implementations and versions, so they MUST NOT be
+    marked `immutable`, and SHOULD be given an expiration that lets caches
+    pick up regenerated markup. The underlying data is content-addressed and
+    never expires, so a stale response can only show outdated markup, never
+    invalid data, and a fixed stale window is safe. The RECOMMENDED window is
+    `public, max-age=604800, stale-while-revalidate=2678400` (one week, plus
+    a 31-day stale period). This fixed window applies only under the
+    immutable `/ipfs/` namespace. The same listing reached through `/ipns/`
+    is mutable and follows the rules below.
 
 - `Cache-Control: public, max-age=<ttl>` SHOULD be returned for mutable
-  resources under the `/ipns/{id-with-ttl}/` namespace, where `<ttl>` is the
-  remaining TTL of the mutable pointer: the :cite[ipns-record] `TTL` field or
-  the DNSLink TXT record TTL.
+  resources under the `/ipns/{id-with-ttl}/` namespace, where `<ttl>` is
+  derived from the TTL of the mutable pointer, expressed in seconds: the
+  :cite[ipns-record] `TTL` field (nanoseconds, converted to seconds) or the
+  DNSLink DNS TXT record TTL (already in seconds).
+  - When serving from a cached resolution, implementations SHOULD lower
+    `<ttl>` by the time elapsed since the resolution, so layered caches do
+    not extend the effective freshness beyond the pointer's TTL.
   - Implementations MAY place an upper bound on any TTL received, as noted in
     Section 8 of :cite[rfc2181].
   - A `stale-while-revalidate` or `stale-if-error` window MAY be added to
     improve CDN and offline behavior, but it MUST respect the pointer's
     expiration. An :cite[ipns-record] with `ValidityType=0` is cryptographically
     valid only until its `Validity` (EOL) timestamp, and a validating client
-    rejects it once that timestamp passes. Cap `max-age` to the remaining
-    validity, and size the stale window so that `max-age` plus the stale window
-    still ends before the EOL; a fixed stale window is unsafe because it can
-    push reuse past the EOL. Return `Cache-Control: no-store` for a response
-    backed by an already-expired record. This bound is mandatory for the raw
-    record response (`format=ipns-record`), whose body is the signed record
-    itself. A DNSLink pointer carries no signature EOL and MAY use a bounded
-    best-effort stale window.
+    rejects it once that timestamp passes. When the EOL is known, `max-age`
+    SHOULD NOT exceed the remaining validity, and the stale window SHOULD be
+    sized so that `max-age` plus the stale window ends at the EOL and never
+    crosses it; a fixed stale window can push reuse past the EOL. A response
+    backed by an already-expired record, or by a record whose `ValidityType`
+    is unrecognized and whose EOL is therefore unknown, SHOULD be served with
+    `Cache-Control: no-store`. For the raw record response
+    (`format=ipns-record`), whose body is the signed record itself, the
+    entire cache lifetime (`max-age` plus any stale window) SHOULD stay
+    within the remaining validity. A DNSLink pointer carries no signature
+    EOL and MAY use a bounded best-effort stale window.
   - A generated response reached through `/ipns/`, such as a directory listing,
     is mutable even though its body is regenerated markup. Apply the `/ipns/`
     `max-age` and stale-window rules above, not the fixed window for generated
     `/ipfs/` responses: the pointer it renders can move and, for an
-    :cite[ipns-record], expire, so the response MUST NOT be cached past the
+    :cite[ipns-record], expire, so the response SHOULD NOT be cached past the
     record's EOL.
   - If the TTL is unknown, implementations MAY send a best-effort
     `Cache-Control` telling caches and CDNs how long a stale response is
-    acceptable.
-  - Whether or not the TTL is known, implementations SHOULD always send a
-    [`Last-Modified`](#last-modified-response-header) header with the timestamp
-    of the record resolution.
+    acceptable. The EOL bound above still applies: when the record's EOL is
+    known, the freshness lifetime SHOULD NOT extend past it.
+  - Implementations SHOULD send a
+    [`Last-Modified`](#last-modified-response-header) header with the
+    timestamp of the record resolution alongside `Cache-Control`: the
+    explicit directive takes precedence over heuristic freshness, and the
+    timestamp enables inexpensive update checks via `If-Modified-Since`.
+    Sending `Last-Modified` without `Cache-Control` triggers heuristic
+    freshness; see the
+    [`Last-Modified`](#last-modified-response-header) section.
 
 ### `Last-Modified` (response header)
 
