@@ -67,6 +67,11 @@ specification compliance. This section can be skipped if IPIP does not deal
 with the way IPFS handles content-addressed data, or the modified specification
 file already includes this information.
 
+Every CID listed here needs CAR coverage attached to the pull request and
+linked from this section, so a reader can still fetch the data years later.
+See [AGENTS.md](AGENTS.md) for how much to attach, when a partial CAR is
+enough, and how to import one.
+
 ### Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
