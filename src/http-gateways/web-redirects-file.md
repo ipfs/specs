@@ -174,6 +174,7 @@ The [max file size](#max-file-size) helps to prevent an additional [denial of se
 
 Sample files for various test cases can be found in `QmQyqMY5vUBSbSxyitJqthgwZunCQjDVtNd8ggVCxzuPQ4`.
 Implementations SHOULD use it for internal testing.
+The data is available as [`redirects.car`](https://github.com/ipfs/gateway-conformance/raw/refs/tags/v0.13.2/fixtures/redirects_file/redirects.car).
 
 ```
 $ ipfs ls QmQyqMY5vUBSbSxyitJqthgwZunCQjDVtNd8ggVCxzuPQ4
@@ -219,6 +220,7 @@ $ ipfs cat /ipfs/QmYBhLYDwVFvxos9h8CGU2ibaY66QNgv8hpfewxaQrPiZj/_redirects
 
 A dedicated test vector with URL query parameter behavior can be found in `bafybeiee3ltldvmfgsxiqazbatrkbvkl34eanbourajwnavhupb64nnbxa`.
 Implementations SHOULD use it for internal testing when [query parameter support](#query-parameters) is desired.
+The data is available as [`redirects-query-params.car`](https://github.com/ipfs/boxo/raw/refs/tags/v0.42.1/gateway/testdata/redirects-query-params.car).
 
 ```
 $ ipfs cat bafybeiee3ltldvmfgsxiqazbatrkbvkl34eanbourajwnavhupb64nnbxa/_redirects

@@ -740,7 +740,9 @@ Test vectors for UnixFS file structures, progressing from simple single-block fi
 
 ### Single `dag-pb` Block File
 
-- Fixture: Well-known test CID from IPFS Gateway Checker
+- Fixture: Well-known test CID from IPFS Gateway Checker, shipped as
+  `cars/unixfs_gateway-checker-file.car` inside
+  [`ipfs-specs-fixtures.zip`](https://github.com/user-attachments/files/31090406/ipfs-specs-fixtures.zip)
 - CID: `bafybeifx7yeb55armcsxwwitkymga5xf53dxiarykms3ygqic223w5sk3m`
 - Type: [`dag-pb` File](#dag-pb-file) with data in the same block
 - Content: "Hello from IPFS Gateway Checker\n" (32 bytes)
