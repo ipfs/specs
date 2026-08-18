@@ -662,7 +662,32 @@ or non-HTTP URLs like `ipfs://cid`, where empty path component is implicit `/`.
 
 See [`Location` section](https://specs.ipfs.tech/http-gateways/subdomain-gateway/#location-response-header) of :cite[subdomain-gateway].
 
+### `Ipfs-Uri` (response header)
+
+Used for HTTP caching and indicating the IPFS address of the data.
+
+Indicates the original, requested content path before any path resolution and traversal is performed.
+
+Any characters found in the URL that are outside the allowed character set will be percent-encoding following normal URL encoding rules found in [Section 2.1 of RFC 3986](https://www.rfc-editor.org/rfc/rfc3986.html#section-2.1).
+
+Example: `Ipfs-Uri: ipfs://bafy..ul6/subdir/file.txt`
+
+This header SHOULD be returned with deserialized responses.
+Implementations MAY omit it with trustless response types
+(`application/vnd.ipld.raw` and `application/vnd.ipld.car`).
+
 ### `X-Ipfs-Path` (response header)
+
+:::warning
+
+This header is deprecated. HTTP header values use a more limited character set
+than IPFS Paths so it is possible to include characters that may break some HTTP
+Clients.
+
+The `Ipfs-Uri` response header should be used instead if it is present as it can
+correctly encode all characters that might be found in an IPFS Path.
+
+:::
 
 Used for HTTP caching and indicating the IPFS address of the data.
 
