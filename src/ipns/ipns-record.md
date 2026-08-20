@@ -450,6 +450,11 @@ years, making them safe for use in CI tests.
 5. [V1+V2](https://dweb.link/ipfs/bafybeifkipmlz2fehxda6y7x752uolfed7bdd46jzdammpfga5zrnkq33u/k51qzi5uqu5dilgf7gorsh9vcqqq4myo6jd4zmqkuy9pxyxi5fua3uf7axph4y_v1-v2-broken-signature-v1.ipns-record) (only signatureV2 valid) → record valid, value points at `/ipfs/bafkqahtwgevxmmrao5uxi2bamjzg623fnyqhg2lhnzqxi5lsmuqhmmi`
 6. [V2-only](https://dweb.link/ipfs/bafybeifkipmlz2fehxda6y7x752uolfed7bdd46jzdammpfga5zrnkq33u/k51qzi5uqu5dit2ku9mutlfgwyz8u730on38kd10m97m36bjt66my99hb6103f_v2.ipns-record) (no V1 fields) → record valid
 
+The records are checked into gateway-conformance under
+[`fixtures/ipns_records/`](https://github.com/ipfs/gateway-conformance/tree/refs/tags/v0.13.2/fixtures/ipns_records),
+and the directory above ships as `cars/ipip-0428_ipns-records.car` inside
+[`ipfs-specs-fixtures.zip`](https://github.com/user-attachments/files/31090406/ipfs-specs-fixtures.zip).
+
 :::note
 
 Implementers can either write own tests against the above test vectors, or run
