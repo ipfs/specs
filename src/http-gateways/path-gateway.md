@@ -4,7 +4,7 @@ description: >
   The comprehensive low-level HTTP Gateway enables the integration of IPFS
   resources into the HTTP stack through /ipfs and /ipns namespaces, supporting
   both deserialized and verifiable response types.
-date: 2026-03-05
+date: 2026-08-21
 maturity: reliable
 editors:
   - name: Marcin Rataj
@@ -668,13 +668,67 @@ Used for HTTP caching and indicating the IPFS address of the data.
 
 Indicates the original, requested content path before any path resolution and traversal is performed.
 
-Any characters found in the URL that are outside the allowed character set will be percent-encoding following normal URL encoding rules found in [Section 2.1 of RFC 3986](https://www.rfc-editor.org/rfc/rfc3986.html#section-2.1).
+The value is one valid URI: `ipfs://` for the `/ipfs/` namespace
+(:cite[ipfs-uri]), or `ipns://` for `/ipns/` (:cite[ipns-uri]).
+
+The content path is the request path, normalized: percent-decode
+each segment once, collapse duplicate slashes, then apply any `.` and `..`
+segments. `%2F` decodes to a separator in the first step, so a request for
+`/ipfs/{cid}/a%2F..%2Fb.txt` gives the content path `/ipfs/{cid}/b.txt`.
+
+The URI authority SHOULD be the content root in the canonical form
+:cite[ipfs-uri] and :cite[ipns-uri] define. A trailing dot on a DNS name
+is stripped. Under `/ipns/`, a legacy base58 peer ID (`Qm...`,
+`12D3Koo...`) becomes a `libp2p-key` CIDv1 in base36. A gateway omits
+this header when it cannot produce such an authority: the root is
+invalid, the IPNS key uses a codec it does not support, or the DNS name
+does not convert to the `dnslink-name` form.
+
+A content root longer than 63 characters is emitted in full and HTTP
+clients SHOULD accept it: the length guidance in :cite[ipfs-uri] and
+:cite[ipns-uri] does not apply to this header.
+
+The URI path mirrors the rest of the content path: split it on `/`,
+percent-encode each segment, and rejoin with `/`. A trailing slash is
+kept, and an empty remainder means no path:
+`/ipfs/{cid}` → `ipfs://{cid}`, `/ipfs/{cid}/` → `ipfs://{cid}/`,
+`/ipfs/{cid}/dir/` → `ipfs://{cid}/dir/`. Interior empty segments MUST NOT
+appear.
+
+Each segment MUST be percent-encoded over its UTF-8 bytes: every byte
+outside the unreserved set `A-Z a-z 0-9 - . _ ~` (Section 2.3 of
+:cite[rfc3986]) MUST be encoded as `%XX` with uppercase hexadecimal
+digits, and unreserved bytes MUST NOT be encoded. This covers `%`, `?`,
+`#`, spaces, control characters, and every non-ASCII byte, so the value is
+ASCII-only and always a valid field value (Section 5.5 of :cite[rfc9110]).
+
+The one exception: a segment that is exactly `.` or `..` MUST be emitted
+as `%2E` or `%2E%2E`, so it cannot be read as a dot segment. The
+normalization above means such segments do not normally occur.
+
+The value MUST NOT contain a query or fragment. Request query parameters
+such as `?format=car` never appear in it.
+
+An HTTP client that recovers the content path MUST apply the
+URI-to-content-path mapping of :cite[ipfs-uri] and :cite[ipns-uri], then
+percent-decode each segment once.
 
 Example: `Ipfs-Uri: ipfs://bafy..ul6/subdir/file.txt`
 
-This header SHOULD be returned with deserialized responses.
+Example: `Ipfs-Uri: ipns://dnslink.example.net/wiki/Bogot%C3%A1`
+
+This header SHOULD be returned with deserialized responses, and on
+redirect and error responses once the content root has been parsed.
 Implementations MAY omit it with trustless response types
-(`application/vnd.ipld.raw` and `application/vnd.ipld.car`).
+(`application/vnd.ipld.raw` and `application/vnd.ipld.car`). They MAY also
+omit it when the value would exceed 8192 bytes.
+
+This header supersedes the deprecated
+[`X-Ipfs-Path`](#x-ipfs-path-response-header). HTTP clients SHOULD prefer
+`Ipfs-Uri` when both headers are present.
+
+Gateways serving cross-origin traffic SHOULD include `Ipfs-Uri` in
+`Access-Control-Expose-Headers`.
 
 ### `X-Ipfs-Path` (response header)
 
@@ -695,19 +749,31 @@ Indicates the original, requested content path before any path resolution and tr
 
 Example: `X-Ipfs-Path: /ipns/k2..ul6/subdir/file.txt`
 
-This header SHOULD be returned with deserialized responses.
+Gateways MAY keep returning this header for legacy clients, with the value
+format unchanged. New implementations SHOULD return only
+[`Ipfs-Uri`](#ipfs-uri-response-header).
+
+A gateway that returns this header MUST omit it when the content path
+contains any byte other than HTAB (0x09), SP (0x20), or visible ASCII
+(0x21-0x7E).
+
+Gateways that return this header SHOULD do so with deserialized responses.
 Implementations MAY omit it with trustless response types
 (`application/vnd.ipld.raw` and `application/vnd.ipld.car`).
+
+Gateways that return this header for cross-origin traffic SHOULD also
+include it in `Access-Control-Expose-Headers`.
 
 ### `X-Ipfs-Roots` (response header)
 
 Used for HTTP caching.
 
 A way to indicate all CIDs required for resolving  logical roots (path
-segments) from `X-Ipfs-Path`. The main purpose of this header is allowing HTTP
-caches to make smarter decisions about cache invalidation.
+segments) from the requested content path. The main purpose of this
+header is allowing HTTP caches to make smarter decisions about cache
+invalidation.
 
-Below, an example to illustrate how `X-Ipfs-Roots` is constructed from `X-Ipfs-Path` pointing at a DNSLink.
+Below, an example to illustrate how `X-Ipfs-Roots` is constructed from a content path pointing at a DNSLink.
 
 The traversal of `/ipns/en.wikipedia-on-ipfs.org/wiki/Block_of_Wikipedia_in_Turkey`
 includes a HAMT-sharded UnixFS directory `/wiki/`.
@@ -887,7 +953,7 @@ such as domains that cannot be resolved, or IPNS keys that cannot be resolved.
   should be produce acceptable cache hits.
 
 - Advanced caching strategies can be built using additional information in
-  `X-Ipfs-Path` and `X-Ipfs-Roots` headers.
+  `Ipfs-Uri` and `X-Ipfs-Roots` headers.
 
 - Implement support for requests sent with
   [`Cache-Control: only-if-cached`](#cache-control-request-header).
