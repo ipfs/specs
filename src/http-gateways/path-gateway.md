@@ -4,7 +4,7 @@ description: >
   The comprehensive low-level HTTP Gateway enables the integration of IPFS
   resources into the HTTP stack through /ipfs and /ipns namespaces, supporting
   both deserialized and verifiable response types.
-date: 2026-08-21
+date: 2026-08-22
 maturity: reliable
 editors:
   - name: Marcin Rataj
@@ -675,6 +675,10 @@ The content path is the request path, normalized: percent-decode
 each segment once, collapse duplicate slashes, then apply any `.` and `..`
 segments. `%2F` decodes to a separator in the first step, so a request for
 `/ipfs/{cid}/a%2F..%2Fb.txt` gives the content path `/ipfs/{cid}/b.txt`.
+
+One consequence: a UnixFS link whose name contains `/` cannot be
+addressed by any content path, because path components never contain `/`
+(:cite[unixfs]); such an entry is reachable only by its own CID.
 
 The URI authority SHOULD be the content root in the canonical form
 :cite[ipfs-uri] and :cite[ipns-uri] define. A trailing dot on a DNS name
