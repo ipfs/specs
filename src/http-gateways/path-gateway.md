@@ -4,7 +4,7 @@ description: >
   The comprehensive low-level HTTP Gateway enables the integration of IPFS
   resources into the HTTP stack through /ipfs and /ipns namespaces, supporting
   both deserialized and verifiable response types.
-date: 2026-08-22
+date: 2026-08-24
 maturity: reliable
 editors:
   - name: Marcin Rataj
@@ -686,7 +686,10 @@ is stripped. Under `/ipns/`, a legacy base58 peer ID (`Qm...`,
 `12D3Koo...`) becomes a `libp2p-key` CIDv1 in base36. A gateway omits
 this header when it cannot produce such an authority: the root is
 invalid, the IPNS key uses a codec it does not support, or the DNS name
-does not convert to the `dnslink-name` form.
+does not convert to the `dnslink-name` form. In the DNSLink case, a name
+with no dot, like `examplenodot`, never becomes an authority: on each
+network it can point at different content. A dotted DNSLink name on a
+private network, like `example.local`, is fine.
 
 A content root longer than 63 characters is emitted in full and HTTP
 clients SHOULD accept it: the length guidance in :cite[ipfs-uri] and
