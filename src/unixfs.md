@@ -111,6 +111,19 @@ More complex nodes use the `dag-pb` (`0x70`) encoding. These nodes require two s
 decoding. The first step is to decode the outer container of the block. This is encoded using the [`dag-pb`][ipld-dag-pb] specification, which uses [Protocol Buffers][protobuf] and can be
 summarized as follows:
 
+:::warning
+In a earlier version of this spec, the `Data` field of the `PBNode` was ordered
+after the repeated `Links` field. This lead to inefficiencies processing HAMT
+shards as all links for a node must be read before the hash type and fanout
+values could be read, which in turns means that if the ready is looking for a
+specific path within the shard, they cannot abort reading links early.
+
+To support legacy data, implementations MUST be able to read and write `PBNode`
+messages in the legacy format as well as the current format described below.
+
+Field IDs were the same in the legacy format.
+:::
+
 ```protobuf
 message PBLink {
   // Binary representation of CID (https://github.com/multiformats/cid) of the target object.
@@ -127,11 +140,11 @@ message PBLink {
 }
 
 message PBNode {
-  // refs to other objects
-  repeated PBLink Links = 2;
-
   // opaque user data
   bytes Data = 1;
+
+  // refs to other objects
+  repeated PBLink Links = 2;
 }
 ```
 
@@ -368,12 +381,12 @@ The HAMT directory is configured through the UnixFS metadata in `PBNode.Data`:
 - `decode(PBNode.Data).fanout` is REQUIRED for HAMTShard nodes (though marked optional in the
   protobuf schema). The value MUST be a power of two, a multiple of 8 (for byte-aligned
   bitfields), and at most 1024.
-  
+
   This determines the number of possible bucket indices (permutations) at each level of the trie.
   For example, fanout=256 provides 256 possible buckets (0x00 to 0xFF), requiring 8 bits from the hash.
   The hex prefix length is `log2(fanout)/4` characters (since each hex character represents 4 bits).
   The same fanout value is used throughout all levels of a single HAMT structure
-  
+
   :::note
   Implementations that onboard user data to create new HAMTDirectory structures are free to choose a `fanout` value or allow users to configure it based on their use case:
   - **256**: Balanced tree depth and node size, suitable for most use cases
@@ -382,7 +395,7 @@ The HAMT directory is configured through the UnixFS metadata in `PBNode.Data`:
     - Trade-offs: Larger blocks mean higher latency on cold cache reads and more data
       rewritten when modifying directories (each change affects a larger block)
   :::
-  
+
   :::warning
   Implementations MUST limit the `fanout` parameter to a maximum of 1024 to prevent
   denial-of-service attacks. Excessively large fanout values can cause memory exhaustion
