@@ -687,7 +687,7 @@ is stripped. Under `/ipns/`, a legacy base58 peer ID (`Qm...`,
 this header when it cannot produce such an authority: the root is
 invalid, the IPNS key uses a codec it does not support, or the DNS name
 does not convert to the `dnslink-name` form. In the DNSLink case, a name
-with no dot, like `examplenodot`, never becomes an authority: on each
+with no dot, like `examplemissingtld`, never becomes an authority: on each
 network it can point at different content. A dotted DNSLink name on a
 private network, like `example.local`, is fine.
 
