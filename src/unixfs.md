@@ -118,7 +118,7 @@ shards as all links for a node must be read before the hash type and fanout
 values could be read, which in turns means that if the ready is looking for a
 specific path within the shard, they cannot abort reading links early.
 
-To support legacy data, implementations MUST be able to read and write `PBNode`
+To support legacy data and reproducible CIDs, implementations MAY write `PBNode`
 messages in the legacy format as well as the current format described below.
 
 Field IDs were the same in the legacy format.
