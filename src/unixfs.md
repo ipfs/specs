@@ -725,13 +725,16 @@ inspired by POSIX paths.
 
 :::warning
 
-Behavior is not defined.
+Behavior is only defined for HTTP interfaces.
 
-Until we agree on a specification for this, implementations SHOULD NOT depend on any escape
-sequences and/or non-ASCII characters for mission-critical applications, or limit escaping to specific context.
+HTTP Gateways percent-decode each request path component once before path
+resolution, so `%2F` becomes a component separator, and the
+[`Ipfs-Uri` response header](https://specs.ipfs.tech/http-gateways/path-gateway/#ipfs-uri-response-header)
+defines the reverse: a canonical percent-encoded form of a content path.
 
-- HTTP interfaces such as Gateways have limited support for [percent-encoding](https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding).
-- The `\` may be used to trigger an escape sequence. However, it is currently broken and inconsistent across implementations.
+Outside of that, the behavior is unspecified.
+The `\` may be used to trigger an escape sequence, but it is currently broken
+and inconsistent across implementations.
 
 :::
 
@@ -757,6 +760,9 @@ The following names SHOULD NOT be used in UnixFS directories:
 - Any string containing a `NULL` (`0x00`) byte, as this is often used to signify string
   terminations in some systems, such as C-compatible systems. Many unix
   file systems do not accept this character in path components.
+- Any string containing a `/` (`0x2F`) codepoint, as path components cannot
+  contain `/` (see [Paths](#paths)): a directory entry with such a name cannot
+  be addressed by any UnixFS path and is reachable only by its own CID.
 
 # Profiles
 
