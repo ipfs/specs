@@ -3,7 +3,7 @@ title: UnixFS
 description: >
   UnixFS is a Protocol Buffers-based format for describing files and directories
   as dag-pb DAGs and raw blocks in IPFS.
-date: 2026-08-27
+date: 2026-09-01
 maturity: draft
 editors:
   - name: Marcin Rataj
@@ -134,23 +134,25 @@ order shown in the chosen variant below.
 
 :::warning
 The two orderings produce different bytes, and therefore different CIDs, for
-the same logical node. Which ordering a writer emits is controlled by the
-selected [profile](#profiles):
+the same logical node:
 
-- `Data`-first is written under the `unixfs-v1-2026` and later profiles.
-- `Links`-first is the legacy ordering written under the `unixfs-v0-2015` and
-  `unixfs-v1-2025` profiles, and the canonical field order of the historical
-  [DAG-PB][ipld-dag-pb] codec specification. For UnixFS data, this document
-  takes precedence over the historical DAG-PB codec specification.
+- `Links`-first is the canonical ordering. It is also the canonical field
+  order of the historical [DAG-PB][ipld-dag-pb] codec specification; for
+  UnixFS data, this document takes precedence over the historical DAG-PB
+  codec specification.
+- `Data`-first is opt-in: no profile writes it. Implementations MAY expose an
+  explicit setting for writers that need it; enabling it changes the CID of
+  every written node.
 
 Readers SHOULD accept both orderings. Writers SHOULD support both orderings
-and write the ordering mandated by the selected profile. Specialized
-implementations MAY support a single ordering, for example a streaming-oriented
-producer that only emits `Data`-first. Implementations that interoperate with
-content on the public IPFS Mainnet MUST accept both orderings when reading.
+and SHOULD write `Links`-first unless the user explicitly opted into
+`Data`-first. Specialized implementations MAY support a single ordering, for
+example a streaming-oriented producer that only emits `Data`-first.
+Implementations that interoperate with content on the public IPFS Mainnet
+MUST accept both orderings when reading.
 :::
 
-`Data`-first ordering, written under the `unixfs-v1-2026` and later profiles:
+`Data`-first ordering (opt-in):
 
 ```protobuf
 message PBNode {
@@ -162,8 +164,7 @@ message PBNode {
 }
 ```
 
-`Links`-first ordering (legacy), written under the `unixfs-v0-2015` and
-`unixfs-v1-2025` profiles:
+`Links`-first ordering (canonical):
 
 ```protobuf
 message PBNode {
@@ -178,7 +179,7 @@ message PBNode {
 The `Data`-first ordering lets a streaming reader process the UnixFS metadata
 in `Data` (for example, HAMTShard `hashType` and `fanout`) before the links,
 and stop reading links early once it finds the entry it is looking for. The
-legacy ordering keeps the CIDs of already-published content stable.
+canonical ordering keeps the CIDs of already-published content stable.
 
 After decoding the node, we obtain a `PBNode`. This `PBNode` contains a field
 `Data` that contains the bytes that require the second decoding. This will also be
@@ -777,8 +778,7 @@ The following profiles are defined:
 | Profile | Defined in | Description |
 | --- | --- | --- |
 | `unixfs-v0-2015` | [IPIP-0499](https://specs.ipfs.tech/ipips/ipip-0499/) | Legacy CIDv0 parameters matching Kubo defaults through v0.39. For reproducing historical CIDv0 references. |
-| `unixfs-v1-2025` | [IPIP-0499](https://specs.ipfs.tech/ipips/ipip-0499/) | Deterministic CIDv1 parameters with modern settings. Writes the legacy `Links`-first `PBNode` ordering. |
-| `unixfs-v1-2026` | [IPIP-0550](https://specs.ipfs.tech/ipips/ipip-0550/) | Same as `unixfs-v1-2025`, plus the `Data`-first `PBNode` ordering for more efficient streaming reads. |
+| `unixfs-v1-2025` | [IPIP-0499](https://specs.ipfs.tech/ipips/ipip-0499/) | Deterministic CIDv1 parameters with modern settings. |
 
 Implementations SHOULD use these exact profile names when exposing profile
 selection in configuration, command-line flags, documentation, and test
@@ -1037,8 +1037,8 @@ Test vectors for UnixFS directory structures, progressing from simple flat direc
     [`dag-pb` HAMTDirectory](#dag-pb-hamtdirectory) in both `PBNode` field
     orderings (see [`dag-pb` Node](#dag-pb-node) and [Profiles](#profiles))
   - CIDs:
-    - `bafybeigqvyloizmfcdy6scaxnyltftzptaruqa3hnnplfzsbf4sqteiwlm`: `Directory`, `Data`-first (`unixfs-v1-2026`)
-    - `bafybeigdcg7pksx2zk5336vrfsktjodlr4rbfz37qr3koc5xboxe5ekv24`: `Directory`, `Links`-first (`unixfs-v1-2025`)
+    - `bafybeigqvyloizmfcdy6scaxnyltftzptaruqa3hnnplfzsbf4sqteiwlm`: `Directory`, `Data`-first (opt-in)
+    - `bafybeigdcg7pksx2zk5336vrfsktjodlr4rbfz37qr3koc5xboxe5ekv24`: `Directory`, `Links`-first (canonical)
     - `bafybeicwgy2rlqmqqu3yy2tqvm2wbgdvy3snu4sbbv4wqpvpnoplpzxz74`: `HAMTShard`, `Data`-first (hand-crafted)
     - `bafybeicjwkfslu7gwyywffvqgse5kiibojtktxcdqhgv7ldj5fjdacuceq`: `HAMTShard`, `Links`-first (hand-crafted)
   - Contents: each root holds a single `hello.txt` ("hello\n") stored as a
