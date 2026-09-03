@@ -298,8 +298,10 @@ A :dfn[Directory], also known as folder, is a named collection of child [Nodes](
   `PBNode.Links[].Name` gives you the name of that child.
 - Duplicate names are not allowed. Therefore, two elements of `PBNode.Link` CANNOT
   have the same `Name`. Names are considered identical if they are byte-for-byte
-  equal (not just semantically equivalent). If two identical names are present in
-  a directory, the decoder MUST fail.
+  equal (not just semantically equivalent). Encoders MUST NOT produce directories
+  with duplicate names.
+  See [Path Resolution](#dag-pb-directory-path-resolution) for how decoders handle
+  third-party data that violates this rule.
 - Implementations SHOULD detect when a directory becomes too big to fit in a single
   `Directory` block and use [`HAMTDirectory`] type instead.
 
@@ -342,9 +344,17 @@ a child under `PBNode.Links`.
 Duplicate names are not allowed in UnixFS directories. However, when reading
 third-party data that contains duplicates, implementations MUST always return
 the first matching entry and ignore subsequent ones (following the
-[Robustness Principle](https://specs.ipfs.tech/architecture/principles/#robustness)).
-Similarly, when writers mutate a UnixFS directory that has duplicate
-names, they MUST drop the redundant entries and only keep the first occurrence
+[Robustness Principle](https://specs.ipfs.tech/architecture/principles/#robustness)):
+- For `Directory` nodes, "first matching entry" is the entry with the lowest
+  index in the `PBNode.Links` list (serialized protobuf order).
+- For `HAMTDirectory` nodes, the [lookup algorithm](#dag-pb-hamtdirectory-path-resolution)
+  hashes the name and uses the bitfield to resolve a single positional index in
+  `PBNode.Links` at each shard level. The entry at that position is the one
+  returned. Any duplicate names placed at other positions are not reachable
+  via lookup.
+
+Similarly, when writers mutate a directory that has duplicate names,
+they MUST drop the redundant entries and only keep the first occurrence
 of each name.
 
 Assuming no errors were raised, you can continue to the path resolution on the
