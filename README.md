@@ -34,6 +34,14 @@ This works through the **InterPlanetary Improvement Process (IPIP)**. See:
   - List of [ratified IPIPs](https://specs.ipfs.tech/ipips/)
   - List of [open IPIPs](https://github.com/ipfs/specs/pulls?q=is%3Apr+is%3Aopen+ipip+sort%3Aupdated-desc)
 
+If you are wondering how to decide between an issue and an IPIP:
+
+- **Does Not Need an IPIP**:
+  - The spec has a bug - something that is plainly a mistake.
+  - Adding more details, test vectors, and editorials/cosmetic changes.
+- **Needs an IPIP**:
+  - An addition to the protocol that could cause an interop issues.
+
 [![contribute](https://cdn.rawgit.com/jbenet/contribute-ipfs-gif/master/img/contribute.gif)](https://github.com/ipfs/community/blob/master/CONTRIBUTING.md)
 
 Suggestions, contributions, criticisms are welcome. Though please make sure to familiarize yourself deeply with IPFS, the models it adopts, and the principles it follows.
