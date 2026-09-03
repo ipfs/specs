@@ -2,14 +2,6 @@
 
 **Don't read the specs here! Go to [specs.ipfs.tech](https://specs.ipfs.tech/), it's a much better experience!**
 
-> This repository contains the specs for the IPFS Protocol and associated subsystems.
-
-- [Documentation and Community](#documentation-and-community)
-- [Understanding badges](#understanding-the-meaning-of-the-spec-badges-and-their-lifecycle)
-- [Index](#index)
-- [Contribute](#contribute)
-  - [InterPlanetary Improvement Process (IPIP)](#interplanetary-improvement-process-ipip)
-
 ## Documentation and Community
 
 Looking for user support?
@@ -33,17 +25,16 @@ Nothing in this spec repository is `permanent` or even `stable` yet. Most of the
 
 ## Contribute
 
+- Want to propose a change to an existing specification?
+- Or add a new protocol?
+
+This works through the **InterPlanetary Improvement Process (IPIP)**. See:
+
+- [IPIP: Improvement Process for IPFS Specifications](https://specs.ipfs.tech/meta/ipip-process/)
+  - List of [ratified IPIPs](https://specs.ipfs.tech/ipips/)
+  - List of [open IPIPs](https://github.com/ipfs/specs/pulls?q=is%3Apr+is%3Aopen+ipip+sort%3Aupdated-desc)
+
 [![contribute](https://cdn.rawgit.com/jbenet/contribute-ipfs-gif/master/img/contribute.gif)](https://github.com/ipfs/community/blob/master/CONTRIBUTING.md)
 
 Suggestions, contributions, criticisms are welcome. Though please make sure to familiarize yourself deeply with IPFS, the models it adopts, and the principles it follows.
 This repository falls under the IPFS [Code of Conduct](https://github.com/ipfs/community/blob/master/code-of-conduct.md).
-
-### InterPlanetary Improvement Process (IPIP)
-
-- Want to propose a change to an existing specification?
-- Or add a new protocol?
-
-See:
-- [IPIP: Improvement Process for IPFS Specifications](https://specs.ipfs.tech/meta/ipip-process/)
-  - List of [ratified IPIPs](https://specs.ipfs.tech/ipips/)
-  - List of [open IPIPs](https://github.com/ipfs/specs/pulls?q=is%3Apr+is%3Aopen+ipip+sort%3Aupdated-desc)
