@@ -3,7 +3,7 @@ title: UnixFS
 description: >
   UnixFS is a Protocol Buffers-based format for describing files and directories
   as dag-pb DAGs and raw blocks in IPFS.
-date: 2026-08-22
+date: 2026-09-01
 maturity: draft
 editors:
   - name: Marcin Rataj
@@ -125,7 +125,48 @@ message PBLink {
   // cumulative size of target object
   uint64 Tsize = 3;
 }
+```
 
+The `PBNode` message holds two fields, `Data` (field number 1) and `Links`
+(field number 2). Two wire orderings of these fields exist, and both decode to
+the same logical node. A conforming writer emits the fields in the declaration
+order shown in the chosen variant below.
+
+:::warning
+The two orderings produce different bytes, and therefore different CIDs, for
+the same logical node:
+
+- `Links`-first is the canonical ordering. It is also the canonical field
+  order of the historical [DAG-PB][ipld-dag-pb] codec specification; for
+  UnixFS data, this document takes precedence over the historical DAG-PB
+  codec specification.
+- `Data`-first is opt-in: no profile writes it. Implementations MAY expose an
+  explicit setting for writers that need it; enabling it changes the CID of
+  every written node.
+
+Readers SHOULD accept both orderings. Writers SHOULD support both orderings
+and SHOULD write `Links`-first unless the user explicitly opted into
+`Data`-first. Specialized implementations MAY support a single ordering, for
+example a streaming-oriented producer that only emits `Data`-first.
+Implementations that interoperate with content on the public IPFS Mainnet
+MUST accept both orderings when reading.
+:::
+
+`Data`-first ordering (opt-in):
+
+```protobuf
+message PBNode {
+  // opaque user data
+  bytes Data = 1;
+
+  // refs to other objects
+  repeated PBLink Links = 2;
+}
+```
+
+`Links`-first ordering (canonical):
+
+```protobuf
 message PBNode {
   // refs to other objects
   repeated PBLink Links = 2;
@@ -134,6 +175,11 @@ message PBNode {
   bytes Data = 1;
 }
 ```
+
+The `Data`-first ordering lets a streaming reader process the UnixFS metadata
+in `Data` (for example, HAMTShard `hashType` and `fanout`) before the links,
+and stop reading links early once it finds the entry it is looking for. The
+canonical ordering keeps the CIDs of already-published content stable.
 
 After decoding the node, we obtain a `PBNode`. This `PBNode` contains a field
 `Data` that contains the bytes that require the second decoding. This will also be
@@ -368,12 +414,12 @@ The HAMT directory is configured through the UnixFS metadata in `PBNode.Data`:
 - `decode(PBNode.Data).fanout` is REQUIRED for HAMTShard nodes (though marked optional in the
   protobuf schema). The value MUST be a power of two, a multiple of 8 (for byte-aligned
   bitfields), and at most 1024.
-  
+
   This determines the number of possible bucket indices (permutations) at each level of the trie.
   For example, fanout=256 provides 256 possible buckets (0x00 to 0xFF), requiring 8 bits from the hash.
   The hex prefix length is `log2(fanout)/4` characters (since each hex character represents 4 bits).
   The same fanout value is used throughout all levels of a single HAMT structure
-  
+
   :::note
   Implementations that onboard user data to create new HAMTDirectory structures are free to choose a `fanout` value or allow users to configure it based on their use case:
   - **256**: Balanced tree depth and node size, suitable for most use cases
@@ -382,7 +428,7 @@ The HAMT directory is configured through the UnixFS metadata in `PBNode.Data`:
     - Trade-offs: Larger blocks mean higher latency on cold cache reads and more data
       rewritten when modifying directories (each change affects a larger block)
   :::
-  
+
   :::warning
   Implementations MUST limit the `fanout` parameter to a maximum of 1024 to prevent
   denial-of-service attacks. Excessively large fanout values can cause memory exhaustion
@@ -719,6 +765,25 @@ The following names SHOULD NOT be used in UnixFS directories:
   contain `/` (see [Paths](#paths)): a directory entry with such a name cannot
   be addressed by any UnixFS path and is reachable only by its own CID.
 
+# Profiles
+
+DAG construction parameters such as chunk size, DAG width, HAMT fanout and
+threshold, and `PBNode` field ordering all affect the resulting CID, so the
+same input can produce different CIDs across implementations. A :dfn[Profile]
+is a named, complete set of these parameters: two implementations importing
+the same input under the same profile produce the same CID.
+
+The following profiles are defined:
+
+| Profile | Defined in | Description |
+| --- | --- | --- |
+| `unixfs-v0-2015` | [IPIP-0499](https://specs.ipfs.tech/ipips/ipip-0499/) | Legacy CIDv0 parameters matching Kubo defaults through v0.39. For reproducing historical CIDv0 references. |
+| `unixfs-v1-2025` | [IPIP-0499](https://specs.ipfs.tech/ipips/ipip-0499/) | Deterministic CIDv1 parameters with modern settings. |
+
+Implementations SHOULD use these exact profile names when exposing profile
+selection in configuration, command-line flags, documentation, and test
+suites, so that a profile name means the same thing in every tool.
+
 # Appendix: Test Vectors
 
 :::warning
@@ -964,6 +1029,25 @@ Test vectors for UnixFS directory structures, progressing from simple flat direc
     - Fanout field = 256
     - Link Names in HAMT have 2-character hex prefix (hash buckets)
     - Can retrieve any file by name through hash bucket calculation
+
+### PBNode Field Ordering
+
+- Fixture: [`pbnode-field-orders.car`](https://github.com/ipfs/gateway-conformance/raw/refs/tags/v0.14.1/fixtures/path_gateway_unixfs/pbnode-field-orders.car)
+  - Type: [`dag-pb` Directory](#dag-pb-directory) and
+    [`dag-pb` HAMTDirectory](#dag-pb-hamtdirectory) in both `PBNode` field
+    orderings (see [`dag-pb` Node](#dag-pb-node) and [Profiles](#profiles))
+  - CIDs:
+    - `bafybeigqvyloizmfcdy6scaxnyltftzptaruqa3hnnplfzsbf4sqteiwlm`: `Directory`, `Data`-first (opt-in)
+    - `bafybeigdcg7pksx2zk5336vrfsktjodlr4rbfz37qr3koc5xboxe5ekv24`: `Directory`, `Links`-first (canonical)
+    - `bafybeicwgy2rlqmqqu3yy2tqvm2wbgdvy3snu4sbbv4wqpvpnoplpzxz74`: `HAMTShard`, `Data`-first (hand-crafted)
+    - `bafybeicjwkfslu7gwyywffvqgse5kiibojtktxcdqhgv7ldj5fjdacuceq`: `HAMTShard`, `Links`-first (hand-crafted)
+  - Contents: each root holds a single `hello.txt` ("hello\n") stored as a
+    `raw` leaf (`bafkreicysg23kiwv34eg2d7qweipxwosdo2py4ldv42nbauguluen5v6am`)
+  - Purpose: readers accept both `PBNode` field orderings
+  - Validation:
+    - `hello.txt` resolves through all four roots
+    - Byte-level vectors: fixtures table in
+      [IPIP-0550](https://specs.ipfs.tech/ipips/ipip-0550/)
 
 ## Special Cases and Advanced Features
 
