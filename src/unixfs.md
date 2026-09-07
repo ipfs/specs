@@ -300,7 +300,8 @@ of the offset list when computing offsets.
 The `Name` field is primarily used in directories to identify child entries.
 
 **For internal file chunks:**
-- Implementations SHOULD NOT produce `Name` fields (the field should be absent in the protobuf, not an empty string)
+- Implementations write an empty `Name` (the field is present, with an empty string)
+- Omitting the field produces different bytes, and therefore a different CID, for the same file
 - For compatibility with historical data, implementations SHOULD treat empty string values ("") the same as absent when parsing
 - If a non-empty `Name` is present in an internal file chunk, the parser MUST reject the file and halt processing as this indicates an invalid file structure
 
@@ -410,14 +411,15 @@ The HAMT directory is configured through the UnixFS metadata in `PBNode.Data`:
 - `decode(PBNode.Data).Type` MUST be `HAMTShard` (value `5`)
 - `decode(PBNode.Data).hashType` indicates the [multihash] function to use to digest
   the path components for sharding. Currently, all HAMT implementations use `murmur3-x64-64` (`0x22`),
-  and this value MUST be consistent across all shards within the same HAMT structure
+  and this value MUST be consistent across all shards within the same HAMT structure.
+  The `murmur3-x64-64` digest is the first 64 bits of `murmur3-x64-128`, serialized as 8 big-endian bytes
 - `decode(PBNode.Data).fanout` is REQUIRED for HAMTShard nodes (though marked optional in the
   protobuf schema). The value MUST be a power of two, a multiple of 8 (for byte-aligned
   bitfields), and at most 1024.
 
   This determines the number of possible bucket indices (permutations) at each level of the trie.
   For example, fanout=256 provides 256 possible buckets (0x00 to 0xFF), requiring 8 bits from the hash.
-  The hex prefix length is `log2(fanout)/4` characters (since each hex character represents 4 bits).
+  The hex prefix length is the number of hex digits in `fanout-1` (2 for fanout=256, 3 for fanout=1024).
   The same fanout value is used throughout all levels of a single HAMT structure
 
   :::note
@@ -438,8 +440,9 @@ The HAMT directory is configured through the UnixFS metadata in `PBNode.Data`:
   :::
 - `decode(PBNode.Data).Data` contains a bitfield indicating which buckets contain entries.
   Each bit corresponds to one bucket (0 to fanout-1), with bit value 1 indicating the bucket
-  is occupied. The bitfield is stored in little-endian byte order. The bitfield size in bytes
-  is `fanout/8`, which is why fanout MUST be a multiple of 8.
+  is occupied. The bitfield is stored in big-endian byte order (bucket 0 is the least significant
+  bit of the last byte), with leading zero bytes stripped. The bitfield size in bytes is at most
+  `fanout/8`, which is why fanout MUST be a multiple of 8.
   - Implementations MUST write this bitfield when creating HAMT nodes
   - Implementations SHOULD use this bitfield for efficient traversal (checking which buckets
     exist without examining all links)
@@ -447,8 +450,8 @@ The HAMT directory is configured through the UnixFS metadata in `PBNode.Data`:
     the bitfield, but this is less efficient
 
 The field `Name` of an element of `PBNode.Links` for a HAMT uses a
-hex-encoded prefix corresponding to the bucket index, zero-padded to a width
-of `log2(fanout)/4` characters.
+hex-encoded prefix corresponding to the bucket index, zero-padded to the
+number of hex digits in `fanout-1`.
 
 To illustrate the HAMT structure with a concrete example:
 
@@ -509,15 +512,15 @@ message PBNode {
 To resolve a path inside a HAMT:
 
 1. Hash the filename using the hash function specified in `decode(PBNode.Data).hashType`
-2. Pop `log2(fanout)` bits from the hash digest (lowest/least significant bits first),
-   then hex encode those bits using little endian to form the bucket prefix. The prefix MUST use uppercase hex characters (00-FF, not 00-ff)
+2. Pop `log2(fanout)` bits from the hash digest (most significant bits first),
+   then hex encode those bits to form the bucket prefix. The prefix MUST use uppercase hex characters (00-FF, not 00-ff)
 3. Find the link whose `Name` starts with this hex prefix:
    - If `Name` equals the prefix exactly → this is a sub-shard, follow the link and repeat from step 2
    - If `Name` equals prefix + filename → target found
    - If no matching prefix → file not in directory
 4. When following to a sub-shard, continue consuming bits from the same hash
 
-Note: Empty intermediate shards are typically collapsed during deletion operations to maintain consistency
+Note: Intermediate shards left empty or with a single entry are collapsed during deletion operations to maintain consistency
 and avoid having HAMT structures that differ based on insertion/deletion history.
 
 :::note
@@ -539,11 +542,11 @@ Given a HAMT-sharded directory containing 1000 files:
 
 #### When to Use HAMT Sharding
 
-Implementations typically convert regular directories to HAMT when the serialized directory
-node exceeds a size threshold between 256 KiB and 1 MiB. This threshold:
+Implementations typically convert regular directories to HAMT when the estimated size of the
+directory node exceeds a threshold. This threshold:
 - Prevents directories from exceeding block size limits
 - Is implementation-specific and may be configurable
-- Common values range from 256 KiB (conservative) to 1 MiB (modern)
+- Is 256 KiB in both [profiles](#profiles), which differ only in how the size is estimated
 
 See [Block Size Considerations](#block-size-considerations) for details on block size limits and conventions.
 
@@ -777,8 +780,8 @@ The following profiles are defined:
 
 | Profile | Defined in | Description |
 | --- | --- | --- |
-| `unixfs-v0-2015` | [IPIP-0499](https://specs.ipfs.tech/ipips/ipip-0499/) | Legacy CIDv0 parameters matching Kubo defaults through v0.39. For reproducing historical CIDv0 references. |
-| `unixfs-v1-2025` | [IPIP-0499](https://specs.ipfs.tech/ipips/ipip-0499/) | Deterministic CIDv1 parameters with modern settings. |
+| `unixfs-v0-2015` | [IPIP-0499](https://specs.ipfs.tech/ipips/ipip-0499/) | Legacy CIDv0 parameters (256KiB chunks, dag-pb leaves, DAG width 174). For reproducing historical CIDv0 references. |
+| `unixfs-v1-2025` | [IPIP-0499](https://specs.ipfs.tech/ipips/ipip-0499/) | Deterministic CIDv1 parameters (1MiB chunks, raw leaves, DAG width 1024). |
 
 Implementations SHOULD use these exact profile names when exposing profile
 selection in configuration, command-line flags, documentation, and test
@@ -856,7 +859,7 @@ Test vectors for UnixFS file structures, progressing from simple single-block fi
     ```
   - Purpose: File chunking and reassembly
   - Validation:
-    - Links have no Names (must be absent)
+    - Links have empty Names
     - Blocksizes array matches Links array length
     - Reassembled content matches original
 
@@ -892,9 +895,9 @@ Test vectors for UnixFS file structures, progressing from simple single-block fi
   - Structure:
     ```
     📄 file-3k           # QmYhmPjhFjYFyaoiuNzYv8WGavpSRDwdHWe5B4M5du5Rtk (dag-pb root)
-    ├── 📦 [0-1023]      # QmPKt7ptM2ZYSGPUc8PmPT2VBkLDK3iqpG9TBJY7PCE9rF (raw, 1024 bytes)
+    ├── 📦 [0-1023]      # QmPKt7ptM2ZYSGPUc8PmPT2VBkLDK3iqpG9TBJY7PCE9rF (dag-pb, 1024 bytes of data)
     ├── ⚠️ [1024-2047]   # (missing block - intentionally removed)
-    └── 📦 [2048-3071]   # QmWXY482zQdwecnfBsj78poUUuPXvyw2JAFAEMw4tzTavV (raw, 1024 bytes)
+    └── 📦 [2048-3071]   # QmWXY482zQdwecnfBsj78poUUuPXvyw2JAFAEMw4tzTavV (dag-pb, 1024 bytes of data)
     ```
   - Critical requirement: Must support seeking without all blocks available
   - Purpose:
@@ -912,7 +915,7 @@ Test vectors for UnixFS directory structures, progressing from simple flat direc
   - CID: `bafybeihchr7vmgjaasntayyatmp5sv6xza57iy2h4xj7g46bpjij6yhrmy`
   - Type: [`dag-pb` Directory](#dag-pb-directory)
   - Block Analysis:
-    - Directory block size (`ipfs block stat`): 185 bytes
+    - Directory block size (`ipfs block stat`): 227 bytes
     - Contains UnixFS Type=Directory metadata + 4 links
   - Structure:
     ```
@@ -963,6 +966,7 @@ Test vectors for UnixFS directory structures, progressing from simple flat direc
   - Structure:
     ```
     📁 /                    # bafybeig6ka5mlwkl4subqhaiatalkcleo4jgnr3hqwvpmsqfca27cijp3i
+    ├── ...
     └── 📁 ą/              # (dag-pb Directory)
         └── 📁 ę/          # (dag-pb Directory)
             └── 📄 file-źł.txt  # (raw, 34 bytes) "I am a txt file on path with utf8"
@@ -994,7 +998,7 @@ Test vectors for UnixFS directory structures, progressing from simple flat direc
   - Structure:
     ```
     📁 /                    # bafybeigcsevw74ssldzfwhiijzmg7a35lssfmjkuoj2t5qs5u5aztj47tq
-    ├── ⚠️  audio_only.m4a   # (link to missing block, ~24MB)
+    ├── ⚠️  audio_only.m4a   # (link to missing block, ~23MB)
     ├── ⚠️  chat.txt         # (link to missing block, ~1KB)
     ├── ⚠️  playback.m3u     # (link to missing block, ~116 bytes)
     └── ⚠️  zoom_0.mp4       # (link to missing block)
@@ -1015,15 +1019,19 @@ Test vectors for UnixFS directory structures, progressing from simple flat direc
     - Root HAMT block size (`ipfs block stat`): 12046 bytes
     - Contains UnixFS Type=HAMTShard metadata with fanout=256
     - Links use 2-character hex prefixes for hash buckets (00-FF)
-  - Structure:
+  - Structure (excerpt, up to three levels deep):
     ```
     📂 /                    # bafybeidbclfqleg2uojchspzd4bob56dqetqjsj27gy2cq3klkkgxtpn4i (HAMT root)
-    ├── 📄 1.txt           # (dag-pb file, multi-block)
-    ├── 📄 2.txt           # (dag-pb file, multi-block)
-    ├── ...
-    └── 📄 1000.txt        # (dag-pb file, multi-block)
+    ├── 📂 00              # bafybeiaebmuestgbpqhkkbrwl2qtjtvs3whkmp2trkbkimuod4yv7oygni (sub-shard)
+    │   ├── 📄 6E470.txt   # 470.txt (dag-pb file, multi-block)
+    │   └── 📄 FF742.txt   # 742.txt (dag-pb file, multi-block)
+    ├── 📂 07              # (sub-shard)
+    │   ├── ...
+    │   └── 📄 C11.txt     # 1.txt (dag-pb file, multi-block)
+    ├── 📄 0E393.txt       # 393.txt (alone in its bucket, so stored directly in the root)
+    └── ...
     ```
-  - Contents: 1000 numbered files (1.txt through 1000.txt), each containing Lorem ipsum text
+  - Contents: 1000 numbered files (1.txt through 1000.txt), each containing the same Lorem ipsum text (same CID)
   - Purpose: HAMT sharding for large directories
   - Validation:
     - Fanout field = 256
@@ -1100,14 +1108,14 @@ This limit ensures identity CIDs remain an optimization for tiny data rather tha
   - CID: `QmWvY6FaqFMS89YAQ9NAPjVP4WZKA1qbHbicc9HeSKQTgt`
   - Types: [`dag-pb` Directory](#dag-pb-directory) containing [`dag-pb` Symlink](#dag-pb-symlink)
   - Block Analysis:
-    - Root directory block: Not measured (V0 CID)
+    - Root directory block: 94 bytes
     - Symlink block (`QmTB8BaCJdCH5H3k7GrxJsxgDNmNYGGR71C58ERkivXoj5`): 9 bytes
     - Target file block (`Qme2y5HA5kvo2jAx13UsnV5bQJVijiAJCPvaW3JGQWhvJZ`): 16 bytes
   - Structure:
     ```
     📁 /                    # QmWvY6FaqFMS89YAQ9NAPjVP4WZKA1qbHbicc9HeSKQTgt
-    ├── 📄 foo           # Qme2y5HA5kvo2jAx13UsnV5bQJVijiAJCPvaW3JGQWhvJZ - file containing "content"
-    └── 🔗 bar           # QmTB8BaCJdCH5H3k7GrxJsxgDNmNYGGR71C58ERkivXoj5 - symlink pointing to "foo"
+    ├── 🔗 bar           # QmTB8BaCJdCH5H3k7GrxJsxgDNmNYGGR71C58ERkivXoj5 - symlink pointing to "foo"
+    └── 📄 foo           # Qme2y5HA5kvo2jAx13UsnV5bQJVijiAJCPvaW3JGQWhvJZ - file containing "content\n"
     ```
   - Purpose: UnixFS symlink resolution
   - Security note: Critical for preventing path traversal vulnerabilities
@@ -1123,7 +1131,7 @@ This limit ensures identity CIDs remain an optimization for tiny data rather tha
     └── 📁 subdir/         # bafybeicnmple4ehlz3ostv2sbojz3zhh5q7tz5r2qkfdpqfilgggeen7xm
         ├── 📄 ascii.txt   # bafkreifkam6ns4aoolg3wedr4uzrs3kvq66p4pecirz6y2vlrngla62mxm (raw, 31 bytes) "hello application/vnd.ipld.car"
         ├── 📄 hello.txt   # bafkreifjjcie6lypi6ny7amxnfftagclbuxndqonfipmb64f2km2devei4 (raw, 12 bytes) "hello world\n"
-        └── 📄 multiblock.txt  # bafybeigcisqd7m5nf3qmuvjdbakl5bdnh4ocrmacaqkpuh77qjvggmt2sa (dag-pb, 1271 bytes total)
+        └── 📄 multiblock.txt  # bafybeigcisqd7m5nf3qmuvjdbakl5bdnh4ocrmacaqkpuh77qjvggmt2sa (dag-pb, 1026 bytes)
     ```
   - Purpose: Directories containing both single-block raw files and multi-block dag-pb files
   - Validation: Can handle mixed file types in same directory
@@ -1213,7 +1221,7 @@ These limits affect several UnixFS behaviors:
 - Small files that fit in a single chunk (most common: 256 KiB, 1 MiB) are typically
   stored as single `raw` blocks or within the `Data` field of a single `dag-pb` node
 - Directories automatically convert to HAMT sharding when approaching the block size
-  limit (commonly triggered around 256 KiB-1 MiB)
+  limit (256 KiB in both [profiles](#profiles))
 - File chunking algorithms target block sizes that stay within these limits while
   maximizing deduplication opportunities
 
