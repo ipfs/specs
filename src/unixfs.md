@@ -136,10 +136,10 @@ order shown in the chosen variant below.
 The two orderings produce different bytes, and therefore different CIDs, for
 the same logical node:
 
-- `Links`-first is the canonical ordering. It is also the canonical field
-  order of the historical [DAG-PB][ipld-dag-pb] codec specification; for
-  UnixFS data, this document takes precedence over the historical DAG-PB
-  codec specification.
+- `Links`-first is the canonical ordering for UnixFS data. The
+  [DAG-PB][ipld-dag-pb] codec specification permits either order on encode
+  and requires decoders to accept both; where the two documents diverge,
+  this one governs UnixFS data.
 - `Data`-first is opt-in: no profile writes it. Implementations MAY expose an
   explicit setting for writers that need it; enabling it changes the CID of
   every written node.
