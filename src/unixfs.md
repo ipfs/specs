@@ -331,7 +331,7 @@ Examples of where `blocksize` is useful:
 
 #### `decode(PBNode.Data).filesize`
 
-For `Type=File` (0) and `Type=Raw` (2), this field is mandatory. While marked as "optional"
+For `Type=File` (2) and `Type=Raw` (0), this field is mandatory. While marked as "optional"
 in the protobuf schema (for compatibility with other types like Directory), implementations:
 - MUST include this field when creating File or Raw nodes
 - When reading, if this field is absent, MUST interpret it as 0 (zero-length file)
