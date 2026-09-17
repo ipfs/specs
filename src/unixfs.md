@@ -3,7 +3,7 @@ title: UnixFS
 description: >
   UnixFS is a Protocol Buffers-based format for describing files and directories
   as dag-pb DAGs and raw blocks in IPFS.
-date: 2026-09-07
+date: 2026-09-17
 maturity: draft
 editors:
   - name: Marcin Rataj
@@ -224,8 +224,13 @@ it is implied that the `PBNode.Data` field is protobuf-encoded.
 Note that this protobuf definition pre-dates protobuf 3 and more recent editions,
 so the `blocksizes` field is encoded according to protobuf 2 defaults, e.g. it
 does not use [packed](https://protobuf.dev/editions/features/#repeated_field_encoding)
-encoding. Modern implementations should also use the older expanded encoding so
+encoding. Modern implementations SHOULD also use the older expanded encoding so
 generated CIDs are stable for the same data.
+
+The same applies to field presence: protobuf 2 writes a `filesize` of `0`, while
+protobuf 3 omits zero values unless the field is marked `optional`. Omitting it
+changes the CID of the empty file listed in
+[Well-Known UnixFS CIDs](#well-known-unixfs-cids).
 
 ## `dag-pb` Types
 
