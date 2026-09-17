@@ -223,8 +223,9 @@ it is implied that the `PBNode.Data` field is protobuf-encoded.
 
 Note that this protobuf definition precedes protobuf 3 and more recent editions,
 so the `blocksizes` field is encoded according to protobuf 2 defaults, e.g. it
-does not use packed encoding. Modern implementations should also use the older
-non-packed encoding so generated CIDs are stable for the same data.
+does not use [packed](https://protobuf.dev/editions/features/#repeated_field_encoding)
+encoding. Modern implementations should also use the older expanded encoding so
+generated CIDs are stable for the same data.
 
 ## `dag-pb` Types
 
