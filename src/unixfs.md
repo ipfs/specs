@@ -3,7 +3,7 @@ title: UnixFS
 description: >
   UnixFS is a Protocol Buffers-based format for describing files and directories
   as dag-pb DAGs and raw blocks in IPFS.
-date: 2026-09-07
+date: 2026-09-17
 maturity: draft
 editors:
   - name: Marcin Rataj
@@ -199,7 +199,7 @@ message Data {
   DataType Type = 1;          // MUST be present - validate at application layer
   bytes Data = 2;              // file content (File), symlink target (Symlink), bitmap (HAMTShard), unused (Directory)
   uint64 filesize = 3;         // mandatory for Type=File and Type=Raw, defaults to 0 if omitted
-  repeated uint64 blocksizes = 4; // required for multi-block files (Type=File) with Links
+  repeated uint64 blocksizes = 4 [packed=false]; // required for multi-block files (Type=File) with Links
   uint64 hashType = 5;         // required for Type=HAMTShard (currently always murmur3-x64-64)
   uint64 fanout = 6;           // required for Type=HAMTShard (power of 2, max 1024)
   uint32 mode = 7;             // opt-in, AKA UnixFS 1.5
@@ -220,6 +220,17 @@ Summarizing, a `dag-pb` UnixFS node is a [`dag-pb`][ipld-dag-pb] protobuf,
 whose `Data` field is a UnixFSV1 Protobuf message. For clarity, the specification
 document may represent these nested Protobufs as one object. In this representation,
 it is implied that the `PBNode.Data` field is protobuf-encoded.
+
+Note that this protobuf definition pre-dates protobuf 3 and more recent editions,
+so the `blocksizes` field is encoded according to protobuf 2 defaults, e.g. it
+does not use [packed](https://protobuf.dev/editions/features/#repeated_field_encoding)
+encoding. Modern implementations SHOULD also use the older expanded encoding so
+generated CIDs are stable for the same data.
+
+The same applies to field presence: protobuf 2 writes a `filesize` of `0`, while
+protobuf 3 omits zero values unless the field is marked `optional`. Omitting it
+changes the CID of the empty file listed in
+[Well-Known UnixFS CIDs](#well-known-unixfs-cids).
 
 ## `dag-pb` Types
 
@@ -325,7 +336,7 @@ Examples of where `blocksize` is useful:
 
 #### `decode(PBNode.Data).filesize`
 
-For `Type=File` (0) and `Type=Raw` (2), this field is mandatory. While marked as "optional"
+For `Type=File` (2) and `Type=Raw` (0), this field is mandatory. While marked as "optional"
 in the protobuf schema (for compatibility with other types like Directory), implementations:
 - MUST include this field when creating File or Raw nodes
 - When reading, if this field is absent, MUST interpret it as 0 (zero-length file)
