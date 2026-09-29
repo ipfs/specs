@@ -5,7 +5,7 @@ description: >
   overlay network used for peer and content routing in the InterPlanetary File
   System (IPFS). It extends the libp2p Kademlia DHT specification, adapting and
   adding features to support IPFS-specific requirements.
-date: 2025-11-20
+date: 2026-09-01
 maturity: reliable
 editors:
   - name: Guillaume Michel
@@ -107,6 +107,9 @@ The Amino DHT is utilized by multiple IPFS implementations, including
 and can be joined by using the [public good Amino DHT Bootstrappers](https://docs.ipfs.tech/concepts/public-utilities/#amino-dht-bootstrappers).
 :::
 
+Amino DHT Servers that implement [protocol version
+`2.0.0`](#protocol-versions) mount the swarm under `/ipfs/kad/2.0.0` as well.
+
 #### IPFS LAN DHTs
 
 _IPFS LAN DHTs_ are DHT swarms operating exclusively within a local network.
@@ -139,6 +142,33 @@ multiaddresses of at least one existing node participating in the swarm.
 Dedicated bootstrapper nodes MAY be used to facilitate this process. They
 SHOULD be publicly reachable, maintain high availability and possess sufficient
 resources to support the network.
+
+### Protocol Versions
+
+The protocol identifier of a swarm ends with a version, for example
+`/ipfs/kad/1.0.0`. This document defines two versions.
+
+Version `1.0.0` is the base protocol. Version `2.0.0` adds the [`ADD_PROVIDER`
+response](#add_provider-response) that [Provider Record
+Limits](#provider-record-limits) and [Spillover](#spillover) need. The two
+versions are identical in every other respect. `PUT_VALUE`, `GET_VALUE`,
+`GET_PROVIDERS`, `FIND_NODE` and `PING` keep the same message formats and the
+same requirements on both versions.
+
+A swarm that runs both versions follows these rules:
+* A DHT Server that implements version `2.0.0` MUST advertise both versions
+through the libp2p identify protocol, and MUST accept an incoming stream on
+both versions.
+* A node that sends an `ADD_PROVIDER` MUST open the stream on version `2.0.0`
+when the remote peer advertises that version, and MUST open it on version
+`1.0.0` otherwise.
+* On a version `1.0.0` stream, the sender MUST NOT wait for an `ADD_PROVIDER`
+response, and the DHT Server MUST NOT set `providerStatus`.
+
+Protocol negotiation thus tells a sender which version a peer supports before
+the sender writes the request, so the sender spends no timeout on a peer that
+implements version `1.0.0` only. A swarm that drops version `1.0.0` at a later
+date only changes the list of advertised identifiers, and needs no flag day.
 
 ### Client and Server Mode
 
@@ -481,7 +511,9 @@ When a node wants to indicate that it provides the content associated with a
 given CID, it first finds the `k` closest DHT Servers to the Kademlia
 Identifier associated with the CID using [`GetClosestPeers`](#getclosestpeers).
 The `key` in the `FIND_NODE` payload is set to the multihash contained in the
-CID.
+CID. The node keeps every peer that the lookup discovered, sorted by ascending
+XOR distance to the Kademlia Identifier, and not only the `k` closest ones.
+[Spillover](#spillover) uses the rest of that list.
 
 Once the `k` closest DHT Servers are found, the node sends each of them an
 `ADD_PROVIDER` RPC, using the same `key` and setting its own Peer ID as
@@ -494,9 +526,14 @@ datastore:
 2. Discard `providerPeers` whose Peer ID is not matching the sender's Peer ID
 
 Upon successful verification, the DHT Server stores the Provider Record in its
-datastore, and caches the provided public multiaddresses. It responds by
-echoing the request to confirm success. If verification fails, the server MUST
-close the stream without sending a response.
+datastore, and caches the provided public multiaddresses, unless [Provider
+Record Limits](#provider-record-limits) make it reject the record.
+
+On a version `1.0.0` stream, the DHT Server responds by echoing the request to
+confirm success. If verification fails, the server MUST close the stream without
+sending a response. On a version `2.0.0` stream, the server answers with the
+[`ADD_PROVIDER` response](#add_provider-response) instead, both for a success
+and for a failure.
 
 #### Provide Validity
 
@@ -519,6 +556,183 @@ content provider alongside the provide record, avoiding an additional DHT walk
 for the Client
 ([rationale](https://github.com/probe-lab/network-measurements/blob/master/results/rfm17.1-sharing-prs-with-multiaddresses.md)).
 
+#### Provider Record Limits
+
+For a popular CID, the `k` closest DHT Servers to its Kademlia Identifier
+receive every `ADD_PROVIDER` for that CID, and they store one Provider Record
+per provider, with no limit. A DHT Server MAY set a maximum number of distinct providers
+per key, `maxProvidersPerKey`, to limit that load.
+
+The server counts the distinct provider Peer IDs that it stores for the key. If
+that count reaches `maxProvidersPerKey`, and the server holds no record for the
+key from the sender of the `ADD_PROVIDER`, the server MUST reject the request or
+evict a stored record. [Eviction](#eviction) gives the rules.
+
+A server MUST always accept a re-advertisement from a provider that it already
+stores for the key, whatever the limit is, so that an existing provider can
+refresh its record.
+
+`maxProvidersPerKey` has no default value. A server that sets it MUST keep the
+value at the replication factor `k` or above. With a value below `k`, the `k`
+closest servers alone cannot resolve even an unpopular key. The RECOMMENDED
+value is `1000`. A client stops after a few dozen usable providers, so a limit
+three orders of magnitude above `k` caps the storage cost and the CPU cost of a
+hotspot, and keeps a popular key fully resolvable. This value is provisional.
+Implementations SHOULD measure the live network and correct it, as they do for
+the [republish interval](#provider-record-republish-interval) and the [provide
+validity](#provide-validity).
+
+DHT Servers SHOULD also enforce coarser limits, such as the total number of
+Provider Records stored, and the total number of keys that they hold records
+for.
+
+A DHT Server MAY reject an `ADD_PROVIDER` for another reason than a limit, for
+example a local policy. The rules below apply to every rejection.
+
+#### Eviction
+
+A DHT Server always accepts a re-advertisement, so the first
+`maxProvidersPerKey` providers of a key can hold their slots forever, and they
+only have to refresh their records. The stored set then freezes around the
+providers that arrived first. A DHT Server MAY add an eviction policy to
+`maxProvidersPerKey` to let the set rotate.
+
+Eviction and rejection are exclusive, and eviction takes precedence:
+* If the server evicts a record, it MUST store the new record, and it MUST
+answer `ACCEPTED`.
+* If the server evicts no record, it MUST keep every stored record, and it MUST
+answer `REJECTED`.
+
+A server MUST NOT evict a record and answer `REJECTED`. That combination drops a
+provider and stores no replacement.
+
+A policy that evicts the record with the oldest `timeReceived` is unsafe on its
+own. An attacker rotates its Peer ID, looks like a new provider on every
+request, and flushes the honest providers out of the `k` closest servers at a
+cost of one request per eviction. The base protocol has no such censorship
+vector, because it removes no record before its expiration.
+
+A DHT Server that evicts MUST select the eviction candidates only among the
+records whose `timeReceived` is older than the [republish
+interval](#provider-record-republish-interval). Such a record passed the moment
+at which its provider had to refresh it. A provider that republishes on schedule
+thus keeps its slot, and an attacker that rotates its Peer ID gains nothing over
+an attacker that waits.
+
+#### `ADD_PROVIDER` Response
+
+On a version `2.0.0` stream, a DHT Server that receives an `ADD_PROVIDER` MUST
+write one response message, and MUST then close its side of the stream. The
+response is a new message, and not a copy of the request. It carries these
+fields:
+
+| Field | Presence | Value |
+|-------|----------|-------|
+| `type` | MUST | `ADD_PROVIDER` |
+| `key` | MUST | the `key` of the request |
+| `providerStatus` | MUST | see below |
+
+The server MUST leave every other field empty, and returns no `providerPeers`
+and no `closerPeers`. If another field is present, the sender MUST ignore it.
+
+`providerStatus` is a response-only field. A sender MUST NOT set it in an
+`ADD_PROVIDER` request, and a DHT Server MUST ignore it when an incoming request
+carries it.
+
+The status values are:
+* `ACCEPTED`: the server stored the Provider Record.
+* `REJECTED`: the server did not store the Provider Record, because of a limit
+or of a local policy. The request is well formed, so the same request MAY
+succeed at another server.
+* `INVALID`: the request is malformed, and no other server accepts it either. A
+server MUST answer `INVALID` when a check of [Content Provider
+Advertisement](#content-provider-advertisement) fails, which means that `key` is
+absent, that `key` exceeds `80` bytes, or that no entry of `providerPeers`
+matches the Peer ID of the sender.
+
+#### Outcome Classification
+
+A node that advertises classifies each `ADD_PROVIDER` attempt as exactly one
+outcome. Only the first two outcomes count towards the replication factor `k`.
+
+| Outcome | Counts towards `k` |
+|---------|--------------------|
+| version `2.0.0`, response with `providerStatus = ACCEPTED` | yes |
+| version `1.0.0`, request written successfully | yes |
+| version `2.0.0`, response with `providerStatus = REJECTED` | no |
+| version `2.0.0`, response with `providerStatus = INVALID` | no, see below |
+| version `2.0.0`, response without `providerStatus` | no |
+| dial failure, stream reset, or write failure | no |
+| stream closed before a response arrived | no |
+| response timeout | no |
+
+A version `1.0.0` request counts as soon as the write succeeds, because the base
+protocol gives the sender no other information. It is the only outcome that
+counts without a response.
+
+A response without `providerStatus` on a version `2.0.0` stream violates this
+specification. The sender MUST count that attempt as a failure, and MUST NOT
+assume that the server stored the record.
+
+A transport failure MUST NOT count towards `k`. Silence tells the sender nothing
+about storage. If silence counted, a peer that drops streams would absorb
+placements and hold no record.
+
+If a server answers `INVALID`, the sender SHOULD stop the advertisement for that
+key, and SHOULD report the error to the caller. Every other server applies the
+same checks and answers `INVALID` too, so another attempt gains nothing.
+
+#### Spillover
+
+When the `k` closest DHT Servers do not all store the Provider Record, the
+advertising node continues with the peers that its lookup found farther from the
+Kademlia Identifier. Each extra batch of `ADD_PROVIDER` requests is a spillover
+round.
+
+The node splits the sorted candidate list of the [Content Provider
+Advertisement](#content-provider-advertisement) into chunks of `α` peers, and
+walks the chunks from the closest to the farthest:
+1. Send `ADD_PROVIDER` to every peer of the current chunk at the same time, on
+the version that each peer advertises.
+2. Classify each attempt with [Outcome
+Classification](#outcome-classification), and add the successful ones to the
+count.
+3. Stop when the count reaches `k`.
+4. Continue with the next chunk while the count stays below `k`. Each of these
+chunks is a spillover round.
+5. Stop when no chunk remains. The node stored fewer than `k` records, and it
+SHOULD report how many it stored.
+
+The first `⌈k/α⌉` chunks hold the `k` closest peers, which is the set that a node
+advertises to without this extension. With `k` = 20 and `α` = 10, these are the
+first two chunks. If those peers store every record, the node stops there, and
+no spillover round happens.
+
+A node SHOULD use a larger request timeout in a spillover round than in the
+first chunks, because it is less likely to already hold a connection to a peer
+that is farther from the key.
+
+#### Deployment
+
+If DHT Servers enforce `maxProvidersPerKey` before the advertising nodes can
+read a rejection, those nodes lose Provider Records with no signal and no
+fallback. Implementations SHOULD deploy this extension in this order.
+1. **Advertising nodes first.** Add version `2.0.0`: the response reader, the
+outcome classification and the spillover. Leave `maxProvidersPerKey` unset. Only
+the negotiated version changes on the wire, and every server still stores every
+record.
+2. **Lookups next.** Add the [Content Provider Lookup](#content-provider-lookup)
+change, so that a client finds a record that spilled over before the first
+record spills over.
+3. **Servers last.** Set `maxProvidersPerKey` only when most of the incoming
+`ADD_PROVIDER` requests that a server sees arrive on version `2.0.0`. Adoption
+on this scale takes months. An implementation SHOULD measure that share, and
+decide from it.
+4. **Version `1.0.0` requests.** While many nodes still advertise on version
+`1.0.0`, a server that enforces `maxProvidersPerKey` SHOULD apply the limit to
+version `2.0.0` requests only, because it cannot tell a version `1.0.0` sender
+that it dropped the record.
+
 ### Content Provider Lookup
 
 To find providers for a given CID, a node initiates a lookup using the
@@ -530,6 +744,21 @@ Clients MAY terminate the lookup early if they are satisfied with the returned
 providers. If a node does not find any provider records and is unable to
 discover closer DHT servers after querying the `β` closest reachable servers,
 the request is considered a failure.
+
+A Provider Record that [spilled over](#spillover) sits on a DHT Server outside
+the `k` closest servers to the Kademlia Identifier, so a client that queries
+only the `k` closest servers never finds it. `GET_PROVIDERS` is unchanged, and
+only the point at which a client stops changes. A client that runs an iterative
+lookup already moves outwards from the closest servers. While it holds fewer
+providers than it wants, it SHOULD continue past the `k` closest servers, and
+query the next chunk of `α` candidates in ascending distance order, as
+[Spillover](#spillover) does. It stops when it holds enough providers, or when
+no candidate remains.
+
+Some clients skip the iterative lookup, and take the `k` closest servers
+directly from a full routing table. Such a client SHOULD extend its query set in
+the same way, because the `k` closest servers return the providers that arrived
+first, and hide every provider that spilled over.
 
 ## Value Storage and Retrieval
 
@@ -690,6 +919,18 @@ message Message {
         CANNOT_CONNECT = 3;
     }
 
+    enum AddProviderStatus {
+        // the DHT Server stored the provider record
+        ACCEPTED = 0;
+
+        // the DHT Server did not store the provider record, because of a limit
+        // or of a local policy
+        REJECTED = 1;
+
+        // the request is malformed, and every other DHT Server rejects it too
+        INVALID = 2;
+    }
+
     message Peer {
         // ID of a given peer.
         bytes id = 1;
@@ -723,6 +964,12 @@ message Message {
     // Used to return Providers
     // GET_VALUE, ADD_PROVIDER, GET_PROVIDERS
     repeated Peer providerPeers = 9;
+
+    // Used to report whether the provider record was stored.
+    // ADD_PROVIDER responses on protocol version 2.0.0 only.
+    // The field is optional because a sender distinguishes an absent status
+    // from ACCEPTED.
+    optional AddProviderStatus providerStatus = 11;
 }
 ```
 
@@ -747,13 +994,17 @@ the `k` closest known `closerPeers`.
 
 * `ADD_PROVIDER`: In the request `key` is set to the multihash contained in the
 target CID. The target node verifies `key` is a valid multihash, all
-`providerPeers` matching the RPC sender's PeerID are recorded as providers.
+`providerPeers` matching the RPC sender's PeerID are recorded as providers. On
+protocol version `2.0.0`, the target node reports the outcome in
+`providerStatus`, see [`ADD_PROVIDER` response](#add_provider-response).
 
 * `PING`: Deprecated message type replaced by the dedicated [ping
 protocol](https://github.com/libp2p/specs/blob/master/ping/ping.md).
 
 If a DHT server receives an invalid request, it simply closes the libp2p stream
-without responding.
+without responding. An `ADD_PROVIDER` on protocol version `2.0.0` is the
+exception: the server answers `INVALID` instead of closing the stream, see
+[`ADD_PROVIDER` response](#add_provider-response).
 
 # Appendix: Notes for Implementers
 
