@@ -2,7 +2,7 @@
 title: Specification Title
 description: >
   Specification short description.
-date: YYYY-MM_DD
+date: YYYY-MM-DD
 maturity: wip
 editors:
   - name: Your Name

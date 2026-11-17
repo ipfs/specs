@@ -3,8 +3,8 @@ title: IPNS Record and Protocol
 description: >
   Specifies the IPNS protocol in a language-agnostic manner, allowing everyone to
   create a compatible IPNS Record Publisher or Resolver.
-date: 2025-02-28
-maturity: reliable
+date: 2026-11-03
+maturity: stable
 editors:
   - name: Vasco Santos
     github: vasco-santos

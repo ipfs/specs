@@ -1,8 +1,8 @@
 ---
 title: IPNS PubSub Router
 description: Specifies how to publish and retrieve IPNS records using libp2p PubSub router.
-date: 2022-11-09
-maturity: reliable
+date: 2026-11-03
+maturity: draft
 editors:
   - name: Adin Schmahmann
     github: aschmahmann

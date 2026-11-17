@@ -4,8 +4,8 @@ description: >
   IPFS is a suite of specifications and tools that are defined by two key characteristics: content-addressing and
   transport-agnosticity. This document provides context and details about these characteristics. In doing so it defines what
   is or is not an IPFS implementation.
-date: 2023-03-28
-maturity: reliable
+date: 2026-11-03
+maturity: stable
 editors:
   - name: Robin Berjon
     email: robin@berjon.com

@@ -3,8 +3,8 @@ title: Web _redirects File Specification
 description: >
   Defines how URL redirects and rewrites can be implemented by adding rules to
   a plain text file stored underneath the root CID of a website.
-date: 2025-03-19
-maturity: reliable
+date: 2026-11-03
+maturity: stable
 editors:
   - name: Justin Johnson
     github: justincjohnson

@@ -5,8 +5,8 @@ description: >
   addressed blocks of data. It attempts to acquire blocks from the p2p network
   that have been requested by the client, and also send blocks to others who
   want them.
-date: 2022-08-26
-maturity: reliable
+date: 2026-11-03
+maturity: stable
 editors:
   - name: Juan Benet
     github: jbenet

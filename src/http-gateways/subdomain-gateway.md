@@ -6,8 +6,8 @@ description: >
   ensures compatibility with native ipfs:// and ipns:// URIs, and aligns with
   the existing Same-origin security model in web browsers, including
   relative URL pathing and permission scopes of Web APIs.
-date: 2025-04-03
-maturity: reliable
+date: 2026-11-03
+maturity: stable
 editors:
   - name: Marcin Rataj
     github: lidel

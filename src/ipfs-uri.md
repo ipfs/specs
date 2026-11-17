@@ -3,8 +3,8 @@ title: IPFS URI (ipfs://)
 description: >
   The ipfs:// URI scheme for addressing immutable, content-addressed data by
   CID, defined for interoperability with web browsers.
-date: 2026-08-03
-maturity: reliable
+date: 2026-11-03
+maturity: stable
 editors:
   - name: Marcin Rataj
     github: lidel

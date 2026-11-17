@@ -3,8 +3,8 @@ title: DNSLink Gateway Specification
 description: >
   Defines how to utilize the HTTP Host header to serve a content path from a
   DNSLink record as a website under a particular DNS name.
-date: 2022-11-09
-maturity: reliable
+date: 2026-11-03
+maturity: stable
 editors:
   - name: Marcin Rataj
     github: lidel

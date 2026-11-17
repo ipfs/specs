@@ -4,8 +4,8 @@ description: >
   The comprehensive low-level HTTP Gateway enables the integration of IPFS
   resources into the HTTP stack through /ipfs and /ipns namespaces, supporting
   both deserialized and verifiable response types.
-date: 2026-08-24
-maturity: reliable
+date: 2026-11-03
+maturity: stable
 editors:
   - name: Marcin Rataj
     github: lidel
