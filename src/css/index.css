@@ -163,3 +163,8 @@ footer a {
 footer img {
   vertical-align: text-bottom;
 }
+
+dt img.maturity {
+  vertical-align: middle;
+  margin-left: 0.4em;
+}
