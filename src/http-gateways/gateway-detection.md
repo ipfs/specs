@@ -3,8 +3,8 @@ title: User-Preferred Gateway Detection
 description: >
   How applications detect the user-preferred IPFS Gateway via the
   IPFS_GATEWAY environment variable or a well-known gateway file.
-date: 2026-08-07
-maturity: reliable
+date: 2026-11-03
+maturity: stable
 editors:
   - name: Mark Gaiser
     github: markg85

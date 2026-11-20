@@ -2,8 +2,8 @@
 title: CID (Content IDentifier)
 description: >
     Self-describing content-addressed identifiers for distributed systems
-date: 2026-06-26
-maturity: permanent
+date: 2026-11-03
+maturity: stable
 editors:
   - name: Marcin Rataj
     github: lidel

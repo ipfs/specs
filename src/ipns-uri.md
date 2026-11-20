@@ -3,8 +3,8 @@ title: IPNS URI (ipns://)
 description: >
   The ipns:// URI scheme for addressing mutable pointers, cryptographic IPNS
   names and DNSLink names, defined for interoperability with web browsers.
-date: 2026-08-03
-maturity: reliable
+date: 2026-11-03
+maturity: stable
 editors:
   - name: Marcin Rataj
     github: lidel

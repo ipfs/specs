@@ -5,8 +5,8 @@ description: >
   overlay network used for peer and content routing in the InterPlanetary File
   System (IPFS). It extends the libp2p Kademlia DHT specification, adapting and
   adding features to support IPFS-specific requirements.
-date: 2025-11-20
-maturity: reliable
+date: 2026-11-03
+maturity: stable
 editors:
   - name: Guillaume Michel
     url: https://guillaume.michel.id

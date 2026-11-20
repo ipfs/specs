@@ -1,12 +1,7 @@
 # This is a CODEOWNERS file
 # Each line is a file pattern followed by one or more owners.
-# Order is important; the last matching pattern takes the most precedence.
 # See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 
-# global IPIP
-IPIP/ @ipfs/specs-stewards
-src/ipips/ @ipfs/specs-stewards
-
-# Selected Spec Stewards can be defined below to be automatically requested for
-# review when someone opens a pull request that modifies area of their
-# interest.
+# The stewards are requested for review on every change. The list of stewards
+# lives in src/meta/ipip-process.md; keep this file in step with it.
+* @darobin @mishmosh

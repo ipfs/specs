@@ -2,8 +2,8 @@
 title: Compact Denylist Format
 description: >
   How content blocking rules can be represented as a .deny file.
-date: 2023-08-24
-maturity: reliable
+date: 2026-11-03
+maturity: stable
 editors:
   - name: Hector Sanjuan
     github: hsanjuan

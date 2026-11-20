@@ -3,7 +3,7 @@ title: Spec for Specs
 description: >
   Specifies the format and system used to create and maintain specifications for
   the interplanetary stack.
-date: 2023-03-14
+date: 2026-11-03
 maturity: stable
 editors:
   - name: Robin Berjon
@@ -86,14 +86,24 @@ Each person as well as the affiliation MUST have a `name`; every other field is 
 
 The `xref` field exemplified above is described in the [references](#refs) section.
 
-The `maturity` field indicates the document's stability. This list is subject to revision, but the
-maturity levels currently supported are:
-- ![draft](https://img.shields.io/badge/status-draft-yellow.svg?style=flat-square)
-- ![WIP](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
-- ![reliable](https://img.shields.io/badge/status-reliable-green.svg?style=flat-square)
-- ![stable](https://img.shields.io/badge/status-stable-brightgreen.svg?style=flat-square)
-- ![permanent](https://img.shields.io/badge/status-permanent-blue.svg?style=flat-square)
-- ![deprecated](https://img.shields.io/badge/status-deprecated-red.svg?style=flat-square)
+The `maturity` field indicates the document's stability. It MUST be one of the following four values:
+
+- ![wip](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) `wip`: not yet a
+  specification. An idea being written up ahead of a proposal; it may change completely or disappear.
+- ![draft](https://img.shields.io/badge/status-draft-yellow.svg?style=flat-square) `draft`: a specification
+  being worked on. It should be implementable, but it is likely to change and implementers should expect to
+  track it.
+- ![stable](https://img.shields.io/badge/status-stable-brightgreen.svg?style=flat-square) `stable`:
+  implemented and relied upon. A stable :ref[spec] MAY receive fixes and clarifications, but it MUST NOT
+  receive a change that alters the behaviour of a conforming implementation unless that change has gone
+  through the IPIP process (:cite[ipip-process]). This is the expected state for most interplanetary :ref[specs].
+- ![deprecated](https://img.shields.io/badge/status-deprecated-red.svg?style=flat-square) `deprecated`: no
+  longer in use. The document will not change, and new implementations should not be written.
+
+The maturity describes the document, not the protocol it specifies: a protocol that has been deployed for
+years can still have a `draft` :ref[spec] if the text has not caught up with what implementations do.
+A change of maturity is a change to the document and SHOULD be made in its own pull request, with the
+`date` field updated.
 
 The `date` field is a `YYYY-MM-DD` specification of the last dated change to the spec.
 

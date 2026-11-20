@@ -149,3 +149,18 @@ durable and give the pin a name that ties it back to the document, for example
 When a fixture's definition changes, the CID changes. Re-pin the new CID and
 update the attachment in the same PR. A stale pin under the right name is
 indistinguishable from a healthy one until someone tries to fetch it.
+
+## Maturity Levels
+
+Every spec carries a `maturity` (in its front matter): `wip`, `draft`, `stable`
+or `deprecated`. See [Spec for Specs](src/meta/spec-for-specs.md) for details.
+Most specs here are `stable`: they are implemented and relied upon, and do not
+need work.
+
+- A `stable` spec takes fixes and clarifications only: text that disagrees
+  with the fixtures or with what the implementations do, missing details for interoperability,
+  broken links. Such a change must not alter the behavior of a conforming
+  implementation.
+- Please do not invent new maturity levels.
+- When a spec's text changes, update its `date:`.
+- A `deprecated` spec is frozen. Fix a broken link, if necessary.

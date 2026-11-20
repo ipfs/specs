@@ -1,7 +1,19 @@
 <dl>
   {% assign sortedPosts = posts | sortByOrder %}
   {%- for post in sortedPosts -%}
-    <dt><a href="{{ post.url }}">{{ post.data.title }}</a></dt>
+    {%- case post.data.maturity -%}
+      {%- when 'stable' -%}{%- assign maturityColour = 'brightgreen' -%}
+      {%- when 'draft' -%}{%- assign maturityColour = 'yellow' -%}
+      {%- when 'wip' -%}{%- assign maturityColour = 'orange' -%}
+      {%- when 'deprecated' -%}{%- assign maturityColour = 'red' -%}
+      {%- else -%}{%- assign maturityColour = 'lightgrey' -%}
+    {%- endcase -%}
+    <dt>
+      <a href="{{ post.url }}">{{ post.data.title }}</a>
+      {%- if post.data.maturity %}
+      <img class="maturity" src="https://img.shields.io/badge/status-{{ post.data.maturity }}-{{ maturityColour }}.svg?style=flat-square" alt="status: {{ post.data.maturity }}" height="20">
+      {%- endif %}
+    </dt>
     <dd>{{ post.data.description }}</dd>
   {%- endfor -%}
 </dl>
