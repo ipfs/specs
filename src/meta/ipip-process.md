@@ -41,11 +41,6 @@ upon, and most of them carry the `stable` maturity defined in
 alter what conforming implementations do. There is no team working on new
 specifications and no review schedule.
 
-This is a deliberate choice, not an accident of neglect. A stable
-specification that nobody is editing is doing its job. What the process below
-guarantees is that mistakes still get fixed, that proposals still get a fair
-hearing, and that anyone can tell who to ask.
-
 [1]: https://github.com/ipfs/specs/
 
 ### Stewards
@@ -57,7 +52,7 @@ who ratify IPIPs. The current stewards are:
 - Michelle Lee ([@mishmosh](https://github.com/mishmosh))
 
 The `CODEOWNERS` file requests their review on every pull request. Stewards
-triage on a best-effort basis; expect days to weeks, not hours.
+triage on a best-effort basis; expect days to weeks.
 
 The editors named in the header of each specification are the first point of
 contact for that document. They are the people who know why it says what it

@@ -5,15 +5,15 @@
 ## Maintenance status
 
 This repository is maintained in a low-activity mode. The specifications in it
-describe a protocol stack that is deployed and stable. Most of them carry the
-`stable` badge, which means they change only to fix errors or to clarify text,
-and there is no team working on new specifications.
+describe a protocol stack that is deployed and stable. Most of them are
+`stable`, which means they change only to fix errors or to clarify text,
+and no team is working on new specifications.
 
 Proposals are still welcome. They go through the
-[IPIP process](https://specs.ipfs.tech/meta/ipip-process/), which names the
-current stewards and explains what to expect from review: there is no schedule,
+[IPIP process](https://specs.ipfs.tech/meta/ipip-process/), which explains what
+to expect from review: we are not committed to a specific schedule
 and a proposal moves when it comes with working code and a reviewer who knows
-the area.
+the area available.
 
 ## Documentation and Community
 
@@ -23,18 +23,14 @@ See [Documentation](https://docs.ipfs.tech),
 [Discussion Forums](https://discuss.ipfs.tech/), and other
 [Community Resources](https://docs.ipfs.tech/community/) instead.
 
-## Spec maturity
+## Spec Maturity
 
 Each specification carries a maturity badge in its header:
 
 - ![wip](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square) - Not yet a specification: an idea being written up ahead of a proposal. May change completely or disappear.
 - ![draft](https://img.shields.io/badge/status-draft-yellow.svg?style=flat-square) - A specification being worked on. It should be implementable, but it is likely to change and implementers should expect to track it.
-- ![stable](https://img.shields.io/badge/status-stable-brightgreen.svg?style=flat-square) - Implemented and relied upon. May receive fixes and clarifications, but no breaking changes. A breaking change to a stable specification requires an IPIP.
+- ![stable](https://img.shields.io/badge/status-stable-brightgreen.svg?style=flat-square) - Implemented and relied upon. May receive fixes and clarifications, but no breaking changes.
 - ![deprecated](https://img.shields.io/badge/status-deprecated-red.svg?style=flat-square) - No longer in use. Will not change; do not implement.
-
-The badge describes the specification text, not the protocol: a `draft` badge
-on a protocol that has shipped for years means the document is still catching
-up with what implementations do.
 
 [Spec for Specs](https://specs.ipfs.tech/meta/spec-for-specs/) defines the
 document format, including the `maturity` field.
